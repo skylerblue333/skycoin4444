@@ -11,7 +11,7 @@
  */
 
 import { getDb } from "./db";
-import * as schema from "../drizzle";
+import * as schema from "../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { invokeLLM } from "./_core/llm";
 

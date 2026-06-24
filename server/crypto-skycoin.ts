@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getDb, placeTrade, updateWalletBalance, getWallet } from "./db";
-import { trades } from "../drizzle";
+import { trades } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 // ─── MARKET DATA (FICTIONAL) ────────────────────────────────────────────

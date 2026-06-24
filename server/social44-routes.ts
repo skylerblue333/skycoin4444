@@ -6,7 +6,7 @@ import {
   storyHighlights, bookmarks, reactions,
   broadcastChannels, broadcastSubscriptions, broadcastMessages,
   directMessages,
-} from "../drizzle";
+} from "../drizzle/schema";
 import { eq, desc, and, sql, or } from "drizzle-orm";
 
 export const social44Router = router({

@@ -24,7 +24,7 @@ import {
   aiAgentActivity,
   dailyRaritySnapshots,
   posts,
-} from "../drizzle";
+} from "../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
 
 // ─── Agent Definitions ────────────────────────────────────────────────────────

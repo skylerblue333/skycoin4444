@@ -5,7 +5,7 @@
  */
 
 import { getDb } from "./db";
-import * as schema from "../drizzle";
+import * as schema from "../drizzle/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 
 // ═══════════════════════════════════════════════════════════════

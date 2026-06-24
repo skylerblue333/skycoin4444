@@ -13,7 +13,7 @@
  */
 
 import { getDb } from "./db";
-import * as schema from "../drizzle";
+import * as schema from "../drizzle/schema";
 import { eq, and, desc, sql, gte, count } from "drizzle-orm";
 
 // ═══════════════════════════════════════════════════════════════

@@ -8,7 +8,7 @@
 // ════════════════════════════════════════════════════════════════════════
 import { invokeLLM } from "./_core/llm";
 import * as repo from "./db-intelligence";
-import type { Opportunity } from "../drizzle";
+import type { Opportunity } from "../drizzle/schema";
 
 // Extract the assistant text content from an invokeLLM result.
 function textOf(result: Awaited<ReturnType<typeof invokeLLM>>): string {

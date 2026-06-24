@@ -34,7 +34,7 @@ import {
   type MissionStep,
   type StartupBlueprint,
   type AiMarketListing,
-} from "../drizzle";
+} from "../drizzle/schema";
 
 // ── Shared types ──────────────────────────────────────────────────────────
 export type TwinGoal = { id: string; title: string; status: string; target?: string; createdAt: number };
