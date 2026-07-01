@@ -50,10 +50,13 @@ export function getMockMarketData() {
 // ─── STRIPE MODULE ────────────────────────────────────────────────────────
 
 let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2026-04-22.dahlia' as any,
-  });
+function getStripeInstance(): Stripe | null {
+  if (!stripe && process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2026-04-22.dahlia' as any,
+    });
+  }
+  return stripe;
 }
 
 export async function createStripeCheckoutSession(
@@ -62,9 +65,10 @@ export async function createStripeCheckoutSession(
   userId: number,
   userEmail: string
 ) {
-  if (!stripe) throw new Error('Stripe not configured');
+  const stripeClient = getStripeInstance();
+  if (!stripeClient) throw new Error('Stripe not configured');
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await stripeClient.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [
       {
@@ -92,14 +96,15 @@ export async function createStripeSubscription(
   userEmail: string,
   priceId: string
 ) {
-  if (!stripe) throw new Error('Stripe not configured');
+  const stripeClient = getStripeInstance();
+  if (!stripeClient) throw new Error('Stripe not configured');
 
-  const customer = await stripe.customers.create({
+  const customer = await stripeClient.customers.create({
     email: userEmail,
     metadata: { userId: userId.toString() },
   });
 
-  const subscription = await stripe.subscriptions.create({
+  const subscription = await stripeClient.subscriptions.create({
     customer: customer.id,
     items: [{ price: priceId }],
     payment_behavior: 'default_incomplete',
