@@ -273,13 +273,13 @@ export default function SkySchoolFull() {
                       <Button
                         size="sm"
                         className="h-7 text-xs bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-300 border border-cyan-500/30"
-                        onClick={e => {
+                        onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
                           if (!isAuthenticated) {
                             toast.error("Sign in to enroll");
                             return;
                           }
-                          enrollMutation.mutate({ courseId: course.id });
+                          enrollMutation.mutate({ courseId: course.id as string });
                         }}
                       >
                         <Play className="w-3 h-3 mr-1" />

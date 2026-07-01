@@ -73,6 +73,7 @@ const GameRoulette = lazy(() => import("./pages/GameRoulette"));
 const GamePlinko = lazy(() => import("./pages/GamePlinko"));
 const TrumpMining = lazy(() => import("./pages/TrumpMining"));
 const HopeAI = lazy(() => import("./pages/HopeAI"));
+const HopeAIMeta = lazy(() => import("./pages/HopeAIMeta"));
 const MissionControl = lazy(() => import("./pages/MissionControl"));
 const GlobalOperationsCenter = lazy(() => import("./pages/GlobalOperationsCenter"));
 const AIToolsHub = lazy(() => import("./pages/AIToolsHub"));
@@ -272,6 +273,7 @@ function LegacyRouter() {
         <Route path="/game/plinko" component={GamePlinko} />
         <Route path="/trump-mining" component={TrumpMining} />
         <Route path="/hope-ai" component={HopeAI} />
+        <Route path="/hope-ai-meta" component={HopeAIMeta} />
         <Route path="/mission-control" component={MissionControl} />
         <Route path="/command-center">{() => <Redirect to="/mission-control" />}</Route>
         <Route path="/global-ops" component={GlobalOperationsCenter} />
