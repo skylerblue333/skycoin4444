@@ -190,7 +190,8 @@ class AICodeImprover {
         ],
       });
 
-      log.changes = response.choices[0]?.message?.content || 'No suggestions generated';
+      const content = response.choices[0]?.message?.content;
+      log.changes = typeof content === 'string' ? content : 'No suggestions generated';
       log.status = 'completed';
 
       await notifyOwner({
@@ -239,7 +240,8 @@ class AICodeImprover {
         ],
       });
 
-      log.changes = response.choices[0]?.message?.content || 'No suggestions generated';
+      const testContent = response.choices[0]?.message?.content;
+      log.changes = typeof testContent === 'string' ? testContent : 'No suggestions generated';
       log.status = 'completed';
 
       return log;
@@ -286,7 +288,8 @@ class AICodeImprover {
         ],
       });
 
-      log.changes = response.choices[0]?.message?.content || 'No suggestions generated';
+      const refactorContent = response.choices[0]?.message?.content;
+      log.changes = typeof refactorContent === 'string' ? refactorContent : 'No suggestions generated';
       log.status = 'completed';
 
       return log;

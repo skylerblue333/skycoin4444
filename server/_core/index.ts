@@ -13,6 +13,8 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { healthRouter, healthMonitor } from "../health-monitor";
+import { miningRouter } from "../autonomous-mining";
+import { registerMiningHeartbeats } from "../mining-heartbeat";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -52,6 +54,10 @@ async function startServer() {
   
   // Health monitoring routes
   app.use("/api", healthRouter);
+  app.use("/api", miningRouter);
+
+  // Register mining heartbeat tasks
+  registerMiningHeartbeats().catch(err => console.error('[Mining] Failed to register heartbeats:', err));
   app.use(compression({ level: 6, threshold: 1024 }) as any);
   app.use(isDev ? morgan("dev") : morgan("combined", { skip: (req) => req.path === "/api/health" }));
   app.use(globalLimiter);
@@ -235,6 +241,12 @@ async function startServer() {
         await import("../emergent-economy-engine.js");
         console.log("[EmergentEconomy] Engine loaded");
       } catch (e) { console.warn("[EmergentEconomy] Engine load failed:", e); }
+      try {
+        // Start autonomous mining system
+        const { autonomousMining } = await import("../autonomous-mining");
+        await autonomousMining.startMining();
+        console.log("[Mining] Autonomous mining started");
+      } catch (e) { console.warn("[Mining] Autonomous mining start failed:", e); }
     })();
   });
 }
