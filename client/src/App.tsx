@@ -128,6 +128,7 @@ const CryptoResearchHub = lazy(() => import("./pages/CryptoResearchHub"));
 const MiningCalculator = lazy(() => import("./pages/MiningCalculator"));
 const MinerDashboard = lazy(() => import("./pages/MinerDashboard"));
 const MiningDashboard = lazy(() => import("./pages/MiningDashboard"));
+const PresentationWithChat = lazy(() => import("./pages/PresentationWithChat"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AIModerationQueue = lazy(() => import("./pages/AIModerationQueue"));
 const Security = lazy(() => import("./pages/Security"));
@@ -350,6 +351,7 @@ function LegacyRouter() {
         <Route path="/mining-calculator" component={MiningCalculator} />
         <Route path="/miner-dashboard" component={MinerDashboard} />
         <Route path="/mining" component={MiningDashboard} />
+        <Route path="/presentation" component={PresentationWithChat} />
         <Route path="/admin-panel">{() => <Redirect to="/admin" />}</Route>
         <Route path="/admin/moderation" component={AIModerationQueue} />
           <Route path="/2fa" component={TwoFactorSetup} />
