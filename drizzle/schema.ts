@@ -1913,3 +1913,160 @@ export const onChainTransactions = mysqlTable("on_chain_transactions", {
 
 export type CustodyWallet = typeof custodyWallets.$inferSelect;
 export type OnChainTransaction = typeof onChainTransactions.$inferSelect;
+
+// ═══════════════════════════════════════════════════════════════
+// DATING SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+export const datingProfiles = mysqlTable("dating_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  age: int("age"),
+  gender: mysqlEnum("gender", ["male", "female", "non-binary", "prefer_not_to_say"]),
+  lookingFor: mysqlEnum("lookingFor", ["male", "female", "non-binary", "everyone"]),
+  bio: text("bio"),
+  interests: json("interests"), // string[]
+  photos: json("photos"), // { url: string, order: number }[]
+  height: varchar("height", { length: 10 }),
+  bodyType: varchar("bodyType", { length: 50 }),
+  ethnicity: varchar("ethnicity", { length: 50 }),
+  religion: varchar("religion", { length: 50 }),
+  education: varchar("education", { length: 100 }),
+  occupation: varchar("occupation", { length: 100 }),
+  smoker: mysqlEnum("smoker", ["yes", "no", "sometimes"]),
+  drinker: mysqlEnum("drinker", ["yes", "no", "sometimes"]),
+  hasKids: boolean("hasKids").default(false),
+  wantsKids: mysqlEnum("wantsKids", ["yes", "no", "maybe", "unsure"]),
+  relationshipGoal: mysqlEnum("relationshipGoal", ["casual", "serious", "marriage", "unsure"]),
+  verificationStatus: mysqlEnum("verificationStatus", ["unverified", "email_verified", "phone_verified", "id_verified"]).default("unverified"),
+  profileCompleteness: int("profileCompleteness").default(0),
+  isActive: boolean("isActive").default(true),
+  lastActiveAt: timestamp("lastActiveAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const datingMatches = mysqlTable("dating_matches", {
+  id: int("id").autoincrement().primaryKey(),
+  user1Id: int("user1Id").notNull(),
+  user2Id: int("user2Id").notNull(),
+  matchType: mysqlEnum("matchType", ["like", "superlike", "mutual_like", "mutual_superlike"]).default("like"),
+  compatibilityScore: decimal("compatibilityScore", { precision: 5, scale: 2 }).default("0"),
+  isMutual: boolean("isMutual").default(false),
+  lastMessageAt: timestamp("lastMessageAt"),
+  isBlocked: boolean("isBlocked").default(false),
+  blockedBy: int("blockedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const datingMessages = mysqlTable("dating_messages", {
+  id: int("id").autoincrement().primaryKey(),
+  matchId: int("matchId").notNull(),
+  senderId: int("senderId").notNull(),
+  recipientId: int("recipientId").notNull(),
+  content: text("content"),
+  mediaUrl: text("mediaUrl"),
+  mediaType: mysqlEnum("mediaType", ["image", "video", "audio"]),
+  readAt: timestamp("readAt"),
+  deletedAt: timestamp("deletedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const datingNotifications = mysqlTable("dating_notifications", {
+  id: varchar("id", { length: 100 }).primaryKey(),
+  userId: int("userId").notNull(),
+  type: mysqlEnum("type", ["match", "message", "superlike", "like", "profile_view", "message_read"]).notNull(),
+  fromUserId: int("fromUserId").notNull(),
+  matchId: int("matchId"),
+  messageId: int("messageId"),
+  title: varchar("title", { length: 200 }).notNull(),
+  content: text("content").notNull(),
+  read: boolean("read").default(false),
+  actionUrl: text("actionUrl"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const datingPreferences = mysqlTable("dating_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  minAge: int("minAge").default(18),
+  maxAge: int("maxAge").default(65),
+  maxDistance: int("maxDistance").default(50), // km
+  lookingFor: json("lookingFor"), // gender preferences
+  interests: json("interests"), // required interests
+  emailNotifications: boolean("emailNotifications").default(true),
+  pushNotifications: boolean("pushNotifications").default(true),
+  smsNotifications: boolean("smsNotifications").default(false),
+  matchNotifications: boolean("matchNotifications").default(true),
+  messageNotifications: boolean("messageNotifications").default(true),
+  superlikeNotifications: boolean("superlikeNotifications").default(true),
+  profileViewNotifications: boolean("profileViewNotifications").default(false),
+  soundEnabled: boolean("soundEnabled").default(true),
+  vibrationEnabled: boolean("vibrationEnabled").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const datingSubscriptions = mysqlTable("dating_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  tier: mysqlEnum("tier", ["free", "premium", "vip", "elite"]).default("free"),
+  status: mysqlEnum("status", ["active", "paused", "cancelled", "expired"]).default("active"),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 100 }),
+  price: decimal("price", { precision: 10, scale: 2 }).default("0"),
+  currency: varchar("currency", { length: 10 }).default("USD"),
+  unlimitedLikes: boolean("unlimitedLikes").default(false),
+  unlimitedSuperLikes: boolean("unlimitedSuperLikes").default(false),
+  unlimitedMessages: boolean("unlimitedMessages").default(false),
+  rewindFeature: boolean("rewindFeature").default(false),
+  boostFeature: boolean("boostFeature").default(false),
+  incognitoMode: boolean("incognitoMode").default(false),
+  advancedFilters: boolean("advancedFilters").default(false),
+  seenByFeature: boolean("seenByFeature").default(false),
+  startsAt: timestamp("startsAt"),
+  endsAt: timestamp("endsAt"),
+  cancelledAt: timestamp("cancelledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export const datingLikes = mysqlTable("dating_likes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  likedUserId: int("likedUserId").notNull(),
+  type: mysqlEnum("type", ["like", "superlike", "pass"]).default("like"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const datingBlocks = mysqlTable("dating_blocks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  blockedUserId: int("blockedUserId").notNull(),
+  reason: text("reason"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const datingReports = mysqlTable("dating_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  reporterId: int("reporterId").notNull(),
+  reportedUserId: int("reportedUserId").notNull(),
+  reason: mysqlEnum("reason", ["inappropriate_photos", "offensive_content", "fake_profile", "harassment", "spam", "other"]).notNull(),
+  description: text("description"),
+  status: mysqlEnum("status", ["pending", "investigating", "resolved", "dismissed"]).default("pending"),
+  resolvedAt: timestamp("resolvedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DatingProfile = typeof datingProfiles.$inferSelect;
+export type InsertDatingProfile = typeof datingProfiles.$inferInsert;
+export type DatingMatch = typeof datingMatches.$inferSelect;
+export type InsertDatingMatch = typeof datingMatches.$inferInsert;
+export type DatingMessage = typeof datingMessages.$inferSelect;
+export type InsertDatingMessage = typeof datingMessages.$inferInsert;
+export type DatingNotification = typeof datingNotifications.$inferSelect;
+export type InsertDatingNotification = typeof datingNotifications.$inferInsert;
+export type DatingPreferences = typeof datingPreferences.$inferSelect;
+export type InsertDatingPreferences = typeof datingPreferences.$inferInsert;
+export type DatingSubscription = typeof datingSubscriptions.$inferSelect;
+export type InsertDatingSubscription = typeof datingSubscriptions.$inferInsert;
