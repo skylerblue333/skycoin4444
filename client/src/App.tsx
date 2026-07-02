@@ -124,6 +124,8 @@ const Retention = lazy(() => import("./pages/Retention"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminWalletManager = lazy(() => import("./pages/AdminWalletManager"));
+const CryptoResearchHub = lazy(() => import("./pages/CryptoResearchHub"));
+const MiningCalculator = lazy(() => import("./pages/MiningCalculator"));
 const MiningDashboard = lazy(() => import("./pages/MiningDashboard"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const AIModerationQueue = lazy(() => import("./pages/AIModerationQueue"));
@@ -343,6 +345,8 @@ function LegacyRouter() {
         <Route path="/admin" component={Admin} />
         <Route path="/admin-dashboard">{() => <Redirect to="/admin" />}</Route>
         <Route path="/admin/wallet" component={AdminWalletManager} />
+        <Route path="/crypto-research" component={CryptoResearchHub} />
+        <Route path="/mining-calculator" component={MiningCalculator} />
         <Route path="/mining" component={MiningDashboard} />
         <Route path="/admin-panel">{() => <Redirect to="/admin" />}</Route>
         <Route path="/admin/moderation" component={AIModerationQueue} />
