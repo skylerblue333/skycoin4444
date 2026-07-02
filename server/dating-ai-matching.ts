@@ -1,6 +1,6 @@
 import { db } from './db';
 import { datingProfiles, datingMatches, datingLikes, users } from '../drizzle/schema';
-import { eq, and, ne, not, inArray, or as drizzleOr } from 'drizzle-orm';
+import { eq, and, ne, not, inArray, or as drizzleOr, gte, lte } from 'drizzle-orm';
 import { invokeLLM } from './_core/llm';
 
 export interface MatchingProfile {
@@ -101,7 +101,15 @@ Consider:
       ],
     });
 
-    const content = response.choices?.[0]?.message?.content || '{}';
+    const content = response.choices?.[0]?.message?.content;
+    if (typeof content !== 'string') {
+      return {
+        userId: profile2.userId,
+        score: 50,
+        reasons: ['Invalid response format'],
+        matchType: 'fair',
+      };
+    }
     const result = JSON.parse(content);
 
     return {
@@ -130,42 +138,45 @@ export async function getRecommendedMatches(
 ): Promise<CompatibilityScore[]> {
   try {
     // Get user's profile
-    const [userProfile] = await db
+    const userProfiles = await db
       .select()
       .from(datingProfiles)
       .where(eq(datingProfiles.userId, userId));
+
+    const userProfile = userProfiles[0];
 
     if (!userProfile) {
       return [];
     }
 
     // Get user's preferences
-    const userPrefs = userProfile.lookingFor?.split(',') || [];
+    const userPrefs = userProfile.lookingFor ? [userProfile.lookingFor] : [];
     const userAge = userProfile.age || 30;
     const userGender = userProfile.gender;
 
     // Get profiles that match user's preferences
+    const conditions: any[] = [
+      ne(datingProfiles.userId, userId),
+      eq(datingProfiles.isActive, true),
+    ];
+
+    // Gender matching
+    if (userPrefs.length > 0) {
+      conditions.push(inArray(datingProfiles.gender as any, userPrefs as any));
+    }
+
+    // Age range (within 5-15 years)
+    if (userProfile.age) {
+      const minAge = Math.max(18, userProfile.age - 15);
+      const maxAge = userProfile.age + 15;
+      conditions.push(gte(datingProfiles.age, minAge));
+      conditions.push(lte(datingProfiles.age, maxAge));
+    }
+
     const potentialMatches = await db
       .select()
       .from(datingProfiles)
-      .where(
-        and(
-          ne(datingProfiles.userId, userId),
-          eq(datingProfiles.isActive, true),
-          // Gender matching
-          userPrefs.length > 0
-            ? inArray(datingProfiles.gender, userPrefs)
-            : undefined,
-          // Age range (within 5-15 years)
-          userProfile.minAge
-            ? and(
-                datingProfiles.age !== null,
-                datingProfiles.age >= (userProfile.minAge || 18),
-                datingProfiles.age <= (userProfile.maxAge || 65)
-              )
-            : undefined
-        )
-      )
+      .where(and(...conditions))
       .limit(limit * 2); // Get more to filter
 
     // Get already liked/matched users

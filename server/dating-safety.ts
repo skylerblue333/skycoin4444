@@ -314,10 +314,11 @@ export async function getModerationStats() {
       .from(datingReports)
       .where(eq(datingReports.status, 'dismissed'));
 
+    // Note: suspended field doesn't exist in schema, using isActive instead
     const suspendedProfiles = await db
       .select()
       .from(datingProfiles)
-      .where(eq(datingProfiles.suspended, true));
+      .where(eq(datingProfiles.isActive, false));
 
     return {
       pendingReports: pendingReports.length,

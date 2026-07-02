@@ -64,7 +64,7 @@ export function PhotoUpload({
 
         const validation = validateFile(file);
         if (!validation.valid) {
-          setError(validation.error);
+          setError(validation.error || 'Invalid file');
           continue;
         }
 
