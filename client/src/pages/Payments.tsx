@@ -55,7 +55,7 @@ export default function Payments() {
   });
 
   const handleCheckout = (planId: string) => {
-    if (!isAuthenticated) { // Removed login redirect for testing; return; }
+    if (!isAuthenticated) return;
     setCheckoutLoading(planId);
     createCheckout.mutate({
       planId: planId as "starter" | "pro" | "enterprise",

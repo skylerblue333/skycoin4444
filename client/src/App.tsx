@@ -607,6 +607,69 @@ function LegacyRouter() {
           <Route path="/agent-city" component={AgentCity} />
           <Route path="/civilization" component={CivilizationSimulator} />
           <Route path="/investor-metrics" component={InvestorMetrics} />
+      <Route path="/productcatalog" component={ProductCatalog} />
+      <Route path="/productdetail" component={ProductDetail} />
+      <Route path="/productreviews" component={ProductReviews} />
+      <Route path="/productcomparison" component={ProductComparison} />
+      <Route path="/inventorymanagement" component={InventoryManagement} />
+      <Route path="/shoppingcart" component={ShoppingCart} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/ordertracking" component={OrderTracking} />
+      <Route path="/returnmanagement" component={ReturnManagement} />
+      <Route path="/wishlistmanagement" component={WishlistManagement} />
+      <Route path="/sellerdashboard" component={SellerDashboard} />
+      <Route path="/productlisting" component={ProductListing} />
+      <Route path="/bulkupload" component={BulkUpload} />
+      <Route path="/shippingmanagement" component={ShippingManagement} />
+      <Route path="/vendoranalytics" component={VendorAnalytics} />
+      <Route path="/dashboardoverview" component={DashboardOverview} />
+      <Route path="/salesanalytics" component={SalesAnalytics} />
+      <Route path="/customeranalytics" component={CustomerAnalytics} />
+      <Route path="/conversionfunnel" component={ConversionFunnel} />
+      <Route path="/cohortanalysis" component={CohortAnalysis} />
+      <Route path="/customreports" component={CustomReports} />
+      <Route path="/dataexport" component={DataExport} />
+      <Route path="/scheduledreports" component={ScheduledReports} />
+      <Route path="/realtimemonitoring" component={RealTimeMonitoring} />
+      <Route path="/alertmanagement" component={AlertManagement} />
+      <Route path="/performancemetrics" component={PerformanceMetrics} />
+      <Route path="/userbehavior" component={UserBehavior} />
+      <Route path="/engagementmetrics" component={EngagementMetrics} />
+      <Route path="/retentionanalytics" component={RetentionAnalytics} />
+      <Route path="/userdirectory" component={UserDirectory} />
+      <Route path="/userpermissions" component={UserPermissions} />
+      <Route path="/accesscontrol" component={AccessControl} />
+      <Route path="/auditlog" component={AuditLog} />
+      <Route path="/useronboarding" component={UserOnboarding} />
+      <Route path="/organizationsettings" component={OrganizationSettings} />
+      <Route path="/departmentmanagement" component={DepartmentManagement} />
+      <Route path="/teammanagement" component={TeamManagement} />
+      <Route path="/rolemanagement" component={RoleManagement} />
+      <Route path="/policymanagement" component={PolicyManagement} />
+      <Route path="/compliancedashboard" component={ComplianceDashboard} />
+      <Route path="/dataprivacy" component={DataPrivacy} />
+      <Route path="/securityaudit" component={SecurityAudit} />
+      <Route path="/backupmanagement" component={BackupManagement} />
+      <Route path="/disasterrecovery" component={DisasterRecovery} />
+      <Route path="/invoicemanagement" component={InvoiceManagement} />
+      <Route path="/billinghistory" component={BillingHistory} />
+      <Route path="/subscriptionmanagement" component={SubscriptionManagement} />
+      <Route path="/costallocation" component={CostAllocation} />
+      <Route path="/expensemanagement" component={ExpenseManagement} />
+      <Route path="/projectboard" component={ProjectBoard} />
+      <Route path="/ganttchart" component={GanttChart} />
+      <Route path="/roadmapview" component={RoadmapView} />
+      <Route path="/milestonetracking" component={MilestoneTracking} />
+      <Route path="/resourceallocation" component={ResourceAllocation} />
+      <Route path="/tasklist" component={TaskList} />
+      <Route path="/taskdetail" component={TaskDetail} />
+      <Route path="/timetracking" component={TimeTracking} />
+      <Route path="/dependencygraph" component={DependencyGraph} />
+      <Route path="/prioritymatrix" component={PriorityMatrix} />
+      <Route path="/documentsharing" component={DocumentSharing} />
+      <Route path="/commentthread" component={CommentThread} />
+      <Route path="/activityfeed" component={ActivityFeed} />
+      <Route path="/fileversioning" component={FileVersioning} />
           <Route component={NotFound} />
       
         </Switch>
@@ -802,6 +865,69 @@ const MemoryConstellation = lazy(() => import("./pages/MemoryConstellation"));
 const AgentCity = lazy(() => import("./pages/AgentCity"));
 const CivilizationSimulator = lazy(() => import("./pages/CivilizationSimulator"));
 const InvestorMetrics = lazy(() => import("./pages/InvestorMetrics"));
+const ProductCatalog = lazy(() => import("./pages/ProductCatalog"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const ProductReviews = lazy(() => import("./pages/ProductReviews"));
+const ProductComparison = lazy(() => import("./pages/ProductComparison"));
+const InventoryManagement = lazy(() => import("./pages/InventoryManagement"));
+const ShoppingCart = lazy(() => import("./pages/ShoppingCart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderTracking = lazy(() => import("./pages/OrderTracking"));
+const ReturnManagement = lazy(() => import("./pages/ReturnManagement"));
+const WishlistManagement = lazy(() => import("./pages/WishlistManagement"));
+const SellerDashboard = lazy(() => import("./pages/SellerDashboard"));
+const ProductListing = lazy(() => import("./pages/ProductListing"));
+const BulkUpload = lazy(() => import("./pages/BulkUpload"));
+const ShippingManagement = lazy(() => import("./pages/ShippingManagement"));
+const VendorAnalytics = lazy(() => import("./pages/VendorAnalytics"));
+const DashboardOverview = lazy(() => import("./pages/DashboardOverview"));
+const SalesAnalytics = lazy(() => import("./pages/SalesAnalytics"));
+const CustomerAnalytics = lazy(() => import("./pages/CustomerAnalytics"));
+const ConversionFunnel = lazy(() => import("./pages/ConversionFunnel"));
+const CohortAnalysis = lazy(() => import("./pages/CohortAnalysis"));
+const CustomReports = lazy(() => import("./pages/CustomReports"));
+const DataExport = lazy(() => import("./pages/DataExport"));
+const ScheduledReports = lazy(() => import("./pages/ScheduledReports"));
+const RealTimeMonitoring = lazy(() => import("./pages/RealTimeMonitoring"));
+const AlertManagement = lazy(() => import("./pages/AlertManagement"));
+const PerformanceMetrics = lazy(() => import("./pages/PerformanceMetrics"));
+const UserBehavior = lazy(() => import("./pages/UserBehavior"));
+const EngagementMetrics = lazy(() => import("./pages/EngagementMetrics"));
+const RetentionAnalytics = lazy(() => import("./pages/RetentionAnalytics"));
+const UserDirectory = lazy(() => import("./pages/UserDirectory"));
+const UserPermissions = lazy(() => import("./pages/UserPermissions"));
+const AccessControl = lazy(() => import("./pages/AccessControl"));
+const AuditLog = lazy(() => import("./pages/AuditLog"));
+const UserOnboarding = lazy(() => import("./pages/UserOnboarding"));
+const OrganizationSettings = lazy(() => import("./pages/OrganizationSettings"));
+const DepartmentManagement = lazy(() => import("./pages/DepartmentManagement"));
+const TeamManagement = lazy(() => import("./pages/TeamManagement"));
+const RoleManagement = lazy(() => import("./pages/RoleManagement"));
+const PolicyManagement = lazy(() => import("./pages/PolicyManagement"));
+const ComplianceDashboard = lazy(() => import("./pages/ComplianceDashboard"));
+const DataPrivacy = lazy(() => import("./pages/DataPrivacy"));
+const SecurityAudit = lazy(() => import("./pages/SecurityAudit"));
+const BackupManagement = lazy(() => import("./pages/BackupManagement"));
+const DisasterRecovery = lazy(() => import("./pages/DisasterRecovery"));
+const InvoiceManagement = lazy(() => import("./pages/InvoiceManagement"));
+const BillingHistory = lazy(() => import("./pages/BillingHistory"));
+const SubscriptionManagement = lazy(() => import("./pages/SubscriptionManagement"));
+const CostAllocation = lazy(() => import("./pages/CostAllocation"));
+const ExpenseManagement = lazy(() => import("./pages/ExpenseManagement"));
+const ProjectBoard = lazy(() => import("./pages/ProjectBoard"));
+const GanttChart = lazy(() => import("./pages/GanttChart"));
+const RoadmapView = lazy(() => import("./pages/RoadmapView"));
+const MilestoneTracking = lazy(() => import("./pages/MilestoneTracking"));
+const ResourceAllocation = lazy(() => import("./pages/ResourceAllocation"));
+const TaskList = lazy(() => import("./pages/TaskList"));
+const TaskDetail = lazy(() => import("./pages/TaskDetail"));
+const TimeTracking = lazy(() => import("./pages/TimeTracking"));
+const DependencyGraph = lazy(() => import("./pages/DependencyGraph"));
+const PriorityMatrix = lazy(() => import("./pages/PriorityMatrix"));
+const DocumentSharing = lazy(() => import("./pages/DocumentSharing"));
+const CommentThread = lazy(() => import("./pages/CommentThread"));
+const ActivityFeed = lazy(() => import("./pages/ActivityFeed"));
+const FileVersioning = lazy(() => import("./pages/FileVersioning"));
 
 function App() {
   return (

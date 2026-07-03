@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Loader2, Plus, Search, Settings } from "lucide-react";
 
-export default function AuditLog() {
+export default function EngagementMetrics() {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +17,7 @@ export default function AuditLog() {
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>AuditLog</CardTitle>
+            <CardTitle>EngagementMetrics</CardTitle>
             <CardDescription>Sign in to access this feature</CardDescription>
           </CardHeader>
           <CardContent>
@@ -33,8 +33,8 @@ export default function AuditLog() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">AuditLog</h1>
-            <p className="text-muted-foreground mt-2">Track all user actions and changes</p>
+            <h1 className="text-3xl font-bold">EngagementMetrics</h1>
+            <p className="text-muted-foreground mt-2">Engagement scoring and analysis</p>
           </div>
           <Button>
             <Plus className="w-4 h-4 mr-2" />
