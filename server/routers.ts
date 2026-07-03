@@ -1,7 +1,9 @@
-
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { miningRouter } from "./mining";
+import { voiceRouter } from "./voice-router";
+import { enterpriseRouter } from "./enterprise-router";
+import { aiRouter } from "./real-ai-engine-v2";
 import * as db from "./db";
 import { users, posts, transactions, products, orders, streams, comments, likes, wallets, notifications, messages, reviews, follows } from "../drizzle/schema";
 import { eq, desc, and, or } from "drizzle-orm";
@@ -47,8 +49,8 @@ export const postRouter = router({
 
 // ============ MARKETPLACE PROCEDURES ============
 export const marketplaceRouter = router({
-  listProducts: publicProcedure.input(z.object({ category: z.string().optional(), limit: z.number().default(20) }))
-    .query(async ({ input }) => db.getProducts(input.limit, input.category)),
+  listProducts: publicProcedure.input(z.object({ category: z.string().optional(), limit: z.number().default(20), offset: z.number().default(0) }))
+    .query(async ({ input }) => db.getProducts(input.limit, input.offset, input.category)),
   getProduct: publicProcedure.input(z.object({ id: z.string() }))
     .query(async ({ input }) => db.getProductById(input.id)),
   createProduct: protectedProcedure.input(z.object({ name: z.string(), price: z.number(), category: z.string() }))
@@ -201,6 +203,9 @@ export const appRouter = router({
   admin: adminRouter,
   search: searchRouter,
   settings: settingsRouter,
+  voice: voiceRouter,
+  enterprise: enterpriseRouter,
+  ai: aiRouter,
 });
 
 export type AppRouter = typeof appRouter;

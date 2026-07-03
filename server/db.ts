@@ -1,18 +1,16 @@
-import { users, posts, products, orders, transactions, wallets } from "../drizzle/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
+import * as schema from '../drizzle/schema';
 
-// Mock database instance
-const mockDb = {};
+const poolConnection = mysql.createPool(process.env.DATABASE_URL as string);
 
-// Export db for backward compatibility
-export const db = mockDb;
+export const db = drizzle(poolConnection, { schema, mode: 'default' });
 
-// Export getDb function for other files
 export async function getDb() {
-  return mockDb;
+  return db;
 }
 
-// Mock database functions - these will be replaced with real DB calls
+// TODO: Replace mock functions with real Drizzle ORM queries
 // For now, returning mock data to get the app running
 
 // ============ USER HELPERS ============
@@ -46,7 +44,7 @@ export async function createPost(userId: string, content: string, media?: string
 }
 
 // ============ PRODUCT HELPERS ============
-export async function getProducts(limit = 20, category?: string) {
+export async function getProducts(limit = 20, offset = 0, category?: string) {
   return [];
 }
 

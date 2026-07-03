@@ -34,7 +34,7 @@ export const followUserProcedure = publicProcedure
     // Operation 3: Check if the follow relationship already exists
     const existingFollow = await db.select()
       .from(follows)
-      .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)))
+      .where(and(eq(follows.followerId, followerId as string), eq(follows.followingId, followingId as string)))
       .limit(1);
 
     if (existingFollow && existingFollow.length > 0) {

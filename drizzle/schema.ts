@@ -1,147 +1,148 @@
 
-import { sqliteTable, text, integer, real, primaryKey } from "drizzle-orm/sqlite-core";
+import { mysqlTable, varchar, text, int, float, boolean, timestamp, primaryKey } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
 // ============ USERS TABLE ============
-export const users = sqliteTable("users", {
-  id: text("id").primaryKey(),
-  email: text("email").unique(),
-  username: text("username").unique(),
-  name: text("name"),
-  bio: text("bio"),
-  avatar: text("avatar"),
-  balance: real("balance").default(0),
-  role: text("role").default("user"), // admin | user
-  verified: integer("verified", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+export const users = mysqlTable("users", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  email: varchar("email", { length: 255 }).unique(),
+  username: varchar("username", { length: 255 }).unique(),
+  name: varchar("name", { length: 255 }),
+  bio: varchar("bio", { length: 255 }),
+  avatar: varchar("avatar", { length: 255 }),
+  balance: float("balance").default(0),
+  role: varchar("role", { length: 255 }).default("user"), // admin | user
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ POSTS TABLE ============
-export const posts = sqliteTable("posts", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  content: text("content"),
-  media: text("media"),
-  likes: integer("likes").default(0),
-  comments: integer("comments").default(0),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+export const posts = mysqlTable("posts", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  content: varchar("content", { length: 255 }),
+  media: varchar("media", { length: 255 }),
+  likes: int("likes").default(0),
+  comments: int("comments").default(0),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ COMMENTS TABLE ============
-export const comments = sqliteTable("comments", {
-  id: text("id").primaryKey(),
-  postId: text("post_id").references(() => posts.id),
-  userId: text("user_id").references(() => users.id),
-  content: text("content"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const comments = mysqlTable("comments", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  postId: varchar("post_id", { length: 255 }).references(() => posts.id),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  content: varchar("content", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ LIKES TABLE ============
-export const likes = sqliteTable("likes", {
-  id: text("id").primaryKey(),
-  postId: text("post_id").references(() => posts.id),
-  userId: text("user_id").references(() => users.id),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const likes = mysqlTable("likes", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  postId: varchar("post_id", { length: 255 }).references(() => posts.id),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ PRODUCTS TABLE ============
-export const products = sqliteTable("products", {
-  id: text("id").primaryKey(),
-  name: text("name"),
-  description: text("description"),
-  price: real("price"),
-  category: text("category"),
-  image: text("image"),
-  stock: integer("stock"),
-  sellerId: text("seller_id").references(() => users.id),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const products = mysqlTable("products", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 255 }),
+  description: varchar("description", { length: 255 }),
+  price: float("price"),
+  category: varchar("category", { length: 255 }),
+  image: varchar("image", { length: 255 }),
+  stock: int("stock"),
+  sellerId: varchar("seller_id", { length: 255 }).references(() => users.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ ORDERS TABLE ============
-export const orders = sqliteTable("orders", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  productId: text("product_id").references(() => products.id),
-  quantity: integer("quantity"),
-  total: real("total"),
-  status: text("status"), // pending | shipped | delivered | cancelled
-  shippingAddress: text("shipping_address"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const orders = mysqlTable("orders", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  productId: varchar("product_id", { length: 255 }).references(() => products.id),
+  quantity: int("quantity"),
+  total: float("total"),
+  status: varchar("status", { length: 255 }), // pending | shipped | delivered | cancelled
+  shippingAddress: varchar("shipping_address", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ STREAMS TABLE ============
-export const streams = sqliteTable("streams", {
-  id: text("id").primaryKey(),
-  streamerId: text("streamer_id").references(() => users.id),
-  title: text("title"),
-  description: text("description"),
-  status: text("status"), // live | ended | scheduled
-  viewers: integer("viewers").default(0),
-  hlsUrl: text("hls_url"),
-  archiveUrl: text("archive_url"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const streams = mysqlTable("streams", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  streamerId: varchar("streamer_id", { length: 255 }).references(() => users.id),
+  title: varchar("title", { length: 255 }),
+  description: varchar("description", { length: 255 }),
+  status: varchar("status", { length: 255 }), // live | ended | scheduled
+  viewers: int("viewers").default(0),
+  hlsUrl: varchar("hls_url", { length: 255 }),
+  archiveUrl: varchar("archive_url", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ TRANSACTIONS TABLE ============
-export const transactions = sqliteTable("transactions", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  type: text("type"), // deposit | withdrawal | transfer | purchase
-  amount: real("amount"),
-  toUserId: text("to_user_id").references(() => users.id),
-  status: text("status"), // pending | completed | failed
-  txHash: text("tx_hash"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const transactions = mysqlTable("transactions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  type: varchar("type", { length: 255 }), // deposit | withdrawal | transfer | purchase
+  amount: float("amount"),
+  toUserId: varchar("to_user_id", { length: 255 }).references(() => users.id),
+  status: varchar("status", { length: 255 }), // pending | completed | failed
+  txHash: varchar("tx_hash", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ WALLETS TABLE ============
-export const wallets = sqliteTable("wallets", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  address: text("address"),
-  balance: real("balance").default(0),
-  currency: text("currency"), // BTC | ETH | SOL | DOGE | SKY444
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const wallets = mysqlTable("wallets", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  address: varchar("address", { length: 255 }),
+  balance: float("balance").default(0),
+  currency: varchar("currency", { length: 255 }), // BTC | ETH | SOL | DOGE | SKY444
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ FOLLOWS TABLE ============
-export const follows = sqliteTable("follows", {
-  id: text("id").primaryKey(),
-  followerId: text("follower_id").references(() => users.id),
-  followingId: text("following_id").references(() => users.id),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const follows = mysqlTable("follows", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  followerId: varchar("follower_id", { length: 255 }).references(() => users.id),
+  followingId: varchar("following_id", { length: 255 }).references(() => users.id),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ NOTIFICATIONS TABLE ============
-export const notifications = sqliteTable("notifications", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  type: text("type"), // like | comment | follow | message | order
-  content: text("content"),
-  read: integer("read", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const notifications = mysqlTable("notifications", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  type: varchar("type", { length: 255 }), // like | comment | follow | message | order
+  content: varchar("content", { length: 255 }),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ MESSAGES TABLE ============
-export const messages = sqliteTable("messages", {
-  id: text("id").primaryKey(),
-  senderId: text("sender_id").references(() => users.id),
-  recipientId: text("recipient_id").references(() => users.id),
-  content: text("content"),
-  read: integer("read", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const messages = mysqlTable("messages", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  senderId: varchar("sender_id", { length: 255 }).references(() => users.id),
+  recipientId: varchar("recipient_id", { length: 255 }).references(() => users.id),
+  content: varchar("content", { length: 255 }),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ REVIEWS TABLE ============
-export const reviews = sqliteTable("reviews", {
-  id: text("id").primaryKey(),
-  productId: text("product_id").references(() => products.id),
-  userId: text("user_id").references(() => users.id),
-  rating: integer("rating"), // 1-5
-  comment: text("comment"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const reviews = mysqlTable("reviews", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  productId: varchar("product_id", { length: 255 }).references(() => products.id),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  rating: int("rating"), // 1-5
+  comment: varchar("comment", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ RELATIONS ============
@@ -161,250 +162,250 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
 
 
 // ============ AUDIT LEDGER TABLE ============
-export const auditLedger = sqliteTable("audit_ledger", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  eventType: text("event_type").notNull(),
-  action: text("action").notNull(),
-  details: text("details"),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  status: text("status").default("success"), // success | failed | pending
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const auditLedger = mysqlTable("audit_ledger", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  eventType: varchar("event_type", { length: 255 }).notNull(),
+  action: varchar("action", { length: 255 }).notNull(),
+  details: varchar("details", { length: 255 }),
+  ipAddress: varchar("ip_address", { length: 255 }),
+  userAgent: varchar("user_agent", { length: 255 }),
+  status: varchar("status", { length: 255 }).default("success"), // success | failed | pending
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 
 // ============ TOKEN BALANCES TABLE ============
-export const tokenBalances = sqliteTable("token_balances", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  tokenSymbol: text("token_symbol").notNull(), // BTC, ETH, SOL, DOGE, SKY444
-  balance: real("balance").default(0),
-  lockedBalance: real("locked_balance").default(0),
-  stakedBalance: real("staked_balance").default(0),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+export const tokenBalances = mysqlTable("token_balances", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  tokenSymbol: varchar("token_symbol", { length: 255 }).notNull(), // BTC, ETH, SOL, DOGE, SKY444
+  balance: float("balance").default(0),
+  lockedBalance: float("locked_balance").default(0),
+  stakedBalance: float("staked_balance").default(0),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ USER BEHAVIOR SIGNALS TABLE ============
-export const userBehaviorSignals = sqliteTable("user_behavior_signals", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  signalType: text("signal_type").notNull(), // login | purchase | post | comment | follow | etc
-  value: real("value").default(0),
-  metadata: text("metadata"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const userBehaviorSignals = mysqlTable("user_behavior_signals", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  signalType: varchar("signal_type", { length: 255 }).notNull(), // login | purchase | post | comment | follow | etc
+  value: float("value").default(0),
+  metadata: varchar("metadata", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 
 // ============ DATING SYSTEM TABLES ============
-export const datingProfiles = sqliteTable("dating_profiles", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  bio: text("bio"),
-  photos: text("photos"), // JSON array
-  interests: text("interests"), // JSON array
-  location: text("location"),
-  age: integer("age"),
-  gender: text("gender"),
-  lookingFor: text("looking_for"),
-  verified: integer("verified", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingProfiles = mysqlTable("dating_profiles", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  bio: varchar("bio", { length: 255 }),
+  photos: varchar("photos", { length: 255 }), // JSON array
+  interests: varchar("interests", { length: 255 }), // JSON array
+  location: varchar("location", { length: 255 }),
+  age: int("age"),
+  gender: varchar("gender", { length: 255 }),
+  lookingFor: varchar("looking_for", { length: 255 }),
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingMatches = sqliteTable("dating_matches", {
-  id: text("id").primaryKey(),
-  userId1: text("user_id_1").references(() => users.id).notNull(),
-  userId2: text("user_id_2").references(() => users.id).notNull(),
-  status: text("status").default("pending"), // pending | matched | rejected
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingMatches = mysqlTable("dating_matches", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId1: varchar("user_id_1", { length: 255 }).references(() => users.id).notNull(),
+  userId2: varchar("user_id_2", { length: 255 }).references(() => users.id).notNull(),
+  status: varchar("status", { length: 255 }).default("pending"), // pending | matched | rejected
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingLikes = sqliteTable("dating_likes", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  likedUserId: text("liked_user_id").references(() => users.id).notNull(),
-  type: text("type").default("like"), // like | superlike
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingLikes = mysqlTable("dating_likes", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  likedUserId: varchar("liked_user_id", { length: 255 }).references(() => users.id).notNull(),
+  type: varchar("type", { length: 255 }).default("like"), // like | superlike
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingMessages = sqliteTable("dating_messages", {
-  id: text("id").primaryKey(),
-  matchId: text("match_id").references(() => datingMatches.id).notNull(),
-  senderId: text("sender_id").references(() => users.id).notNull(),
-  content: text("content").notNull(),
-  read: integer("read", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingMessages = mysqlTable("dating_messages", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  matchId: varchar("match_id", { length: 255 }).references(() => datingMatches.id).notNull(),
+  senderId: varchar("sender_id", { length: 255 }).references(() => users.id).notNull(),
+  content: varchar("content", { length: 255 }).notNull(),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingSubscriptions = sqliteTable("dating_subscriptions", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  tier: text("tier").default("free"), // free | premium | vip
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingSubscriptions = mysqlTable("dating_subscriptions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  tier: varchar("tier", { length: 255 }).default("free"), // free | premium | vip
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingPreferences = sqliteTable("dating_preferences", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  minAge: integer("min_age").default(18),
-  maxAge: integer("max_age").default(65),
-  maxDistance: integer("max_distance").default(50),
-  genderPreference: text("gender_preference"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingPreferences = mysqlTable("dating_preferences", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  minAge: int("min_age").default(18),
+  maxAge: int("max_age").default(65),
+  maxDistance: int("max_distance").default(50),
+  genderPreference: varchar("gender_preference", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingNotifications = sqliteTable("dating_notifications", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  type: text("type").notNull(), // match | message | like
-  relatedUserId: text("related_user_id"),
-  read: integer("read", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingNotifications = mysqlTable("dating_notifications", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  type: varchar("type", { length: 255 }).notNull(), // match | message | like
+  relatedUserId: varchar("related_user_id", { length: 255 }),
+  read: boolean("read").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingBlocks = sqliteTable("dating_blocks", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  blockedUserId: text("blocked_user_id").references(() => users.id).notNull(),
-  reason: text("reason"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingBlocks = mysqlTable("dating_blocks", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  blockedUserId: varchar("blocked_user_id", { length: 255 }).references(() => users.id).notNull(),
+  reason: varchar("reason", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const datingReports = sqliteTable("dating_reports", {
-  id: text("id").primaryKey(),
-  reporterId: text("reporter_id").references(() => users.id).notNull(),
-  reportedUserId: text("reported_user_id").references(() => users.id).notNull(),
-  reason: text("reason").notNull(),
-  status: text("status").default("pending"), // pending | reviewed | resolved
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const datingReports = mysqlTable("dating_reports", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  reporterId: varchar("reporter_id", { length: 255 }).references(() => users.id).notNull(),
+  reportedUserId: varchar("reported_user_id", { length: 255 }).references(() => users.id).notNull(),
+  reason: varchar("reason", { length: 255 }).notNull(),
+  status: varchar("status", { length: 255 }).default("pending"), // pending | reviewed | resolved
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ FRAUD & SECURITY TABLES ============
-export const fraudSignals = sqliteTable("fraud_signals", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  signalType: text("signal_type").notNull(),
-  severity: text("severity").default("low"), // low | medium | high | critical
-  details: text("details"),
-  resolved: integer("resolved", { mode: "boolean" }).default(false),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const fraudSignals = mysqlTable("fraud_signals", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  signalType: varchar("signal_type", { length: 255 }).notNull(),
+  severity: varchar("severity", { length: 255 }).default("low"), // low | medium | high | critical
+  details: varchar("details", { length: 255 }),
+  resolved: boolean("resolved").default(false),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const rateLimitBuckets = sqliteTable("rate_limit_buckets", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id),
-  endpoint: text("endpoint").notNull(),
-  count: integer("count").default(0),
-  resetAt: integer("reset_at", { mode: "timestamp" }),
+export const rateLimitBuckets = mysqlTable("rate_limit_buckets", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  endpoint: varchar("endpoint", { length: 255 }).notNull(),
+  count: int("count").default(0),
+  resetAt: timestamp("reset_at"),
 });
 
 // ============ WALLET & TRANSACTION TABLES ============
-export const walletTransactions = sqliteTable("wallet_transactions", {
-  id: text("id").primaryKey(),
-  walletId: text("wallet_id").references(() => wallets.id).notNull(),
-  type: text("type").notNull(), // deposit | withdrawal | transfer | swap
-  amount: real("amount").notNull(),
-  fee: real("fee").default(0),
-  status: text("status").default("pending"), // pending | confirmed | failed
-  txHash: text("tx_hash"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const walletTransactions = mysqlTable("wallet_transactions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  walletId: varchar("wallet_id", { length: 255 }).references(() => wallets.id).notNull(),
+  type: varchar("type", { length: 255 }).notNull(), // deposit | withdrawal | transfer | swap
+  amount: float("amount").notNull(),
+  fee: float("fee").default(0),
+  status: varchar("status", { length: 255 }).default("pending"), // pending | confirmed | failed
+  txHash: varchar("tx_hash", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const walletAuditLog = sqliteTable("wallet_audit_log", {
-  id: text("id").primaryKey(),
-  walletId: text("wallet_id").references(() => wallets.id).notNull(),
-  action: text("action").notNull(),
-  details: text("details"),
-  ipAddress: text("ip_address"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const walletAuditLog = mysqlTable("wallet_audit_log", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  walletId: varchar("wallet_id", { length: 255 }).references(() => wallets.id).notNull(),
+  action: varchar("action", { length: 255 }).notNull(),
+  details: varchar("details", { length: 255 }),
+  ipAddress: varchar("ip_address", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const custodyWallets = sqliteTable("custody_wallets", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  provider: text("provider").notNull(), // coinbase | kraken | etc
-  externalId: text("external_id").notNull(),
-  balance: real("balance").default(0),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const custodyWallets = mysqlTable("custody_wallets", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  provider: varchar("provider", { length: 255 }).notNull(), // coinbase | kraken | etc
+  externalId: varchar("external_id", { length: 255 }).notNull(),
+  balance: float("balance").default(0),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const onChainTransactions = sqliteTable("on_chain_transactions", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  blockchain: text("blockchain").notNull(), // ethereum | solana | bitcoin
-  txHash: text("tx_hash").notNull(),
-  fromAddress: text("from_address"),
-  toAddress: text("to_address"),
-  amount: real("amount"),
-  status: text("status").default("pending"),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const onChainTransactions = mysqlTable("on_chain_transactions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  blockchain: varchar("blockchain", { length: 255 }).notNull(), // ethereum | solana | bitcoin
+  txHash: varchar("tx_hash", { length: 255 }).notNull(),
+  fromAddress: varchar("from_address", { length: 255 }),
+  toAddress: varchar("to_address", { length: 255 }),
+  amount: float("amount"),
+  status: varchar("status", { length: 255 }).default("pending"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ TOKEN & ECONOMY TABLES ============
-export const tokenMarketState = sqliteTable("token_market_state", {
-  id: text("id").primaryKey(),
-  tokenSymbol: text("token_symbol").notNull(),
-  price: real("price").notNull(),
-  marketCap: real("market_cap"),
-  volume24h: real("volume_24h"),
-  circulatingSupply: real("circulating_supply"),
-  totalSupply: real("total_supply"),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+export const tokenMarketState = mysqlTable("token_market_state", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  tokenSymbol: varchar("token_symbol", { length: 255 }).notNull(),
+  price: float("price").notNull(),
+  marketCap: float("market_cap"),
+  volume24h: float("volume_24h"),
+  circulatingSupply: float("circulating_supply"),
+  totalSupply: float("total_supply"),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const tokenEmissionCaps = sqliteTable("token_emission_caps", {
-  id: text("id").primaryKey(),
-  tokenSymbol: text("token_symbol").notNull(),
-  maxEmission: real("max_emission"),
-  currentEmission: real("current_emission"),
-  emissionRate: real("emission_rate"),
-  lastAdjustedAt: integer("last_adjusted_at", { mode: "timestamp" }),
+export const tokenEmissionCaps = mysqlTable("token_emission_caps", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  tokenSymbol: varchar("token_symbol", { length: 255 }).notNull(),
+  maxEmission: float("max_emission"),
+  currentEmission: float("current_emission"),
+  emissionRate: float("emission_rate"),
+  lastAdjustedAt: timestamp("last_adjusted_at"),
 });
 
-export const userArchetypes = sqliteTable("user_archetypes", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id).notNull(),
-  archetype: text("archetype").notNull(), // trader | hodler | miner | creator | etc
-  score: real("score").default(0),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+export const userArchetypes = mysqlTable("user_archetypes", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  archetype: varchar("archetype", { length: 255 }).notNull(), // trader | hodler | miner | creator | etc
+  score: float("score").default(0),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
 // ============ GOVERNANCE & MODERATION TABLES ============
-export const governanceProposals = sqliteTable("governance_proposals", {
-  id: text("id").primaryKey(),
-  proposerId: text("proposer_id").references(() => users.id).notNull(),
-  title: text("title").notNull(),
-  description: text("description"),
-  status: text("status").default("active"), // active | passed | failed | executed
-  votesFor: integer("votes_for").default(0),
-  votesAgainst: integer("votes_against").default(0),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
+export const governanceProposals = mysqlTable("governance_proposals", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  proposerId: varchar("proposer_id", { length: 255 }).references(() => users.id).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: varchar("description", { length: 255 }),
+  status: varchar("status", { length: 255 }).default("active"), // active | passed | failed | executed
+  votesFor: int("votes_for").default(0),
+  votesAgainst: int("votes_against").default(0),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  expiresAt: timestamp("expires_at"),
 });
 
-export const governanceVotes = sqliteTable("governance_votes", {
-  id: text("id").primaryKey(),
-  proposalId: text("proposal_id").references(() => governanceProposals.id).notNull(),
-  voterId: text("voter_id").references(() => users.id).notNull(),
-  vote: text("vote").notNull(), // for | against
-  weight: real("weight").default(1),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const governanceVotes = mysqlTable("governance_votes", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  proposalId: varchar("proposal_id", { length: 255 }).references(() => governanceProposals.id).notNull(),
+  voterId: varchar("voter_id", { length: 255 }).references(() => users.id).notNull(),
+  vote: varchar("vote", { length: 255 }).notNull(), // for | against
+  weight: float("weight").default(1),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const moderationLogs = sqliteTable("moderation_logs", {
-  id: text("id").primaryKey(),
-  moderatorId: text("moderator_id").references(() => users.id),
-  targetUserId: text("target_user_id").references(() => users.id),
-  action: text("action").notNull(), // warn | mute | ban | delete
-  reason: text("reason"),
-  duration: integer("duration"), // in seconds, null for permanent
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+export const moderationLogs = mysqlTable("moderation_logs", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  moderatorId: varchar("moderator_id", { length: 255 }).references(() => users.id),
+  targetUserId: varchar("target_user_id", { length: 255 }).references(() => users.id),
+  action: varchar("action", { length: 255 }).notNull(), // warn | mute | ban | delete
+  reason: varchar("reason", { length: 255 }),
+  duration: int("duration"), // in seconds, null for permanent
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const platformMetrics = sqliteTable("platform_metrics", {
-  id: text("id").primaryKey(),
-  metricType: text("metric_type").notNull(), // dau | mau | tvl | volume
-  value: real("value").notNull(),
-  timestamp: integer("timestamp", { mode: "timestamp" }).default(new Date()),
+export const platformMetrics = mysqlTable("platform_metrics", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  metricType: varchar("metric_type", { length: 255 }).notNull(), // dau | mau | tvl | volume
+  value: float("value").notNull(),
+  timestamp: timestamp("timestamp").default(new Date()),
 });

@@ -54,7 +54,7 @@ export const unfollowUserProcedure = publicProcedure
 
     // Operation 3: Attempt to delete the follow relationship
     const result = await db.delete(follows)
-      .where(and(eq(follows.followerId, followerId), eq(follows.followingId, followingId)))
+      .where(and(eq(follows.followerId, followerId as string), eq(follows.followingId, followingId as string)))
       .returning({ id: follows.followerId }); // Return something to check if a row was affected
 
     // Operation 4: Check if any row was actually deleted

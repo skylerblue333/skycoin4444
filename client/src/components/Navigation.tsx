@@ -54,7 +54,7 @@ const navCategories = {
   ],
 };
 
-export function TopNavigation() {
+export default function Navigation() {
   return (
     <nav className="sticky top-0 z-40 bg-slate-950 border-b border-slate-800 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -110,65 +110,4 @@ export function TopNavigation() {
   );
 }
 
-export function BottomNavigation() {
-  const items = [
-    { label: "Home", icon: Home, path: "/" },
-    { label: "Explore", icon: Compass, path: "/explore" },
-    { label: "Shop", icon: ShoppingCart, path: "/marketplace" },
-    { label: "Community", icon: Users, path: "/communityhub" },
-    { label: "Profile", icon: User, path: "/profile" },
-  ];
 
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800 bg-slate-950 md:hidden">
-      <div className="flex items-center justify-between px-2 py-2">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Link key={item.path} href={item.path}>
-              <a className="flex-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full flex flex-col items-center gap-1 h-auto py-2"
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs">{item.label}</span>
-                </Button>
-              </a>
-            </Link>
-          );
-        })}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 flex flex-col items-center gap-1 h-auto py-2"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-              <span className="text-xs">More</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 mb-20">
-            <DropdownMenuLabel>Categories</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {Object.entries(navCategories).map(([category]) => (
-              <Link key={category} href={`/${category.toLowerCase()}`}>
-                <a>
-                  <DropdownMenuItem className="cursor-pointer">
-                    {category}
-                  </DropdownMenuItem>
-                </a>
-              </Link>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </nav>
-  );
-}
-
-
-export { Navigation };

@@ -246,8 +246,8 @@ Predict 2-3 likely system events in the next 24 hours. Respond in JSON array:
     const events = await db
       .select()
       .from(auditLedger)
-      .where(gte(auditLedger.occurredAt, since))
-      .orderBy(desc(auditLedger.occurredAt))
+      .where(gte(auditLedger.createdAt, since))
+      .orderBy(desc(auditLedger.createdAt))
       .limit(500);
 
     for (const event of events) {
