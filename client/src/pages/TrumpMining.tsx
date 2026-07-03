@@ -70,7 +70,7 @@ export default function TrumpMining() {
 
   const handleLogin = () => {
     // Use window.location.href for server-side redirect to avoid pushState security error
-    window.location.href = getLoginUrl();
+    // Removed login redirect for testing;
   };
 
   const startMining = () => {

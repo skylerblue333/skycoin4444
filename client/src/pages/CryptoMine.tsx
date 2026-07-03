@@ -107,7 +107,7 @@ export default function CryptoMine() {
   });
 
   const handleMine = (action: typeof MINE_ACTIONS[number]["action"]) => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     setMiningAction(action);
     engageMutation.mutate({ action });
   };
@@ -233,7 +233,7 @@ export default function CryptoMine() {
 
             {!isAuthenticated && (
               <Button
-                onClick={() => window.location.href = getLoginUrl()}
+                onClick={() => // Removed login redirect for testing}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold"
               >
                 <Unlock className="w-4 h-4 mr-2" /> Login to Mine

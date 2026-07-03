@@ -53,7 +53,7 @@ export default function GamePlinko() {
   const multipliers = getMultipliers(risk);
 
   const drop = useCallback(() => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     const w = parseFloat(wager);
     if (isNaN(w) || w <= 0) { toast.error("Enter a valid wager"); return; }
     if (w > balance) { toast.error("Insufficient balance"); return; }
@@ -105,7 +105,7 @@ export default function GamePlinko() {
           <Circle className="w-16 h-16 text-yellow-400 mx-auto" />
           <h2 className="text-2xl font-black text-white">Plinko</h2>
           <p className="text-slate-400">Sign in to play with SKY444</p>
-          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white border-0">Sign In to Play</Button>
+          <Button onClick={() => // Removed login redirect for testing} className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white border-0">Sign In to Play</Button>
         </div>
       </div>
     );

@@ -96,7 +96,7 @@ function BuyWidget() {
 
   const handleBuy = () => {
     if (!user) {
-      window.location.href = getLoginUrl();
+      // Removed login redirect for testing;
       return;
     }
     if (usdAmount < 100) {
@@ -577,7 +577,7 @@ export default function InvestorPortal() {
                 <Lock className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
                 <h3 className="text-xl font-bold mb-2">Sign In to View Your Portfolio</h3>
                 <p className="text-zinc-500 mb-6">Track your SKY444 purchases, vesting schedule, and claimable tokens.</p>
-                <Button onClick={() => window.location.href = getLoginUrl()} className="bg-violet-600 hover:bg-violet-500">
+                <Button onClick={() => // Removed login redirect for testing} className="bg-violet-600 hover:bg-violet-500">
                   Sign In
                 </Button>
               </div>

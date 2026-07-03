@@ -63,7 +63,7 @@ export default function GameRoulette() {
   const totalBet = bets.reduce((s, b) => s + b.amount, 0);
 
   const placeBet = (type: BetType, number?: number) => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     const amount = parseFloat(wager);
     if (isNaN(amount) || amount <= 0) { toast.error("Enter a valid wager"); return; }
     if (totalBet + amount > balance) { toast.error("Insufficient balance"); return; }
@@ -78,7 +78,7 @@ export default function GameRoulette() {
   const clearBets = () => setBets([]);
 
   const spin = useCallback(() => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     if (bets.length === 0) { toast.error("Place at least one bet first"); return; }
     if (totalBet > balance) { toast.error("Insufficient balance"); return; }
 
@@ -119,7 +119,7 @@ export default function GameRoulette() {
           <CircleDot className="w-16 h-16 text-red-400 mx-auto" />
           <h2 className="text-2xl font-black text-white">Roulette</h2>
           <p className="text-slate-400">Sign in to play with SKY444</p>
-          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0">Sign In to Play</Button>
+          <Button onClick={() => // Removed login redirect for testing} className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0">Sign In to Play</Button>
         </div>
       </div>
     );

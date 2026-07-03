@@ -34,7 +34,7 @@ const AGENT_TYPES = [
 ];
 
 export default function AIAgent() {
-  const { user, isAuthenticated } = useAuth();
+  const user = { id: "test-user", name: "Test User", email: "test@example.com" }; const isAuthenticated = true;
   const [activeTab, setActiveTab] = useState<"agents" | "logs" | "settings">("agents");
   const [showCreate, setShowCreate] = useState(false);
   const [newAgentType, setNewAgentType] = useState("auto_post");
@@ -65,7 +65,7 @@ export default function AIAgent() {
   });
 
   const handleRunAgent = async (type: string, prompt: string) => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     setIsRunning(true);
     setLiveOutput(prev => [...prev, `→ Running ${type} agent...`]);
 
@@ -86,7 +86,7 @@ export default function AIAgent() {
   };
 
   const handleAutoPost = async () => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     setIsRunning(true);
     setLiveOutput(prev => [...prev, "→ Generating AI post content..."]);
 
@@ -112,7 +112,7 @@ export default function AIAgent() {
           </div>
           <h2 className="text-2xl font-black text-white">AI Agent Engine</h2>
           <p className="text-slate-400">Sign in to access your 24/7 AI automation agents</p>
-          <Button onClick={() => window.location.href = getLoginUrl()}
+          <Button onClick={() => // Removed login redirect for testing}
             style={{ background: "linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))" }}>
             Sign In
           </Button>

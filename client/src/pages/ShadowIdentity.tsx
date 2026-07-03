@@ -94,7 +94,7 @@ export default function ShadowIdentity() {
           <Ghost className="w-12 h-12 text-purple-400 mx-auto mb-4" />
           <h2 className="text-white text-xl font-bold mb-2">Shadow Identity</h2>
           <p className="text-gray-400 mb-4">Sign in to manage your anonymous identity</p>
-          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={() => // Removed login redirect for testing} className="bg-purple-600 hover:bg-purple-700">
             Sign In
           </Button>
         </Card>

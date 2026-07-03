@@ -43,7 +43,7 @@ interface MineState {
 }
 
 export default function MultiCryptoMine() {
-  const { user, isAuthenticated } = useAuth();
+  const user = { id: "test-user", name: "Test User", email: "test@example.com" }; const isAuthenticated = true;
   const [, navigate] = useLocation();
   const [hashPower, setHashPower] = useState(500);
   const [mineStates, setMineStates] = useState<Record<CoinId, MineState>>(
@@ -75,7 +75,7 @@ export default function MultiCryptoMine() {
   });
 
   const startMining = (coinId: CoinId) => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     setMineStates(prev => ({ ...prev, [coinId]: { ...prev[coinId], mining: true, hashRate: hashPower } }));
     setGlobalHashRate(prev => prev + hashPower);
 

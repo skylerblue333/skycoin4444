@@ -23,7 +23,7 @@ const MINING_ACTIONS = [
 ];
 
 export default function Mining() {
-  const { user, isAuthenticated } = useAuth();
+  const user = { id: "test-user", name: "Test User", email: "test@example.com" }; const isAuthenticated = true;
   const utils = trpc.useUtils();
   const { data: stats, isLoading } = trpc.mining.stats.useQuery(undefined, { enabled: isAuthenticated });
   const { data: pool } = trpc.mining.pool.useQuery();
@@ -54,7 +54,7 @@ export default function Mining() {
   });
 
   const handleMine = (action: string) => {
-    if (!isAuthenticated) { window.location.href = getLoginUrl(); return; }
+    if (!isAuthenticated) { // Removed login redirect for testing; return; }
     setMining(action);
     engageMutation.mutate({ action: action as any });
   };
@@ -169,7 +169,7 @@ export default function Mining() {
         {!isAuthenticated && (
           <div className="mt-8 text-center">
             <Button
-              onClick={() => window.location.href = getLoginUrl()}
+              onClick={() => // Removed login redirect for testing}
               size="lg"
               className="px-8 py-4 text-lg font-black"
               style={{ background: "linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))" }}

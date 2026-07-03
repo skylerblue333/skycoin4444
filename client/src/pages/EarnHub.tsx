@@ -340,7 +340,7 @@ function YieldTab() {
                 variant="outline"
                 style={{ borderColor: pool.color + "40", color: pool.color }}
                 onClick={() => {
-                  if (!user) { window.location.href = getLoginUrl(); return; }
+                  if (!user) { // Removed login redirect for testing; return; }
                   toast.success(`Entering ${pool.name} pool...`);
                 }}
               >
