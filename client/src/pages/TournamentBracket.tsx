@@ -99,7 +99,7 @@ export default function TournamentBracket() {
                   </Button>
                 )}
                 {!isAuthenticated && t.status === "upcoming" && (
-                  <Button onClick={() => // Removed login redirect for testing} variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full">
                     Sign in to Enter
                   </Button>
                 )}

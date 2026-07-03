@@ -130,7 +130,7 @@ export default function Messages() {
           </div>
           <h2 className="text-2xl font-black text-white">Private Messages</h2>
           <p className="text-slate-400">Sign in to access your encrypted messages</p>
-          <Button onClick={() => // Removed login redirect for testing}
+          <Button 
             style={{ background: "linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))" }}>
             Sign In
           </Button>

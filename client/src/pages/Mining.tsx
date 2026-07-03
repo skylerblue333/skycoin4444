@@ -169,7 +169,7 @@ export default function Mining() {
         {!isAuthenticated && (
           <div className="mt-8 text-center">
             <Button
-              onClick={() => // Removed login redirect for testing}
+              
               size="lg"
               className="px-8 py-4 text-lg font-black"
               style={{ background: "linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))" }}

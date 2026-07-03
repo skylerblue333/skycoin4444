@@ -219,7 +219,7 @@ export default function CryptoHub() {
           <Wallet className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Connect to CryptoHub</h2>
           <p className="text-zinc-400 mb-6">Sign in to mine, swap, stake, and burn tokens.</p>
-          <Button onClick={() => // Removed login redirect for testing} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button  className="bg-indigo-600 hover:bg-indigo-700">
             Sign In
           </Button>
         </Card>

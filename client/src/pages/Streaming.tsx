@@ -494,7 +494,7 @@ export default function Streaming() {
                 <Plus className="w-4 h-4 mr-2" /> Schedule a Stream
               </Button>
             ) : (
-              <Button onClick={() => // Removed login redirect for testing}
+              <Button
                 style={{ background: "linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))" }}>
                 Sign In to Schedule
               </Button>

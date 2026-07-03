@@ -119,7 +119,7 @@ export default function GameRoulette() {
           <CircleDot className="w-16 h-16 text-red-400 mx-auto" />
           <h2 className="text-2xl font-black text-white">Roulette</h2>
           <p className="text-slate-400">Sign in to play with SKY444</p>
-          <Button onClick={() => // Removed login redirect for testing} className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0">Sign In to Play</Button>
+          <Button  className="bg-gradient-to-r from-red-600 to-orange-600 text-white border-0">Sign In to Play</Button>
         </div>
       </div>
     );

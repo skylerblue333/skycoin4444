@@ -969,15 +969,24 @@ export async function getStakingPoolStats() {
   ];
   const results = [];
   for (const pool of pools) {
-    const [stats] = await db.select({
-      totalStaked: sum(stakingPositions.amount),
-      participants: count(),
-    }).from(stakingPositions).where(and(eq(stakingPositions.lockDays, pool.lockDays), eq(stakingPositions.status, "active")));
-    results.push({
-      ...pool,
-      totalStaked: Number(stats?.totalStaked || 0),
-      participants: stats?.participants || 0,
-    });
+    try {
+      const [stats] = await db.select({
+        totalStaked: sum(stakingPositions.amount),
+        participants: count(),
+      }).from(stakingPositions).where(and(eq(stakingPositions.lockDays, pool.lockDays), eq(stakingPositions.status, "active")));
+      results.push({
+        ...pool,
+        totalStaked: Number(stats?.totalStaked || 0),
+        participants: stats?.participants || 0,
+      });
+    } catch (error) {
+      console.error(`[Staking] Failed to get stats for pool ${pool.id}:`, error);
+      results.push({
+        ...pool,
+        totalStaked: 0,
+        participants: 0,
+      });
+    }
   }
   return results;
 }

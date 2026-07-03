@@ -97,7 +97,7 @@ export default function OrderHistory() {
         <div className="text-center space-y-4">
           <ShoppingBag className="w-16 h-16 text-slate-700 mx-auto" />
           <h2 className="text-xl font-bold text-white">Sign in to view orders</h2>
-          <Button onClick={() => // Removed login redirect for testing} className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
+          <Button  className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
             Sign In
           </Button>
         </div>
