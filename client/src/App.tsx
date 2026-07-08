@@ -465,7 +465,7 @@ const HealthArticles = lazy(() => import('./pages/HealthArticles'));
 const HealthDashboard = lazy(() => import('./pages/HealthDashboard'));
 const HealthGoals = lazy(() => import('./pages/HealthGoals'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
-const Home = lazy(() => import('./pages/Home'));
+// Home is already imported at the top
 const HopeAI = lazy(() => import('./pages/HopeAI'));
 const HopeAIAdvanced = lazy(() => import('./pages/HopeAIAdvanced'));
 const HopeAIMeta = lazy(() => import('./pages/HopeAIMeta'));
@@ -615,7 +615,7 @@ const NetWorthTracker = lazy(() => import('./pages/NetWorthTracker'));
 const NetworkGraph = lazy(() => import('./pages/NetworkGraph'));
 const NetworkHealth = lazy(() => import('./pages/NetworkHealth'));
 const NetworkStatistics = lazy(() => import('./pages/NetworkStatistics'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+// NotFound is already imported at the top
 const NotesApp = lazy(() => import('./pages/NotesApp'));
 const NotificationCenter = lazy(() => import('./pages/NotificationCenter'));
 const NotificationHistory = lazy(() => import('./pages/NotificationHistory'));
