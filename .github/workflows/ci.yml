@@ -1,0 +1,1 @@
+name: CI\non: [push, pull_request]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Build\n        run: echo 'Building core ecosystem...'
