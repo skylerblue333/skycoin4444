@@ -1,0 +1,371 @@
+Tier,Category,Company,Contact_Name,Email,Phone,Priority,Type
+0,Mega VC,a16z crypto,Chris Dixon,cdixon@a16z.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,a16z crypto,Chris Dixon,chris@a16z.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Sequoia Capital,Roelof Botha,roelof@sequoia.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Sequoia Capital,Roelof Botha,roelof.botha@sequoia.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Paradigm,Fred Ehrsam,fred@paradigm.xyz,(415) 800-5000,CRITICAL,VC
+0,Mega VC,Paradigm,Fred Ehrsam,fred.ehrsam@paradigm.xyz,(415) 800-5000,CRITICAL,VC
+0,Mega VC,Polychain Capital,Olaf Carlson-Wee,olaf@polychain.capital,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Polychain Capital,Olaf Carlson-Wee,olaf.carlson-wee@polychain.capital,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Coinbase Ventures,Adam White,ventures@coinbase.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Coinbase Ventures,Adam White,adam.white@coinbase.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Binance Labs,Ella Zhang,labs@binance.com,+65-6950-0000,CRITICAL,VC
+0,Mega VC,Binance Labs,Ella Zhang,ella.zhang@binance.com,+65-6950-0000,CRITICAL,VC
+0,Mega VC,Galaxy Digital,Mike Novogratz,info@galaxydigital.io,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Galaxy Digital,Mike Novogratz,mike@galaxydigital.io,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Pantera Capital,Dan Morehead,info@panteracapital.com,(650) 814-1100,CRITICAL,VC
+0,Mega VC,Pantera Capital,Dan Morehead,dan@panteracapital.com,(650) 814-1100,CRITICAL,VC
+0,Mega VC,Electric Capital,Avichal Garg,hello@electriccapital.com,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Electric Capital,Avichal Garg,avichal@electriccapital.com,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Dragonfly Capital,Haseeb Qureshi,hello@dragonflycapital.com,(415) 800-5000,CRITICAL,VC
+0,Mega VC,Dragonfly Capital,Haseeb Qureshi,haseeb@dragonflycapital.com,(415) 800-5000,CRITICAL,VC
+0,Mega VC,Multicoin Capital,Kyle Samani,hello@multicoin.capital,(512) 900-0000,CRITICAL,VC
+0,Mega VC,Multicoin Capital,Kyle Samani,kyle@multicoin.capital,(512) 900-0000,CRITICAL,VC
+0,Mega VC,Distributed Global,Raoul Paul,hello@distributed.global,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Distributed Global,Raoul Paul,raoul@distributed.global,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Sfermion,Raoul Paul,hello@sfermion.io,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Sfermion,Raoul Paul,raoul@sfermion.io,(650) 308-3000,CRITICAL,VC
+0,Mega VC,Placeholder,Joel Monegro,hello@placeholder.vc,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Placeholder,Joel Monegro,joel@placeholder.vc,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Lerer Hippeau,Ben Lerer,submissions@lererhippeau.com,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Lerer Hippeau,Ben Lerer,ben@lererhippeau.com,(212) 390-9200,CRITICAL,VC
+0,Mega VC,Initialized Capital,Alexis Ohanian,hello@initialized.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Initialized Capital,Alexis Ohanian,alexis@initialized.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Khosla Ventures,Vinod Khosla,submissions@khosla.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Khosla Ventures,Vinod Khosla,vinod@khosla.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Greylock Partners,Reid Hoffman,submissions@greylock.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Greylock Partners,Reid Hoffman,reid@greylock.com,(650) 854-3927,CRITICAL,VC
+0,Mega VC,Bessemer Venture Partners,Byron Deeter,submissions@bvp.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Bessemer Venture Partners,Byron Deeter,byron@bvp.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Accel Partners,Rich Wong,submissions@accel.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,Accel Partners,Rich Wong,rich@accel.com,(650) 614-1200,CRITICAL,VC
+0,Mega VC,OpenAI Ventures,Sam Altman,ventures@openai.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,OpenAI Ventures,Sam Altman,sam@openai.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Anthropic,Dario Amodei,partnerships@anthropic.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Anthropic,Dario Amodei,dario@anthropic.com,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Hugging Face,Clement Delangue,partnerships@huggingface.co,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Hugging Face,Clement Delangue,clement@huggingface.co,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Stability AI,Emad Mostaque,partnerships@stability.ai,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Stability AI,Emad Mostaque,emad@stability.ai,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Together AI,Vipul Jain,partnerships@together.ai,(415) 944-7000,CRITICAL,VC
+0,Mega VC,Together AI,Vipul Jain,vipul@together.ai,(415) 944-7000,CRITICAL,VC
+0,Strategic,Tesla Ventures,Elon Musk,partnerships@tesla.com,(512) 516-8177,HIGH,Strategic
+0,Strategic,Tesla Ventures,Elon Musk,elon@tesla.com,(512) 516-8177,HIGH,Strategic
+0,Strategic,SpaceX,Elon Musk,partnerships@spacex.com,(310) 363-6000,HIGH,Strategic
+0,Strategic,SpaceX,Elon Musk,elon@spacex.com,(310) 363-6000,HIGH,Strategic
+0,Strategic,X (Twitter),Elon Musk,partnerships@twitter.com,(415) 222-9670,HIGH,Strategic
+0,Strategic,X (Twitter),Elon Musk,elon@twitter.com,(415) 222-9670,HIGH,Strategic
+0,Strategic,Google Ventures,Bill Maris,ventures@google.com,(650) 253-0000,HIGH,Strategic
+0,Strategic,Google Ventures,Bill Maris,bill.maris@google.com,(650) 253-0000,HIGH,Strategic
+0,Strategic,Microsoft Ventures,Nagraj Kashyap,ventures@microsoft.com,(425) 882-8080,HIGH,Strategic
+0,Strategic,Microsoft Ventures,Nagraj Kashyap,nagraj@microsoft.com,(425) 882-8080,HIGH,Strategic
+1,Exchanges,Binance,Changpeng Zhao,partnerships@binance.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,Binance,Changpeng Zhao,cz@binance.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,Binance,Changpeng Zhao,listing@binance.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,Coinbase,Brian Armstrong,partnerships@coinbase.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,Coinbase,Brian Armstrong,brian@coinbase.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,Coinbase,Brian Armstrong,listing@coinbase.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,Kraken,Jesse Powell,partnerships@kraken.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,Kraken,Jesse Powell,jesse@kraken.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,Kraken,Jesse Powell,listing@kraken.com,(415) 944-7000,HIGH,Exchange
+1,Exchanges,OKX,Star Xu,partnerships@okx.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,OKX,Star Xu,star@okx.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,OKX,Star Xu,listing@okx.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,Gate.io,Lin Han,partnerships@gate.io,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Gate.io,Lin Han,linhan@gate.io,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Gate.io,Lin Han,listing@gate.io,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Bybit,Ben Zhou,partnerships@bybit.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,Bybit,Ben Zhou,ben@bybit.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,Bybit,Ben Zhou,listing@bybit.com,+65-6950-0000,HIGH,Exchange
+1,Exchanges,KuCoin,Johnny Lyu,partnerships@kucoin.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,KuCoin,Johnny Lyu,johnny@kucoin.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,KuCoin,Johnny Lyu,listing@kucoin.com,+852-3956-6888,HIGH,Exchange
+1,Exchanges,Huobi,Leon Li,partnerships@huobi.com,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Huobi,Leon Li,leon@huobi.com,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Huobi,Leon Li,listing@huobi.com,+86-10-5731-0000,HIGH,Exchange
+1,Exchanges,Uniswap,Hayden Adams,hello@uniswap.org,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Uniswap,Hayden Adams,hayden@uniswap.org,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Uniswap,Hayden Adams,governance@uniswap.org,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Aave,Stani Kulechov,governance@aave.com,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Aave,Stani Kulechov,stani@aave.com,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Aave,Stani Kulechov,partnerships@aave.com,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Curve Finance,Michael Egorov,hello@curve.fi,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Curve Finance,Michael Egorov,michael@curve.fi,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Balancer,Fernando Martinelli,hello@balancer.fi,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Balancer,Fernando Martinelli,fernando@balancer.fi,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Compound,Robert Leshner,hello@compound.finance,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Compound,Robert Leshner,robert@compound.finance,(212) 390-9200,HIGH,Exchange
+1,Exchanges,MakerDAO,Rune Christensen,hello@makerdao.com,(212) 390-9200,HIGH,Exchange
+1,Exchanges,MakerDAO,Rune Christensen,rune@makerdao.com,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Lido,Lido DAO,hello@lido.fi,(212) 390-9200,HIGH,Exchange
+1,Exchanges,Lido,Lido DAO,governance@lido.fi,(212) 390-9200,HIGH,Exchange
+2,Media,TechCrunch,Sarah Buhr,press@techcrunch.com,(415) 944-7000,HIGH,Media
+2,Media,TechCrunch,Sarah Buhr,sarah@techcrunch.com,(415) 944-7000,HIGH,Media
+2,Media,TechCrunch,TechCrunch,editorial@techcrunch.com,(415) 944-7000,HIGH,Media
+2,Media,Cointelegraph,Michael Casey,press@cointelegraph.com,(212) 390-9200,HIGH,Media
+2,Media,Cointelegraph,Michael Casey,michael@cointelegraph.com,(212) 390-9200,HIGH,Media
+2,Media,Cointelegraph,Cointelegraph,editorial@cointelegraph.com,(212) 390-9200,HIGH,Media
+2,Media,The Block,Frank Chaparro,press@theblock.co,(212) 390-9200,HIGH,Media
+2,Media,The Block,Frank Chaparro,frank@theblock.co,(212) 390-9200,HIGH,Media
+2,Media,The Block,The Block,editorial@theblock.co,(212) 390-9200,HIGH,Media
+2,Media,Decrypt,Daniel Roberts,hello@decrypt.co,(212) 390-9200,HIGH,Media
+2,Media,Decrypt,Daniel Roberts,daniel@decrypt.co,(212) 390-9200,HIGH,Media
+2,Media,Decrypt,Decrypt,editorial@decrypt.co,(212) 390-9200,HIGH,Media
+2,Media,CoinDesk,Nikhilesh De,editorial@coindesk.com,(212) 390-9200,HIGH,Media
+2,Media,CoinDesk,Nikhilesh De,nikhilesh@coindesk.com,(212) 390-9200,HIGH,Media
+2,Media,CoinDesk,CoinDesk,press@coindesk.com,(212) 390-9200,HIGH,Media
+2,Media,Blockworks,Will Gottsegen,hello@blockworks.co,(212) 390-9200,HIGH,Media
+2,Media,Blockworks,Will Gottsegen,will@blockworks.co,(212) 390-9200,HIGH,Media
+2,Media,Blockworks,Blockworks,editorial@blockworks.co,(212) 390-9200,HIGH,Media
+2,Media,Bankless,Ryan Sean Adams,hello@bankless.com,(212) 390-9200,HIGH,Media
+2,Media,Bankless,Ryan Sean Adams,ryan@bankless.com,(212) 390-9200,HIGH,Media
+2,Media,Bankless,Bankless,editorial@bankless.com,(212) 390-9200,HIGH,Media
+2,Media,The Defiant,Camila Russo,hello@thedefiant.com,(212) 390-9200,HIGH,Media
+2,Media,The Defiant,Camila Russo,camila@thedefiant.com,(212) 390-9200,HIGH,Media
+2,Media,The Defiant,The Defiant,editorial@thedefiant.com,(212) 390-9200,HIGH,Media
+2,Media,Wired,Nicholas Thompson,tips@wired.com,(415) 944-7000,HIGH,Media
+2,Media,Wired,Nicholas Thompson,nicholas@wired.com,(415) 944-7000,HIGH,Media
+2,Media,Wired,Wired,editorial@wired.com,(415) 944-7000,HIGH,Media
+2,Media,MIT Technology Review,Gideon Lichfield,submissions@technologyreview.com,(617) 253-0000,HIGH,Media
+2,Media,MIT Technology Review,Gideon Lichfield,gideon@technologyreview.com,(617) 253-0000,HIGH,Media
+2,Media,MIT Technology Review,MIT Tech Review,editorial@technologyreview.com,(617) 253-0000,HIGH,Media
+2,Media,VentureBeat,Dean Takahashi,news@venturebeat.com,(415) 944-7000,HIGH,Media
+2,Media,VentureBeat,Dean Takahashi,dean@venturebeat.com,(415) 944-7000,HIGH,Media
+2,Media,VentureBeat,VentureBeat,editorial@venturebeat.com,(415) 944-7000,HIGH,Media
+2,Media,Forbes,Steven Bertoni,contact@forbes.com,(212) 633-6000,HIGH,Media
+2,Media,Forbes,Steven Bertoni,steven@forbes.com,(212) 633-6000,HIGH,Media
+2,Media,Forbes,Forbes,editorial@forbes.com,(212) 633-6000,HIGH,Media
+2,Media,Fast Company,Stephanie Mehta,submissions@fastcompany.com,(212) 633-6000,HIGH,Media
+2,Media,Fast Company,Stephanie Mehta,stephanie@fastcompany.com,(212) 633-6000,HIGH,Media
+2,Media,Fast Company,Fast Company,editorial@fastcompany.com,(212) 633-6000,HIGH,Media
+2,Media,Inc Magazine,Jill Schlesinger,editorial@inc.com,(212) 633-6000,HIGH,Media
+2,Media,Inc Magazine,Jill Schlesinger,jill@inc.com,(212) 633-6000,HIGH,Media
+2,Media,Inc Magazine,Inc,press@inc.com,(212) 633-6000,HIGH,Media
+2,Podcasts,Bankless Podcast,Ryan Sean Adams,hello@bankless.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Bankless Podcast,Ryan Sean Adams,ryan@bankless.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,The Defiant Podcast,Camila Russo,hello@thedefiant.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,The Defiant Podcast,Camila Russo,camila@thedefiant.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Unchained Podcast,Laura Shin,hello@unchained.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Unchained Podcast,Laura Shin,laura@unchained.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Pomp & Circle,Anthony Pompliano,hello@pompandcircle.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Pomp & Circle,Anthony Pompliano,pomp@pompandcircle.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Invest Like the Best,Patrick O'Shaughnessy,hello@investlikethebest.com,(212) 390-9200,HIGH,Podcast
+2,Podcasts,Invest Like the Best,Patrick O'Shaughnessy,patrick@investlikethebest.com,(212) 390-9200,HIGH,Podcast
+3,Infrastructure,MetaMask,Dan Finlay,hello@metamask.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Infrastructure,MetaMask,Dan Finlay,dan@metamask.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Infrastructure,Phantom,Ryan Salame,hello@phantom.app,(415) 944-7000,MEDIUM,Infrastructure
+3,Infrastructure,Phantom,Ryan Salame,ryan@phantom.app,(415) 944-7000,MEDIUM,Infrastructure
+3,Infrastructure,Ledger,Pascal Gauthier,partnerships@ledger.com,+33-1-4000-0000,MEDIUM,Infrastructure
+3,Infrastructure,Ledger,Pascal Gauthier,pascal@ledger.com,+33-1-4000-0000,MEDIUM,Infrastructure
+3,Infrastructure,Trezor,Marek Palatinus,partnerships@trezor.io,+420-2-2142-0000,MEDIUM,Infrastructure
+3,Infrastructure,Trezor,Marek Palatinus,marek@trezor.io,+420-2-2142-0000,MEDIUM,Infrastructure
+3,Infrastructure,Safe,Lukas Schor,hello@safe.global,(212) 390-9200,MEDIUM,Infrastructure
+3,Infrastructure,Safe,Lukas Schor,lukas@safe.global,(212) 390-9200,MEDIUM,Infrastructure
+3,Development,Alchemy,Nikil Viswanathan,partnerships@alchemy.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Alchemy,Nikil Viswanathan,nikil@alchemy.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Infura,Lex Sokolin,partnerships@infura.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Infura,Lex Sokolin,lex@infura.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,QuickNode,Avi Eisenberg,partnerships@quicknode.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,QuickNode,Avi Eisenberg,avi@quicknode.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Moralis,Ivan Liljeqvist,partnerships@moralis.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Moralis,Ivan Liljeqvist,ivan@moralis.io,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Thirdweb,Steven Bartlett,partnerships@thirdweb.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Development,Thirdweb,Steven Bartlett,steven@thirdweb.com,(415) 944-7000,MEDIUM,Infrastructure
+3,Blockchain,Chainlink,Sergey Nazarov,partnerships@chain.link,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,Chainlink,Sergey Nazarov,sergey@chain.link,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,The Graph,Yaniv Tal,hello@thegraph.com,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,The Graph,Yaniv Tal,yaniv@thegraph.com,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,Arweave,Sam Williams,hello@arweave.org,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,Arweave,Sam Williams,sam@arweave.org,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,IPFS,Juan Benet,hello@ipfs.io,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,IPFS,Juan Benet,juan@ipfs.io,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,Filecoin,Juan Benet,hello@filecoin.io,(212) 390-9200,MEDIUM,Infrastructure
+3,Blockchain,Filecoin,Juan Benet,juan@filecoin.io,(212) 390-9200,MEDIUM,Infrastructure
+4,AI,OpenAI,Sam Altman,partnerships@openai.com,(415) 944-7000,MEDIUM,AI
+4,AI,OpenAI,Sam Altman,sam@openai.com,(415) 944-7000,MEDIUM,AI
+4,AI,Anthropic,Dario Amodei,partnerships@anthropic.com,(415) 944-7000,MEDIUM,AI
+4,AI,Anthropic,Dario Amodei,dario@anthropic.com,(415) 944-7000,MEDIUM,AI
+4,AI,Google DeepMind,Demis Hassabis,partnerships@deepmind.com,(650) 253-0000,MEDIUM,AI
+4,AI,Google DeepMind,Demis Hassabis,demis@deepmind.com,(650) 253-0000,MEDIUM,AI
+4,AI,Meta AI,Yann LeCun,partnerships@meta.com,(650) 308-3000,MEDIUM,AI
+4,AI,Meta AI,Yann LeCun,yann@meta.com,(650) 308-3000,MEDIUM,AI
+4,AI,Hugging Face,Clement Delangue,partnerships@huggingface.co,(415) 944-7000,MEDIUM,AI
+4,AI,Hugging Face,Clement Delangue,clement@huggingface.co,(415) 944-7000,MEDIUM,AI
+4,AI,Stability AI,Emad Mostaque,partnerships@stability.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Stability AI,Emad Mostaque,emad@stability.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Together AI,Vipul Jain,partnerships@together.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Together AI,Vipul Jain,vipul@together.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Replicate,Ben Firshman,partnerships@replicate.com,(415) 944-7000,MEDIUM,AI
+4,AI,Replicate,Ben Firshman,ben@replicate.com,(415) 944-7000,MEDIUM,AI
+4,AI,Cohere,Aidan Gomez,partnerships@cohere.com,(415) 944-7000,MEDIUM,AI
+4,AI,Cohere,Aidan Gomez,aidan@cohere.com,(415) 944-7000,MEDIUM,AI
+4,AI,Scale AI,Alexandr Wang,partnerships@scale.com,(415) 944-7000,MEDIUM,AI
+4,AI,Scale AI,Alexandr Wang,alexandr@scale.com,(415) 944-7000,MEDIUM,AI
+4,AI,Jasper,Dave Rogenmoser,partnerships@jasper.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Jasper,Dave Rogenmoser,dave@jasper.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Copy.ai,Paul Yacoubian,partnerships@copy.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Copy.ai,Paul Yacoubian,paul@copy.ai,(415) 944-7000,MEDIUM,AI
+4,AI,Midjourney,David Holz,partnerships@midjourney.com,(415) 944-7000,MEDIUM,AI
+4,AI,Midjourney,David Holz,david@midjourney.com,(415) 944-7000,MEDIUM,AI
+4,AI,Runway,Cristobal Valenzuela,partnerships@runway.ml,(415) 944-7000,MEDIUM,AI
+4,AI,Runway,Cristobal Valenzuela,cristobal@runway.ml,(415) 944-7000,MEDIUM,AI
+4,AI,Synthesia,Victor Riparbelli,partnerships@synthesia.io,(415) 944-7000,MEDIUM,AI
+4,AI,Synthesia,Victor Riparbelli,victor@synthesia.io,(415) 944-7000,MEDIUM,AI
+5,Cloud,AWS Startups,David Turetsky,startups@amazon.com,(206) 266-7000,MEDIUM,Cloud
+5,Cloud,AWS Startups,David Turetsky,david@amazon.com,(206) 266-7000,MEDIUM,Cloud
+5,Cloud,Google Cloud,Sundar Pichai,startups@google.com,(650) 253-0000,MEDIUM,Cloud
+5,Cloud,Google Cloud,Sundar Pichai,sundar@google.com,(650) 253-0000,MEDIUM,Cloud
+5,Cloud,Microsoft Azure,Satya Nadella,startups@microsoft.com,(425) 882-8080,MEDIUM,Cloud
+5,Cloud,Microsoft Azure,Satya Nadella,satya@microsoft.com,(425) 882-8080,MEDIUM,Cloud
+5,Cloud,DigitalOcean,Yancey Spruill,partnerships@digitalocean.com,(212) 390-9200,MEDIUM,Cloud
+5,Cloud,DigitalOcean,Yancey Spruill,yancey@digitalocean.com,(212) 390-9200,MEDIUM,Cloud
+5,Cloud,Heroku,Oren Teich,partnerships@heroku.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Heroku,Oren Teich,oren@heroku.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Vercel,Guillermo Rauch,partnerships@vercel.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Vercel,Guillermo Rauch,guillermo@vercel.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Netlify,Matt Biilmann,partnerships@netlify.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Netlify,Matt Biilmann,matt@netlify.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Railway,Bryan Stitt,partnerships@railway.app,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Railway,Bryan Stitt,bryan@railway.app,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Render,Anurag Goel,partnerships@render.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Render,Anurag Goel,anurag@render.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Fly.io,Kurt Mackey,partnerships@fly.io,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Fly.io,Kurt Mackey,kurt@fly.io,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Supabase,Paul Copplestone,partnerships@supabase.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Supabase,Paul Copplestone,paul@supabase.com,(415) 944-7000,MEDIUM,Cloud
+5,Cloud,Firebase,David Eastman,partnerships@firebase.com,(650) 253-0000,MEDIUM,Cloud
+5,Cloud,Firebase,David Eastman,david@firebase.com,(650) 253-0000,MEDIUM,Cloud
+6,Payment,Stripe,Patrick Collison,partnerships@stripe.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Stripe,Patrick Collison,patrick@stripe.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Square,Jack Dorsey,partnerships@squareup.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Square,Jack Dorsey,jack@squareup.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,PayPal,Dan Schulman,partnerships@paypal.com,(408) 967-1000,MEDIUM,Payment
+6,Payment,PayPal,Dan Schulman,dan@paypal.com,(408) 967-1000,MEDIUM,Payment
+6,Payment,Wise,Kristo Käärmann,partnerships@wise.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Wise,Kristo Käärmann,kristo@wise.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Revolut,Nikolay Storonsky,partnerships@revolut.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Revolut,Nikolay Storonsky,nikolay@revolut.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Circle,Jeremy Allaire,partnerships@circle.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Circle,Jeremy Allaire,jeremy@circle.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Paxos,Charles Cascarilla,partnerships@paxos.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Paxos,Charles Cascarilla,charles@paxos.com,(212) 390-9200,MEDIUM,Payment
+6,Payment,Wyre,Christy Shin,partnerships@wyre.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Wyre,Christy Shin,christy@wyre.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Ramp,Srinivas Krishnan,partnerships@ramp.network,(415) 944-7000,MEDIUM,Payment
+6,Payment,Ramp,Srinivas Krishnan,srinivas@ramp.network,(415) 944-7000,MEDIUM,Payment
+6,Payment,MoonPay,Ivan Soto-Wright,partnerships@moonpay.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,MoonPay,Ivan Soto-Wright,ivan@moonpay.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Transak,Rahul Rai,partnerships@transak.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Transak,Rahul Rai,rahul@transak.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Banxa,Ray King,partnerships@banxa.com,(415) 944-7000,MEDIUM,Payment
+6,Payment,Banxa,Ray King,ray@banxa.com,(415) 944-7000,MEDIUM,Payment
+7,Social,Discord,Jason Citron,partnerships@discord.com,(415) 944-7000,MEDIUM,Social
+7,Social,Discord,Jason Citron,jason@discord.com,(415) 944-7000,MEDIUM,Social
+7,Social,Twitter/X,Elon Musk,partnerships@twitter.com,(415) 222-9670,MEDIUM,Social
+7,Social,Twitter/X,Elon Musk,elon@twitter.com,(415) 222-9670,MEDIUM,Social
+7,Social,Reddit,Steve Huffman,partnerships@reddit.com,(415) 944-7000,MEDIUM,Social
+7,Social,Reddit,Steve Huffman,steve@reddit.com,(415) 944-7000,MEDIUM,Social
+7,Social,Telegram,Pavel Durov,partnerships@telegram.org,+1-650-253-0000,MEDIUM,Social
+7,Social,Telegram,Pavel Durov,pavel@telegram.org,+1-650-253-0000,MEDIUM,Social
+7,Social,Signal,Moxie Marlinspike,partnerships@signal.org,(415) 944-7000,MEDIUM,Social
+7,Social,Signal,Moxie Marlinspike,moxie@signal.org,(415) 944-7000,MEDIUM,Social
+7,Social,Slack,Stewart Butterfield,partnerships@slack.com,(415) 944-7000,MEDIUM,Social
+7,Social,Slack,Stewart Butterfield,stewart@slack.com,(415) 944-7000,MEDIUM,Social
+7,Social,Notion,Ivan Zhao,partnerships@notion.so,(415) 944-7000,MEDIUM,Social
+7,Social,Notion,Ivan Zhao,ivan@notion.so,(415) 944-7000,MEDIUM,Social
+7,Social,Figma,Dylan Field,partnerships@figma.com,(415) 944-7000,MEDIUM,Social
+7,Social,Figma,Dylan Field,dylan@figma.com,(415) 944-7000,MEDIUM,Social
+7,Social,Loom,Joe Thomas,partnerships@loom.com,(415) 944-7000,MEDIUM,Social
+7,Social,Loom,Joe Thomas,joe@loom.com,(415) 944-7000,MEDIUM,Social
+7,Social,Calendly,Tronc Seibert,partnerships@calendly.com,(415) 944-7000,MEDIUM,Social
+7,Social,Calendly,Tronc Seibert,tronc@calendly.com,(415) 944-7000,MEDIUM,Social
+7,Social,Zapier,Wade Foster,partnerships@zapier.com,(415) 944-7000,MEDIUM,Social
+7,Social,Zapier,Wade Foster,wade@zapier.com,(415) 944-7000,MEDIUM,Social
+7,Social,IFTTT,Linden Tibbets,partnerships@ifttt.com,(415) 944-7000,MEDIUM,Social
+7,Social,IFTTT,Linden Tibbets,linden@ifttt.com,(415) 944-7000,MEDIUM,Social
+8,Gaming,Unity,John Riccitiello,partnerships@unity.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Unity,John Riccitiello,john@unity.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Unreal Engine,Tim Sweeney,partnerships@unrealengine.com,(919) 460-0000,MEDIUM,Gaming
+8,Gaming,Unreal Engine,Tim Sweeney,tim@unrealengine.com,(919) 460-0000,MEDIUM,Gaming
+8,Gaming,Roblox,David Baszucki,partnerships@roblox.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Roblox,David Baszucki,david@roblox.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Decentraland,Esteban Ordano,partnerships@decentraland.org,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Decentraland,Esteban Ordano,esteban@decentraland.org,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,The Sandbox,Sebastien Borget,partnerships@sandbox.game,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,The Sandbox,Sebastien Borget,sebastien@sandbox.game,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Axie Infinity,Jihoz,partnerships@axieinfinity.com,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Axie Infinity,Jihoz,jihoz@axieinfinity.com,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Gala Games,Eric Schiermeyer,partnerships@gala.games,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Gala Games,Eric Schiermeyer,eric@gala.games,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Enjin,Maxim Blagov,partnerships@enjin.io,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Enjin,Maxim Blagov,maxim@enjin.io,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Flow,Dieter Shirley,partnerships@flow.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Flow,Dieter Shirley,dieter@flow.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Immutable,Robbie Ferguson,partnerships@immutable.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Immutable,Robbie Ferguson,robbie@immutable.com,(415) 944-7000,MEDIUM,Gaming
+8,Gaming,Polygon,Sandeep Nailwal,partnerships@polygon.technology,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Polygon,Sandeep Nailwal,sandeep@polygon.technology,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Arbitrum,Steven Goldfeder,partnerships@arbitrum.io,(212) 390-9200,MEDIUM,Gaming
+8,Gaming,Arbitrum,Steven Goldfeder,steven@arbitrum.io,(212) 390-9200,MEDIUM,Gaming
+9,Angels,AngelList,Naval Ravikant,partnerships@angellist.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,AngelList,Naval Ravikant,naval@angellist.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,SeedInvest,Ryan Frazier,partnerships@seedinvest.com,(212) 390-9200,MEDIUM,Angel
+9,Angels,SeedInvest,Ryan Frazier,ryan@seedinvest.com,(212) 390-9200,MEDIUM,Angel
+9,Angels,Crunchbase,Jager McConnell,partnerships@crunchbase.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Crunchbase,Jager McConnell,jager@crunchbase.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,PitchBook,John Gabbert,partnerships@pitchbook.com,(206) 774-4000,MEDIUM,Angel
+9,Angels,PitchBook,John Gabbert,john@pitchbook.com,(206) 774-4000,MEDIUM,Angel
+9,Angels,Gust,Justin Fishman,partnerships@gust.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Gust,Justin Fishman,justin@gust.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Fundable,Andrew Romans,partnerships@fundable.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Fundable,Andrew Romans,andrew@fundable.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Wefunder,Oren Klaff,partnerships@wefunder.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Wefunder,Oren Klaff,oren@wefunder.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,StartEngine,Howard Marks,partnerships@startengine.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,StartEngine,Howard Marks,howard@startengine.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Equity Zen,Atish Davey,partnerships@equityzen.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Equity Zen,Atish Davey,atish@equityzen.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,SecondMarket,Barry Silbert,partnerships@secondmarket.com,(212) 390-9200,MEDIUM,Angel
+9,Angels,SecondMarket,Barry Silbert,barry@secondmarket.com,(212) 390-9200,MEDIUM,Angel
+9,Angels,Forge,Anil Sethi,partnerships@forge.com,(415) 944-7000,MEDIUM,Angel
+9,Angels,Forge,Anil Sethi,anil@forge.com,(415) 944-7000,MEDIUM,Angel
+10,Strategic,Coursera,Daphne Koller,partnerships@coursera.org,(415) 944-7000,LOW,Strategic
+10,Strategic,Coursera,Daphne Koller,daphne@coursera.org,(415) 944-7000,LOW,Strategic
+10,Strategic,Udemy,Gagan Biyani,partnerships@udemy.com,(415) 944-7000,LOW,Strategic
+10,Strategic,Udemy,Gagan Biyani,gagan@udemy.com,(415) 944-7000,LOW,Strategic
+10,Strategic,Skillshare,Betty Chen,partnerships@skillshare.com,(415) 944-7000,LOW,Strategic
+10,Strategic,Skillshare,Betty Chen,betty@skillshare.com,(415) 944-7000,LOW,Strategic
+10,Strategic,MasterClass,David Rogier,partnerships@masterclass.com,(415) 944-7000,LOW,Strategic
+10,Strategic,MasterClass,David Rogier,david@masterclass.com,(415) 944-7000,LOW,Strategic
+10,Strategic,LinkedIn Learning,Karthik Krishnan,partnerships@linkedin.com,(415) 944-7000,LOW,Strategic
+10,Strategic,LinkedIn Learning,Karthik Krishnan,karthik@linkedin.com,(415) 944-7000,LOW,Strategic
+10,Charity,GiveWell,Elie Hassenfeld,partnerships@givewell.org,(415) 944-7000,LOW,Charity
+10,Charity,GiveWell,Elie Hassenfeld,elie@givewell.org,(415) 944-7000,LOW,Charity
+10,Charity,Charity Navigator,Trent Stamp,partnerships@charitynavigator.org,(212) 390-9200,LOW,Charity
+10,Charity,Charity Navigator,Trent Stamp,trent@charitynavigator.org,(212) 390-9200,LOW,Charity
+10,Charity,GlobalGiving,Donna Callejon,partnerships@globalgiving.org,(202) 688-9200,LOW,Charity
+10,Charity,GlobalGiving,Donna Callejon,donna@globalgiving.org,(202) 688-9200,LOW,Charity
+10,Charity,Guidestar,Jacob Harold,partnerships@guidestar.org,(703) 556-0000,LOW,Charity
+10,Charity,Guidestar,Jacob Harold,jacob@guidestar.org,(703) 556-0000,LOW,Charity
+10,Charity,Candid,Don Gips,partnerships@candid.org,(415) 944-7000,LOW,Charity
+10,Charity,Candid,Don Gips,don@candid.org,(415) 944-7000,LOW,Charity
+10,Streaming,Twitch,Dan Clancy,partnerships@twitch.tv,(206) 266-7000,LOW,Streaming
+10,Streaming,Twitch,Dan Clancy,dan@twitch.tv,(206) 266-7000,LOW,Streaming
+10,Streaming,YouTube,Susan Wojcicki,partnerships@youtube.com,(650) 253-0000,LOW,Streaming
+10,Streaming,YouTube,Susan Wojcicki,susan@youtube.com,(650) 253-0000,LOW,Streaming
+10,Streaming,Kick,Ed Craven,partnerships@kick.com,(415) 944-7000,LOW,Streaming
+10,Streaming,Kick,Ed Craven,ed@kick.com,(415) 944-7000,LOW,Streaming
+10,Streaming,Rumble,Chris Pavlovski,partnerships@rumble.com,(415) 944-7000,LOW,Streaming
+10,Streaming,Rumble,Chris Pavlovski,chris@rumble.com,(415) 944-7000,LOW,Streaming
+10,Streaming,Dailymotion,Olivier Schrameck,partnerships@dailymotion.com,(415) 944-7000,LOW,Streaming
+10,Streaming,Dailymotion,Olivier Schrameck,olivier@dailymotion.com,(415) 944-7000,LOW,Streaming
+10,Commerce,Shopify,Tobi Lutke,partnerships@shopify.com,(613) 241-3074,LOW,Commerce
+10,Commerce,Shopify,Tobi Lutke,tobi@shopify.com,(613) 241-3074,LOW,Commerce
+10,Commerce,WooCommerce,Matt Mullenweg,partnerships@woocommerce.com,(415) 944-7000,LOW,Commerce
+10,Commerce,WooCommerce,Matt Mullenweg,matt@woocommerce.com,(415) 944-7000,LOW,Commerce
+10,Commerce,BigCommerce,Brent Bellm,partnerships@bigcommerce.com,(512) 391-1234,LOW,Commerce
+10,Commerce,BigCommerce,Brent Bellm,brent@bigcommerce.com,(512) 391-1234,LOW,Commerce
+10,Commerce,Etsy,Josh Silverman,partnerships@etsy.com,(212) 390-9200,LOW,Commerce
+10,Commerce,Etsy,Josh Silverman,josh@etsy.com,(212) 390-9200,LOW,Commerce
+10,Commerce,eBay,Jamie Iannone,partnerships@ebay.com,(408) 550-5000,LOW,Commerce
+10,Commerce,eBay,Jamie Iannone,jamie@ebay.com,(408) 550-5000,LOW,Commerce
