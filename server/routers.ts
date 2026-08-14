@@ -5,6 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { userRouter } from "./userRouter";
 import { marketplaceRouter } from "./marketplaceRouter";
+import { messagesRouter } from "./messagesRouter";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -43,7 +44,7 @@ export const appRouter = router({
   socialCore: createFeatureRouter(),
   feed: createFeatureRouter(),
   community: createFeatureRouter(),
-  dm: createFeatureRouter(),
+  dm: messagesRouter,
   story: createFeatureRouter(),
 
   // Marketplace & Commerce Routers
