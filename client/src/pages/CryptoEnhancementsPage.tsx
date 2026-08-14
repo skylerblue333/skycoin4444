@@ -1,144 +1,109 @@
-import React from 'react';
-import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Coins, Zap, Wallet } from 'lucide-react'; // Using lucide-react for icons
+import {
+  AlertTriangle,
+  Database,
+  Landmark,
+  ShieldCheck,
+  WalletCards,
+} from "lucide-react";
 
-const CryptoEnhancementsPage = () => {
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Verified wallet and custody integration",
+    icon: WalletCards,
+    detail:
+      "Supported networks, securely managed wallet connections, transaction signing, address and network validation, asset reconciliation, transaction status verification, failure handling, and clear custody disclosures are required before offering wallet or portfolio functions.",
+  },
+  {
+    title: "Market data, trading, and swap infrastructure",
+    icon: Database,
+    detail:
+      "An authorized price-data source, source attribution, liquidity and routing integration, quote validation, fee disclosure, order or transaction verification, risk controls, and incident monitoring are required before showing a market price, enabling a swap, or presenting trading information.",
+  },
+  {
+    title: "Mining, staking, and yield safeguards",
+    icon: ShieldCheck,
+    detail:
+      "Verified eligibility, audited smart contracts or mining infrastructure, transparent reward rules, operational monitoring, loss and failure handling, risk disclosure, and independently verifiable results are required before claiming a mining, staking, yield, or reward opportunity.",
+  },
+  {
+    title: "Financial, legal, and governance controls",
+    icon: Landmark,
+    detail:
+      "Applicable compliance review, documented governance authority, policy controls, customer disclosures, authorization boundaries, audit trails, complaint handling, and support procedures are required before operating a digital-asset financial service.",
+  },
+];
+
+export default function CryptoEnhancementsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-gray-900 text-white">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-center px-4 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://via.placeholder.com/1920x1080/0A0A3A/FFFFFF?text=CRYPTO_ENHANCEMENTS_BACKGROUND"
-            alt="Crypto Enhancements Background"
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 animate-fade-in-up">
-            SKY444 Crypto Enhancements: Powering Your Digital Assets
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Crypto enhancements
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Crypto Enhancements
           </h1>
-          <p className="text-lg md:text-xl mb-8 opacity-90 animate-fade-in-up animation-delay-200">
-            Explore advanced features for multi-crypto mining, secure wallet management, seamless swapping, and intelligent trading within the Skycoin Ecosystem.
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Mining, wallet management, portfolio values, swaps, trading tools,
+            market prices, AI trading agents, staking, yield farming, token
+            rewards, hardware-wallet support, multi-signature custody,
+            governance, and transaction history are not configured for this
+            deployment. No asset, price, account, order, yield, mining output,
+            balance, transaction, or financial result is represented as current,
+            verified, or available.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animation-delay-400">
-            <Link href="/wallet">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Access Your Wallet <WalletIcon className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link href="/swap">
-              <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Start Swapping <Zap className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Features Section */}
-      <section className="py-20 px-4 text-center">
-        <h2 className="text-4xl font-bold mb-12">Unlocking New Crypto Possibilities</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <CoinIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Enhanced Multi-Crypto Mining</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Boost your mining power with optimized algorithms and access to exclusive mining pools for higher returns on SKY444, BTC, ETH, SOL, and DOGE.</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <WalletIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Advanced Wallet Features</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Securely manage your diverse crypto portfolio with multi-signature support, hardware wallet integration, and detailed transaction history.</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <Zap className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Seamless Crypto Swapping</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Instantly swap between various cryptocurrencies with competitive rates and low fees, directly within your SKY444 wallet.</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <CoinIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Intelligent Trading Tools</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Access AI-powered trading bots, real-time market data, and advanced charting tools to make informed trading decisions.</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <WalletIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Staking & Yield Farming</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Participate in staking and yield farming opportunities to earn passive income on your SKY444 and other crypto holdings.</CardDescription>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
-            <CardHeader>
-              <Zap className="h-10 w-10 text-blue-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl">Decentralized Governance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="text-gray-300">Influence the future of the SKY444 ecosystem by participating in decentralized governance and voting on key proposals.</CardDescription>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated crypto operations or financial outcomes
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not connect a wallet, quote or execute a swap,
+                provide a market price, allocate a reward, run a mining process,
+                represent a stake, calculate yield, offer trading guidance, or
+                confirm a blockchain transaction.
+              </p>
+            </div>
+          </div>
+        </section>
 
-      {/* Call to Action */}
-      <section className="py-20 px-4 bg-blue-700 text-center">
-        <h2 className="text-4xl font-bold mb-6">Ready to Maximize Your Crypto Potential?</h2>
-        <p className="text-lg mb-8 opacity-90">Explore the full suite of SKY444 crypto enhancements and take control of your digital wealth.</p>
-        <Link href="/wallet">
-          <Button className="bg-white text-blue-700 text-lg px-10 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-            Explore Enhancements <ArrowRightIcon className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 py-10 px-4 text-center text-gray-400">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h4 className="text-xl font-semibold text-white mb-4">SKY444 Crypto</h4>
-            <p>Powering the next generation of digital assets.</p>
-          </div>
-          <div>
-            <h4 className="text-xl font-semibold text-white mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              <li><Link href="/mining" className="hover:text-blue-400">Mining</Link></li>
-              <li><Link href="/swap" className="hover:text-blue-400">Swap</Link></li>
-              <li><Link href="/staking" className="hover:text-blue-400">Staking</Link></li>
-              <li><Link href="/governance" className="hover:text-blue-400">Governance</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-xl font-semibold text-white mb-4">Contact Us</h4>
-            <p>Email: crypto@sky444.com</p>
-            <p>Follow us for crypto updates!</p>
-          </div>
-        </div>
-        <div className="mt-10 border-t border-gray-700 pt-8">
-          <p>&copy; {new Date().getFullYear()} SKY444 Crypto. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+      </div>
+    </main>
   );
-};
-
-export default CryptoEnhancementsPage;
+}
