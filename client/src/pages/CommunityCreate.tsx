@@ -1,168 +1,107 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { PageHeader } from "@/components/PageHeader";
-import { toast } from "sonner";
-import { Users, Lock, Globe, Coins, Crown, Loader2 } from "lucide-react";
-import { getLoginUrl } from "@/const";
+import {
+  AlertTriangle,
+  Database,
+  LockKeyhole,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 
-const CATEGORIES = ["Crypto", "AI", "Dev", "DeFi", "Creator", "Gaming", "NFT", "Trading", "Charity", "Community", "Other"];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const COMMUNITY_TYPES = [
-  { id: "public",      label: "Public",       icon: Globe,  desc: "Anyone can join and view" },
-  { id: "private",     label: "Private",      icon: Lock,   desc: "Members must be approved" },
-  { id: "token_gated", label: "Token Gated",  icon: Coins,  desc: "Requires SKY444 tokens to join" },
-  { id: "premium",     label: "Premium",      icon: Crown,  desc: "Paid subscription required" },
+const serviceRequirements = [
+  {
+    title: "Authorized community creation and ownership records",
+    icon: Users,
+    detail:
+      "Authenticated server-side creation, unique-slug validation, ownership assignment, durable records, moderation controls, deletion handling, audit trails, and clear community terms are required before allowing a community or group to be created.",
+  },
+  {
+    title: "Membership, privacy, and access controls",
+    icon: LockKeyhole,
+    detail:
+      "Verified membership rules, invitation and approval workflows, privacy settings, content visibility rules, role permissions, abuse reporting, blocking controls, data-retention policies, and support processes are required before offering public or private community access.",
+  },
+  {
+    title: "Token and subscription gate verification",
+    icon: Database,
+    detail:
+      "Validated wallet or payment integrations, clear eligibility criteria, server-side entitlement checks, transaction or subscription verification, failure handling, refund or dispute procedures, and legal review are required before claiming token-gated or premium community access.",
+  },
+  {
+    title: "Safety and moderation infrastructure",
+    icon: ShieldCheck,
+    detail:
+      "Published policies, scoped moderator authority, content-review workflows, reporting tools, rate limits, user-protection measures, incident response, and durable audit records are required before operating a community publishing surface.",
+  },
 ];
 
 export default function CommunityCreate() {
-  const [, navigate] = useLocation();
-  const { isAuthenticated } = useAuth();
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState<"public" | "private" | "token_gated" | "premium">("public");
-  const [category, setCategory] = useState("Community");
-  const [slugTouched, setSlugTouched] = useState(false);
-
-  const createMutation = trpc.community.create.useMutation({
-    onSuccess: (data) => {
-      toast.success("Community created! 🎉");
-      navigate(`/community`);
-    },
-    onError: (err) => toast.error(err.message || "Failed to create community"),
-  });
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container py-16 max-w-lg text-center">
-        <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-xl font-bold mb-2">Sign in to create a community</h2>
-        <p className="text-muted-foreground mb-6">Build your own space in the SKYCOIN4444 ecosystem</p>
-        <a href={getLoginUrl()}>
-          <Button className="btn-primary">Sign In</Button>
-        </a>
-      </div>
-    );
-  }
-
-  const handleNameChange = (val: string) => {
-    setName(val);
-    if (!slugTouched) {
-      setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""));
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!name.trim()) { toast.error("Community name is required"); return; }
-    if (!slug.trim()) { toast.error("URL slug is required"); return; }
-    if (slug.length < 3) { toast.error("Slug must be at least 3 characters"); return; }
-    createMutation.mutate({ name: name.trim(), slug: slug.trim(), description: description.trim(), type, category });
-  };
-
   return (
-    <div className="container py-8 max-w-2xl animate-page-in">
-      <PageHeader
-        backHref="/channels"
-        icon={Users}
-        title="Create Community"
-        subtitle="Build your own space for your audience"
-      />
-
-      <div className="space-y-6">
-        {/* Basic Info */}
-        <Card className="p-6 space-y-4">
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Community Name *</Label>
-            <Input
-              value={name}
-              onChange={e => handleNameChange(e.target.value)}
-              placeholder="e.g. SKY444 Traders"
-              maxLength={100}
-            />
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Community creation
+            unavailable
           </div>
-          <div>
-            <Label className="text-sm font-medium mb-2 block">URL Slug *</Label>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">shadowchat.io/community/</span>
-              <Input
-                value={slug}
-                onChange={e => { setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")); setSlugTouched(true); }}
-                placeholder="sky444-traders"
-                maxLength={100}
-                className="flex-1"
-              />
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Create Community
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Community creation, public and private groups, membership approvals,
+            categories, custom slugs, token-gated access, premium subscriptions,
+            roles, posts, member lists, and publishing controls are not
+            configured for this deployment. No community, membership, access
+            right, payment entitlement, or visibility setting is represented as
+            created, verified, or active.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated group creation or paid access
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not create a community, reserve a slug, publish a
+                group, accept a member, apply a privacy setting, verify a
+                wallet, charge a subscription, or grant token-gated access.
+              </p>
             </div>
           </div>
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Description</Label>
-            <Textarea
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              placeholder="What is this community about?"
-              className="min-h-[80px] resize-none"
-              maxLength={500}
-            />
-            <div className="text-xs text-muted-foreground text-right mt-1">{description.length}/500</div>
-          </div>
-        </Card>
+        </section>
 
-        {/* Category */}
-        <Card className="p-6">
-          <Label className="text-sm font-medium mb-3 block">Category</Label>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${category === cat ? "bg-primary text-primary-foreground" : "bg-secondary/50 text-muted-foreground hover:bg-secondary"}`}
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
               >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </Card>
-
-        {/* Type */}
-        <Card className="p-6">
-          <Label className="text-sm font-medium mb-3 block">Community Type</Label>
-          <div className="grid grid-cols-2 gap-3">
-            {COMMUNITY_TYPES.map(t => {
-              const Icon = t.icon;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setType(t.id as any)}
-                  className={`p-4 rounded-xl text-left border transition-all ${type === t.id ? "border-primary bg-primary/10" : "border-border hover:border-primary/40 hover:bg-primary/5"}`}
-                >
-                  <Icon className={`w-5 h-5 mb-2 ${type === t.id ? "text-primary" : "text-muted-foreground"}`} />
-                  <div className="font-medium text-sm">{t.label}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{t.desc}</div>
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Submit */}
-        <Button
-          onClick={handleSubmit}
-          disabled={createMutation.isPending || !name.trim() || !slug.trim()}
-          className="w-full btn-primary h-12 text-base"
-        >
-          {createMutation.isPending ? (
-            <><Loader2 className="w-4 h-4 animate-spin mr-2" />Creating…</>
-          ) : (
-            <><Users className="w-4 h-4 mr-2" />Create Community</>
-          )}
-        </Button>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
