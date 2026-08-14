@@ -50,9 +50,11 @@ export default function Settings() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const result = await upload(file);
-    if (result) {
+    try {
+      const result = await upload(file);
       updateProfile.mutate({ avatar: result.url });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Avatar upload failed.");
     }
   };
 

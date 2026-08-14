@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRightIcon, LightningBoltIcon, RocketIcon, StarIcon } from '@radix-ui/react-icons';
+import { ArrowRight, Rocket, Star, Zap } from "lucide-react";
 
 const LandingPage = () => {
   return (
@@ -27,12 +27,12 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animation-delay-400">
             <Link href="/dashboard">
               <Button className="bg-sky-500 hover:bg-sky-600 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Start Mining Now <LightningBoltIcon className="ml-2 h-5 w-5" />
+                Start Mining Now <Zap className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/whitepaper">
               <Button variant="outline" className="border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Read Whitepaper <ArrowRightIcon className="ml-2 h-5 w-5" />
+                Read Whitepaper <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>
@@ -45,7 +45,7 @@ const LandingPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <LightningBoltIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Zap className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">AI-Powered Mining</CardTitle>
             </CardHeader>
             <CardContent>
@@ -54,7 +54,7 @@ const LandingPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <StarIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Star className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Decentralized Marketplace</CardTitle>
             </CardHeader>
             <CardContent>
@@ -63,7 +63,7 @@ const LandingPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <RocketIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Rocket className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Social & Gaming Hub</CardTitle>
             </CardHeader>
             <CardContent>
@@ -72,7 +72,7 @@ const LandingPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <LightningBoltIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Zap className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Multi-Crypto Wallets</CardTitle>
             </CardHeader>
             <CardContent>
@@ -81,7 +81,7 @@ const LandingPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <StarIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Star className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Advanced Analytics</CardTitle>
             </CardHeader>
             <CardContent>
@@ -90,7 +90,7 @@ const LandingPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <RocketIcon className="h-10 w-10 text-sky-400 mx-auto mb-4" />
+              <Rocket className="h-10 w-10 text-sky-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Scalable-Grade Security</CardTitle>
             </CardHeader>
             <CardContent>
@@ -195,7 +195,7 @@ const LandingPage = () => {
         <p className="text-lg mb-8 opacity-90">Experience the power of a truly integrated $2M digital ecosystem. Start your journey with SKY444 today, backed by 1.07M+ Lines of Code!</p>
         <Link href="/dashboard">
           <Button className="bg-white text-sky-700 text-lg px-10 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-            Get Started Now <ArrowRightIcon className="ml-2 h-5 w-5" />
+            Get Started Now <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </section>

@@ -1,5 +1,5 @@
 /**
- * AIPersonaSystem — Phase 22 AI Persona System
+ * AIPersonaSystem — Phase 22 AI Persona Demo Simulation
  * The "living world" engine — AI social actors with memory, goals, relationships
  */
 import { useState, useEffect, useRef } from "react";
@@ -74,7 +74,7 @@ export default function AIPersonaSystem() {
             <Brain className="w-5 h-5 text-purple-400" />
             AI Persona System
           </h1>
-          <p className="text-xs text-muted-foreground">Living world engine — Phase 22</p>
+          <p className="text-xs text-muted-foreground">Local demo simulation — no live AI service connected</p>
         </div>
         <button onClick={toggleSimulation}
           className={`ml-auto text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${isRunning ? "bg-red-500/20 text-red-400 hover:bg-red-500/30" : "bg-green-500/20 text-green-400 hover:bg-green-500/30"}`}>
@@ -87,11 +87,11 @@ export default function AIPersonaSystem() {
         <div className="card p-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20">
           <div className="flex items-center gap-2 mb-2">
             <div className={`w-2 h-2 rounded-full ${isRunning ? "bg-green-400 animate-pulse" : "bg-secondary"}`} />
-            <span className="text-sm font-semibold">{isRunning ? "World is alive" : "World paused"}</span>
+            <span className="text-sm font-semibold">{isRunning ? "Demo simulation running" : "Demo simulation paused"}</span>
             <span className="text-xs text-muted-foreground ml-auto">{behaviorLog.length} events logged</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            {personas.length} AI personas are active. They post, debate, collaborate, and react — creating a living social world before real users arrive.
+            {personas.length} local demo personas are available. Events are deterministic simulation content and do not represent live AI agents, user activity, or production metrics.
           </p>
         </div>
 

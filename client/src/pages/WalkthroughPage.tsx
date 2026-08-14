@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeftIcon, ArrowRightIcon } from '@radix-ui/react-icons';
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const steps = [
   {
@@ -78,16 +78,16 @@ const WalkthroughPage = () => {
               variant="outline"
               className="border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white"
             >
-              <ArrowLeftIcon className="h-5 w-5 mr-2" /> Previous
+              <ArrowLeft className="h-5 w-5 mr-2" /> Previous
             </Button>
             {currentStep < steps.length - 1 ? (
               <Button onClick={handleNext} className="bg-sky-500 hover:bg-sky-600 text-white">
-                Next <ArrowRightIcon className="h-5 w-5 ml-2" />
+                Next <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             ) : (
               <Link href={step.link}>
                 <Button className="bg-green-500 hover:bg-green-600 text-white">
-                  {step.linkText} <ArrowRightIcon className="h-5 w-5 ml-2" />
+                  {step.linkText} <ArrowRight className="h-5 w-5 ml-2" />
                 </Button>
               </Link>
             )}

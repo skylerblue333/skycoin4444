@@ -198,15 +198,6 @@ export async function createWallet(data: any) {
   }
 }
 
-// ============ GENERIC HELPERS ============
-export async function getAllRecords(table: any) {
-  try {
-    return await db.query[table].findMany();
-  } catch (error) {
-    return [];
-  }
-}
-
 export async function deleteRecord(table: any, id: string) {
   try {
     await db.delete(table).where(eq(table.id, id));

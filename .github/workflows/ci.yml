@@ -1,1 +1,71 @@
-name: CI\non: [push, pull_request]\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v3\n      - name: Build\n        run: echo 'Building core ecosystem...'
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate application
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Run formatting, backend type, test, build, and production dependency checks
+        run: pnpm run validate
+
+      - name: Inventory full application type-contract debt
+        id: full_typecheck
+        continue-on-error: true
+        shell: bash
+        run: |
+          pnpm check > full-typecheck.log 2>&1
+          status=$?
+          cat full-typecheck.log
+          exit "$status"
+
+      - name: Upload full type-check inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skycoin4444-full-typecheck-inventory
+          path: full-typecheck.log
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload validated production bundle
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: skycoin4444-production-bundle
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
