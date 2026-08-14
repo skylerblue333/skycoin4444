@@ -1,111 +1,112 @@
-import { Link, useParams } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Award, Share2, Download, ExternalLink, CheckCircle2, Share2 as TwitterIcon, Link2 as LinkedinIcon, Copy, ChevronRight, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import {
+  AlertTriangle,
+  Award,
+  Database,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Verified learner and completion records",
+    icon: Database,
+    detail:
+      "Authenticated learner identity, durable enrollment and course-progress records, assessment provenance, grading controls, completion rules, correction workflows, privacy safeguards, record retention, and appropriate access controls are required before displaying a learner name, course, score, completion date, time spent, credential identifier, achievement, or educational record.",
+  },
+  {
+    title: "Credential issuance and verification governance",
+    icon: Award,
+    detail:
+      "An authorized issuer, documented academic or program criteria, secure certificate generation, tamper-resistant identifiers, revocation and correction procedures, verification records, appropriate signing authority, and public-verification policy are required before issuing a certificate or asserting that a credential can be verified by an employer, institution, or other third party.",
+  },
+  {
+    title: "Blockchain and external-publication controls",
+    icon: ShieldCheck,
+    detail:
+      "A configured network, verified contract address, custody and key-management controls, signed and confirmed transactions, transaction-status handling, blockchain explorer integration, privacy review, cost disclosure, and appropriate user consent are required before stating that a certificate, identifier, record, or credential is stored on-chain or linking to an external verification destination.",
+  },
+  {
+    title: "Accurate sharing and representation safeguards",
+    icon: Scale,
+    detail:
+      "Verified public URLs, user authorization, disclosure requirements, issuer brand approval, platform-specific sharing integrations, accessible content, and clear failure handling are required before providing a share action, copying a credential link, inviting a public claim, or representing a qualification as earned.",
+  },
+];
 
 export default function SchoolCertificate() {
-  const params = useParams<{ id: string }>();
-  const [copied, setCopied] = useState(false);
-  const hash = "0x7f4e2a1b9c3d5e8f0a2b4c6d8e0f1a3b5c7d9e1f";
-  const shortHash = hash.slice(0, 10) + "..." + hash.slice(-8);
-
-  const handleCopy = () => { navigator.clipboard.writeText(`https://shadowchat-xvi6fbz3.manus.space/school/certificate/${params.id}`); setCopied(true); setTimeout(() => setCopied(false), 2000); };
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b border-border/50 bg-card/30 px-4 py-3">
-        <div className="container flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/school"><span className="hover:text-foreground cursor-pointer">Sky School</span></Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-foreground">Certificate</span>
-        </div>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Credential service
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            School Certificate
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Certificate issuance, learner names, completed courses, quiz scores,
+            completion dates, instructional attribution, credential identifiers,
+            on-chain verification, blockchain explorer links, achievement
+            sharing, learning-time metrics, earned experience, and course
+            recommendations are not configured for this deployment. No person,
+            educational outcome, credential, record, issuer, transaction, or
+            qualification is represented as current, verified, or earned.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated credential, grade, verification, or blockchain
+                record
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not verify an identity, determine course
+                completion, calculate a score, issue or sign a credential,
+                create a public verification link, record anything on-chain,
+                submit a blockchain transaction, copy a credential URL, open an
+                explorer, or report that an academic or professional achievement
+                has been earned.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-
-      <div className="container py-10 max-w-4xl">
-        {/* Certificate */}
-        <div className="relative rounded-2xl overflow-hidden mb-8 shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-900/40 via-zinc-900 to-purple-900/40" />
-          <div className="absolute inset-0 border-8 border-yellow-500/20 rounded-2xl" />
-          <div className="absolute inset-2 border-2 border-yellow-500/10 rounded-xl" />
-          <div className="relative z-10 p-12 text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-primary/20 border-2 border-primary/50 flex items-center justify-center text-xl">🚀</div>
-              <div>
-                <div className="text-xl font-bold text-primary font-mono">SKYCOIN4444</div>
-                <div className="text-xs text-muted-foreground tracking-widest uppercase">Sky School</div>
-              </div>
-            </div>
-            <div className="text-yellow-400/60 text-sm tracking-widest uppercase mb-4 font-mono">Certificate of Completion</div>
-            <div className="text-muted-foreground text-sm mb-2">This certifies that</div>
-            <div className="text-3xl md:text-4xl font-bold text-foreground mb-2" style={{ fontFamily: "Georgia, serif" }}>Skyler Blue</div>
-            <div className="text-muted-foreground text-sm mb-4">has successfully completed</div>
-            <div className="text-2xl md:text-3xl font-bold text-primary mb-2">Blockchain Fundamentals</div>
-            <div className="text-muted-foreground text-sm mb-8">with a score of <span className="text-purple-400 font-bold">94%</span> on June 17, 2026</div>
-            <div className="flex items-center justify-center gap-8">
-              <div className="text-center">
-                <div className="w-24 h-px bg-foreground/30 mb-1" />
-                <div className="text-xs text-muted-foreground">Dr. Alex Chen</div>
-                <div className="text-xs text-muted-foreground/60">Instructor</div>
-              </div>
-              <Award className="h-12 w-12 text-yellow-400" />
-              <div className="text-center">
-                <div className="w-24 h-px bg-foreground/30 mb-1" />
-                <div className="text-xs text-muted-foreground">Skyler Spillers</div>
-                <div className="text-xs text-muted-foreground/60">Platform CEO</div>
-              </div>
-            </div>
-            <div className="mt-6 text-xs text-muted-foreground/50 font-mono">{shortHash}</div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="rounded-xl border border-border/50 bg-card/30 p-5">
-            <h3 className="font-semibold mb-3 flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-purple-400" />On-Chain Verification</h3>
-            <p className="text-sm text-muted-foreground mb-3">This certificate is permanently recorded on-chain and can be verified by anyone.</p>
-            <div className="flex items-center gap-2 p-2 rounded-lg bg-card/50 border border-border/30 mb-3">
-              <code className="text-xs text-primary font-mono flex-1 truncate">{shortHash}</code>
-              <Button variant="ghost" size="sm" onClick={handleCopy}><Copy className="h-3.5 w-3.5" /></Button>
-            </div>
-            <Button variant="outline" size="sm" className="w-full gap-2"><ExternalLink className="h-3.5 w-3.5" />View on Explorer</Button>
-          </div>
-          <div className="rounded-xl border border-border/50 bg-card/30 p-5">
-            <h3 className="font-semibold mb-3 flex items-center gap-2"><Share2 className="h-4 w-4 text-blue-400" />Share Achievement</h3>
-            <p className="text-sm text-muted-foreground mb-3">Share your certificate on social media and with employers.</p>
-            <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/10"><Share2 as TwitterIcon className="h-3.5 w-3.5" />Share on Share2 as TwitterIcon</Button>
-              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-600/30 text-blue-500 hover:bg-blue-600/10"><Link2 as LinkedinIcon className="h-3.5 w-3.5" />Add to LinkedIn</Button>
-              <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleCopy}><Copy className="h-3.5 w-3.5" />{copied ? "Copied!" : "Copy Link"}</Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[{ label: "Completion Date", value: "Jun 17, 2026" }, { label: "Time Spent", value: "11h 24m" }, { label: "Quiz Score", value: "94%" }, { label: "XP Earned", value: "2,400" }].map(s => (
-            <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-4 text-center">
-              <div className="text-lg font-bold text-primary">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Next Courses */}
-        <div>
-          <h3 className="font-bold text-lg mb-4">Continue Your Journey</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            {[{ title: "DeFi Mastery", emoji: "💎", level: "Intermediate", href: "/school/course/defi-mastery" }, { title: "Solidity Smart Contracts", emoji: "⚡", level: "Intermediate", href: "/school/course/solidity-smart-contracts" }, { title: "Crypto Security", emoji: "🛡️", level: "Advanced", href: "/school/course/crypto-security" }].map(c => (
-              <Link key={c.title} href={c.href}>
-                <div className="rounded-xl border border-border/50 bg-card/30 p-4 hover:border-primary/30 transition-all cursor-pointer flex items-center gap-3">
-                  <span className="text-2xl">{c.emoji}</span>
-                  <div className="flex-1"><p className="font-medium text-sm">{c.title}</p><p className="text-xs text-muted-foreground">{c.level}</p></div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }
