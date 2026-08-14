@@ -1,263 +1,109 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertTriangle,
+  Database,
+  Landmark,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
 
-const TOKEN_REGISTRY = [
-  { symbol: "SKY444", name: "SKYCOIN4444", supply: 21_000_000, circulating: 8_400_000, color: "yellow", role: "Primary Reserve" },
-  { symbol: "HOPE", name: "HOPE Token", supply: 100_000_000, circulating: 12_000_000, color: "blue", role: "AI Governance" },
-  { symbol: "SHADOW", name: "ShadowCoin", supply: 50_000_000, circulating: 5_500_000, color: "purple", role: "Privacy Layer" },
-  { symbol: "EARN", name: "EarnToken", supply: 500_000_000, circulating: 45_000_000, color: "emerald", role: "Rewards" },
-  { symbol: "BUILD", name: "BuildToken", supply: 200_000_000, circulating: 22_000_000, color: "orange", role: "Developer Incentives" },
-  { symbol: "NATION", name: "NationToken", supply: 1_000_000, circulating: 180_000, color: "red", role: "Citizenship NFT" },
-  { symbol: "WISDOM", name: "WisdomToken", supply: 10_000_000, circulating: 890_000, color: "pink", role: "Knowledge Economy" },
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Legal, policy, and governance authority",
+    icon: Landmark,
+    detail:
+      "A documented mandate, legal review, accountable governance process, transparent policy rules, separation of duties, independent oversight, public disclosures, and an appeal or dispute process are required before presenting a central-bank, monetary-policy, or treasury-management service.",
+  },
+  {
+    title: "Verified token and blockchain data",
+    icon: Database,
+    detail:
+      "Supported networks, validated contract addresses, indexed on-chain data, reconciliation, supply methodology, transaction verification, reliable availability handling, and source attribution are required before displaying a token, supply, circulating amount, burn, reserve, or market state.",
+  },
+  {
+    title: "Custody and financial-control infrastructure",
+    icon: ShieldCheck,
+    detail:
+      "Secure custody, key management, multi-party approval, transaction controls, accounting reconciliation, reserve attestations, incident response, and authorization boundaries are required before representing a treasury balance, protocol revenue, reserve, allocation, or fund movement.",
+  },
+  {
+    title: "Economic-model safeguards",
+    icon: Scale,
+    detail:
+      "A documented model, controlled issuance process, validated calculations, risk review, independent testing, monitoring, clear disclosures, and change-management controls are required before claiming an emission rate, yield, burn rate, governance weight, allocation, or economic health status.",
+  },
 ];
 
-const COLOR_MAP: Record<string, { text: string; bg: string; border: string }> = {
-  yellow: { text: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30" },
-  blue: { text: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/30" },
-  purple: { text: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/30" },
-  emerald: { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
-  orange: { text: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/30" },
-  red: { text: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30" },
-  pink: { text: "text-pink-400", bg: "bg-pink-500/10", border: "border-pink-500/30" },
-};
-
-function formatNum(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toString();
-}
-
 export default function SKY444CentralBank() {
-  const [selectedToken, setSelectedToken] = useState("SKY444");
-
-  const { data: econHealth } = trpc.enterprise.economy.healthReport.useQuery();
-  const { data: marketStates } = trpc.enterprise.economy.marketStates.useQuery();
-  const { data: emissionCaps } = trpc.enterprise.economy.emissionCaps.useQuery();
-  const { data: emergentStatus } = trpc.enterprise.emergent.digitalNationStatus.useQuery();
-
-  const token = TOKEN_REGISTRY.find((t) => t.symbol === selectedToken)!;
-  const colors = COLOR_MAP[token.color];
-  const circulatingPct = Math.round((token.circulating / token.supply) * 100);
-
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <div className="border-b border-yellow-500/20 bg-gradient-to-r from-black via-yellow-950/10 to-black">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-2xl">
-                🏦
-              </div>
-              <div>
-                <h1 className="text-2xl font-black text-white tracking-widest uppercase">
-                  SKY444 CENTRAL BANK
-                </h1>
-                <p className="text-sm text-yellow-500/60 mt-1">
-                  Monetary policy · Token economics · Treasury management
-                </p>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center gap-4">
-              <Badge className={`${econHealth?.overallHealth === "HEALTHY" ? "bg-emerald-500/20 text-emerald-400" : "bg-orange-500/20 text-orange-400"} border-0`}>
-                ECONOMY: {econHealth?.overallHealth ?? "LOADING"}
-              </Badge>
-              <Badge className="bg-yellow-500/20 text-yellow-400 border-0">
-                7 TOKENS ACTIVE
-              </Badge>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Central-bank service
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            SKY444 Central Bank
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Monetary policy, token registries, supplies, issuance, circulation,
+            token roles, market health, treasury balances, protocol revenue,
+            reserves, burn pools, economic controls, governance weights, staking
+            yields, and allocations are not configured for this deployment. No
+            token, financial value, reserve, policy, reward, or market state is
+            represented as current, verified, or authoritative.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated central bank, token economics, or treasury
+                management
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not create, issue, list, price, burn, stake,
+                allocate, reserve, transfer, or custody an asset; it also does
+                not calculate monetary policy, yield, token supply, or economic
+                health.
+              </p>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        <Tabs defaultValue="overview">
-          <TabsList className="bg-white/5 border border-white/10">
-            <TabsTrigger value="overview">OVERVIEW</TabsTrigger>
-            <TabsTrigger value="tokens">TOKEN REGISTRY</TabsTrigger>
-            <TabsTrigger value="policy">MONETARY POLICY</TabsTrigger>
-            <TabsTrigger value="treasury">TREASURY</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6 mt-6">
-            {/* Economy Health Banner */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: "Economy Status", value: econHealth?.overallHealth ?? "—", icon: "📊" },
-                { label: "Total Tokens", value: "7", icon: "🪙" },
-                { label: "Active Sinks", value: String((emissionCaps as unknown[])?.length ?? 0), icon: "🔥" },
-                { label: "Nation Mode", value: (emergentStatus as unknown as Record<string, unknown>)?.mode as string ?? "GENESIS", icon: "🌍" },
-              ].map((stat, i) => (
-                <Card key={i} className="bg-black/60 border-yellow-500/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span>{stat.icon}</span>
-                      <span className="text-xs text-white/40 uppercase">{stat.label}</span>
-                    </div>
-                    <div className="text-xl font-black text-yellow-400 font-mono">{stat.value}</div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Token Quick View */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {TOKEN_REGISTRY.slice(0, 4).map((t) => {
-                const c = COLOR_MAP[t.color];
-                const pct = Math.round((t.circulating / t.supply) * 100);
-                return (
-                  <button
-                    key={t.symbol}
-                    onClick={() => setSelectedToken(t.symbol)}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      selectedToken === t.symbol ? `${c.bg} ${c.border}` : "bg-black/40 border-white/10 hover:border-white/30"
-                    }`}
-                  >
-                    <div className={`text-sm font-bold ${c.text} mb-1`}>{t.symbol}</div>
-                    <div className="text-xs text-white/40 mb-2">{t.role}</div>
-                    <div className="text-lg font-black text-white">{formatNum(t.circulating)}</div>
-                    <Progress value={pct} className="h-1 mt-2" />
-                    <div className="text-xs text-white/30 mt-1">{pct}% circulating</div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Economy Alerts */}
-            {econHealth?.alerts && econHealth.alerts.length > 0 && (
-              <Card className="bg-black/60 border-orange-500/20">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-orange-400 text-sm uppercase tracking-widest">
-                    ⚠️ ECONOMY ALERTS
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  {econHealth.alerts.slice(0, 3).map((alert, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 text-sm text-white/70">
-                      {String(alert)}
-                    </div>
-                  ))}
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
                 </CardContent>
               </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="tokens" className="space-y-4 mt-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              {TOKEN_REGISTRY.map((t) => {
-                const c = COLOR_MAP[t.color];
-                const pct = Math.round((t.circulating / t.supply) * 100);
-                return (
-                  <Card key={t.symbol} className={`bg-black/60 ${c.border} border`}>
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <div className={`text-lg font-black ${c.text}`}>{t.symbol}</div>
-                          <div className="text-xs text-white/40">{t.name}</div>
-                        </div>
-                        <Badge className={`${c.bg} ${c.text} border-0 text-xs`}>{t.role}</Badge>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 mb-3">
-                        <div>
-                          <div className="text-xs text-white/40">Max Supply</div>
-                          <div className="text-white font-mono font-bold">{formatNum(t.supply)}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-white/40">Circulating</div>
-                          <div className="text-white font-mono font-bold">{formatNum(t.circulating)}</div>
-                        </div>
-                      </div>
-                      <Progress value={pct} className="h-2" />
-                      <div className="text-xs text-white/30 mt-1">{pct}% of max supply in circulation</div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="policy" className="space-y-6 mt-6">
-            <Card className="bg-black/60 border-yellow-500/20">
-              <CardHeader>
-                <CardTitle className="text-yellow-400 text-sm uppercase tracking-widest">
-                  MONETARY POLICY CONTROLS
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[
-                  { label: "Emission Rate", value: "0.5% / month", status: "NOMINAL", desc: "New token creation rate" },
-                  { label: "Burn Rate", value: "0.3% / month", status: "ACTIVE", desc: "Deflationary pressure via sinks" },
-                  { label: "Staking APY", value: "12.5%", status: "HEALTHY", desc: "Annual yield for stakers" },
-                  { label: "Governance Weight", value: "1 SKY = 1 Vote", status: "CAPPED", desc: "Anti-whale 15% max cap" },
-                  { label: "Treasury Reserve", value: "2,100,000 SKY444", status: "SECURE", desc: "10% of max supply held in reserve" },
-                ].map((policy, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
-                    <div>
-                      <div className="font-semibold text-white">{policy.label}</div>
-                      <div className="text-xs text-white/40">{policy.desc}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-mono text-yellow-400 font-bold">{policy.value}</div>
-                      <Badge className="bg-emerald-500/20 text-emerald-400 border-0 text-xs mt-1">{policy.status}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="treasury" className="space-y-6 mt-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { label: "Treasury Balance", value: "2.1M SKY444", icon: "🏦", color: "yellow" },
-                { label: "Protocol Revenue", value: "145K EARN/month", icon: "📈", color: "emerald" },
-                { label: "Burn Pool", value: "890K SKY444", icon: "🔥", color: "orange" },
-              ].map((item, i) => {
-                const c = COLOR_MAP[item.color];
-                return (
-                  <Card key={i} className={`bg-black/60 ${c.border} border`}>
-                    <CardContent className="p-5 text-center">
-                      <div className="text-4xl mb-2">{item.icon}</div>
-                      <div className={`text-xl font-black ${c.text} font-mono`}>{item.value}</div>
-                      <div className="text-xs text-white/40 mt-1">{item.label}</div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-            <Card className="bg-black/60 border-yellow-500/20">
-              <CardHeader>
-                <CardTitle className="text-yellow-400 text-sm uppercase tracking-widest">
-                  TREASURY ALLOCATION
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { label: "Development Fund", pct: 40, color: "blue" },
-                  { label: "Community Rewards", pct: 25, color: "emerald" },
-                  { label: "Liquidity Reserve", pct: 20, color: "yellow" },
-                  { label: "Emergency Fund", pct: 10, color: "orange" },
-                  { label: "Burn Reserve", pct: 5, color: "red" },
-                ].map((alloc, i) => {
-                  const c = COLOR_MAP[alloc.color];
-                  return (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="text-sm text-white/60 w-40 shrink-0">{alloc.label}</div>
-                      <Progress value={alloc.pct} className="flex-1 h-2" />
-                      <div className={`text-sm font-mono font-bold ${c.text} w-10 text-right`}>{alloc.pct}%</div>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
