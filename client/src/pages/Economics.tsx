@@ -1,78 +1,112 @@
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { PageHeader } from "@/components/PageHeader";
-import { StatCard } from "@/components/StatCard";
-import { BarChart3, TrendingUp, DollarSign, Coins, PieChart, ArrowRight, Zap, Lock, Flame, Users } from "lucide-react";
+import {
+  AlertTriangle,
+  Database,
+  Landmark,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
 
-const TOKENOMICS = [
-  { label: "Community Rewards", pct: 35, color: "bg-primary" },
-  { label: "Development Fund", pct: 20, color: "bg-accent" },
-  { label: "Treasury Reserve", pct: 20, color: "bg-success" },
-  { label: "Team & Advisors", pct: 10, color: "bg-warning" },
-  { label: "Marketing", pct: 10, color: "bg-destructive" },
-  { label: "Liquidity Pool", pct: 5, color: "bg-cyber-gold" },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const METRICS = [
-  { icon: Coins, label: "Total Supply", value: "444,444,444", color: "primary" as const },
-  { icon: Flame, label: "Burned", value: "12,345,678", color: "destructive" as const },
-  { icon: Lock, label: "Staked", value: "89,234,567", color: "success" as const },
-  { icon: Users, label: "Holders", value: "24,891", color: "accent" as const },
+const serviceRequirements = [
+  {
+    title: "Verified token and blockchain records",
+    icon: Database,
+    detail:
+      "A configured and validated network, verified contract addresses, source-attributed on-chain records, transaction indexing, reorganization handling, supply methodology, holder and balance reconciliation, price provenance, freshness controls, and independent auditability are required before presenting a token, supply, burn, stake, holder, price, liquidity, transaction, or market metric.",
+  },
+  {
+    title: "Governed treasury and allocation operations",
+    icon: Landmark,
+    detail:
+      "Documented allocation policy, approved governance controls, authorized signatories, custody safeguards, durable accounting, reconciliation, disclosures, audit trails, conflict-of-interest controls, and reporting procedures are required before representing a treasury, reserve, development fund, community reward pool, marketing allocation, team allocation, liquidity allocation, or other financial designation.",
+  },
+  {
+    title: "Authorized financial utility and transaction flows",
+    icon: ShieldCheck,
+    detail:
+      "Secure custody or wallet infrastructure, validated addresses and network parameters, signature verification, transaction simulation, duplicate-submission prevention, status monitoring, failure handling, consumer protections, and clear risk disclosures are required before enabling or claiming governance voting, staking rewards, payments, donations, premium access, gaming rewards, token transfers, or any financial outcome.",
+  },
+  {
+    title: "Compliance and market-disclosure controls",
+    icon: Scale,
+    detail:
+      "Appropriate legal and regulatory review, jurisdictional controls, issuer authorization, market-data licensing, investor and consumer disclosures, policy enforcement, tax considerations, privacy safeguards, and incident response are required before describing a token economy, investment characteristic, market condition, expected utility, reward, financial return, or availability of financial services.",
+  },
 ];
 
 export default function Economics() {
   return (
-    <div className="container py-8 max-w-5xl animate-page-in">
-      <PageHeader backHref="/token" icon={BarChart3} title="Token Economics" subtitle="SKY444 tokenomics, distribution, and live market data" badge="Live" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {METRICS.map(m => <StatCard key={m.label} icon={m.icon} label={m.label} value={m.value} color={m.color} />)}
-      </div>
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <div className="card p-6">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><PieChart className="w-5 h-5 text-primary" />Token Distribution</h3>
-          <div className="space-y-3">
-            {TOKENOMICS.map(t => (
-              <div key={t.label}>
-                <div className="flex justify-between text-sm mb-1"><span>{t.label}</span><span className="font-mono text-muted-foreground">{t.pct}%</span></div>
-                <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                  <div className={`h-full ${t.color} rounded-full transition-all duration-700`} style={{ width: `${t.pct}%` }} />
-                </div>
-              </div>
-            ))}
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Token economics service
+            unavailable
           </div>
-        </div>
-        <div className="card p-6">
-          <h3 className="font-semibold mb-4 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-primary" />Price History</h3>
-          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
-            <div className="text-center">
-              <BarChart3 className="w-12 h-12 mx-auto mb-2 opacity-30" />
-              <p>Live chart loading...</p>
-              <Link href="/trading"><Button size="sm" className="mt-3 btn-primary">View Trading</Button></Link>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Token Economics
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Tokenomics, token distribution, total supply, burned supply, staked
+            supply, holder totals, treasury and allocation categories, liquidity
+            pools, live price history, financial market data, governance voting,
+            staking rewards, marketplace payments, donations, gaming rewards,
+            and premium utility claims are not configured for this deployment.
+            No token, contract, account, balance, supply, allocation, price,
+            reward, transaction, financial service, or market outcome is
+            represented as current, verified, or available.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated supply, allocation, price, reward, or financial
+                utility
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not read blockchain data, inspect an address,
+                calculate supply, determine a balance, quote a price, derive a
+                holder count, allocate a treasury, execute a transfer, create a
+                vote, open a stake, issue a reward, accept a payment, or report
+                that any financial action has succeeded.
+              </p>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-      <div className="card p-6">
-        <h3 className="font-semibold mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-primary" />Utility & Use Cases</h3>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {[
-            { label: "Governance Voting", href: "/governance" },
-            { label: "Staking Rewards", href: "/staking" },
-            { label: "Marketplace Payments", href: "/marketplace" },
-            { label: "Premium Features", href: "/subscriptions" },
-            { label: "Charity Donations", href: "/charity" },
-            { label: "Gaming Rewards", href: "/arcade" },
-          ].map(u => (
-            <Link key={u.label} href={u.href}>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer">
-                <span className="text-sm">{u.label}</span>
-                <ArrowRight className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }
