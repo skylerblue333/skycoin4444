@@ -1,98 +1,112 @@
-import React, { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
+import {
+  Activity,
+  AlertTriangle,
+  Database,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Governed autonomous-agent operations",
+    icon: Activity,
+    detail:
+      "A documented agent purpose and capability scope, explicit user authorization, authenticated ownership, least-privilege permissions, tool allowlists, input and output validation, execution logs, rate limits, human oversight, interruption controls, safe failure handling, and incident response are required before creating, deploying, assigning, or reporting activity for an autonomous agent.",
+  },
+  {
+    title: "Verified task, goal, and marketplace records",
+    icon: Database,
+    detail:
+      "Durable user-owned records, authorization-aware access, clear task definitions, validation of completion evidence, audit trails, privacy controls, correction and deletion workflows, service-level boundaries, and reliable state reconciliation are required before showing a goal, task queue, agent status, completed action, level, efficiency, workload, marketplace listing, or operational metric.",
+  },
+  {
+    title: "Financial, trading, and reward safeguards",
+    icon: ShieldCheck,
+    detail:
+      "Authorized custody or wallet infrastructure, verified accounts and networks, transaction validation and signature controls, duplicate-submission prevention, balance and supply reconciliation, accounting, fraud controls, risk disclosures, settlement monitoring, and independent auditability are required before representing trading, earnings, token rewards, wallet activity, balances, payouts, financial performance, or any financial result.",
+  },
+  {
+    title: "AI, governance, and compliance assurance",
+    icon: Scale,
+    detail:
+      "Appropriate legal and policy review, documented model limitations, privacy and safety assessment, user notices, role-based authorization, governance controls, monitoring, transparency, dispute handling, and human decision authority are required before an AI system recommends or undertakes trading, governance, creator, development, research, or other consequential activity on behalf of a user.",
+  },
+];
 
 export default function AIAgentEconomy() {
-  const { data: goals, isLoading } = trpc.enterprise.freeWill.goals.useQuery();
-  const { data: actionLog = [] } = trpc.enterprise.freeWill.actionLog.useQuery({});
-  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
-
-
-  const agentTypes = [
-    { id: 'research', name: 'Research Agent', icon: '🔬', color: 'bg-blue-500' },
-    { id: 'trading', name: 'Trading Agent', icon: '📈', color: 'bg-green-500' },
-    { id: 'creator', name: 'Creator Agent', icon: '🎨', color: 'bg-purple-500' },
-    { id: 'governance', name: 'Governance Agent', icon: '⚖️', color: 'bg-amber-500' },
-    { id: 'developer', name: 'Developer Agent', icon: '💻', color: 'bg-indigo-500' },
-  ];
-
-  if (isLoading) return <Spinner />;
-
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">AGENT CITY</h1>
-          <p className="text-gray-400">Your autonomous AI workforce — earning on your behalf</p>
-        </div>
-
-        {/* Agent Marketplace */}
-        <div className="grid grid-cols-5 gap-4 mb-12">
-          {agentTypes.map((type) => (
-            <Card key={type.id} className="bg-gray-900 border-gray-800 p-6 cursor-pointer hover:border-cyan-500 transition" onClick={() => setSelectedAgent(type.id)}>
-              <div className="text-4xl mb-3">{type.icon}</div>
-              <h3 className="font-bold text-lg">{type.name}</h3>
-              <p className="text-sm text-gray-400 mt-2">Deploy & earn</p>
-            </Card>
-          ))}
-        </div>
-
-        {/* Active Agents Grid */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">ACTIVE AGENTS ({goals?.length || 0})</h2>
-          <div className="grid grid-cols-3 gap-6">
-            {goals?.map((agent: any) => (
-              <Card key={agent.id} className="bg-gray-900 border-gray-800 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-lg">{agent.name}</h3>
-                  <Badge className={agent.status === 'working' ? 'bg-green-500' : 'bg-gray-600'}>{agent.status}</Badge>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Level</span>
-                    <span className="font-bold">{agent.level}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Tasks Today</span>
-                    <span className="font-bold text-cyan-400">{agent.tasksToday}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Earned Today</span>
-                    <span className="font-bold text-yellow-400">+{agent.earnedToday} SKY</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Efficiency</span>
-                    <span className="font-bold">{agent.efficiency}%</span>
-                  </div>
-                </div>
-                <Button className="w-full mt-4 bg-cyan-600 hover:bg-cyan-700">View Activity</Button>
-              </Card>
-            ))}
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Autonomous agent service
+            unavailable
           </div>
-        </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            AI Agent Economy
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Autonomous agent deployment, agent marketplaces, research, trading,
+            creator, governance, and developer agents, task execution, goal
+            tracking, activity logs, agent status, levels, workload,
+            performance, efficiency, earnings, rewards, token balances,
+            financial outcomes, and actions undertaken on a user’s behalf are
+            not configured for this deployment. No agent, task, result, record,
+            transaction, balance, recommendation, or economic outcome is
+            represented as active, verified, authorized, or available.
+          </p>
+        </header>
 
-        {/* Task Queue */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">TASK QUEUE ({actionLog?.length || 0})</h2>
-          <div className="space-y-3">
-            {actionLog?.slice(0, 5).map((task: any) => (
-              <Card key={task.id} className="bg-gray-900 border-gray-800 p-4 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold">{task.title}</h4>
-                  <p className="text-sm text-gray-400">{task.description}</p>
-                </div>
-                <div className="text-right">
-                  <Badge className="bg-purple-600 mb-2">{task.reward} SKY</Badge>
-                  <p className="text-xs text-gray-400">{task.assignedAgents} agents</p>
-                </div>
-              </Card>
-            ))}
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated agent, execution, trading, governance, reward, or
+                financial result
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not create or deploy an agent, access user goals,
+                run a task, call an external service, make a trading or
+                governance decision, perform work on a user’s behalf, issue an
+                instruction, collect a reward, move a token, calculate earnings,
+                inspect a wallet, or report that an autonomous action succeeded.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
