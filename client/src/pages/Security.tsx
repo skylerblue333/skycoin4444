@@ -1,58 +1,110 @@
-import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { PageHeader } from "@/components/PageHeader";
-import { StatCard } from "@/components/StatCard";
-import { Shield, Lock, Eye, AlertTriangle, CheckCircle, Zap, Key, Fingerprint, Globe, Bug, Server, Activity } from "lucide-react";
+import {
+  AlertTriangle,
+  KeyRound,
+  LockKeyhole,
+  ShieldCheck,
+  Siren,
+} from "lucide-react";
 
-const SECURITY_FEATURES = [
-  { icon: Lock, label: "End-to-End Encryption", status: "active", desc: "All DMs and sensitive data encrypted at rest and in transit" },
-  { icon: Fingerprint, label: "2FA Authentication", status: "active", desc: "TOTP and hardware key support for all accounts" },
-  { icon: Eye, label: "Audit Logging", status: "active", desc: "Every action logged with IP, timestamp, and user agent" },
-  { icon: Globe, label: "WAF Protection", status: "active", desc: "Web Application Firewall blocks malicious traffic" },
-  { icon: Bug, label: "Bug Bounty Program", status: "active", desc: "Earn up to $10,000 for critical vulnerability reports" },
-  { icon: Key, label: "API Key Management", status: "active", desc: "Scoped API keys with expiry and rate limiting" },
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Verified identity, session, and account-security controls",
+    icon: LockKeyhole,
+    detail:
+      "Authenticated account ownership, server-side session management, verified multi-factor enrollment, recovery and revocation workflows, device and sign-in evidence, scoped authorization, audit logging, secure credential handling, and clear error states are required before representing authentication, two-factor protection, recovery, account safeguards, or session security as active.",
+  },
+  {
+    title: "Verified data-protection and infrastructure safeguards",
+    icon: ShieldCheck,
+    detail:
+      "Documented encryption architecture, key-management controls, verified transport protections, validated infrastructure configuration, source-attributed monitoring, alert routing, incident response, access reviews, vulnerability management, and independently evidenced safeguards are required before representing encryption, firewall protection, threat blocking, uptime, availability, alerting, infrastructure health, or security posture as active or complete.",
+  },
+  {
+    title: "Authorized reporting, disclosure, and vulnerability workflows",
+    icon: Siren,
+    detail:
+      "Defined reporting channels, accountable owners, triage standards, response targets, disclosure policy, scope, eligibility rules, payment controls where applicable, audit trails, abuse prevention, and approved communications are required before accepting a vulnerability report, offering a bounty, assigning a severity, promising a reward, disclosing a finding, or reporting remediation status.",
+  },
+  {
+    title: "Evidence-based API and security-operation reporting",
+    icon: KeyRound,
+    detail:
+      "Authorized API-key infrastructure, server-side lifecycle controls, scope enforcement, expiration and revocation, rate-limit evidence, documented metric definitions, durable telemetry, observability, capacity monitoring, and independently verifiable methods are required before creating, listing, revoking, or reporting API keys, alerts, bugs, active users, transaction totals, success rates, response times, live data, automation, advanced analytics, security scores, or production readiness.",
+  },
 ];
 
 export default function Security() {
   return (
-    <div className="container py-8 max-w-5xl animate-page-in">
-      <PageHeader backHref="/dashboard" icon={Shield} title="Security Center" subtitle="Robust security protecting your assets and data" badge="SOC 2 Ready" badgeVariant="default" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={Shield} label="Threats Blocked" value="12,847" change={-5.2} changeLabel="this month" color="success" />
-        <StatCard icon={Activity} label="Uptime" value="..." change={0.01} color="primary" />
-        <StatCard icon={AlertTriangle} label="Active Alerts" value="0" color="warning" />
-        <StatCard icon={Bug} label="Bugs Reported" value="3" change={-25} changeLabel="this month" color="accent" />
-      </div>
-      <div className="grid md:grid-cols-2 gap-4 mb-8">
-        {SECURITY_FEATURES.map(f => (
-          <div key={f.label} className="card p-4 flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center shrink-0">
-              <f.icon className="w-4 h-4 text-success" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-sm">{f.label}</span>
-                <Badge variant="outline" className="text-xs text-success border-success/30">Active</Badge>
-              </div>
-              <p className="text-xs text-muted-foreground">{f.desc}</p>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Security-center service
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Security Center
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Account-security controls, encryption, multi-factor authentication,
+            audit logs, web-application firewall protection, API keys,
+            vulnerability reporting, rewards, alerts, uptime, operational
+            metrics, and security scores are not configured for this deployment.
+            No protection, finding, security result, payment, metric, or service
+            result is represented as current, complete, verified, active, or
+            available.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated security control, scan, alert, bounty, or metric
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not enable or verify a security control, create
+                an API key, retrieve a log or alert, execute a scan, accept a
+                vulnerability report, issue a reward, calculate a metric, or
+                report that a security action succeeded.
+              </p>
             </div>
           </div>
-        ))}
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-      <div className="card p-6 border-warning/30 bg-warning/5">
-        <h3 className="font-semibold mb-3 flex items-center gap-2"><Bug className="w-5 h-5 text-warning" />Bug Bounty Program</h3>
-        <p className="text-sm text-muted-foreground mb-4">Found a vulnerability? Report it responsibly and earn rewards up to $10,000 in SKY444.</p>
-        <div className="grid sm:grid-cols-3 gap-3 mb-4">
-          {[{level:"Critical",reward:"$5,000–$10,000"},{level:"High",reward:"$1,000–$5,000"},{level:"Medium",reward:"$100–$1,000"}].map(b => (
-            <div key={b.level} className="p-3 bg-secondary/50 rounded-lg text-center">
-              <div className="text-sm font-semibold">{b.level}</div>
-              <div className="text-xs font-mono text-primary mt-1">{b.reward}</div>
-            </div>
-          ))}
-        </div>
-        <Button className="btn-primary gap-2"><Bug className="w-4 h-4" />Report Vulnerability</Button>
-      </div>
-    </div>
+    </main>
   );
 }
