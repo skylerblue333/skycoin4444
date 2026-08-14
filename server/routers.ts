@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { userRouter } from "./userRouter";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -16,6 +17,8 @@ const createFeatureRouter = () => router({
 export const appRouter = router({
   system: systemRouter,
   
+  user: userRouter,
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
