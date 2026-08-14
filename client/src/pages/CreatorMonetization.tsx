@@ -1,201 +1,109 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { PageHeader } from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getLoginUrl } from "@/const";
-import { DollarSign, Users, Heart, Star, TrendingUp, Award, Gift, Zap, ChevronRight } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
-import { Link } from "wouter";
+import {
+  AlertTriangle,
+  BarChart3,
+  Database,
+  Landmark,
+  ShieldCheck,
+} from "lucide-react";
 
-const REVENUE_DATA = Array.from({length:12},(_,i)=>({
-  month:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][i],
-  subscriptions: Math.floor(Math.random()*500+200),
-  tips: Math.floor(Math.random()*300+100),
-  content: Math.floor(Math.random()*200+50),
-}));
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const MONETIZATION_FEATURES = [
-  { icon:<Users className="w-5 h-5"/>, title:"Subscriptions", desc:"Monthly recurring revenue from fans", href:"/subscriptions", color:"oklch(0.72 0.22 295)", badge:"Active", revenue: 1300 },
-  { icon:<Heart className="w-5 h-5"/>, title:"Tips & Donations", desc:"One-time payments from supporters", href:"/tips", color:"oklch(0.76 0.19 185)", badge:"Active", revenue: 655 },
-  { icon:<Star className="w-5 h-5"/>, title:"Ads & Sponsorships", desc:"Brand partnerships and ad revenue", href:"/premium-content", color:"oklch(0.78 0.16 65)", badge:"Active", revenue: 1280 },
-  { icon:<Gift className="w-5 h-5"/>, title:"Stream Gifts", desc:"Real-time gifts during live streams", href:"/streaming", color:"oklch(0.72 0.18 150)", badge:"Active", revenue: 250 },
-  { icon:<Award className="w-5 h-5"/>, title:"Memberships", desc:"Tiered fan clubs with perks", href:"/memberships", color:"oklch(0.82 0.16 80)", badge:"Active", revenue: 420 },
-  { icon:<Zap className="w-5 h-5"/>, title:"Affiliate Program", desc:"Earn from referrals and partnerships", href:"/affiliate", color:"oklch(0.62 0.22 25)", badge:"Active", revenue: 180 },
+const serviceRequirements = [
+  {
+    title: "Creator payment and payout infrastructure",
+    icon: Landmark,
+    detail:
+      "An authorized payment provider, creator onboarding, payee verification, payout account controls, taxes and jurisdiction review, transaction reconciliation, refund and dispute handling, payout-failure recovery, and secure financial records are required before collecting or distributing creator funds.",
+  },
+  {
+    title: "Verified subscriptions, tips, gifts, and membership entitlements",
+    icon: Database,
+    detail:
+      "Server-side purchase records, entitlement checks, pricing and fee disclosure, webhook verification, duplicate-prevention controls, cancellation and refund workflows, role controls, and auditing are required before granting subscriber, tip, gift, membership, or premium-content access.",
+  },
+  {
+    title: "Reliable creator analytics and reporting",
+    icon: BarChart3,
+    detail:
+      "Authenticated source data, durable event records, metric definitions, period and currency handling, reconciliation, privacy controls, methodology disclosure, and correction processes are required before displaying revenue, payout status, audience metrics, creator performance, or forecast data.",
+  },
+  {
+    title: "Creator safety, fairness, and policy safeguards",
+    icon: ShieldCheck,
+    detail:
+      "Published creator policies, content and transaction moderation, anti-fraud controls, reporting and appeal processes, customer support, access controls, retention policies, and incident response are required before operating a monetization or affiliate program.",
+  },
 ];
 
 export default function CreatorMonetization() {
-  const { isAuthenticated } = useAuth();
-  const { data: earnings } = trpc.creator.earnings.useQuery(undefined, { enabled: isAuthenticated });
-  const { data: milestones } = trpc.creatorGrowth.getMilestones.useQuery(undefined, { enabled: isAuthenticated });
-  const { data: advice } = trpc.creatorGrowth.getGrowthAdvice.useQuery(undefined, { enabled: isAuthenticated });
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <DollarSign className="w-16 h-16 text-green-400 mx-auto mb-4"/>
-          <h2 className="text-2xl font-bold mb-2">Creator Monetization</h2>
-          <p className="text-muted-foreground mb-6">Turn your content into income. Multiple revenue streams, all in one place.</p>
-          <Button asChild className="bg-green-600 hover:bg-green-500"><a href={getLoginUrl()}>Get Started</a></Button>
-        </div>
-      </div>
-    );
-  }
-
-  const totalRevenue = (earnings?.totalRevenue || 0);
-  const subRevenue = (earnings?.subRevenue || 0);
-  const tipRevenue = (earnings?.tipRevenue || 0);
-
   return (
-    <div className="min-h-screen">
-      <PageHeader title="Creator Monetization" subtitle="Multiple revenue streams · Real earnings · Growth tools"/>
-      <div className="container py-6 max-w-6xl">
-        {/* Revenue Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {[
-            { label:"Total Revenue", value:`$${totalRevenue.toFixed(2)}`, icon:<DollarSign className="w-4 h-4"/>, color:"text-green-400" },
-            { label:"Subscriptions", value:`$${subRevenue.toFixed(2)}`, icon:<Users className="w-4 h-4"/>, color:"text-purple-400" },
-            { label:"Tips", value:`$${tipRevenue.toFixed(2)}`, icon:<Heart className="w-4 h-4"/>, color:"text-pink-400" },
-            { label:"Active Subs", value:String(earnings?.subscriptions || 0), icon:<Star className="w-4 h-4"/>, color:"text-yellow-400" },
-          ].map(s => (
-            <div key={s.label} className="rounded-xl bg-white/5 border border-white/10 p-4">
-              <div className={`${s.color} mb-2`}>{s.icon}</div>
-              <div className="text-xl font-bold font-mono">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Creator monetization
+            service unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Creator Monetization
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Subscriptions, tips, donations, sponsorships, advertising revenue,
+            stream gifts, memberships, affiliate earnings, creator earnings,
+            revenue analytics, payout schedules, milestones, AI growth advice,
+            premium content, and payment entitlements are not configured for
+            this deployment. No payment, earnings balance, payout, membership,
+            performance result, or financial claim is represented as current,
+            verified, or available.
+          </p>
+        </header>
 
-        <Tabs defaultValue="streams">
-          <TabsList className="bg-white/5 border border-white/10 mb-4">
-            <TabsTrigger value="streams">Revenue Streams</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="growth">Growth</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="streams">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {MONETIZATION_FEATURES.map(f => (
-                <Link key={f.title} href={f.href}>
-                  <div className="rounded-xl bg-white/5 border border-white/10 p-5 hover:bg-white/8 transition-all cursor-pointer group">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="p-2 rounded-lg" style={{backgroundColor:`${f.color}20`,color:f.color}}>{f.icon}</div>
-                      <Badge className="text-xs" style={f.badge==="Active"?{backgroundColor:`${f.color}20`,color:f.color,border:`1px solid ${f.color}40`}:{}}
-                        variant={f.badge==="Active"?"secondary":"outline"}>{f.badge}</Badge>
-                    </div>
-                    <h3 className="font-bold mb-1">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground">{f.desc}</p>
-                    <div className="flex items-center gap-1 mt-3 text-xs" style={{color:f.color}}>
-                      <span>Manage</span><ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform"/>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated creator earnings, payments, or audience analytics
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not accept a payment, create a subscription,
+                award a tip or gift, provide a paid entitlement, calculate
+                earnings, schedule or complete a payout, generate a performance
+                chart, issue an affiliate reward, or provide AI growth guidance.
+              </p>
             </div>
-          </TabsContent>
+          </div>
+        </section>
 
-          <TabsContent value="analytics">
-            <div className="space-y-6">
-              <div className="rounded-xl bg-white/5 border border-white/10 p-6">
-                <h3 className="font-bold mb-4">Revenue Breakdown (12 months)</h3>
-                <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={REVENUE_DATA}>
-                    <XAxis dataKey="month" tick={{fontSize:11}} stroke="transparent" tickLine={false}/>
-                    <YAxis tick={{fontSize:11}} stroke="transparent" tickLine={false} tickFormatter={v=>`$${v}`}/>
-                    <Tooltip contentStyle={{background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.1)",borderRadius:"8px"}} formatter={(v:any,n:string)=>[`$${v}`,n]}/>
-                    <Bar dataKey="subscriptions" fill="oklch(0.72 0.22 295)" radius={[4,4,0,0]} name="Subscriptions"/>
-                    <Bar dataKey="tips" fill="oklch(0.76 0.19 185)" radius={[4,4,0,0]} name="Tips"/>
-                    <Bar dataKey="content" fill="oklch(0.78 0.16 65)" radius={[4,4,0,0]} name="Premium Content"/>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="rounded-xl bg-white/5 border border-white/10 p-6">
-                <h3 className="font-bold mb-4">Revenue by Source</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {MONETIZATION_FEATURES.map(f => (
-                    <div key={f.title} className="rounded-lg bg-white/5 p-4 border border-white/10">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="p-2 rounded-lg" style={{backgroundColor:`${f.color}20`,color:f.color}}>{f.icon}</div>
-                        <span className="text-sm font-medium">{f.title}</span>
-                      </div>
-                      <div className="text-2xl font-bold">${f.revenue}</div>
-                      <div className="text-xs text-muted-foreground mt-1">{((f.revenue / totalRevenue) * 100).toFixed(1)}% of total</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-xl bg-white/5 border border-white/10 p-6">
-                <h3 className="font-bold mb-4">Payout Schedule</h3>
-                <div className="space-y-3">
-                  {[
-                    { date: '2026-07-01', amount: 3485, status: 'Completed' },
-                    { date: '2026-06-01', amount: 2945, status: 'Completed' },
-                    { date: '2026-05-01', amount: 2120, status: 'Completed' },
-                  ].map((payout, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                      <div>
-                        <p className="font-medium">{payout.date}</p>
-                        <p className="text-xs text-muted-foreground">Monthly payout</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold">${payout.amount.toLocaleString()}</p>
-                        <p className="text-xs text-green-400">{payout.status}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="growth">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Milestones */}
-              <div className="rounded-xl bg-white/5 border border-white/10 p-5">
-                <h3 className="font-bold mb-4 flex items-center gap-2"><Award className="w-4 h-4 text-yellow-400"/>Milestones</h3>
-                {!milestones || (milestones as any[]).length === 0 ? (
-                  <p className="text-muted-foreground text-sm">No milestones yet. Keep creating!</p>
-                ) : (
-                  <div className="space-y-3">
-                    {(milestones as any[]).slice(0,5).map((m: any, i: number) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${m.achieved?"bg-yellow-500/20 text-yellow-400":"bg-white/5 text-muted-foreground"}`}>
-                          {m.achieved?"✓":i+1}
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-medium">{m.title || m.name || `Milestone ${i+1}`}</div>
-                          <div className="text-xs text-muted-foreground">{m.description || m.desc || ""}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* AI Growth Advice */}
-              <div className="rounded-xl bg-white/5 border border-white/10 p-5">
-                <h3 className="font-bold mb-4 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-cyan-400"/>AI Growth Advice</h3>
-                {!advice ? (
-                  <div className="space-y-2">
-                    {[0,1,2].map(i=><div key={i} className="h-4 bg-white/10 rounded animate-pulse"/>)}
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {((advice as any).tips || [(advice as any).advice || "Keep creating consistently and engage with your audience daily."]).slice(0,4).map((tip: string, i: number) => (
-                      <div key={i} className="flex gap-2 text-sm">
-                        <span className="text-cyan-400 shrink-0">→</span>
-                        <span className="text-muted-foreground">{tip}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
