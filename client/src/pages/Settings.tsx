@@ -1,366 +1,112 @@
-import { useState, useEffect } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import {
+  AlertTriangle,
+  Database,
+  LockKeyhole,
+  ShieldCheck,
+  WalletCards,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Authenticated preferences and profile-data controls",
+    icon: Database,
+    detail:
+      "Authenticated ownership checks, persisted preference records, input validation, data minimization, clear user disclosures, privacy controls, durable updates, audit history, correction paths, and error recovery are required before saving or representing profile preferences, notification choices, privacy settings, communication permissions, or account data.",
+  },
+  {
+    title: "Account security, sessions, and deletion safeguards",
+    icon: LockKeyhole,
+    detail:
+      "Secure multi-factor enrollment, recovery procedures, session inventory, device verification, re-authentication for high-risk actions, account-deletion workflows, retention and legal-hold rules, user notification, revocation controls, and abuse prevention are required before managing two-factor authentication, sessions, login history, or account deletion.",
+  },
+  {
+    title: "Verified wallet and financial integrations",
+    icon: WalletCards,
+    detail:
+      "Authorized wallet infrastructure, verified addresses and network state, transaction confirmation, custody safeguards, token and staking eligibility checks, balance reconciliation, financial and legal review, alerts, incident handling, and clear risk disclosures are required before displaying a wallet, enabling auto-staking, or representing token-related settings or activity.",
+  },
+  {
+    title: "Accurate personal metrics and service delivery",
+    icon: ShieldCheck,
+    detail:
+      "Authoritative source records, documented metric definitions, authorization, privacy review, data-quality checks, moderation and safety controls, notification delivery infrastructure, monitoring, and correction workflows are required before displaying profile levels, XP, reputation, followers, service availability, or notification outcomes.",
+  },
+];
 
 export default function Settings() {
-  const { user } = useAuth();
-  const [displayName, setDisplayName] = useState("");
-  const [bio, setBio] = useState("");
-  const [email, setEmail] = useState("");
-  const [notifyTips, setNotifyTips] = useState(true);
-  const [notifyFollows, setNotifyFollows] = useState(true);
-  const [notifyMessages, setNotifyMessages] = useState(true);
-  const [notifySystem, setNotifySystem] = useState(true);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [privacyMode, setPrivacyMode] = useState(false);
-  const [showOnlineStatus, setShowOnlineStatus] = useState(true);
-  const [allowDMs, setAllowDMs] = useState(true);
-
-  const { upload, uploading } = useFileUpload();
-
-  const { data: profile } = trpc.user.profile.useQuery(
-    { userId: user?.id || 0 },
-    { enabled: !!user }
-  );
-
-  const updateProfile = trpc.user.updateProfile.useMutation({
-    onSuccess: () => toast.success("Profile updated!"),
-    onError: (err) => toast.error(err.message),
-  });
-
-  useEffect(() => {
-    if (profile) {
-      setDisplayName(profile.name || "");
-      setBio(profile.bio || "");
-      setEmail(profile.email || "");
-    }
-  }, [profile]);
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const result = await upload(file);
-      updateProfile.mutate({ avatar: result.url });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Avatar upload failed.");
-    }
-  };
-
-  const handleSaveProfile = () => {
-    updateProfile.mutate({
-      displayName,
-      bio,
-    });
-  };
-
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
-        </div>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Account-settings service
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Settings
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Profile settings, avatar uploads, notification preferences, privacy
+            controls, direct-message permissions, account deletion, two-factor
+            authentication, active sessions, login history, wallet information,
+            staking controls, transaction notifications, account statistics, and
+            social metrics are not configured for this deployment. No
+            preference, profile update, account-security state, session, wallet,
+            financial setting, statistic, or notification setting is represented
+            as current, verified, or available.
+          </p>
+        </header>
 
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="bg-card border border-border">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="privacy">Privacy</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="wallet">Wallet</TabsTrigger>
-          </TabsList>
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated account changes, security states, or wallet
+                controls
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not save profile data, accept a file upload,
+                alter notifications or privacy, manage direct messages, delete
+                an account, enroll two-factor authentication, enumerate
+                sessions, derive a wallet address, stake an asset, or represent
+                a security, social, or financial setting as successful.
+              </p>
+            </div>
+          </div>
+        </section>
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="space-y-4">
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>Update your public profile details</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Avatar */}
-                <div className="flex items-center gap-4">
-                  <div className="relative group">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl font-bold overflow-hidden">
-                      {profile?.avatar ? (
-                        <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
-                      ) : (
-                        displayName.charAt(0).toUpperCase() || "?"
-                      )}
-                    </div>
-                    <label className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                      <span className="text-xs text-white">Change</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarUpload}
-                        disabled={uploading}
-                      />
-                    </label>
-                  </div>
-                  <div>
-                    <p className="font-medium">{displayName || "Anonymous"}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {uploading ? "Uploading..." : "Click avatar to change"}
-                    </p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Fields */}
-                <div className="grid gap-4">
-                  <div>
-                    <Label>Display Name</Label>
-                    <Input
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      placeholder="Your display name"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label>Bio</Label>
-                    <Textarea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                      placeholder="Tell people about yourself..."
-                      className="mt-1"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label>Email</Label>
-                    <Input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="mt-1"
-                      disabled
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">Email is managed by your OAuth provider</p>
-                  </div>
-                </div>
-
-                <Button onClick={handleSaveProfile} disabled={updateProfile.isPending}>
-                  {updateProfile.isPending ? "Saving..." : "Save Changes"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Account Stats */}
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Account Stats</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.level || 1}</p>
-                    <p className="text-xs text-muted-foreground">Level</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-blue-400">{profile?.xp || 0}</p>
-                    <p className="text-xs text-muted-foreground">XP</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.reputation || 0}</p>
-                    <p className="text-xs text-muted-foreground">Reputation</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-amber-400">{profile?.followerCount || 0}</p>
-                    <p className="text-xs text-muted-foreground">Followers</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Notifications Tab */}
-          <TabsContent value="notifications" className="space-y-4">
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>Choose what notifications you receive</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Tip Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When someone sends you a tip</p>
-                  </div>
-                  <Switch checked={notifyTips} onCheckedChange={setNotifyTips} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Follow Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When someone follows you</p>
-                  </div>
-                  <Switch checked={notifyFollows} onCheckedChange={setNotifyFollows} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Message Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When you receive a direct message</p>
-                  </div>
-                  <Switch checked={notifyMessages} onCheckedChange={setNotifyMessages} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>System Notifications</Label>
-                    <p className="text-xs text-muted-foreground">Platform updates and announcements</p>
-                  </div>
-                  <Switch checked={notifySystem} onCheckedChange={setNotifySystem} />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Privacy Tab */}
-          <TabsContent value="privacy" className="space-y-4">
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Privacy Settings</CardTitle>
-                <CardDescription>Control who can see your activity</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Privacy Mode</Label>
-                    <p className="text-xs text-muted-foreground">Hide your activity from public feeds</p>
-                  </div>
-                  <Switch checked={privacyMode} onCheckedChange={setPrivacyMode} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Show Online Status</Label>
-                    <p className="text-xs text-muted-foreground">Let others see when you're online</p>
-                  </div>
-                  <Switch checked={showOnlineStatus} onCheckedChange={setShowOnlineStatus} />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Allow Direct Messages</Label>
-                    <p className="text-xs text-muted-foreground">Let anyone send you messages</p>
-                  </div>
-                  <Switch checked={allowDMs} onCheckedChange={setAllowDMs} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/50 border-border border-red-500/20">
-              <CardHeader>
-                <CardTitle className="text-red-400">Danger Zone</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Delete Account</p>
-                    <p className="text-xs text-muted-foreground">Permanently delete your account and all data</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="text-red-400 border-red-400/50 hover:bg-red-500/10">
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Security Tab */}
-          <TabsContent value="security" className="space-y-4">
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Security</CardTitle>
-                <CardDescription>Protect your account</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Two-Factor Authentication</Label>
-                    <p className="text-xs text-muted-foreground">Add an extra layer of security</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {twoFactorEnabled && <Badge className="bg-purple-600/20 text-purple-400">Active</Badge>}
-                    <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
-                  </div>
-                </div>
-                <Separator />
-                <div>
-                  <Label>Active Sessions</Label>
-                  <div className="mt-2 space-y-2">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                      <div>
-                        <p className="text-sm font-medium">Current Session</p>
-                        <p className="text-xs text-muted-foreground">Chrome on macOS • Last active now</p>
-                      </div>
-                      <Badge className="bg-purple-600/20 text-purple-400">Active</Badge>
-                    </div>
-                  </div>
-                </div>
-                <Separator />
-                <div>
-                  <Label>Login History</Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Last login: {new Date().toLocaleDateString()} from your current device
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
                   </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Wallet Tab */}
-          <TabsContent value="wallet" className="space-y-4">
-            <Card className="bg-card/50 border-border">
-              <CardHeader>
-                <CardTitle>Wallet Settings</CardTitle>
-                <CardDescription>Manage your SKY444 wallet</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-                  <p className="text-sm text-muted-foreground">Wallet Address</p>
-                  <p className="font-mono text-sm mt-1 break-all">
-                    {user?.id ? `0x${user.id.toString(16).padStart(40, '0')}` : "Not connected"}
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
                   </p>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Auto-stake Rewards</Label>
-                    <p className="text-xs text-muted-foreground">Automatically stake earned tokens</p>
-                  </div>
-                  <Switch />
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Transaction Notifications</Label>
-                    <p className="text-xs text-muted-foreground">Get notified for all wallet activity</p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
