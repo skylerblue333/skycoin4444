@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { userRouter } from "./userRouter";
+import { marketplaceRouter } from "./marketplaceRouter";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -46,7 +47,7 @@ export const appRouter = router({
   story: createFeatureRouter(),
 
   // Marketplace & Commerce Routers
-  marketplace: createFeatureRouter(),
+  marketplace: marketplaceRouter,
   creator: createFeatureRouter(),
   creatorGrowth: createFeatureRouter(),
   digitalArt: createFeatureRouter(),
