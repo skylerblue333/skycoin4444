@@ -1,160 +1,116 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
+import {
+  AlertTriangle,
+  Brain,
+  Database,
+  FileCheck2,
+  Network,
+  ShieldCheck,
+} from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Authenticated, consent-aware personal-memory graph data service",
+    icon: Database,
+    detail:
+      "Authenticated account ownership, strict tenant isolation, explicit consent, durable and attributable memory, relationship, identity, content, and metadata records, documented data classification and purpose, retention and deletion controls, access control, audit history, export and correction workflows, defined empty states, and reliable recovery are required before retrieving, creating, searching, changing, removing, or reporting a memory, relationship, connection, graph node, graph edge, user profile, personal data item, or graph result.",
+  },
+  {
+    title:
+      "Validated graph, inference, clustering, and visualization processing",
+    icon: Network,
+    detail:
+      "A documented and evaluated graph-processing architecture, versioned schemas, data provenance, validated graph layout and rendering logic, deterministic interaction behavior, bounds and performance controls, accessible nonvisual alternatives, approved model and retrieval contracts, confidence-calibration methods, user controls, safety assessments, and independently verifiable evaluation evidence are required before generating or reporting a graph, constellation, cluster, label, description, strength score, confidence score, relationship, insight, AI inference, visualization, or interaction result.",
+  },
+  {
+    title: "Privacy, security, and AI-data governance controls",
+    icon: ShieldCheck,
+    detail:
+      "Privacy impact assessment, data-minimization rules, encryption with managed keys, authorization enforcement, secure secret handling, abuse prevention, rate limits, monitoring, incident response, access reviews, deletion verification, and evidence that the controls operate as designed are required before representing personal memory data, graph relationships, profiles, AI processing, rendered details, or a stored graph as private, protected, available, or successfully processed.",
+  },
+  {
+    title: "Evidence-based graph operations and reporting",
+    icon: FileCheck2,
+    detail:
+      "Traceable metric definitions, observable graph generation, monitoring, alerting, capacity and performance testing, documented synchronization semantics, retry and failure handling, support procedures, and independently verifiable operational evidence are required before reporting memory totals, connection counts, cluster counts, activity, graph depth, strengths, analytics, visualizer status, documentation availability, or production readiness.",
+  },
+];
 
 export default function MemoryGraphVisualizer() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { data: graph, isLoading } = trpc.enterprise.memoryGraph.snapshot.useQuery();
-  const [selectedNode, setSelectedNode] = useState<any>(null);
-
-  useEffect(() => {
-    if (!canvasRef.current || !graph) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    // Simple force-directed graph visualization
-    const nodes = (graph as any)?.nodes || [];
-    const links = (graph as any)?.links || [];
-
-    // Initialize positions if not set
-    nodes.forEach((node: any, i: number) => {
-      if (!node.x) node.x = Math.random() * canvas.width;
-      if (!node.y) node.y = Math.random() * canvas.height;
-      if (!node.vx) node.vx = 0;
-      if (!node.vy) node.vy = 0;
-    });
-
-    // Animation loop
-    let animationId: number;
-    const animate = () => {
-      // Clear canvas
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Apply forces
-      nodes.forEach((node: any) => {
-        node.vx *= 0.99;
-        node.vy *= 0.99;
-        node.x += node.vx;
-        node.y += node.vy;
-
-        // Bounds checking
-        if (node.x < 0) node.x = 0;
-        if (node.x > canvas.width) node.x = canvas.width;
-        if (node.y < 0) node.y = 0;
-        if (node.y > canvas.height) node.y = canvas.height;
-      });
-
-      // Draw links
-      ctx.strokeStyle = '#444444';
-      ctx.lineWidth = 1;
-      ((graph as any)?.links || []).forEach((link: any) => {
-        const source = nodes[link.source];
-        const target = nodes[link.target];
-        if (source && target) {
-          ctx.beginPath();
-          ctx.moveTo(source.x, source.y);
-          ctx.lineTo(target.x, target.y);
-          ctx.stroke();
-        }
-      });
-
-      // Draw nodes
-      (nodes as any[]).forEach((node: any) => {
-        const size = node.size || 8;
-        ctx.fillStyle = node.color || '#00ff88';
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Draw label
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '12px monospace';
-        ctx.fillText(node.label || '', node.x + size + 5, node.y);
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => cancelAnimationFrame(animationId);
-  }, [graph]);
-
-  if (isLoading) return <Spinner />;
-
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">MEMORY CONSTELLATION</h1>
-          <p className="text-gray-400">Your life as a star map — every memory, skill, and connection</p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-8">
-          {/* Canvas */}
-          <div className="col-span-2">
-            <Card className="bg-gray-900 border-gray-800 p-4 h-[600px]">
-              <canvas
-                ref={canvasRef}
-                className="w-full h-full bg-black rounded cursor-pointer"
-                onClick={(e) => {
-                  const rect = canvasRef.current?.getBoundingClientRect();
-                  if (rect) {
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    // Find clicked node
-                    (graph as any)?.nodes?.forEach((node: any) => {
-                      const dist = Math.sqrt((node.x - x) ** 2 + (node.y - y) ** 2);
-                      if (dist < (node.size || 8) + 5) {
-                        setSelectedNode(node);
-                      }
-                    });
-                  }
-                }}
-              />
-            </Card>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Memory graph visualizer
+            unavailable
           </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Memory Constellation
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Personal memory graphs, graph connections and clusters, graph
+            rendering, node selection, memory details, user profiles, AI
+            inferences, confidence or strength scores, analytics, and
+            operational metrics are not configured for this deployment. No
+            memory, relationship, graph node, graph edge, cluster,
+            visualization, profile, personal data item, inference, confidence
+            score, strength score, metric, or service status is represented as
+            current, complete, verified, active, private, protected, available,
+            or delivered.
+          </p>
+        </header>
 
-          {/* Info Panel */}
-          <div>
-            <Card className="bg-gray-900 border-gray-800 p-6">
-              <h3 className="text-xl font-bold mb-4">MEMORY STATS</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-gray-400 text-sm">Total Memories</p>
-                  <p className="text-2xl font-bold text-cyan-400">{(graph as any)?.nodes?.length || 0}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Connections</p>
-                  <p className="text-2xl font-bold text-purple-400">{(graph as any)?.links?.length || 0}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Knowledge Clusters</p>
-                  <p className="text-2xl font-bold text-yellow-400">{(graph as any)?.clusters?.length || 0}</p>
-                </div>
-              </div>
-
-              {selectedNode && (
-                <div className="mt-8 pt-8 border-t border-gray-700">
-                  <h4 className="font-bold mb-4">{selectedNode.label}</h4>
-                  <p className="text-sm text-gray-400 mb-4">{selectedNode.description}</p>
-                  <div className="space-y-2">
-                    <p className="text-xs text-gray-500">Type: {selectedNode.type}</p>
-                    <p className="text-xs text-gray-500">Strength: {selectedNode.strength}%</p>
-                  </div>
-                </div>
-              )}
-            </Card>
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated graph, personal-memory, or AI result
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not retrieve, generate, render, select, infer,
+                cluster, score, summarize, create, modify, remove, synchronize,
+                or report a memory graph, graph node, graph connection, personal
+                data item, profile, AI output, metric, or operational result. It
+                does not claim that a personal memory graph has been stored,
+                processed, protected, or visualized.
+              </p>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
