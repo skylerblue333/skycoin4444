@@ -1,146 +1,118 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Link } from "wouter";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { TableSkeleton } from "@/components/PageSkeleton";
-import { EmptyState } from "@/components/EmptyState";
 import {
-  Trophy, Zap, MessageSquare, Users, TrendingUp,
-  Crown, Medal, Award, Star
+  AlertTriangle,
+  Award,
+  Database,
+  FileCheck2,
+  ShieldCheck,
+  Trophy,
 } from "lucide-react";
 
-const RANK_STYLES = [
-  { bg: 'linear-gradient(135deg, oklch(0.80 0.18 70), oklch(0.72 0.24 40))', icon: <Crown className="w-4 h-4 text-white" />, label: "#1" },
-  { bg: 'linear-gradient(135deg, oklch(0.75 0.05 270), oklch(0.65 0.05 270))', icon: <Medal className="w-4 h-4 text-white" />, label: "#2" },
-  { bg: 'linear-gradient(135deg, oklch(0.62 0.24 40), oklch(0.55 0.20 40))', icon: <Award className="w-4 h-4 text-white" />, label: "#3" },
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Persisted users, profiles, content, and activity records",
+    icon: Database,
+    detail:
+      "Authenticated, tenant-isolated services for users, profiles, posts, followers, reactions, XP or points, reputation, events, timestamps, privacy, deletion, and reconciliation are required before retrieving or reporting a user, ranking input, activity record, post count, follower count, reputation value, level, or leaderboard position.",
+  },
+  {
+    title: "Defined ranking and anti-abuse semantics",
+    icon: Trophy,
+    detail:
+      "Documented metric definitions, time windows, tie handling, eligibility, aggregation, duplicate and missing-event detection, moderation exclusions, rate limits, anti-gaming controls, backfill behavior, and reproducible query results are required before calculating, displaying, or reporting XP, posts, followers, reputation, rank, creator status, contribution, or competitive standing.",
+  },
+  {
+    title: "Verified rewards and authorization controls",
+    icon: Award,
+    detail:
+      "Explicit reward eligibility, accounting, approval, issuance, revocation, identity binding, authorization, privacy controls, audit trails, and a clear distinction between recognition and financial or token value are required before promising, issuing, displaying, or reporting a badge, award, reward, SKY444 amount, creator earning, or user-specific outcome.",
+  },
+  {
+    title: "Evidence-based analytics and operational reporting",
+    icon: FileCheck2,
+    detail:
+      "Traceable source data, metric definitions, monitoring, performance testing, support procedures, incident handling, and independently verifiable operational records are required before reporting active users, rankings, success rates, response times, engagement analytics, automation outcomes, documentation availability, or production readiness.",
+  },
 ];
 
-function LeaderRow({ rank, user, value, label }: { rank: number; user: any; value: string | number; label: string }) {
-  const isTop3 = rank <= 3;
-  const style = isTop3 ? RANK_STYLES[rank - 1] : null;
-
-  return (
-    <div
-      className="flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.01]"
-      style={{
-        background: isTop3 ? 'oklch(0.72 0.28 305 / 0.08)' : 'oklch(0.10 0.025 270)',
-        border: `1px solid ${isTop3 ? 'oklch(0.72 0.28 305 / 0.30)' : 'oklch(0.18 0.025 270)'}`,
-      }}
-    >
-      {/* Rank badge */}
-      <div
-        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold"
-        style={style ? { background: style.bg } : { background: 'oklch(0.15 0.025 270)', color: 'oklch(0.55 0.025 275)' }}
-      >
-        {isTop3 ? style!.icon : rank}
-      </div>
-
-      {/* Avatar */}
-      <div className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center text-sm font-bold text-white overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, oklch(0.72 0.28 305), oklch(0.72 0.28 340))' }}>
-        {user.avatar ? <img src={user.avatar} alt="" className="w-full h-full object-cover" /> : (user.displayName || user.name || "?")[0].toUpperCase()}
-      </div>
-
-      {/* Name */}
-      <div className="flex-1 min-w-0">
-        <Link href={`/profile/${user.id}`}>
-          <p className="text-white text-sm font-semibold truncate hover:underline cursor-pointer">
-            {user.displayName || user.name || "Unknown"}
-            {user.verified && <span className="ml-1 text-xs" style={{ color: 'oklch(0.72 0.28 305)' }}>✓</span>}
-          </p>
-        </Link>
-        <p className="text-xs truncate" style={{ color: 'oklch(0.55 0.025 275)' }}>
-          @{user.username || `user${user.id}`} · Level {user.level || 1}
-        </p>
-      </div>
-
-      {/* Value */}
-      <div className="text-right flex-shrink-0">
-        <p className="text-sm font-bold" style={{ color: isTop3 ? 'oklch(0.85 0.25 305)' : 'white' }}>
-          {typeof value === "number" ? value.toLocaleString() : value}
-        </p>
-        <p className="text-xs" style={{ color: 'oklch(0.50 0.020 275)' }}>{label}</p>
-      </div>
-    </div>
-  );
-}
-
 export default function Leaderboard() {
-  const { user } = useAuth();
-  const [tab, setTab] = useState("xp");
-
-  const { data: users, isLoading } = trpc.user.leaderboard.useQuery({ type: tab as any, limit: 50 });
-
-  const tabConfig = [
-    { id: "xp", label: "XP", icon: Zap, valueKey: "xp", valueLabel: "XP" },
-    { id: "posts", label: "Posts", icon: MessageSquare, valueKey: "postCount", valueLabel: "posts" },
-    { id: "followers", label: "Followers", icon: Users, valueKey: "followerCount", valueLabel: "followers" },
-    { id: "reputation", label: "Rep", icon: Star, valueKey: "reputation", valueLabel: "rep" },
-  ];
-
   return (
-    <div className="min-h-screen" style={{ background: 'oklch(0.08 0.025 270)' }}>
-      {/* Hero */}
-      <div className="relative overflow-hidden py-12 px-4 text-center" style={{ background: 'linear-gradient(180deg, oklch(0.12 0.025 270), oklch(0.08 0.025 270))' }}>
-        <div className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(ellipse at 50% 0%, oklch(0.72 0.28 305), transparent 70%)' }} />
-        <div className="relative">
-          <div className="text-5xl mb-3">🏆</div>
-          <h1 className="text-3xl font-bold text-white mb-2">Leaderboard</h1>
-          <p className="text-sm" style={{ color: 'oklch(0.55 0.025 275)' }}>Top creators, earners, and contributors on SKYCOIN4444</p>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Leaderboard service
+            unavailable
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Leaderboard
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Verified ranking, user, profile, activity, XP, post, follower,
+            reputation, reward, analytics, automation, operational, and support
+            services are not configured for this deployment. No rank, user,
+            count, score, level, reputation, badge, reward, earning, metric,
+            competitive result, or service status is represented as current,
+            complete, verified, active, private, available, or successful.
+          </p>
+        </header>
+
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated rankings, rewards, or social metrics
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not retrieve or calculate rankings, list users,
+                count posts or followers, score XP or reputation, issue rewards,
+                update activity, synchronize records, automate actions, or
+                report analytics or operational outcomes. It does not claim that
+                any rank, award, earning, or user-specific result is current or
+                successful.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+
+        <div className="mt-8 flex items-center gap-3 text-sm text-slate-400">
+          <ShieldCheck className="h-4 w-4" /> Ranking and reward interactions
+          will remain disabled until the required services are configured and
+          verified.
         </div>
       </div>
-
-      <div className="max-w-2xl mx-auto px-4 pb-16">
-        <Tabs value={tab} onValueChange={setTab} className="space-y-4">
-          <TabsList className="w-full" style={{ background: 'oklch(0.12 0.025 270)' }}>
-            {tabConfig.map(t => (
-              <TabsTrigger key={t.id} value={t.id} className="flex-1 gap-1 text-xs">
-                <t.icon className="w-3.5 h-3.5" /> {t.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          {tabConfig.map(t => (
-            <TabsContent key={t.id} value={t.id} className="space-y-2">
-              {isLoading ? (
-                <TableSkeleton rows={10} />
-              ) : !users || users.length === 0 ? (
-                <EmptyState
-                  icon="🏆"
-                  title="No rankings yet"
-                  description="Be the first to earn XP and claim the top spot!"
-                />
-              ) : (
-                users.map((u: any, i: number) => (
-                  <LeaderRow
-                    key={u.id}
-                    rank={i + 1}
-                    user={u}
-                    value={u[t.valueKey] || 0}
-                    label={t.valueLabel}
-                  />
-                ))
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
-
-        {/* Your rank */}
-        {user && users && users.length > 0 && (
-          <div className="mt-6 p-4 rounded-2xl" style={{ background: 'oklch(0.72 0.28 305 / 0.10)', border: '1px solid oklch(0.72 0.28 305 / 0.30)' }}>
-            <p className="text-white text-sm font-semibold mb-1">Your Rank</p>
-            {(() => {
-              const myRank = users.findIndex((u: any) => u.id === (user as any).id);
-              if (myRank === -1) return <p className="text-sm" style={{ color: 'oklch(0.55 0.025 275)' }}>Post more to appear on the leaderboard!</p>;
-              const myUser = users[myRank];
-              const tabConf = tabConfig.find(t => t.id === tab)!;
-              return <LeaderRow rank={myRank + 1} user={myUser} value={(myUser as any)[tabConf.valueKey] || 0} label={tabConf.valueLabel} />;
-            })()}
-          </div>
-        )}
-      </div>
-    </div>
+    </main>
   );
 }
