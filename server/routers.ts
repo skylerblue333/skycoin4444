@@ -6,6 +6,7 @@ import { z } from "zod";
 import { userRouter } from "./userRouter";
 import { marketplaceRouter } from "./marketplaceRouter";
 import { messagesRouter } from "./messagesRouter";
+import { communityRouter } from "./communityRouter";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -43,7 +44,7 @@ export const appRouter = router({
   social: createFeatureRouter(),
   socialCore: createFeatureRouter(),
   feed: createFeatureRouter(),
-  community: createFeatureRouter(),
+  community: communityRouter,
   dm: messagesRouter,
   story: createFeatureRouter(),
 
