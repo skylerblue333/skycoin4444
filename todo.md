@@ -179,3 +179,4 @@
 - [x] Connect the backed community-post list/create/delete contracts to the existing community UI with loading, error, empty, retry, and authenticated states.
 - [x] Audit the persisted Notifications domain and implement only backed list/read behavior if its contract and UI can be completed without fabricated delivery or operational metrics.
 - [x] Connect authenticated notification listing and mark-read behavior to the existing Notifications UI with loading, error, empty, retry, and unavailable-delivery states.
+- [x] Audit and, if supported by the existing comments table, add ownership-safe post-comment list/create/delete contracts and tests without inventing comment counts or engagement analytics.
