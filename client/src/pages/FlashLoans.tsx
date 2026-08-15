@@ -1,84 +1,41 @@
 import { Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { PageHeader } from "@/components/PageHeader";
+
+import { UnavailableService } from "@/pages/mission-control/UnavailableService";
+
+const requirements = [
+  {
+    title: "Verified protocol, market, and liquidity integration",
+    detail:
+      "A configured protocol and network, supported assets, reserve and liquidity checks, oracle validation, fee and rate semantics, slippage controls, and current market data are required before presenting a flash-loan capability or quote.",
+  },
+  {
+    title: "Atomic transaction and repayment guarantees",
+    detail:
+      "Audited contracts, transaction simulation, signature and nonce handling, atomic repayment enforcement, gas estimation, network confirmation, failure recovery, and transaction hashes are required before enabling or representing any flash-loan operation as safe or successful.",
+  },
+  {
+    title: "Security, authorization, and risk controls",
+    detail:
+      "Server-side authorization, private-key protections, contract allowlists, reentrancy and oracle-manipulation defenses, rate limits, monitoring, incident response, and independent security review are required before exposing automation or execution controls.",
+  },
+  {
+    title: "Evidence-based performance and documentation",
+    detail:
+      "Traceable production telemetry, defined uptime and latency measurements, throughput methodology, reproducible analytics, versioned documentation, integration tests, and support ownership are required before reporting performance, availability, security, or operational metrics.",
+  },
+];
 
 export default function FlashLoans() {
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader icon={Zap} title="Flash Loans" subtitle="Advanced flash loans with cutting-edge technology" />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Main Content Area */}
-        <Card className="p-8 bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20">
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Flash Loans</h2>
-            
-            {/* Advanced Features */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="p-4 bg-background/80 border border-primary/30 hover:border-primary/80 transition-all cursor-pointer hover:shadow-lg hover:shadow-primary/20">
-                <div className="space-y-3">
-                  <Zap className="w-8 h-8 text-primary" />
-                  <h3 className="font-bold text-lg">Advanced Analytics</h3>
-                  <p className="text-sm text-muted-foreground">Real-time data processing with AI insights</p>
-                  <Button size="sm" variant="outline" className="w-full">Explore</Button>
-                </div>
-              </Card>
-              
-              <Card className="p-4 bg-background/80 border border-primary/30 hover:border-primary/80 transition-all cursor-pointer hover:shadow-lg hover:shadow-primary/20">
-                <div className="space-y-3">
-                  <Zap className="w-8 h-8 text-primary" />
-                  <h3 className="font-bold text-lg">Automation Engine</h3>
-                  <p className="text-sm text-muted-foreground">Autonomous operations with intelligent decision making</p>
-                  <Button size="sm" variant="outline" className="w-full">Configure</Button>
-                </div>
-              </Card>
-              
-              <Card className="p-4 bg-background/80 border border-primary/30 hover:border-primary/80 transition-all cursor-pointer hover:shadow-lg hover:shadow-primary/20">
-                <div className="space-y-3">
-                  <Zap className="w-8 h-8 text-primary" />
-                  <h3 className="font-bold text-lg">Security First</h3>
-                  <p className="text-sm text-muted-foreground">Robust encryption and protection</p>
-                  <Button size="sm" variant="outline" className="w-full">Secure</Button>
-                </div>
-              </Card>
-            </div>
-            
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-              <div className="p-4 bg-background/50 rounded-lg border border-border/50">
-                <p className="text-xs text-muted-foreground">Processing Speed</p>
-                <p className="text-2xl font-bold text-primary">99.9%</p>
-              </div>
-              <div className="p-4 bg-background/50 rounded-lg border border-border/50">
-                <p className="text-xs text-muted-foreground">Uptime</p>
-                <p className="text-2xl font-bold text-primary">24/7</p>
-              </div>
-              <div className="p-4 bg-background/50 rounded-lg border border-border/50">
-                <p className="text-xs text-muted-foreground">Latency</p>
-                <p className="text-2xl font-bold text-primary">&lt;50ms</p>
-              </div>
-              <div className="p-4 bg-background/50 rounded-lg border border-border/50">
-                <p className="text-xs text-muted-foreground">Throughput</p>
-                <p className="text-2xl font-bold text-primary">10K+/s</p>
-              </div>
-            </div>
-            
-            {/* Action Section */}
-            <div className="flex gap-4 flex-wrap pt-6">
-              <Button size="lg" className="bg-primary hover:bg-primary/90">
-                Get Started Now
-              </Button>
-              <Button size="lg" variant="outline">
-                View Documentation
-              </Button>
-              <Button size="lg" variant="ghost">
-                Schedule Demo
-              </Button>
-            </div>
-          </div>
-        </Card>
+    <main className="min-h-screen bg-background p-4 text-foreground sm:p-8">
+      <div className="mx-auto max-w-5xl">
+        <UnavailableService
+          title="Flash Loans"
+          icon={Zap}
+          summary="Flash-loan protocol, liquidity, oracle, transaction, repayment, security, automation, analytics, and operational services are not configured for this deployment. No asset, rate, quote, balance, transaction, profit, latency, throughput, uptime, security, or execution status is represented as current, verified, safe, available, or successful."
+          requirements={requirements}
+        />
       </div>
-    </div>
+    </main>
   );
 }
