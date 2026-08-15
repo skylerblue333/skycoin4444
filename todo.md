@@ -184,3 +184,10 @@
 - [ ] Audit production launch readiness: repository state, validation gate, runtime configuration, deployment artifacts, domains, TLS, authentication, database, critical workflows, observability, backups, and rollback evidence.
 - [ ] Produce a verified launch verdict distinguishing completed prerequisites from unresolved blockers; do not change production infrastructure during the audit.
 - [x] Fix formatting failures in Notifications.tsx and Community.tsx, then rerun the complete validation gate.
+- [ ] Review attached production-launch audit source and extract every blocker, requirement, security issue, test gap, and operational dependency.
+- [ ] Implement verifiable P0/P1 code or operational safeguards where the required infrastructure exists; leave unavailable infrastructure explicitly unresolved.
+- [ ] Re-run the complete production-readiness audit and write PRODUCTION_READINESS.md with evidence, changed files, infrastructure results, and GREEN/YELLOW/RED status.
+- [x] Make production bind the configured PORT exactly and fail fast if unavailable; retain fallback-port behavior only for development.
+- [x] Add an explicit HTTP /healthz liveness endpoint and baseline security headers without claiming database readiness.
+- [x] Fix the production bundle startup failure caused by named ESM imports from the CommonJS cookie package, then rerun the local production smoke test and full validation.
+- [x] Replace Express 4 wildcard fallback routes with Express 5-compatible named wildcards so the production server can initialize and serve SPA routes.
