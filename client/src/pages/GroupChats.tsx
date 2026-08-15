@@ -1,89 +1,41 @@
 import { MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { PageHeader } from "@/components/PageHeader";
+
+import { UnavailableService } from "@/pages/mission-control/UnavailableService";
+
+const requirements = [
+  {
+    title: "Authenticated group, membership, and message services",
+    detail:
+      "Server-side services for authenticated group creation, membership, roles, invitations, message persistence, pagination, unread state, delivery, edits, deletion, attachments, and synchronization are required before this area can display or modify group conversations.",
+  },
+  {
+    title: "Authorization, moderation, and abuse controls",
+    detail:
+      "Ownership and membership checks, role-based permissions, blocking, reporting, moderation, rate limits, spam prevention, content handling, audit trails, and privacy controls are required before group actions can be offered as secure or authorized.",
+  },
+  {
+    title: "Verifiable real-time delivery and recovery",
+    detail:
+      "A configured transport, connection authentication, delivery acknowledgements, ordering semantics, reconnect and replay behavior, failure handling, and monitoring are required before real-time updates or message delivery can be represented as available or successful.",
+  },
+  {
+    title: "Operational evidence and support procedures",
+    detail:
+      "Traceable source data, defined service-level metrics, integration tests, incident handling, data export and deletion procedures, documentation, and support ownership are required before reporting users, messages, transactions, success rates, latency, uptime, analytics, or automation outcomes.",
+  },
+];
 
 export default function GroupChats() {
   return (
-    <div className="min-h-screen bg-background">
-      <PageHeader icon={MessageSquare} title="Group Chats" subtitle="Fully functional group chats page with live data and real-time updates" />
-      
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {/* Main Content Area */}
-        <Card className="p-8 bg-card border border-border/50">
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold">Group Chats</h2>
-            
-            {/* Feature Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Card className="p-4 bg-background/50 border border-border/30 hover:border-primary/50 transition-all cursor-pointer">
-                <div className="space-y-2">
-                  <MessageSquare className="w-6 h-6 text-primary" />
-                  <h3 className="font-semibold">Feature 1</h3>
-                  <p className="text-sm text-muted-foreground">Real-time data and live updates</p>
-                </div>
-              </Card>
-              
-              <Card className="p-4 bg-background/50 border border-border/30 hover:border-primary/50 transition-all cursor-pointer">
-                <div className="space-y-2">
-                  <MessageSquare className="w-6 h-6 text-primary" />
-                  <h3 className="font-semibold">Feature 2</h3>
-                  <p className="text-sm text-muted-foreground">Advanced analytics and insights</p>
-                </div>
-              </Card>
-              
-              <Card className="p-4 bg-background/50 border border-border/30 hover:border-primary/50 transition-all cursor-pointer">
-                <div className="space-y-2">
-                  <MessageSquare className="w-6 h-6 text-primary" />
-                  <h3 className="font-semibold">Feature 3</h3>
-                  <p className="text-sm text-muted-foreground">Seamless integration and automation</p>
-                </div>
-              </Card>
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex gap-4 flex-wrap pt-4">
-              <Button className="bg-primary hover:bg-primary/90">
-                Get Started
-              </Button>
-              <Button variant="outline">
-                Learn More
-              </Button>
-              <Button variant="ghost">
-                Documentation
-              </Button>
-            </div>
-          </div>
-        </Card>
-        
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="p-4 bg-card border border-border/50">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Active Users</p>
-              <p className="text-2xl font-bold">802K+</p>
-            </div>
-          </Card>
-          <Card className="p-4 bg-card border border-border/50">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Total Transactions</p>
-              <p className="text-2xl font-bold">2.4M</p>
-            </div>
-          </Card>
-          <Card className="p-4 bg-card border border-border/50">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Success Rate</p>
-              <p className="text-2xl font-bold">99.9%</p>
-            </div>
-          </Card>
-          <Card className="p-4 bg-card border border-border/50">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Avg Response Time</p>
-              <p className="text-2xl font-bold">45ms</p>
-            </div>
-          </Card>
-        </div>
+    <main className="min-h-screen bg-background p-4 text-foreground sm:p-8">
+      <div className="mx-auto max-w-5xl">
+        <UnavailableService
+          title="Group Chats"
+          icon={MessageSquare}
+          summary="Authenticated group membership, messaging, real-time delivery, moderation, attachments, analytics, and operational services are not configured for this deployment. No conversation, user, message, transaction, success-rate, latency, or integration status is represented as current, complete, verified, available, or successful."
+          requirements={requirements}
+        />
       </div>
-    </div>
+    </main>
   );
 }
