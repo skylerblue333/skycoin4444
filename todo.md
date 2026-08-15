@@ -193,5 +193,5 @@
 - [x] Replace Express 4 wildcard fallback routes with Express 5-compatible named wildcards so the production server can initialize and serve SPA routes.
 - [x] Prepare repository-side deployment package: EC2 deployment script, systemd services, Nginx proxy, sanitized environment templates, health check, smoke tests, deployment/rollback/database/backup/restore/monitoring/domain runbooks, and deployment README.
 - [x] Validate the deployment package and update PRODUCTION_READINESS.md while preserving RED status until external infrastructure evidence exists.
-- [ ] Audit remaining repository-side launch gaps that can be closed without AWS, Cloudflare, database, OAuth, or production secrets.
-- [ ] Implement only safe repository-side launch improvements and update evidence while preserving RED status for unavailable infrastructure.
+- [x] Audit remaining repository-side launch gaps that can be closed without AWS, Cloudflare, database, OAuth, or production secrets.
+- [x] Implement only safe repository-side launch improvements and update evidence while preserving RED status for unavailable infrastructure.

@@ -4,7 +4,7 @@
 **Repository:** SKYCOIN4444 canonical monolith  
 **Branch:** `manus/pipeline-stabilization-20260814`  
 **Baseline requested by source material:** `39d1c9b`  
-**Current audited repository SHA:** `22d3e47`  
+**Current audited repository SHA:** `f2e28aa`  
 **Deployed Git SHA:** **None — no production deployment was performed**  
 **Final status:** **RED — DO NOT LAUNCH**
 
@@ -105,18 +105,18 @@ The following changes were made against the canonical monolith and pushed to bra
 
 ## Repository-side deployment package
 
-The deployment-preparation package is committed at source SHA `22d3e47` and pushed to `manus/pipeline-stabilization-20260814`. It contains the following repository-side artifacts:
+The deployment-preparation package was introduced at source SHA `22d3e47` and the latest repository-side launch improvements are committed at `f2e28aa`, both pushed to `manus/pipeline-stabilization-20260814`. It contains the following repository-side artifacts:
 
 | Artifact group | Files | State |
 |---|---|---|
-| EC2/process | `deploy/production/scripts/deploy.sh`, `deploy/production/systemd/skycoin4444.service`, `deploy/staging/systemd/skycoin4444-staging.service` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| EC2/process | `deploy/production/scripts/preflight.sh`, `deploy/production/scripts/deploy.sh`, `deploy/production/systemd/skycoin4444.service`, `deploy/staging/systemd/skycoin4444-staging.service` | **IMPLEMENTED — NOT YET DEPLOYED** |
 | Reverse proxy | `deploy/production/nginx/skycoin4444.conf`, `deploy/staging/nginx/skycoin4444-staging.conf` | **IMPLEMENTED — NOT YET DEPLOYED** |
 | Environments | `deploy/production/.env.example`, `deploy/staging/.env.example` | **IMPLEMENTED — NOT YET DEPLOYED** |
 | Health and smoke tests | `deploy/production/health/healthcheck.sh`, `deploy/production/scripts/smoke-test.sh` | **IMPLEMENTED — NOT YET DEPLOYED** |
 | Operational runbooks | `deploy/docs/production-runbook.md`, `domains-and-tls.md`, `database-migrations.md`, `monitoring.md`, `backup-restore.md`, `rollback.md` | **IMPLEMENTED — NOT YET DEPLOYED** |
 | Package documentation | `deploy/README.md`, `deploy/production/README.md` | **IMPLEMENTED — NOT YET DEPLOYED** |
 
-The package was syntax-checked with `bash -n` and the full repository validation gate was rerun successfully. It refuses unauthorized production deployment, refuses to automate production migrations, reports unavailable smoke-test environments as blocked/failing, and contains no production secrets.
+The package was syntax-checked with `bash -n` and the full repository validation gate was rerun successfully. The preflight validates the actual runtime variables read by `server/_core/env.ts` without printing values; a negative test correctly fails when `NODE_ENV` is not production. The deployment script refuses unauthorized production deployment, refuses to automate production migrations, reports unavailable smoke-test environments as blocked/failing, and contains no production secrets. Existing CI now validates both `main` and `manus/pipeline-stabilization-20260814`.
 
 No EC2, DNS, registrar, reverse-proxy, TLS, database, monitoring, backup, restore, or rollback infrastructure was changed by this audit.
 
@@ -132,6 +132,8 @@ The following repository checks passed after the code changes:
 | `pnpm build` | **VERIFIED — production bundle generated** |
 | `pnpm run validate` | **VERIFIED** |
 | `pnpm audit --prod --audit-level=high` | **VERIFIED — no known vulnerabilities reported by branch audit** |
+| `bash -n` on deployment scripts | **VERIFIED** |
+| Production preflight negative test | **VERIFIED — correctly fails outside NODE_ENV=production** |
 | Local production startup from built bundle | **VERIFIED** |
 | Local `GET /healthz` smoke test | **VERIFIED — HTTP 200** |
 | Local security-header smoke test | **VERIFIED** |
@@ -162,7 +164,7 @@ No domain was marked production-ready. No DNS records were modified. No certific
 
 ## EC2, database, authentication, monitoring, backup, restore, and rollback evidence
 
-No EC2 deployment was performed. No production Git SHA exists. The current repository SHA `22d3e47` is a pushed source commit containing the deployment package, not a deployed release. The runtime hardening fixes remain in the preceding source commit `4310420`.
+No EC2 deployment was performed. No production Git SHA exists. The current repository SHA `f2e28aa` is a pushed source commit containing the deployment package and final repository-side preflight/CI improvements, not a deployed release. The deployment package was introduced at `22d3e47`; runtime hardening remains in `4310420`.
 
 No production database endpoint or credentials were available, so database connectivity, migrations, reads, writes, authentication persistence, Marketplace persistence, and backed-product persistence were not tested against production. No production authentication or OAuth flow was executed through an approved hostname.
 
