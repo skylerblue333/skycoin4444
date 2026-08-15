@@ -4,7 +4,7 @@
 **Repository:** SKYCOIN4444 canonical monolith  
 **Branch:** `manus/pipeline-stabilization-20260814`  
 **Baseline requested by source material:** `39d1c9b`  
-**Current audited repository SHA:** `4310420`  
+**Current audited repository SHA:** `22d3e47`  
 **Deployed Git SHA:** **None — no production deployment was performed**  
 **Final status:** **RED — DO NOT LAUNCH**
 
@@ -103,6 +103,21 @@ The following changes were made against the canonical monolith and pushed to bra
 | `todo.md` | Recorded launch audit tasks and remediation history. | **IMPLEMENTED — NOT YET DEPLOYED** |
 | `PRODUCTION_READINESS.md` | This report. | **IMPLEMENTED — NOT YET DEPLOYED** |
 
+## Repository-side deployment package
+
+The deployment-preparation package is committed at source SHA `22d3e47` and pushed to `manus/pipeline-stabilization-20260814`. It contains the following repository-side artifacts:
+
+| Artifact group | Files | State |
+|---|---|---|
+| EC2/process | `deploy/production/scripts/deploy.sh`, `deploy/production/systemd/skycoin4444.service`, `deploy/staging/systemd/skycoin4444-staging.service` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| Reverse proxy | `deploy/production/nginx/skycoin4444.conf`, `deploy/staging/nginx/skycoin4444-staging.conf` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| Environments | `deploy/production/.env.example`, `deploy/staging/.env.example` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| Health and smoke tests | `deploy/production/health/healthcheck.sh`, `deploy/production/scripts/smoke-test.sh` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| Operational runbooks | `deploy/docs/production-runbook.md`, `domains-and-tls.md`, `database-migrations.md`, `monitoring.md`, `backup-restore.md`, `rollback.md` | **IMPLEMENTED — NOT YET DEPLOYED** |
+| Package documentation | `deploy/README.md`, `deploy/production/README.md` | **IMPLEMENTED — NOT YET DEPLOYED** |
+
+The package was syntax-checked with `bash -n` and the full repository validation gate was rerun successfully. It refuses unauthorized production deployment, refuses to automate production migrations, reports unavailable smoke-test environments as blocked/failing, and contains no production secrets.
+
 No EC2, DNS, registrar, reverse-proxy, TLS, database, monitoring, backup, restore, or rollback infrastructure was changed by this audit.
 
 ## Tests and validation executed
@@ -147,7 +162,7 @@ No domain was marked production-ready. No DNS records were modified. No certific
 
 ## EC2, database, authentication, monitoring, backup, restore, and rollback evidence
 
-No EC2 deployment was performed. No production Git SHA exists. The current repository SHA `4310420` is a pushed source commit, not a deployed release.
+No EC2 deployment was performed. No production Git SHA exists. The current repository SHA `22d3e47` is a pushed source commit containing the deployment package, not a deployed release. The runtime hardening fixes remain in the preceding source commit `4310420`.
 
 No production database endpoint or credentials were available, so database connectivity, migrations, reads, writes, authentication persistence, Marketplace persistence, and backed-product persistence were not tested against production. No production authentication or OAuth flow was executed through an approved hostname.
 
@@ -172,4 +187,4 @@ To complete the remaining gates, the project owner must provide secure access to
 
 The mandatory launch gates do not all have direct evidence. The repository has improved from the requested `39d1c9b` baseline and now passes its validation gates with additional runtime hardening, but production launch must wait until EC2, reverse proxy, production environment, database, authentication, all four domains, TLS, monitoring, backups, restore, rollback, and deployed end-to-end smoke tests are actually verified.
 
-The correct next action is **not** to add more simulated product breadth. It is to obtain the external infrastructure access listed above and execute the P0 deployment sequence against the real environment.
+The correct next action is **not** to add more simulated product breadth. It is to obtain the external infrastructure access listed above and execute the P0 deployment sequence using `deploy/production/scripts/deploy.sh` and the associated runbooks against the real environment.
