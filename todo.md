@@ -181,3 +181,6 @@
 - [x] Connect authenticated notification listing and mark-read behavior to the existing Notifications UI with loading, error, empty, retry, and unavailable-delivery states.
 - [x] Audit and, if supported by the existing comments table, add ownership-safe post-comment list/create/delete contracts and tests without inventing comment counts or engagement analytics.
 - [x] Connect persisted post comments to the Community UI with post-scoped loading, create/delete controls, and explicit unavailable engagement metrics.
+- [ ] Audit production launch readiness: repository state, validation gate, runtime configuration, deployment artifacts, domains, TLS, authentication, database, critical workflows, observability, backups, and rollback evidence.
+- [ ] Produce a verified launch verdict distinguishing completed prerequisites from unresolved blockers; do not change production infrastructure during the audit.
+- [x] Fix formatting failures in Notifications.tsx and Community.tsx, then rerun the complete validation gate.

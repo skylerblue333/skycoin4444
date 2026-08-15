@@ -43,19 +43,29 @@ function CommentThread({ postId }: { postId: string }) {
         <MessageCircle className="h-3.5 w-3.5" /> Persisted comments
       </div>
       {commentsQuery.isLoading ? (
-        <Loader2 className="mt-3 h-4 w-4 animate-spin text-sky-300" aria-label="Loading comments" />
+        <Loader2
+          className="mt-3 h-4 w-4 animate-spin text-sky-300"
+          aria-label="Loading comments"
+        />
       ) : commentsQuery.isError ? (
-        <p className="mt-3 text-xs text-amber-200">{commentsQuery.error.message}</p>
+        <p className="mt-3 text-xs text-amber-200">
+          {commentsQuery.error.message}
+        </p>
       ) : comments.length === 0 ? (
         <p className="mt-3 text-xs text-slate-500">No stored comments yet.</p>
       ) : (
         <div className="mt-3 space-y-2">
           {comments.map(comment => (
-            <div key={comment.id} className="flex items-start justify-between gap-3 rounded-lg bg-slate-950/70 p-3">
+            <div
+              key={comment.id}
+              className="flex items-start justify-between gap-3 rounded-lg bg-slate-950/70 p-3"
+            >
               <div>
                 <p className="text-sm text-slate-200">{comment.content}</p>
                 <p className="mt-1 text-xs text-slate-500">
-                  {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ""}
+                  {comment.createdAt
+                    ? new Date(comment.createdAt).toLocaleString()
+                    : ""}
                 </p>
               </div>
               {user?.id === comment.userId ? (
@@ -63,7 +73,9 @@ function CommentThread({ postId }: { postId: string }) {
                   variant="ghost"
                   size="sm"
                   aria-label="Delete comment"
-                  onClick={() => deleteComment.mutate({ commentId: comment.id })}
+                  onClick={() =>
+                    deleteComment.mutate({ commentId: comment.id })
+                  }
                   disabled={deleteComment.isPending}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -90,8 +102,16 @@ function CommentThread({ postId }: { postId: string }) {
             className="min-h-10 border-slate-700 bg-slate-950"
             disabled={createComment.isPending}
           />
-          <Button type="submit" size="sm" disabled={!content.trim() || createComment.isPending}>
-            {createComment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          <Button
+            type="submit"
+            size="sm"
+            disabled={!content.trim() || createComment.isPending}
+          >
+            {createComment.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
             <span className="sr-only">Add comment</span>
           </Button>
         </form>
@@ -104,7 +124,10 @@ export default function Community() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [content, setContent] = useState("");
   const utils = trpc.useUtils();
-  const postsQuery = trpc.community.listPosts.useQuery({ limit: 20, offset: 0 });
+  const postsQuery = trpc.community.listPosts.useQuery({
+    limit: 20,
+    offset: 0,
+  });
   const createPost = trpc.community.createPost.useMutation({
     onSuccess: async () => {
       setContent("");
@@ -136,7 +159,9 @@ export default function Community() {
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs font-medium text-sky-200">
             <MessageSquare className="h-3.5 w-3.5" /> Persisted posts enabled
           </div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Community</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Community
+          </h1>
           <p className="mt-3 text-sm leading-6 text-slate-300">
             Community posts are stored in the platform database. Memberships,
             private groups, voice rooms, token-gated access, moderation queues,
@@ -147,7 +172,10 @@ export default function Community() {
         {!authLoading && isAuthenticated ? (
           <Card className="mt-8 border-slate-700 bg-slate-900">
             <CardContent className="p-5">
-              <label htmlFor="community-post" className="text-sm font-medium text-white">
+              <label
+                htmlFor="community-post"
+                className="text-sm font-medium text-white"
+              >
                 Share a post
               </label>
               <Textarea
@@ -160,7 +188,9 @@ export default function Community() {
                 disabled={createPost.isPending}
               />
               <div className="mt-3 flex items-center justify-between gap-3">
-                <span className="text-xs text-slate-400">{content.length}/255</span>
+                <span className="text-xs text-slate-400">
+                  {content.length}/255
+                </span>
                 <Button
                   onClick={publish}
                   disabled={!content.trim() || createPost.isPending}
@@ -186,23 +216,36 @@ export default function Community() {
               onClick={() => void postsQuery.refetch()}
               disabled={postsQuery.isFetching}
             >
-              <RefreshCw className={`mr-2 h-4 w-4 ${postsQuery.isFetching ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${postsQuery.isFetching ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
           </div>
 
           {postsQuery.isLoading ? (
             <div className="flex min-h-48 items-center justify-center rounded-xl border border-slate-700 bg-slate-900">
-              <Loader2 className="h-6 w-6 animate-spin text-sky-300" aria-label="Loading posts" />
+              <Loader2
+                className="h-6 w-6 animate-spin text-sky-300"
+                aria-label="Loading posts"
+              />
             </div>
           ) : postsQuery.isError ? (
             <Card className="border-amber-900/60 bg-amber-950/30">
               <CardContent className="flex items-start gap-3 p-5">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
                 <div>
-                  <h3 className="font-semibold text-amber-100">Posts unavailable</h3>
-                  <p className="mt-1 text-sm text-amber-200">{postsQuery.error.message}</p>
-                  <Button className="mt-4" variant="outline" onClick={() => void postsQuery.refetch()}>
+                  <h3 className="font-semibold text-amber-100">
+                    Posts unavailable
+                  </h3>
+                  <p className="mt-1 text-sm text-amber-200">
+                    {postsQuery.error.message}
+                  </p>
+                  <Button
+                    className="mt-4"
+                    variant="outline"
+                    onClick={() => void postsQuery.refetch()}
+                  >
                     Try again
                   </Button>
                 </div>
@@ -212,9 +255,13 @@ export default function Community() {
             <Card className="border-slate-700 bg-slate-900">
               <CardContent className="flex min-h-48 flex-col items-center justify-center p-6 text-center">
                 <MessageSquare className="h-10 w-10 text-slate-600" />
-                <p className="mt-3 text-sm text-slate-300">No persisted posts yet.</p>
+                <p className="mt-3 text-sm text-slate-300">
+                  No persisted posts yet.
+                </p>
                 {!isAuthenticated ? (
-                  <p className="mt-1 text-xs text-slate-500">Sign in to publish the first post.</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Sign in to publish the first post.
+                  </p>
                 ) : null}
               </CardContent>
             </Card>
@@ -228,7 +275,9 @@ export default function Community() {
                         <UsersRound className="h-4 w-4 text-sky-300" />
                         <span>{post.userId ?? "Community member"}</span>
                         <span className="text-xs text-slate-500">
-                          {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
+                          {post.createdAt
+                            ? new Date(post.createdAt).toLocaleString()
+                            : ""}
                         </span>
                       </div>
                       {user?.id === post.userId ? (
@@ -261,7 +310,8 @@ export default function Community() {
               <h2 className="font-semibold text-amber-100">Scope boundary</h2>
               <p className="mt-1 text-sm leading-6 text-amber-200">
                 Posts are persisted. Membership, private channels, messaging,
-                token access, moderation operations, and engagement analytics remain unavailable.
+                token access, moderation operations, and engagement analytics
+                remain unavailable.
               </p>
             </div>
           </div>
