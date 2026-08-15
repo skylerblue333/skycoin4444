@@ -181,12 +181,12 @@
 - [x] Connect authenticated notification listing and mark-read behavior to the existing Notifications UI with loading, error, empty, retry, and unavailable-delivery states.
 - [x] Audit and, if supported by the existing comments table, add ownership-safe post-comment list/create/delete contracts and tests without inventing comment counts or engagement analytics.
 - [x] Connect persisted post comments to the Community UI with post-scoped loading, create/delete controls, and explicit unavailable engagement metrics.
-- [ ] Audit production launch readiness: repository state, validation gate, runtime configuration, deployment artifacts, domains, TLS, authentication, database, critical workflows, observability, backups, and rollback evidence.
-- [ ] Produce a verified launch verdict distinguishing completed prerequisites from unresolved blockers; do not change production infrastructure during the audit.
+- [x] Audit production launch readiness: repository state, validation gate, runtime configuration, deployment artifacts, domains, TLS, authentication, database, critical workflows, observability, backups, and rollback evidence.
+- [x] Produce a verified launch verdict distinguishing completed prerequisites from unresolved blockers; do not change production infrastructure during the audit.
 - [x] Fix formatting failures in Notifications.tsx and Community.tsx, then rerun the complete validation gate.
-- [ ] Review attached production-launch audit source and extract every blocker, requirement, security issue, test gap, and operational dependency.
-- [ ] Implement verifiable P0/P1 code or operational safeguards where the required infrastructure exists; leave unavailable infrastructure explicitly unresolved.
-- [ ] Re-run the complete production-readiness audit and write PRODUCTION_READINESS.md with evidence, changed files, infrastructure results, and GREEN/YELLOW/RED status.
+- [x] Review attached production-launch audit source and extract every blocker, requirement, security issue, test gap, and operational dependency.
+- [x] Implement verifiable P0/P1 code or operational safeguards where the required infrastructure exists; leave unavailable infrastructure explicitly unresolved.
+- [x] Re-run the complete production-readiness audit and write PRODUCTION_READINESS.md with evidence, changed files, infrastructure results, and GREEN/YELLOW/RED status.
 - [x] Make production bind the configured PORT exactly and fail fast if unavailable; retain fallback-port behavior only for development.
 - [x] Add an explicit HTTP /healthz liveness endpoint and baseline security headers without claiming database readiness.
 - [x] Fix the production bundle startup failure caused by named ESM imports from the CommonJS cookie package, then rerun the local production smoke test and full validation.
