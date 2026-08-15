@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   Loader2,
+  MessageCircle,
   MessageSquare,
   RefreshCw,
   Send,
@@ -15,6 +16,89 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+
+function CommentThread({ postId }: { postId: string }) {
+  const { user } = useAuth();
+  const [content, setContent] = useState("");
+  const utils = trpc.useUtils();
+  const commentsQuery = trpc.comments.listByPost.useQuery({ postId });
+  const comments = commentsQuery.data ?? [];
+  const createComment = trpc.comments.create.useMutation({
+    onSuccess: async () => {
+      setContent("");
+      await utils.comments.listByPost.invalidate({ postId });
+    },
+    onError: error => toast.error(error.message),
+  });
+  const deleteComment = trpc.comments.deleteOwn.useMutation({
+    onSuccess: async () => {
+      await utils.comments.listByPost.invalidate({ postId });
+    },
+    onError: error => toast.error(error.message),
+  });
+
+  return (
+    <div className="mt-5 border-t border-slate-700 pt-4">
+      <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+        <MessageCircle className="h-3.5 w-3.5" /> Persisted comments
+      </div>
+      {commentsQuery.isLoading ? (
+        <Loader2 className="mt-3 h-4 w-4 animate-spin text-sky-300" aria-label="Loading comments" />
+      ) : commentsQuery.isError ? (
+        <p className="mt-3 text-xs text-amber-200">{commentsQuery.error.message}</p>
+      ) : comments.length === 0 ? (
+        <p className="mt-3 text-xs text-slate-500">No stored comments yet.</p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {comments.map(comment => (
+            <div key={comment.id} className="flex items-start justify-between gap-3 rounded-lg bg-slate-950/70 p-3">
+              <div>
+                <p className="text-sm text-slate-200">{comment.content}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {comment.createdAt ? new Date(comment.createdAt).toLocaleString() : ""}
+                </p>
+              </div>
+              {user?.id === comment.userId ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Delete comment"
+                  onClick={() => deleteComment.mutate({ commentId: comment.id })}
+                  disabled={deleteComment.isPending}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
+      {user ? (
+        <form
+          className="mt-3 flex gap-2"
+          onSubmit={event => {
+            event.preventDefault();
+            const trimmed = content.trim();
+            if (trimmed) createComment.mutate({ postId, content: trimmed });
+          }}
+        >
+          <Textarea
+            value={content}
+            maxLength={255}
+            onChange={event => setContent(event.target.value)}
+            placeholder="Add a comment…"
+            className="min-h-10 border-slate-700 bg-slate-950"
+            disabled={createComment.isPending}
+          />
+          <Button type="submit" size="sm" disabled={!content.trim() || createComment.isPending}>
+            {createComment.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            <span className="sr-only">Add comment</span>
+          </Button>
+        </form>
+      ) : null}
+    </div>
+  );
+}
 
 export default function Community() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -162,6 +246,7 @@ export default function Community() {
                     <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-100">
                       {post.content}
                     </p>
+                    <CommentThread postId={post.id} />
                   </CardContent>
                 </Card>
               ))}
