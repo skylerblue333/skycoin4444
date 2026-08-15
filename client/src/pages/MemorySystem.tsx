@@ -1,201 +1,114 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { PageHeader } from "@/components/PageHeader";
-import { toast } from "sonner";
-import { Brain, Database, User, Tag, Clock, Search, Plus, Trash2, RefreshCw, Layers } from "lucide-react";
+import {
+  AlertTriangle,
+  Brain,
+  Database,
+  FileCheck2,
+  ShieldCheck,
+} from "lucide-react";
 
-const MEMORY_CATEGORIES = [
-  { id: "preferences", label: "Preferences", icon: User, color: "text-blue-400", count: 47 },
-  { id: "context", label: "Context", icon: Layers, color: "text-purple-400", count: 128 },
-  { id: "interactions", label: "Interactions", icon: Clock, color: "text-green-400", count: 2341 },
-  { id: "knowledge", label: "Knowledge", icon: Brain, color: "text-yellow-400", count: 89 },
-];
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const SAMPLE_MEMORIES = [
-  { id: 1, type: "preference", content: "User prefers dark mode and compact layouts", confidence: 0.97, lastAccessed: "2 min ago", tags: ["UI", "display"] },
-  { id: 2, type: "context", content: "Currently building a DeFi staking dashboard with SKY444 integration", confidence: 0.94, lastAccessed: "5 min ago", tags: ["crypto", "project"] },
-  { id: 3, type: "interaction", content: "Asked about TRUMP mining 3 times this week — high interest signal", confidence: 0.88, lastAccessed: "1 hour ago", tags: ["mining", "TRUMP"] },
-  { id: 4, type: "knowledge", content: "User is a software engineer with Web3 and React expertise", confidence: 0.99, lastAccessed: "1 day ago", tags: ["skills", "background"] },
-  { id: 5, type: "preference", content: "Prefers concise responses with code examples over long explanations", confidence: 0.91, lastAccessed: "3 hours ago", tags: ["communication", "style"] },
-  { id: 6, type: "context", content: "Working on YC pitch — needs clean MVP narrative, not feature list", confidence: 0.96, lastAccessed: "30 min ago", tags: ["YC", "pitch", "startup"] },
+const serviceRequirements = [
+  {
+    title: "Authenticated, consent-aware memory data service",
+    icon: Database,
+    detail:
+      "Authenticated account ownership, strict tenant isolation, explicit consent, durable and attributable memory records, documented collection purpose, data classification, retention and deletion controls, input and output validation, access control, audit history, export and correction workflows, defined empty states, and reliable recovery are required before listing, creating, changing, removing, searching, synchronizing, or reporting any preference, context, interaction, knowledge, tag, memory, user profile, or activity record.",
+  },
+  {
+    title: "Validated AI-memory, preference, and graph processing safeguards",
+    icon: Brain,
+    detail:
+      "A documented and evaluated memory-processing architecture, approved model and data-use contracts, prompt and retrieval controls, provenance, confidence-calibration methods, user controls, bias and safety assessments, human-review pathways where appropriate, versioned graph and inference logic, deterministic failure handling, and independently verifiable evaluation evidence are required before creating or reporting an AI memory, preference model, context window, graph node, confidence score, compression result, inferred interest, user characteristic, insight, recommendation, or automated outcome.",
+  },
+  {
+    title: "Privacy, security, and governance controls",
+    icon: ShieldCheck,
+    detail:
+      "Privacy impact assessment, data-minimization rules, encryption with managed keys, authorization enforcement, secure secret handling, abuse prevention, rate limits, monitoring, incident response, access reviews, deletion verification, and evidence that the controls operate as designed are required before representing personal memory or preference data, account context, profile information, AI processing, synchronization, or a stored record as private, protected, available, or successfully processed.",
+  },
+  {
+    title: "Evidence-based synchronization and operational reporting",
+    icon: FileCheck2,
+    detail:
+      "Defined synchronization semantics, idempotency and conflict-resolution controls, observable job execution, retry and failure handling, traceable metric definitions, monitoring, alerting, capacity and performance testing, documented support procedures, and independently verifiable operational evidence are required before starting or reporting memory synchronization, active context, retention duration, graph size, compression, activity, performance, status, analytics, documentation availability, or production readiness.",
+  },
 ];
 
 export default function MemorySystem() {
-  const { user } = useAuth();
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newMemory, setNewMemory] = useState("");
-
-  const filtered = SAMPLE_MEMORIES.filter(m => {
-    if (activeCategory !== "all" && !m.type.startsWith(activeCategory.slice(0, -1))) return false;
-    if (searchQuery && !m.content.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
-
   return (
-    <div className="container py-8 max-w-6xl animate-page-in">
-      <PageHeader
-        backHref="/agent-coordination"
-        icon={Brain}
-        title="Long-Term Memory System"
-        subtitle="Phase 9 — Persistent memory graphs, user preference models, context continuity"
-      />
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {MEMORY_CATEGORIES.map(cat => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(activeCategory === cat.id ? "all" : cat.id)}
-            className={`card p-4 text-left transition-all hover:border-primary/50 ${activeCategory === cat.id ? "border-primary" : ""}`}
-          >
-            <cat.icon className={`w-6 h-6 ${cat.color} mb-2`} />
-            <div className="text-xl font-bold">{cat.count.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">{cat.label}</div>
-          </button>
-        ))}
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Memory list */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="w-full bg-secondary/50 border border-border/50 rounded-lg pl-9 pr-3 py-2 text-sm"
-                placeholder="Search memories..."
-              />
-            </div>
-            <button
-              onClick={() => toast.info("Memory sync running...")}
-              className="p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Long-term memory service
+            unavailable
           </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Long-Term Memory System
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Persistent memories, preference models, context continuity, memory
+            graphs, synchronization, confidence scores, user and activity data,
+            AI inferences, analytics, and operational metrics are not configured
+            for this deployment. No memory, profile, preference, context,
+            interaction, knowledge item, tag, graph node, confidence score,
+            synchronization outcome, AI result, user characteristic, metric, or
+            service status is represented as current, complete, verified,
+            active, private, protected, available, or delivered.
+          </p>
+        </header>
 
-          {filtered.map(mem => (
-            <div key={mem.id} className="card p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <div className="text-sm mb-2">{mem.content}</div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {mem.lastAccessed}
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated memory, profile, AI, or synchronization result
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not access, create, search, alter, remove,
+                synchronize, infer, compress, rank, or report a memory,
+                preference, context, interaction, knowledge item, user profile,
+                activity, graph, confidence score, AI output, metric, or
+                operational result. It also does not claim that any personal
+                data has been stored, processed, protected, retained, deleted,
+                or synchronized.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Database className="w-3 h-3" />
-                      {(mem.confidence * 100).toFixed(0)}% confidence
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {mem.tags.map(tag => (
-                      <span key={tag} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  onClick={() => toast.success("Memory removed")}
-                  className="p-1.5 rounded-lg hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition-colors shrink-0"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-              {/* Confidence bar */}
-              <div className="mt-3 h-1 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: `${mem.confidence * 100}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Add memory + model info */}
-        <div className="space-y-4">
-          <div className="card p-5">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Plus className="w-4 h-4 text-primary" />
-              Add Memory
-            </h3>
-            <textarea
-              value={newMemory}
-              onChange={e => setNewMemory(e.target.value)}
-              rows={4}
-              className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm resize-none mb-3"
-              placeholder="Enter a fact, preference, or context to remember..."
-            />
-            <button
-              onClick={() => {
-                if (!newMemory.trim()) return;
-                toast.success("Memory stored");
-                setNewMemory("");
-              }}
-              className="btn-primary w-full text-sm"
-            >
-              Store Memory
-            </button>
-          </div>
-
-          <div className="card p-5">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-purple-400" />
-              Preference Model
-            </h3>
-            <div className="space-y-3">
-              {[
-                { label: "Content Style", value: "Technical + Concise", bar: 0.91 },
-                { label: "Response Length", value: "Short", bar: 0.78 },
-                { label: "Code Examples", value: "Always include", bar: 0.97 },
-                { label: "Topic Focus", value: "Web3 + AI", bar: 0.94 },
-              ].map(pref => (
-                <div key={pref.label}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">{pref.label}</span>
-                    <span className="font-medium">{pref.value}</span>
-                  </div>
-                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full" style={{ width: `${pref.bar * 100}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="card p-5">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Brain className="w-4 h-4 text-yellow-400" />
-              Context Continuity
-            </h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Active Context Window</span>
-                <span className="font-medium text-green-400">Live</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Memory Depth</span>
-                <span className="font-medium">30 days</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Graph Nodes</span>
-                <span className="font-medium">2,605</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Compression</span>
-                <span className="font-medium text-blue-400">Auto</span>
-              </div>
-            </div>
-          </div>
-        </div>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
