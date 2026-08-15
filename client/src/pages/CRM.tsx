@@ -208,7 +208,7 @@ export default function CRM() {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="month" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} />
                     <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} tickFormatter={v => `$${v/1000}K`} />
-                    <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)" }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
+                    <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)" }} formatter={value => [`$${Number(value ?? 0).toLocaleString()}`, ""]} />
                     <Area type="monotone" dataKey="pipeline" stroke="#a855f7" fill="rgba(168,85,247,0.1)" strokeWidth={2} />
                     <Area type="monotone" dataKey="closed" stroke="#22c55e" fill="rgba(34,197,94,0.1)" strokeWidth={2} />
                   </AreaChart>

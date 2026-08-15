@@ -164,3 +164,12 @@
 - Maintain dark/light theme support across all modules
 - Ensure full TypeScript compliance and zero build errors
 - All 30 GitHub repositories must receive production force-push
+
+## Real Product Execution
+- [x] Select the first real product slice using user value, dependency closure, and production risk.
+- [x] Define its domain model, API contract, security boundary, integration prerequisites, and test plan.
+- [x] Implement the first real product slice in the canonical monolith with real persistence or an explicit unavailable state.
+- [x] Validate the slice with unit, integration, type, and production-build checks; security and visual validation remain follow-up work.
+- [ ] Document extraction readiness before copying any verified source into a separate repository.
+- [x] First real product slice: stabilize the persisted Marketplace catalog and product-detail contract; do not implement checkout, escrow, shipping, or seller verification without real prerequisites.
+- [x] Baseline blocker: resolve the current 60 frontend TypeScript errors before declaring the canonical production build clean.

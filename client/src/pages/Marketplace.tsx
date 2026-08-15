@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "wouter";
 import { Loader2, Package, RefreshCw, Search, ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -157,7 +158,12 @@ export default function Marketplace() {
                 </div>
                 <CardHeader className="pb-2">
                   <CardTitle className="line-clamp-2 text-base text-white">
-                    {product.name ?? "Untitled product"}
+                    <Link
+                      href={`/product-detail?id=${encodeURIComponent(product.id)}`}
+                      className="hover:text-sky-300"
+                    >
+                      {product.name ?? "Untitled product"}
+                    </Link>
                   </CardTitle>
                   {product.category ? (
                     <p className="text-xs font-medium uppercase tracking-wide text-sky-300">
@@ -193,9 +199,15 @@ export default function Marketplace() {
                       </dd>
                     </div>
                   </dl>
-                  <p className="rounded-md bg-slate-800 p-2 text-xs text-slate-400">
-                    Ordering is not yet enabled for this catalog.
-                  </p>
+                  <div className="flex items-center justify-between gap-3 rounded-md bg-slate-800 p-2 text-xs text-slate-400">
+                    <span>Ordering is not yet enabled.</span>
+                    <Link
+                      href={`/product-detail?id=${encodeURIComponent(product.id)}`}
+                      className="font-medium text-sky-300 hover:text-sky-200"
+                    >
+                      View details
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}

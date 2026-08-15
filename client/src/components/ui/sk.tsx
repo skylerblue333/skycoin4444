@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export {
@@ -12,7 +13,7 @@ export {
 export { StatCard } from "@/components/StatCard";
 
 type IconTileProps = {
-  icon: ComponentType<{ className?: string }> | ReactNode;
+  icon: LucideIcon | ReactNode;
   label: string;
   description?: string;
   className?: string;
@@ -24,7 +25,11 @@ export function IconTile({
   description,
   className,
 }: IconTileProps) {
-  const Icon = typeof icon === "function" ? icon : null;
+  const Icon =
+    typeof icon === "function"
+      ? (icon as ComponentType<{ className?: string }>)
+      : null;
+  const iconNode = Icon ? null : (icon as ReactNode);
 
   return (
     <div
@@ -34,7 +39,7 @@ export function IconTile({
       )}
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-        {Icon ? <Icon className="h-4 w-4" /> : icon}
+        {Icon ? <Icon className="h-4 w-4" /> : iconNode}
       </div>
       <div className="min-w-0">
         <p className="text-sm font-medium">{label}</p>

@@ -88,7 +88,7 @@ function DepthChart({ bids, asks }: { bids: any[]; asks: any[] }) {
         <Tooltip
           contentStyle={{ background: "#0e0a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }}
           labelStyle={{ color: "#94a3b8", fontSize: 11 }}
-          formatter={(value: any, name: string) => [`${value}K`, name === "cumBid" ? "Bid Depth" : "Ask Depth"]}
+          formatter={(value, name) => [`${value ?? 0}K`, name === "cumBid" ? "Bid Depth" : "Ask Depth"]}
         />
         <Area type="stepAfter" dataKey="cumBid" stroke="#22c55e" strokeWidth={1.5} fill="url(#bidGrad)" connectNulls={false} />
         <Area type="stepAfter" dataKey="cumAsk" stroke="#ef4444" strokeWidth={1.5} fill="url(#askGrad)" connectNulls={false} />

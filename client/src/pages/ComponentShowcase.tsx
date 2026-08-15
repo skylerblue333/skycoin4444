@@ -1294,7 +1294,7 @@ export default function ComponentsShowcase() {
             <Card>
               <CardContent className="pt-6">
                 <ResizablePanelGroup
-                  direction="horizontal"
+                  orientation="horizontal"
                   className="min-h-[200px] rounded-lg border"
                 >
                   <ResizablePanel defaultSize={50}>
