@@ -1,0 +1,25 @@
+[Unit]
+Description=SKYCOIN4444 production application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=skycoin
+Group=skycoin
+WorkingDirectory=/srv/skycoin4444/current
+EnvironmentFile=/etc/skycoin4444/production.env
+ExecStart=/usr/bin/env node dist/index.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/skycoin4444/shared
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

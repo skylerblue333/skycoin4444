@@ -191,3 +191,5 @@
 - [x] Add an explicit HTTP /healthz liveness endpoint and baseline security headers without claiming database readiness.
 - [x] Fix the production bundle startup failure caused by named ESM imports from the CommonJS cookie package, then rerun the local production smoke test and full validation.
 - [x] Replace Express 4 wildcard fallback routes with Express 5-compatible named wildcards so the production server can initialize and serve SPA routes.
+- [ ] Prepare repository-side deployment package: EC2 deployment script, systemd services, Nginx proxy, sanitized environment templates, health check, smoke tests, deployment/rollback/database/backup/restore/monitoring/domain runbooks, and deployment README.
+- [ ] Validate the deployment package and update PRODUCTION_READINESS.md while preserving RED status until external infrastructure evidence exists.
