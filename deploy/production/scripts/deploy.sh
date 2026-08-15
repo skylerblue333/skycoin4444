@@ -21,6 +21,8 @@ command -v git >/dev/null || { echo "git is required" >&2; exit 1; }
 command -v pnpm >/dev/null || { echo "pnpm is required" >&2; exit 1; }
 command -v node >/dev/null || { echo "node is required" >&2; exit 1; }
 
+"$(dirname "$0")/preflight.sh"
+
 mkdir -p "$APP_ROOT/releases" "$APP_ROOT/shared"
 release_dir="$APP_ROOT/releases/$RELEASE_SHA"
 

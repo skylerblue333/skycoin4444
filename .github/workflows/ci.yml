@@ -2,9 +2,9 @@ name: Continuous Integration
 
 on:
   push:
-    branches: [main]
+    branches: [main, manus/pipeline-stabilization-20260814]
   pull_request:
-    branches: [main]
+    branches: [main, manus/pipeline-stabilization-20260814]
   workflow_dispatch:
 
 permissions:

@@ -44,8 +44,9 @@ The package assumes Ubuntu-like Linux, Node.js compatible with the repository lo
 | `staging/nginx/skycoin4444-staging.conf` | Staging proxy template |
 | `production/.env.example` | Sanitized production variable names |
 | `staging/.env.example` | Sanitized staging variable names |
-| `production/scripts/deploy.sh` | Clean checkout, frozen install, validation, build, release, restart |
+| `production/scripts/preflight.sh` | Validates runtime environment-variable presence and host commands without printing values |
 | `production/health/healthcheck.sh` | Direct liveness check with explicit failure/block behavior |
+| `production/scripts/deploy.sh` | Clean checkout, frozen install, preflight, validation, build, release, restart |
 | `production/scripts/smoke-test.sh` | Domain and critical-route smoke-test scaffold |
 | `docs/domains-and-tls.md` | DNS, canonical-domain, certificate, and verification procedure |
 | `docs/database-migrations.md` | Safe migration and schema verification procedure |
