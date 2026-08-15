@@ -1,90 +1,109 @@
-import { Link } from "wouter";
-import { PageHeader } from "@/components/PageHeader";
-import { Activity, CheckCircle, AlertTriangle, XCircle, Clock, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  Database,
+  FileCheck2,
+  ShieldCheck,
+  Workflow,
+} from "lucide-react";
 
-const SERVICES = [
-  { name: "API Gateway", status: "operational", latency: "12ms", uptime: "99.99%" },
-  { name: "Authentication", status: "operational", latency: "8ms", uptime: "100%" },
-  { name: "Database (TiDB)", status: "operational", latency: "4ms", uptime: "..." },
-  { name: "File Storage (S3)", status: "operational", latency: "45ms", uptime: "99.99%" },
-  { name: "WebSocket Server", status: "degraded", latency: "120ms", uptime: "98.2%" },
-  { name: "AI/LLM Engine", status: "operational", latency: "850ms", uptime: "99.5%" },
-  { name: "Blockchain RPC", status: "operational", latency: "230ms", uptime: "99.1%" },
-  { name: "Email Service", status: "operational", latency: "320ms", uptime: "99.8%" },
-  { name: "CDN / Media", status: "operational", latency: "18ms", uptime: "99.99%" },
-  { name: "Sprint Engine", status: "operational", latency: "N/A", uptime: "99.3%" },
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const serviceRequirements = [
+  {
+    title: "Verified service inventory and health integrations",
+    icon: Database,
+    detail:
+      "An authoritative service inventory, authenticated health checks, dependency mapping, validated environment scope, uptime definitions, consistent time sources, failure-state modeling, and independently verifiable service probes are required before identifying a service, displaying health, or reporting a system, provider, database, storage, authentication, AI, blockchain, messaging, media, or network status.",
+  },
+  {
+    title: "Evidence-based telemetry and metric definitions",
+    icon: Workflow,
+    detail:
+      "Durable telemetry, documented measurement methods, source attribution, timestamped data, sampling and aggregation definitions, stale-data detection, retention controls, alert thresholds, error-budget policy, independent validation, and clear data-quality states are required before reporting latency, uptime, availability, traffic, performance, error rates, monitoring state, or real-time operational metrics.",
+  },
+  {
+    title: "Controlled incident and public-status operations",
+    icon: FileCheck2,
+    detail:
+      "Documented incident governance, authorized incident creation and review, severity definitions, time-bound updates, stakeholder approval, post-incident review, correction workflows, change records, and durable audit history are required before publishing, updating, resolving, or presenting an incident, degradation, outage, maintenance window, recovery statement, or other operational event.",
+  },
+  {
+    title: "Secure observability and access safeguards",
+    icon: ShieldCheck,
+    detail:
+      "Least-privilege access, secure handling of operational data and credentials, environment isolation, audit logging, secret management, abuse protections, dependency review, incident response, and independently evidenced safeguards are required before exposing service topology, monitoring data, diagnostic information, incident details, or operational controls.",
+  },
 ];
-
-const INCIDENTS = [
-  { date: "Jun 15, 2026", title: "WebSocket latency spike", status: "monitoring", duration: "Ongoing", severity: "minor" },
-  { date: "Jun 10, 2026", title: "Database connection pool exhaustion", status: "resolved", duration: "14 min", severity: "major" },
-  { date: "Jun 3, 2026", title: "AI engine timeout errors", status: "resolved", duration: "8 min", severity: "minor" },
-];
-
-function StatusIcon({ status }: { status: string }) {
-  if (status === "operational") return <CheckCircle className="w-4 h-4 text-success" />;
-  if (status === "degraded") return <AlertTriangle className="w-4 h-4 text-warning" />;
-  return <XCircle className="w-4 h-4 text-destructive" />;
-}
 
 export default function PlatformStatus() {
-  const allOperational = SERVICES.every(s => s.status === "operational");
-
   return (
-    <div className="container py-8 max-w-4xl animate-page-in">
-      <PageHeader backHref="/dashboard" icon={Activity} title="Platform Status" subtitle="Real-time health and uptime for all SKYCOIN4444 services" />
-
-      {/* Overall Status Banner */}
-      <div className={`rounded-xl p-4 mb-8 flex items-center gap-3 border ${allOperational ? "bg-success/10 border-success/30" : "bg-warning/10 border-warning/30"}`}>
-        {allOperational ? <CheckCircle className="w-6 h-6 text-success" /> : <AlertTriangle className="w-6 h-6 text-warning" />}
-        <div>
-          <div className={`font-semibold ${allOperational ? "text-success" : "text-warning"}`}>
-            {allOperational ? "All Systems Operational" : "Minor Service Degradation"}
+    <main className="min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+      <div className="mx-auto max-w-5xl">
+        <header className="max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-200">
+            <AlertTriangle className="h-3.5 w-3.5" /> Platform-status service
+            unavailable
           </div>
-          <div className="text-xs text-muted-foreground">Last updated: just now</div>
-        </div>
-        <div className="ml-auto text-right">
-          <div className="text-2xl font-bold text-success">99.97%</div>
-          <div className="text-xs text-muted-foreground">30-day uptime</div>
-        </div>
-      </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Platform Status
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-slate-300">
+            Platform health, service status, uptime, latency, availability,
+            incident history, maintenance state, real-time monitoring,
+            operational metrics, and recovery status are not configured for this
+            deployment. No service, dependency, incident, metric, or platform
+            result is represented as current, complete, verified, active,
+            operational, degraded, resolved, or available.
+          </p>
+        </header>
 
-      {/* Services Grid */}
-      <div className="card mb-6 overflow-hidden">
-        <div className="px-5 py-3 border-b border-border/50 flex items-center justify-between">
-          <h3 className="font-semibold text-sm">Service Health</h3>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Zap className="w-3 h-3 text-primary" />Live</div>
-        </div>
-        {SERVICES.map((s, i) => (
-          <div key={i} className="flex items-center gap-4 px-5 py-3 border-b border-border/10 last:border-0 hover:bg-secondary/20 transition-colors">
-            <StatusIcon status={s.status} />
-            <div className="flex-1 text-sm font-medium">{s.name}</div>
-            <div className="text-xs text-muted-foreground font-mono">{s.latency}</div>
-            <div className={`text-xs font-semibold ${s.status === "operational" ? "text-success" : "text-warning"}`}>{s.uptime}</div>
-            <div className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              s.status === "operational" ? "bg-success/10 text-success" :
-              s.status === "degraded" ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
-            }`}>{s.status}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Incident History */}
-      <div className="card p-5">
-        <h3 className="font-semibold mb-4 flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />Incident History</h3>
-        {INCIDENTS.map((inc, i) => (
-          <div key={i} className="flex items-start gap-3 py-3 border-b border-border/20 last:border-0">
-            <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${inc.status === "resolved" ? "bg-success" : "bg-warning"}`} />
-            <div className="flex-1">
-              <div className="text-sm font-medium">{inc.title}</div>
-              <div className="text-xs text-muted-foreground">{inc.date} · Duration: {inc.duration}</div>
-            </div>
-            <div className={`text-xs px-2 py-0.5 rounded-full ${inc.status === "resolved" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
-              {inc.status}
+        <section className="mt-8 rounded-xl border border-amber-900/60 bg-amber-950/30 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+            <div>
+              <h2 className="font-semibold text-amber-100">
+                No simulated health, uptime, latency, or incident record
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-amber-200">
+                This page does not check a service, query a dependency, retrieve
+                telemetry, calculate an uptime or latency metric, create or
+                update an incident, report an outage, stream an update, or
+                report that a platform operation succeeded.
+              </p>
             </div>
           </div>
-        ))}
+        </section>
+
+        <section className="mt-8 grid gap-5 md:grid-cols-2">
+          {serviceRequirements.map(requirement => {
+            const Icon = requirement.icon;
+
+            return (
+              <Card
+                key={requirement.title}
+                className="border-slate-700 bg-slate-900"
+              >
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-base text-white">
+                    <span className="rounded-lg bg-slate-800 p-2 text-sky-300">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    {requirement.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-slate-300">
+                    {requirement.detail}
+                  </p>
+                  <p className="mt-4 text-xs font-medium text-slate-400">
+                    Status: not configured
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
