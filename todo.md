@@ -174,3 +174,4 @@
 - [x] First real product slice: stabilize the persisted Marketplace catalog and product-detail contract; do not implement checkout, escrow, shipping, or seller verification without real prerequisites.
 - [x] Baseline blocker: resolve the current 60 frontend TypeScript errors before declaring the canonical production build clean.
 - [x] Next real product slice: stabilize authenticated Profile read/update behavior using the existing protected user contracts, with username uniqueness and authorization tests.
+- [x] Next real product slice: validate authenticated Messages inbox/thread behavior with ownership checks, message persistence, and failure-state tests.
