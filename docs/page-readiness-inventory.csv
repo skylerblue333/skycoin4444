@@ -538,7 +538,7 @@ MarginTrading,client/src/pages/MarginTrading.tsx,static-review,True,False,False,
 MarkdownRendering,client/src/pages/MarkdownRendering.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MarketSentiment,client/src/pages/MarketSentiment.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MarketingROI,client/src/pages/MarketingROI.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Marketplace,client/src/pages/Marketplace.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+Marketplace,client/src/pages/Marketplace.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MarketplaceAnalytics,client/src/pages/MarketplaceAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 MasterArchitecture,client/src/pages/MasterArchitecture.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 MatchChat,client/src/pages/MatchChat.tsx,interactive-review,True,False,False,False,False,True,True,False,False
