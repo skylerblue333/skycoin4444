@@ -90,7 +90,18 @@ export default function Profile() {
     ? trpc.user.profileByUsername.useQuery({ username }, { enabled: !!username })
     : { data: me, isLoading: false };
 
+  const utils = trpc.useUtils();
   const { data: myPosts } = trpc.feed.list.useQuery();
+  const [postDraft, setPostDraft] = useState("");
+
+  const createPost = trpc.feed.create.useMutation({
+    onSuccess: async () => {
+      setPostDraft("");
+      await utils.feed.list.invalidate();
+      toast.success("Post published.");
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
   const followUser = trpc.user.follow.useMutation({
     onSuccess: () => toast.success("Following!"),
@@ -308,6 +319,32 @@ export default function Profile() {
           </TabsList>
 
           <TabsContent value="posts">
+            {isOwnProfile && isAuthenticated && (
+              <div className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4 mb-4">
+                <label htmlFor="profile-post" className="block text-sm font-medium text-white/70 mb-2">Share an update</label>
+                <textarea
+                  id="profile-post"
+                  value={postDraft}
+                  onChange={(event) => setPostDraft(event.target.value)}
+                  maxLength={255}
+                  rows={3}
+                  placeholder="Write something real and useful to your community…"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 p-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-purple-500/60"
+                  disabled={createPost.isPending}
+                />
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="text-xs text-white/35">{postDraft.length}/255</span>
+                  <Button
+                    size="sm"
+                    onClick={() => createPost.mutate({ content: postDraft.trim() })}
+                    disabled={createPost.isPending || postDraft.trim().length === 0}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0"
+                  >
+                    {createPost.isPending ? "Publishing…" : "Publish"}
+                  </Button>
+                </div>
+              </div>
+            )}
             {userPosts.length > 0 ? (
               <div className="space-y-3">
                 {userPosts.map((post: any) => <PostCard key={post.id} post={post} />)}
