@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-08-16  
 **Repository:** `skylerblue333/skycoin4444`  
-**Verified synchronized checkpoint:** `6bbed61` (`6bbed617dd57de3e9eaf96c7f88d5773ee5f226c`)
+**Verified synchronized checkpoint:** `398c408` (`398c408053fe9a94bf3d78b6bf5006f77bce3c19f`)
 **Assessment:** **Code validation green; GA release not yet authorized.**
 
 ## Verified local evidence
@@ -14,8 +14,8 @@
 | Available automated tests | Pass for available suite | `pnpm run test -- --run` passes **3 tests in 2 test files**: logout cookie clearing and admin authorization allow/deny behavior. This is not a complete GA critical-workflow suite. |
 | Diff hygiene | Pass | `git diff --check` completed without whitespace errors during each verified remediation checkpoint. |
 | Truthful page inventory | Pass | `docs/page-readiness-inventory.csv` regenerated for **1,079 routes**. |
-| Hard-coded-money evidence | Partial, explicitly bounded | `scripts/audit_hard_coded_money.py` produces a reproducible page-level evidence file. It is a machine-generated review aid, not a substitute for manual classification of every signal. |
-| GitHub synchronization | Pass | `master` is synchronized with `origin/master` at `48e849c`. |
+| Hard-coded-money evidence | Pass for scanned signals; manual review remains required | `scripts/audit_hard_coded_money.py` reports **0 unresolved rows** on the current checkpoint. The result is a reproducible scan and does not replace manual review of financial claims outside the scanner's patterns. |
+| GitHub synchronization | Pass | `master` is synchronized with `origin/master` at `398c408`. |
 | GitHub Actions for current checkpoint | Not yet verified in this record | Prior CI runs were successful, but a successful CI run for the current checkpoint must be captured before release authorization. |
 
 ## Current route classification
@@ -25,11 +25,11 @@ The current inventory records:
 | Classification | Count |
 |---|---:|
 | Total routes | 1,079 |
-| Truthfully gated | 274 |
-| Integration-backed review | 101 |
-| Interactive review | 594 |
-| Static review | 110 |
-| Hard-coded-money pages | 90 |
+| Truthfully gated | 282 |
+| Integration-backed review | 99 |
+| Interactive review | 589 |
+| Static review | 109 |
+| Hard-coded-money pages detected by inventory scan | 86 |
 | Type-check-exempt pages | 0 |
 | Registered routes | 1,070 |
 
@@ -39,7 +39,7 @@ These are **readiness classifications**, not a claim that all 1,079 routes are p
 
 The campaign fixed an authorization defect in the admin router by replacing authenticated-user protection with `adminProcedure` for admin statistics, user listings, moderation queues, and role updates. Regression tests verify that non-admin users are rejected and admin users can reach the protected procedure.
 
-The campaign also removed or truthfully gated unsupported public and high-risk surfaces, including wallet USD valuation, HopeAI marketing claims, fabricated search results, trust and observability telemetry, advanced analytics, economy controls, public landing claims, ecosystem valuation, ambient and unified feeds, investor presentation claims, WorldBrain actions, WorldSimulationControl, AgentDebate, GTM metrics, AI Copy Studio, and automation workflows. Unsupported wallet custody, signing, broadcasting, exchange execution, order books, swaps, staking, mining, DeFi, portfolio operations, and on-chain market data remain unavailable or gated where verified integrations are absent.
+The campaign also removed or truthfully gated unsupported public and high-risk surfaces, including wallet USD valuation, HopeAI marketing claims, fabricated search results, trust and observability telemetry, advanced analytics, economy controls, public landing claims, ecosystem valuation, ambient and unified feeds, investor presentation claims, WorldBrain actions, WorldSimulationControl, AgentDebate, GTM metrics, AI Copy Studio, automation workflows, unsupported IITR service pricing and outcomes, unsupported StreamClip media metrics, and unsupported VideoArea media, token, and yield-farming claims. The hard-coded-money audit now reports zero unresolved rows on the current checkpoint. Unsupported wallet custody, signing, broadcasting, exchange execution, order books, swaps, staking, mining, DeFi, portfolio operations, and on-chain market data remain unavailable or gated where verified integrations are absent.
 
 Verified account-scoped wallet ledger reads remain distinct from on-chain custody. A database ledger balance must not be marketed as a blockchain balance, custodial wallet, market valuation, or successful transaction.
 
@@ -54,7 +54,7 @@ Verified account-scoped wallet ledger reads remain distinct from on-chain custod
 | Monitoring and alerting | Not verified | Structured error collection, uptime checks, database/API alerts, sensitive-data redaction, and on-call ownership. |
 | Backup and restore | Not verified | Encrypted backup schedule, retention, restore test, and recovery-objective evidence. |
 | Critical workflow coverage | Incomplete | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, admin authorization, and representative service integration tests. |
-| Dependency advisory | Open / externally confirmed | GitHub reports one moderate Dependabot advisory, **#121**. The package detail and remediation status require confirmation in GitHub Security. |
+| Dependency advisory | Open in GitHub; local audit clean | GitHub reports one moderate Dependabot advisory, **#121**, but its alert endpoint is permission-restricted in this session. `pnpm audit --json` reports zero vulnerabilities across 670 resolved dependencies; the GitHub alert still requires owner-level confirmation or dismissal/remediation in GitHub Security. |
 | Current-checkpoint CI evidence | Pending | Capture successful dependency installation, typecheck, tests, production build, and security audit for the current synchronized checkpoint. |
 
 ## Release decision
@@ -65,7 +65,7 @@ The repository is suitable as a **code-green stabilization checkpoint** and cont
 
 ## Smallest next remediation and verification batch
 
-1. Confirm and remediate or formally accept Dependabot advisory #121.
+1. Confirm and remediate or formally accept Dependabot advisory #121 in GitHub Security; local `pnpm audit` alone is not sufficient to close the alert.
 2. Run current-checkpoint GitHub CI and capture its run ID and artifacts.
 3. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
 4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
