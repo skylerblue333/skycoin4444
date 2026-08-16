@@ -38,7 +38,7 @@ export async function upsertUser(data: any) {
       return data;
     }
   } catch (error) {
-    return data;
+    return null;
   }
 }
 
@@ -72,7 +72,7 @@ export async function createUser(data: any) {
     await db.insert(schema.users).values(data);
     return data;
   } catch (error) {
-    return data;
+    return null;
   }
 }
 
@@ -137,7 +137,7 @@ export async function createProduct(data: any) {
     await db.insert(schema.products).values(data);
     return data;
   } catch (error) {
-    return data;
+    return null;
   }
 }
 
@@ -155,7 +155,7 @@ export async function createOrder(data: any) {
     await db.insert(schema.orders).values(data);
     return data;
   } catch (error) {
-    return data;
+    return null;
   }
 }
 
@@ -191,7 +191,7 @@ export async function createWallet(data: any) {
     await db.insert(schema.wallets).values(data);
     return data;
   } catch (error) {
-    return data;
+    return null;
   }
 }
 
