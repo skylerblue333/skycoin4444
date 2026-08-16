@@ -342,7 +342,7 @@ EmbedSDK,client/src/pages/EmbedSDK.tsx,interactive-review,True,False,False,False
 EmptySearchState,client/src/pages/EmptySearchState.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 EngagementMetrics,client/src/pages/EngagementMetrics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 EngagementStats,client/src/pages/EngagementStats.tsx,static-review,True,False,False,False,False,False,False,False,False
-Engineer,client/src/pages/Engineer.tsx,blocked-by-type-safety,True,True,False,True,False,True,True,True,False
+Engineer,client/src/pages/Engineer.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Enterprise,client/src/pages/Enterprise.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 EnterpriseAPI,client/src/pages/EnterpriseAPI.tsx,integration-backed-review,True,False,True,False,False,True,False,False,True
 EnterpriseAnalytics,client/src/pages/EnterpriseAnalytics.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
