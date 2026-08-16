@@ -11,8 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Link, useLocation } from "wouter";
 import {
-  User, Camera, Palette, Wallet, Globe, Share2 as TwitterIcon,
-  Share2 as InstagramIcon, Play as YoutubeIcon, Link2, ArrowLeft, Zap,
+  User, Camera, Palette, Wallet, Globe, Share2, Link2, ArrowLeft, Zap,
   CheckCircle, Loader2, MapPin, Edit3
 } from "lucide-react";
 
@@ -28,6 +27,8 @@ const THEME_PRESETS = [
 export default function ProfileEdit() {
   
   const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const isAuthenticated = Boolean(user);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
@@ -69,23 +70,22 @@ export default function ProfileEdit() {
     }
   }, [user]);
 
-  const updateProfile = trpc.user.updateProfile.useMutation({
-    onSuccess: () => {
-      utils.auth.me.invalidate();
+  const updateProfile = {
+    mutateAsync: async (_input: Record<string, string>) => {
+      throw new Error("Profile persistence is unavailable until a verified user-profile API is configured.");
     },
-  });
+    mutate: (_input: Record<string, string>) => {
+      toast.error("Profile persistence is unavailable until a verified user-profile API is configured.");
+    },
+  };
 
-  const uploadAvatar = trpc.user.uploadAvatar.useMutation({
-    onSuccess: (data, variables) => {
-      utils.auth.me.invalidate();
-      const field = variables.type;
-      setSavedFields(prev => new Set([...prev, field]));
-      toast.success(`${field === "avatar" ? "Profile photo" : "Banner"} updated!`);
+  const uploadAvatar = {
+    isPending: false,
+    variables: undefined as { type: "avatar" | "banner" } | undefined,
+    mutate: (_input: { data: string; type: "avatar" | "banner"; mimeType: string }) => {
+      toast.error("Image upload is unavailable until an authenticated storage API is configured and verified.");
     },
-    onError: (err) => {
-      toast.error("Upload failed: " + err.message);
-    },
-  });
+  };
 
   // Auto-save field on blur
   const handleFieldBlur = useCallback(async (field: string, value: string) => {
@@ -289,9 +289,9 @@ export default function ProfileEdit() {
               <CardContent className="space-y-4">
                 {[
                   { key: "website", icon: Globe, placeholder: "https://yoursite.com", label: "Website" },
-                  { key: "twitter", icon: Share2 as TwitterIcon, placeholder: "@username", label: "Share2 as TwitterIcon / X" },
-                  { key: "instagram", icon: Share2 as InstagramIcon, placeholder: "@username", label: "Share2 as InstagramIcon" },
-                  { key: "youtube", icon: Play as YoutubeIcon as Play as YoutubeIconIcon, placeholder: "Channel URL or @handle", label: "YouTube" },
+                  { key: "twitter", icon: Share2, placeholder: "@username", label: "Twitter / X" },
+                  { key: "instagram", icon: Share2, placeholder: "@username", label: "Instagram" },
+                  { key: "youtube", icon: Share2, placeholder: "Channel URL or @handle", label: "YouTube" },
                 ].map(({ key, icon: Icon, placeholder, label }) => (
                   <div key={key} className="space-y-1.5">
                     <Label className="text-white/70 text-xs flex items-center gap-1">

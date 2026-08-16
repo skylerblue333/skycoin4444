@@ -291,9 +291,9 @@ export default function Profile() {
             <div className="flex flex-wrap items-center gap-4 text-xs text-white/40 mb-4">
               {profile.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{profile.location}</span>}
               {profile.website && <a href={profile.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-purple-400 transition-colors"><Globe className="w-3 h-3" />{profile.website.replace(/^https?:\/\//, "")}</a>}
-              {profile.twitter && <a href={`https://twitter.com/${profile.twitter}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-sky-400 transition-colors"><Share2 as TwitterIcon className="w-3 h-3" />@{profile.twitter}</a>}
-              {profile.instagram && <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-pink-400 transition-colors"><Share2 as InstagramIcon className="w-3 h-3" />@{profile.instagram}</a>}
-              {profile.youtube && <a href={profile.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-red-400 transition-colors"><Play as YoutubeIconIcon as Play as YoutubeIconIcon className="w-3 h-3" />YouTube</a>}
+              {profile.twitter && <a href={`https://twitter.com/${profile.twitter}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-sky-400 transition-colors"><Share2 className="w-3 h-3" />@{profile.twitter}</a>}
+              {profile.instagram && <a href={`https://instagram.com/${profile.instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-pink-400 transition-colors"><Share2 className="w-3 h-3" />@{profile.instagram}</a>}
+              {profile.youtube && <a href={profile.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 hover:text-red-400 transition-colors"><Play className="w-3 h-3" />YouTube</a>}
               {profile.createdAt && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Joined {new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>}
             </div>
 
