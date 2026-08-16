@@ -558,7 +558,7 @@ MemorySystem,client/src/pages/MemorySystem.tsx,interactive-review,True,False,Fal
 Mentions,client/src/pages/Mentions.tsx,static-review,True,False,False,False,False,False,False,False,False
 MessageEncryption,client/src/pages/MessageEncryption.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MessageSearch,client/src/pages/MessageSearch.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Messages,client/src/pages/Messages.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
+Messages,client/src/pages/Messages.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MetaversePortal,client/src/pages/MetaversePortal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MilestoneTracking,client/src/pages/MilestoneTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 MinerDashboard,client/src/pages/MinerDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
