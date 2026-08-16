@@ -10,18 +10,22 @@
 |---|---|---|
 | Staging resource | **BLOCKED / NOT VERIFIED** | `01-staging-resource.md` |
 | Least-privilege credentials | **BLOCKED / NOT VERIFIED** | `02-staging-credentials.md` |
-| Migration and schema checksum | **BLOCKED / NOT VERIFIED** | `03-migration-transcript.txt` |
+| Migration and schema checksum | **BLOCKED / NOT VERIFIED** | `03-migration-transcript.txt`; Phase B only after Phase A evidence is independently verified |
 | Connection limits | **BLOCKED / NOT VERIFIED** | `04-connection-test.md` |
 | Authorization tests | **BLOCKED / NOT VERIFIED** | `05-authorization-tests.md` |
 | Backup and restore | **BLOCKED / NOT VERIFIED** | `06-backup-restore.md` |
 
-## Missing infrastructure inputs
+## Phase A — infrastructure-owner evidence
 
-The infrastructure/database owner must provide an isolated staging provider resource, endpoint metadata, database name, secret-manager reference, confirmation that production data is excluded, network/access controls, and an approved process for staging-only credentials. Secret values must remain in the approved secret manager and must not be committed, logged, or pasted into chat.
+The infrastructure/database owner must provide actual evidence for the approved isolated staging provider/resource ID, host and port, staging database name, secret-manager reference, production-data exclusion, network/access controls and TLS, staging-only credential lifecycle, correct staging connection verification, backup/restore capability, connection capacity and bounded recovery test, and least-privilege grants with an unauthorized-operation result. Metadata and evidence only are required; secret values must never be sent.
+
+## Phase B — application/release-operator evidence
+
+Only after Phase A evidence is independently verified may the release operator retrieve the staging secret through the approved mechanism, reverify the target, run authorization and bounded connection tests, execute `pnpm run db:push`, inspect the actual schema, generate the actual deterministic checksum, sanitize `03-migration-transcript.txt`, and rerun relevant database/security tests.
 
 ## Required execution sequence after access is provided
 
-Provision or identify the isolated resource; configure the staging-only credential through the secret manager; execute the real Drizzle migration command; generate a reproducible schema checksum; verify grants and connection limits; run synthetic cross-account authorization tests; create an encrypted snapshot; restore it into an isolated temporary target; verify schema and synthetic data; capture sanitized transcripts; clean up the temporary target; and obtain explicit owner acceptance.
+Complete Phase A evidence and independently verify every prerequisite; then complete Phase B by securely retrieving the staging secret, verifying host/database/user/TLS and production exclusion, verifying grants, running bounded connection and synthetic authorization tests, executing the real Drizzle migration command, independently verifying the schema, generating a reproducible checksum from actual staging state, creating and restoring an encrypted snapshot, capturing sanitized transcripts, cleaning up the temporary target, and obtaining explicit owner acceptance.
 
 ## Rollback actions
 
