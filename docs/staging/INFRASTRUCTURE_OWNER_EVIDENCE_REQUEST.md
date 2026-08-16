@@ -18,7 +18,7 @@ Please return metadata and evidence only. Do **not** send passwords, complete co
 | 9 | Backup/restore | Applicable policy, or encrypted backup and isolated restore evidence |
 | 10 | Connections | Provider capacity, application pool configuration, bounded test, timeouts, and recovery evidence |
 | 11 | Authorization | Least-privilege grants and synthetic authorization test evidence |
-| 12 | Migration | Sanitized `pnpm run db:push` transcript, schema verification, and actual schema checksum |
+| 12 | Migration | **Phase B release-operator deliverable; not an infrastructure-owner deliverable** |
 
 ## Acceptance requirements
 
@@ -26,12 +26,12 @@ Each item must be traceable to a provider record, sanitized configuration export
 
 ## Phase separation
 
-**Phase A — Infrastructure owner:** provision the isolated staging resource and supply the twelve metadata/evidence items.
+**Phase A — Infrastructure owner:** provision the isolated staging resource and supply only items **1–11**: provider/resource, endpoint, database name, secret-manager reference, data isolation, network/TLS, credential lifecycle, connection verification, backup/restore, connection capacity, and authorization/least-privilege evidence. Phase A must transition from `BLOCKED` to `INFRASTRUCTURE EVIDENCE RECEIVED` and then `EVIDENCE VERIFIED` only after independent review.
 
-**Phase B — Application/release operator:** after the evidence is verified, retrieve the staging secret through the approved mechanism, verify the target, run the exact repository command `pnpm run db:push`, independently verify the resulting schema, generate the actual checksum, and update `03-migration-transcript.txt`.
+**Phase B — Application/release operator:** only after Phase A is verified, securely retrieve the staging secret, reverify the target, run the required authorization and bounded connection checks, execute exactly `pnpm run db:push`, independently verify the resulting schema, generate the actual checksum, sanitize `03-migration-transcript.txt`, and rerun relevant database/security tests. Migration evidence is item **12** and is not an infrastructure-owner deliverable.
 
 ## Valid state transitions
 
-`BLOCKED → INFRASTRUCTURE EVIDENCE RECEIVED → EVIDENCE VERIFIED → MIGRATION EXECUTED → SCHEMA VERIFIED → CHECKSUM VERIFIED → FINAL STAGING GATE`
+`BLOCKED → INFRASTRUCTURE EVIDENCE RECEIVED → EVIDENCE VERIFIED → MIGRATION EXECUTED → SCHEMA VERIFIED → CHECKSUM VERIFIED → FINAL STAGING GATE → OWNER ACCEPTANCE`
 
-The current state remains **BLOCKED** until the infrastructure owner supplies and the release operator verifies the package.
+The current state remains **BLOCKED** because no approved staging resource, endpoint, database name, or secret-manager reference has been supplied. The infrastructure owner must return actual metadata/evidence for items 1–11; no item may be populated with guesses.
