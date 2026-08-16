@@ -302,7 +302,7 @@ DeveloperMarketplace,client/src/pages/DeveloperMarketplace.tsx,interactive-revie
 DeveloperProtocol,client/src/pages/DeveloperProtocol.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 DifficultyCalculator,client/src/pages/DifficultyCalculator.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 DifficultyTracking,client/src/pages/DifficultyTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-DigitalArtStore,client/src/pages/DigitalArtStore.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+DigitalArtStore,client/src/pages/DigitalArtStore.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 DigitalNationMode,client/src/pages/DigitalNationMode.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
 DigitalTwin,client/src/pages/DigitalTwin.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 DirectMessages,client/src/pages/DirectMessages.tsx,static-review,True,False,False,False,False,False,False,False,False
