@@ -7,7 +7,7 @@ AIAssistant,client/src/pages/AIAssistant.tsx,interactive-review,True,False,False
 AIBrain,client/src/pages/AIBrain.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 AICodeStudio,client/src/pages/AICodeStudio.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 AICopyStudio,client/src/pages/AICopyStudio.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
-AICore,client/src/pages/AICore.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
+AICore,client/src/pages/AICore.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AIEngineer,client/src/pages/AIEngineer.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
 AIGovernance,client/src/pages/AIGovernance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AIMarketAgents,client/src/pages/AIMarketAgents.tsx,integration-backed-review,True,True,False,True,True,True,False,False,True
