@@ -346,7 +346,7 @@ Engineer,client/src/pages/Engineer.tsx,truthfully-gated,True,False,False,False,F
 Enterprise,client/src/pages/Enterprise.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 EnterpriseAPI,client/src/pages/EnterpriseAPI.tsx,integration-backed-review,True,False,True,False,False,True,False,False,True
 EnterpriseAnalytics,client/src/pages/EnterpriseAnalytics.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
-EnterpriseBilling,client/src/pages/EnterpriseBilling.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
+EnterpriseBilling,client/src/pages/EnterpriseBilling.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 EntityProfile,client/src/pages/EntityProfile.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 EnvironmentManagement,client/src/pages/EnvironmentManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 Error403,client/src/pages/Error403.tsx,interactive-review,True,False,False,False,False,True,False,False,False
