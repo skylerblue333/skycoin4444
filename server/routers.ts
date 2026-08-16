@@ -1808,7 +1808,56 @@ export const appRouter = router({
       .mutation(() => unavailableMutationResult),
   }),
   languageExchange: createFeatureRouter(),
-  audienceLockIn: createFeatureRouter(),
+  audienceLockIn: router({
+    getStreak: protectedProcedure.query(() => ({
+      current: 0,
+      longest: 0,
+      freezesRemaining: 0,
+    })),
+    getLoyaltyProfile: protectedProcedure.query(() => ({
+      tier: "bronze",
+      lifetimePoints: 0,
+    })),
+    getUserBadges: protectedProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          name: string;
+          description: string;
+          earnedAt: string;
+        }>
+    ),
+    getActiveQuests: protectedProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          type: string;
+          title: string;
+          name: string;
+          description: string;
+          progress: number;
+          target: number;
+          xpReward: number;
+          reward: number;
+          skyReward: number;
+        }>
+    ),
+    getFanLevel: protectedProcedure.query(() => ({
+      level: 1,
+      xp: 0,
+      xpToNext: 1000,
+    })),
+    recordActivity: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        increased: false,
+        broken: false,
+        streak: 0,
+        reward: "",
+        multiplier: 0,
+      })),
+  }),
   shadowIdentity: router({
     getMyIdentity: protectedProcedure.query(() => ({
       displayName: "",
