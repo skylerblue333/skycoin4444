@@ -836,7 +836,7 @@ ShoppingCart,client/src/pages/ShoppingCart.tsx,interactive-review,True,False,Fal
 SidebarNavigation,client/src/pages/SidebarNavigation.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SignUp,client/src/pages/SignUp.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SignUpFlow,client/src/pages/SignUpFlow.tsx,interactive-review,True,False,False,False,False,True,True,False,True
-SignUp_old,client/src/pages/SignUp_old.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
+SignUp_old,client/src/pages/SignUp_old.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Signin,client/src/pages/Signin.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SituationRoom,client/src/pages/SituationRoom.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 SkillBadges,client/src/pages/SkillBadges.tsx,interactive-review,True,False,False,False,False,True,True,False,False
