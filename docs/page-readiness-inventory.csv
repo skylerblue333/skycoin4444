@@ -536,7 +536,7 @@ MaintenanceMode,client/src/pages/MaintenanceMode.tsx,interactive-review,True,Fal
 MapView,client/src/pages/MapView.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 MarginTrading,client/src/pages/MarginTrading.tsx,static-review,True,False,False,False,False,False,False,False,False
 MarkdownRendering,client/src/pages/MarkdownRendering.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-MarketSentiment,client/src/pages/MarketSentiment.tsx,static-review,True,False,False,False,False,False,False,False,False
+MarketSentiment,client/src/pages/MarketSentiment.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MarketingROI,client/src/pages/MarketingROI.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Marketplace,client/src/pages/Marketplace.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
 MarketplaceAnalytics,client/src/pages/MarketplaceAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
