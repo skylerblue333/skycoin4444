@@ -780,7 +780,7 @@ RoleManagement,client/src/pages/RoleManagement.tsx,static-review,True,False,Fals
 SDKDownload,client/src/pages/SDKDownload.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SDKManagement,client/src/pages/SDKManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SEOOptimizer,client/src/pages/SEOOptimizer.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-SKY444CentralBank,client/src/pages/SKY444CentralBank.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
+SKY444CentralBank,client/src/pages/SKY444CentralBank.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 SMSCampaigns,client/src/pages/SMSCampaigns.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SMSIntegration,client/src/pages/SMSIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SMSTemplates,client/src/pages/SMSTemplates.tsx,interactive-review,True,False,False,False,False,True,False,False,False
