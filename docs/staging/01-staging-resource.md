@@ -24,8 +24,34 @@
 | Provisioning timestamp | NOT VERIFIED |
 | Owner and approval date | NOT VERIFIED |
 
-No approved isolated staging MySQL/TiDB instance is available to the execution environment. No production database was contacted, and no substitute database was used. The exact missing dependency is an infrastructure/database-owner-provided staging resource and secure access path.
+## Evidence assessment
+
+No approved isolated staging MySQL/TiDB instance is available to the execution environment.
+
+No production database was contacted. No substitute database was used. No mock, SQLite, in-memory, fabricated, or unapproved public database was used.
+
+## Exact missing dependency
+
+An infrastructure/database-owner-provided approved isolated staging MySQL/TiDB resource and secure approved access path.
+
+## Required owner evidence
+
+The owner must supply traceable evidence for the approved provider/resource identifier, resource status, STAGING classification, MySQL/TiDB engine and version, region, host and port, staging database name, isolation, production-data exclusion, TLS requirement, approved network path, allowlist/security-group, public-access configuration, provisioning timestamp, owner identity, and approval date.
+
+## Security restriction
+
+No password, complete `DATABASE_URL`, private key, access token, or other secret may be recorded in this artifact.
+
+## Release decision
+
+**BLOCKED — `01-staging-resource.md` cannot transition to VERIFIED until the infrastructure/database owner supplies traceable provider/configuration evidence.**
+
+## Migration status
+
+`pnpm run db:push` — **NOT RUN**
 
 **Rollback action:** Not applicable because no resource was provisioned or modified.
 
 **Acceptance:** NOT VERIFIED / NOT ACCEPTED.
+
+**Checkpoint state:** **BLOCKED**.
