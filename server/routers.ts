@@ -1549,6 +1549,8 @@ export const appRouter = router({
       status: "unavailable" as const,
       totalActions: 0,
       accuracy: undefined as number | undefined,
+      autoModerated: 0,
+      manualReviews: 0,
       message:
         "Moderation telemetry is unavailable until observability storage is connected.",
     })),
@@ -1638,12 +1640,15 @@ export const appRouter = router({
       available: false as const,
       status: "unavailable" as const,
       totalUsers: 0,
+      totalPosts: 0,
+      uptime: "Unavailable",
+      version: "Unavailable",
       message:
         "Platform metrics are unavailable until observability storage is connected.",
     })),
     health: publicProcedure.query(() => ({
       available: false as const,
-      status: "unavailable" as const,
+      status: "unavailable" as string,
       message:
         "Platform health telemetry is unavailable until observability storage is connected.",
     })),
