@@ -1906,7 +1906,25 @@ export const appRouter = router({
   search: createFeatureRouter(),
 
   // Gaming & Gamification Routers
-  gamification: createFeatureRouter(),
+  gamification: router({
+    getSpinPrizes: publicProcedure.query(
+      () =>
+        [] as Array<{ id: string; label: string; type: string; amount: number }>
+    ),
+    getState: protectedProcedure.query(() => ({
+      spinsRemaining: 0,
+      lastSpinAt: null as string | null,
+      available: false as const,
+    })),
+    spin: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => unavailableMutationResult),
+    list: publicProcedure.query(() => []),
+    get: publicProcedure.input(z.unknown().optional()).query(() => ({})),
+    create: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+  }),
   simulation: router({
     getWorldState: publicProcedure.query(() => ({
       tick: 0,
