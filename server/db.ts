@@ -199,9 +199,14 @@ export async function createWallet(data: any) {
 }
 
 // ============ GENERIC HELPERS ============
-export async function getAllRecords(table: any) {
+type RelationalFindMany = {
+  findMany: () => Promise<unknown[]>;
+};
+
+export async function getAllRecords(table: keyof typeof db.query) {
   try {
-    return await db.query[table].findMany();
+    const query = db.query[table] as unknown as RelationalFindMany;
+    return await query.findMany();
   } catch (error) {
     return [];
   }
