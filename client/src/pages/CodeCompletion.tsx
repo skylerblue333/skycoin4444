@@ -1,20 +1,5 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import UnavailableFeature from "@/components/UnavailableFeature";
 
-const CodeCompletion = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">CodeCompletion</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            CodeCompletion feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default CodeCompletion;
+export default function CodeCompletion() {
+  return <UnavailableFeature name="Code Completion" />;
+}

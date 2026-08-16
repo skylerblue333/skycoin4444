@@ -1,20 +1,10 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import UnavailableFeature from "@/components/UnavailableFeature";
 
-const AuditLogs = () => {
+export default function AuditLogs() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">AuditLogs</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            AuditLogs feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
+    <UnavailableFeature
+      name="Audit logs"
+      reason="Audit log retrieval is not exposed as a verified production read path yet."
+    />
   );
-};
-
-export default AuditLogs;
+}

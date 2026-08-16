@@ -1,41 +1,43 @@
 // @ts-nocheck
-import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useAuth } from '@/_core/hooks/useAuth';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import UnavailableFeature from "@/components/UnavailableFeature";
 
 export default function AdminPage() {
-  
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
-  const { data: users, isLoading: usersLoading } = trpc.wave4Admin.getUsers.useQuery({
-    limit: 20,
-  });
+  const { data: users, isLoading: usersLoading } =
+    trpc.wave4Admin.getUsers.useQuery({
+      limit: 20,
+    });
 
-  const { data: reports, isLoading: reportsLoading } = trpc.wave4Admin.getReports.useQuery({
-    limit: 20,
-  });
+  const { data: reports, isLoading: reportsLoading } =
+    trpc.wave4Admin.getReports.useQuery({
+      limit: 20,
+    });
 
   const { data: health } = trpc.wave4Admin.getHealth.useQuery();
   const { data: analytics } = trpc.wave4Admin.getAnalytics.useQuery();
 
   const banUserMutation = trpc.wave4Admin.banUser.useMutation({
     onSuccess: () => {
-      toast.success('User banned successfully');
+      toast.success("User banned successfully");
     },
   });
 
   const resolveReportMutation = trpc.wave4Admin.resolveReport.useMutation({
     onSuccess: () => {
-      toast.success('Report resolved');
+      toast.success("Report resolved");
     },
   });
 
-  if (!isAuthenticated || user?.role !== 'admin') {
+  if (!isAuthenticated || user?.role !== "admin") {
     return (
       <div className="container py-8">
         <Card className="p-6">
@@ -49,7 +51,9 @@ export default function AdminPage() {
     <div className="container py-8 space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-gray-600">Manage users, reports, and platform health</p>
+        <p className="text-gray-600">
+          Manage users, reports, and platform health
+        </p>
       </div>
 
       {/* Health Stats */}
@@ -65,11 +69,15 @@ export default function AdminPage() {
           </Card>
           <Card className="p-4">
             <p className="text-sm text-gray-600">Banned Users</p>
-            <p className="text-2xl font-bold text-red-600">{health.bannedUsers}</p>
+            <p className="text-2xl font-bold text-red-600">
+              {health.bannedUsers}
+            </p>
           </Card>
           <Card className="p-4">
             <p className="text-sm text-gray-600">Open Reports</p>
-            <p className="text-2xl font-bold text-yellow-600">{health.openReports}</p>
+            <p className="text-2xl font-bold text-yellow-600">
+              {health.openReports}
+            </p>
           </Card>
         </div>
       )}
@@ -93,7 +101,9 @@ export default function AdminPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600">Revenue</p>
-              <p className="text-2xl font-bold">${analytics.revenue24h.toFixed(2)}</p>
+              <p className="text-2xl font-bold">
+                ${analytics.revenue24h.toFixed(2)}
+              </p>
             </div>
           </div>
         </Card>
@@ -114,11 +124,16 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-2">
               {users?.users.map((u: any) => (
-                <Card key={u.id} className="p-4 flex justify-between items-center">
+                <Card
+                  key={u.id}
+                  className="p-4 flex justify-between items-center"
+                >
                   <div>
                     <p className="font-semibold">{u.name}</p>
                     <p className="text-sm text-gray-600">{u.email}</p>
-                    <p className="text-xs text-gray-500">Posts: {u._count.posts}</p>
+                    <p className="text-xs text-gray-500">
+                      Posts: {u._count.posts}
+                    </p>
                   </div>
                   <Button
                     variant="destructive"
@@ -126,7 +141,7 @@ export default function AdminPage() {
                     onClick={() => {
                       banUserMutation.mutate({
                         userId: u.id,
-                        reason: 'Admin action',
+                        reason: "Admin action",
                       });
                     }}
                   >
@@ -146,16 +161,20 @@ export default function AdminPage() {
             <div className="space-y-2">
               {reports?.reports.map((r: any) => (
                 <Card key={r.id} className="p-4">
-                  <p className="font-semibold">Report from {r.reporter?.name}</p>
+                  <p className="font-semibold">
+                    Report from {r.reporter?.name}
+                  </p>
                   <p className="text-sm text-gray-600 mt-2">{r.reason}</p>
-                  <p className="text-xs text-gray-500 mt-2">Against: {r.reportedUser?.name}</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Against: {r.reportedUser?.name}
+                  </p>
                   <div className="flex gap-2 mt-4">
                     <Button
                       size="sm"
                       onClick={() => {
                         resolveReportMutation.mutate({
                           reportId: r.id,
-                          action: 'resolved',
+                          action: "resolved",
                         });
                       }}
                     >
@@ -167,7 +186,7 @@ export default function AdminPage() {
                       onClick={() => {
                         resolveReportMutation.mutate({
                           reportId: r.id,
-                          action: 'dismissed',
+                          action: "dismissed",
                         });
                       }}
                     >
@@ -182,9 +201,10 @@ export default function AdminPage() {
 
         {/* Logs Tab */}
         <TabsContent value="logs">
-          <Card className="p-6">
-            <p className="text-gray-600">Audit logs coming soon...</p>
-          </Card>
+          <UnavailableFeature
+            name="Administrative audit logs"
+            reason="Audit log retrieval is not exposed as a verified production read path yet."
+          />
         </TabsContent>
       </Tabs>
     </div>
