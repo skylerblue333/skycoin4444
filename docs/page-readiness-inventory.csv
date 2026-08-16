@@ -802,7 +802,7 @@ SchoolCourse,client/src/pages/SchoolCourse.tsx,interactive-review,True,False,Fal
 SchoolDashboard,client/src/pages/SchoolDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
 SchoolLesson,client/src/pages/SchoolLesson.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SchoolQuiz,client/src/pages/SchoolQuiz.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-Search,client/src/pages/Search.tsx,blocked-by-type-safety,True,True,False,False,True,True,True,True,True
+Search,client/src/pages/Search.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SearchAnalytics,client/src/pages/SearchAnalytics.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SearchHistory,client/src/pages/SearchHistory.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SearchResults,client/src/pages/SearchResults.tsx,interactive-review,True,False,False,False,False,True,False,False,False
