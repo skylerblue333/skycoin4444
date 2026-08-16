@@ -264,7 +264,7 @@ export function SignUp() {
                   id="terms"
                   name="acceptTerms"
                   checked={formData.acceptTerms}
-                  onChange={handleChange}
+                  onCheckedChange={(checked) => setFormData({ ...formData, acceptTerms: checked === true })}
                 />
                 <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer">
                   I agree to the <a href="#" className="text-blue-400 hover:underline">Terms</a> and <a href="#" className="text-blue-400 hover:underline">Privacy Policy</a>

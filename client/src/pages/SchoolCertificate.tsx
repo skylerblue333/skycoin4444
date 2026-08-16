@@ -151,7 +151,7 @@ export default function SchoolCertificate() {
                 size="sm"
                 className="w-full gap-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
               >
-                <Share2 as TwitterIcon className="h-3.5 w-3.5" />
+                <TwitterIcon className="h-3.5 w-3.5" />
                 Share on Share2 as TwitterIcon
               </Button>
               <Button
@@ -159,7 +159,7 @@ export default function SchoolCertificate() {
                 size="sm"
                 className="w-full gap-2 border-blue-600/30 text-blue-500 hover:bg-blue-600/10"
               >
-                <Link2 as LinkedinIcon className="h-3.5 w-3.5" />
+                <LinkedinIcon className="h-3.5 w-3.5" />
                 Add to LinkedIn
               </Button>
               <Button

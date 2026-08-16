@@ -6,11 +6,39 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
-  Users, Building2, DollarSign, TrendingUp, Phone, Mail, MessageSquare,
-  Plus, Search, Filter, Star, Target, Activity, BarChart3, Calendar,
-  ChevronRight, CheckCircle2, Clock, AlertCircle, Zap, ArrowUpRight,
+  Users,
+  Building2,
+  DollarSign,
+  TrendingUp,
+  Phone,
+  Mail,
+  MessageSquare,
+  Plus,
+  Search,
+  Filter,
+  Star,
+  Target,
+  Activity,
+  BarChart3,
+  Calendar,
+  ChevronRight,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Zap,
+  ArrowUpRight,
 } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
 
 const PIPELINE_STAGES = [
   { name: "Lead", count: 24, value: 48000, color: "bg-blue-500" },
@@ -21,11 +49,61 @@ const PIPELINE_STAGES = [
 ];
 
 const CONTACTS = [
-  { id: 1, name: "Alex Chen", company: "TechVentures", email: "alex@techventures.io", stage: "Qualified", value: 12000, score: 92, lastContact: "2h ago", tags: ["Hot Lead", "Scalable"] },
-  { id: 2, name: "Maria Santos", company: "CryptoDAO", email: "maria@cryptodao.xyz", stage: "Proposal", value: 45000, score: 78, lastContact: "1d ago", tags: ["Web3", "Investor"] },
-  { id: 3, name: "James Park", company: "SkyFund", email: "james@skyfund.com", stage: "Negotiation", value: 85000, score: 95, lastContact: "3h ago", tags: ["VIP", "Fund"] },
-  { id: 4, name: "Priya Patel", company: "AILabs", email: "priya@ailabs.dev", stage: "Lead", value: 8000, score: 65, lastContact: "3d ago", tags: ["Developer", "API"] },
-  { id: 5, name: "Carlos Rivera", company: "MetaMarket", email: "carlos@metamarket.io", stage: "Closed Won", value: 32000, score: 88, lastContact: "5h ago", tags: ["NFT", "Marketplace"] },
+  {
+    id: 1,
+    name: "Alex Chen",
+    company: "TechVentures",
+    email: "alex@techventures.io",
+    stage: "Qualified",
+    value: 12000,
+    score: 92,
+    lastContact: "2h ago",
+    tags: ["Hot Lead", "Scalable"],
+  },
+  {
+    id: 2,
+    name: "Maria Santos",
+    company: "CryptoDAO",
+    email: "maria@cryptodao.xyz",
+    stage: "Proposal",
+    value: 45000,
+    score: 78,
+    lastContact: "1d ago",
+    tags: ["Web3", "Investor"],
+  },
+  {
+    id: 3,
+    name: "James Park",
+    company: "SkyFund",
+    email: "james@skyfund.com",
+    stage: "Negotiation",
+    value: 85000,
+    score: 95,
+    lastContact: "3h ago",
+    tags: ["VIP", "Fund"],
+  },
+  {
+    id: 4,
+    name: "Priya Patel",
+    company: "AILabs",
+    email: "priya@ailabs.dev",
+    stage: "Lead",
+    value: 8000,
+    score: 65,
+    lastContact: "3d ago",
+    tags: ["Developer", "API"],
+  },
+  {
+    id: 5,
+    name: "Carlos Rivera",
+    company: "MetaMarket",
+    email: "carlos@metamarket.io",
+    stage: "Closed Won",
+    value: 32000,
+    score: 88,
+    lastContact: "5h ago",
+    tags: ["NFT", "Marketplace"],
+  },
 ];
 
 const REVENUE_DATA = [
@@ -38,10 +116,34 @@ const REVENUE_DATA = [
 ];
 
 const ACTIVITIES = [
-  { type: "call", contact: "Alex Chen", note: "Discussed enterprise plan pricing", time: "2h ago", icon: Phone },
-  { type: "email", contact: "Maria Santos", note: "Sent proposal deck v2", time: "5h ago", icon: Mail },
-  { type: "meeting", contact: "James Park", note: "Contract review scheduled", time: "1d ago", icon: Calendar },
-  { type: "message", contact: "Priya Patel", note: "API integration questions", time: "2d ago", icon: MessageSquare },
+  {
+    type: "call",
+    contact: "Alex Chen",
+    note: "Discussed enterprise plan pricing",
+    time: "2h ago",
+    icon: Phone,
+  },
+  {
+    type: "email",
+    contact: "Maria Santos",
+    note: "Sent proposal deck v2",
+    time: "5h ago",
+    icon: Mail,
+  },
+  {
+    type: "meeting",
+    contact: "James Park",
+    note: "Contract review scheduled",
+    time: "1d ago",
+    icon: Calendar,
+  },
+  {
+    type: "message",
+    contact: "Priya Patel",
+    note: "API integration questions",
+    time: "2d ago",
+    icon: MessageSquare,
+  },
 ];
 
 const stageColors: Record<string, string> = {
@@ -56,13 +158,15 @@ export default function CRM() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("pipeline");
 
-  const filtered = CONTACTS.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.company.toLowerCase().includes(search.toLowerCase())
+  const filtered = CONTACTS.filter(
+    c =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.company.toLowerCase().includes(search.toLowerCase())
   );
 
   const totalPipeline = PIPELINE_STAGES.reduce((s, p) => s + p.value, 0);
-  const totalClosed = PIPELINE_STAGES.find(p => p.name === "Closed Won")?.value || 0;
+  const totalClosed =
+    PIPELINE_STAGES.find(p => p.name === "Closed Won")?.value || 0;
 
   return (
     <div className="min-h-screen p-6 space-y-6">
@@ -75,7 +179,9 @@ export default function CRM() {
             </div>
             <h1 className="text-2xl font-bold text-gradient">CRM Hub</h1>
           </div>
-          <p className="text-sm text-white/50">Business contacts, deal pipeline, and customer analytics</p>
+          <p className="text-sm text-white/50">
+            Business contacts, deal pipeline, and customer analytics
+          </p>
         </div>
         <Button className="gradient-psychedelic text-white gap-2">
           <Plus className="w-4 h-4" /> Add Contact
@@ -85,16 +191,42 @@ export default function CRM() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Pipeline", value: `$${(totalPipeline / 1000).toFixed(0)}K`, icon: Target, color: "text-purple-400", change: "+18%" },
-          { label: "Closed Won", value: `$${(totalClosed / 1000).toFixed(0)}K`, icon: CheckCircle2, color: "text-green-400", change: "+24%" },
-          { label: "Active Contacts", value: "67", icon: Users, color: "text-cyan-400", change: "+12" },
-          { label: "Win Rate", value: "38%", icon: TrendingUp, color: "text-yellow-400", change: "+5%" },
+          {
+            label: "Total Pipeline",
+            value: `$${(totalPipeline / 1000).toFixed(0)}K`,
+            icon: Target,
+            color: "text-purple-400",
+            change: "+18%",
+          },
+          {
+            label: "Closed Won",
+            value: `$${(totalClosed / 1000).toFixed(0)}K`,
+            icon: CheckCircle2,
+            color: "text-green-400",
+            change: "+24%",
+          },
+          {
+            label: "Active Contacts",
+            value: "67",
+            icon: Users,
+            color: "text-cyan-400",
+            change: "+12",
+          },
+          {
+            label: "Win Rate",
+            value: "38%",
+            icon: TrendingUp,
+            color: "text-yellow-400",
+            change: "+5%",
+          },
         ].map(kpi => (
           <Card key={kpi.label} className="glass-card border-white/10">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <kpi.icon className={`w-5 h-5 ${kpi.color}`} />
-                <span className="text-xs text-green-400 font-mono">{kpi.change}</span>
+                <span className="text-xs text-green-400 font-mono">
+                  {kpi.change}
+                </span>
               </div>
               <div className="text-2xl font-bold font-mono">{kpi.value}</div>
               <div className="text-xs text-white/40 mt-1">{kpi.label}</div>
@@ -118,18 +250,33 @@ export default function CRM() {
               <Card key={stage.name} className="glass-card border-white/10">
                 <CardHeader className="pb-2 pt-4 px-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm font-semibold">{stage.name}</CardTitle>
-                    <Badge variant="outline" className="text-xs font-mono">{stage.count}</Badge>
+                    <CardTitle className="text-sm font-semibold">
+                      {stage.name}
+                    </CardTitle>
+                    <Badge variant="outline" className="text-xs font-mono">
+                      {stage.count}
+                    </Badge>
                   </div>
-                  <div className="text-lg font-bold font-mono text-white/80">${(stage.value / 1000).toFixed(0)}K</div>
+                  <div className="text-lg font-bold font-mono text-white/80">
+                    ${(stage.value / 1000).toFixed(0)}K
+                  </div>
                 </CardHeader>
                 <CardContent className="px-4 pb-4">
-                  <div className={`h-1 w-full rounded-full ${stage.color} opacity-60`} />
+                  <div
+                    className={`h-1 w-full rounded-full ${stage.color} opacity-60`}
+                  />
                   {CONTACTS.filter(c => c.stage === stage.name).map(contact => (
-                    <div key={contact.id} className="mt-3 p-2 rounded-lg bg-white/5 border border-white/8 hover:border-white/20 transition-colors cursor-pointer">
+                    <div
+                      key={contact.id}
+                      className="mt-3 p-2 rounded-lg bg-white/5 border border-white/8 hover:border-white/20 transition-colors cursor-pointer"
+                    >
                       <div className="font-medium text-xs">{contact.name}</div>
-                      <div className="text-xs text-white/40">{contact.company}</div>
-                      <div className="text-xs text-green-400 font-mono mt-1">${contact.value.toLocaleString()}</div>
+                      <div className="text-xs text-white/40">
+                        {contact.company}
+                      </div>
+                      <div className="text-xs text-green-400 font-mono mt-1">
+                        ${contact.value.toLocaleString()}
+                      </div>
                     </div>
                   ))}
                 </CardContent>
@@ -156,7 +303,10 @@ export default function CRM() {
           </div>
           <div className="space-y-2">
             {filtered.map(contact => (
-              <Card key={contact.id} className="glass-card border-white/10 hover:border-white/20 transition-colors cursor-pointer">
+              <Card
+                key={contact.id}
+                className="glass-card border-white/10 hover:border-white/20 transition-colors cursor-pointer"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -164,18 +314,33 @@ export default function CRM() {
                         {contact.name[0]}
                       </div>
                       <div>
-                        <div className="font-semibold text-sm">{contact.name}</div>
-                        <div className="text-xs text-white/40">{contact.company} &middot; {contact.email}</div>
+                        <div className="font-semibold text-sm">
+                          {contact.name}
+                        </div>
+                        <div className="text-xs text-white/40">
+                          {contact.company} &middot; {contact.email}
+                        </div>
                         <div className="flex gap-1 mt-1">
                           {contact.tags.map(tag => (
-                            <span key={tag} className="text-xs px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/50">{tag}</span>
+                            <span
+                              key={tag}
+                              className="text-xs px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-white/50"
+                            >
+                              {tag}
+                            </span>
                           ))}
                         </div>
                       </div>
                     </div>
                     <div className="text-right flex flex-col items-end gap-2">
-                      <Badge className={`text-xs border ${stageColors[contact.stage]}`}>{contact.stage}</Badge>
-                      <div className="text-sm font-bold font-mono text-green-400">${contact.value.toLocaleString()}</div>
+                      <Badge
+                        className={`text-xs border ${stageColors[contact.stage]}`}
+                      >
+                        {contact.stage}
+                      </Badge>
+                      <div className="text-sm font-bold font-mono text-green-400">
+                        ${contact.value.toLocaleString()}
+                      </div>
                       <div className="flex items-center gap-1 text-xs text-white/40">
                         <Clock className="w-3 h-3" /> {contact.lastContact}
                       </div>
@@ -185,7 +350,9 @@ export default function CRM() {
                   <div className="mt-3 flex items-center gap-2">
                     <span className="text-xs text-white/40">Lead Score</span>
                     <Progress value={contact.score} className="flex-1 h-1.5" />
-                    <span className="text-xs font-mono text-white/60">{contact.score}</span>
+                    <span className="text-xs font-mono text-white/60">
+                      {contact.score}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -199,18 +366,45 @@ export default function CRM() {
             <Card className="glass-card border-white/10">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-purple-400" /> Pipeline vs Closed Revenue
+                  <BarChart3 className="w-4 h-4 text-purple-400" /> Pipeline vs
+                  Closed Revenue
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={REVENUE_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="month" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} />
-                    <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} tickFormatter={v => `$${v/1000}K`} />
-                    <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)" }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
-                    <Area type="monotone" dataKey="pipeline" stroke="#a855f7" fill="rgba(168,85,247,0.1)" strokeWidth={2} />
-                    <Area type="monotone" dataKey="closed" stroke="#22c55e" fill="rgba(34,197,94,0.1)" strokeWidth={2} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.05)"
+                    />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                    />
+                    <YAxis
+                      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                      tickFormatter={v => `$${v / 1000}K`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#0a0a0a",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="pipeline"
+                      stroke="#a855f7"
+                      fill="rgba(168,85,247,0.1)"
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="closed"
+                      stroke="#22c55e"
+                      fill="rgba(34,197,94,0.1)"
+                      strokeWidth={2}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -218,16 +412,30 @@ export default function CRM() {
             <Card className="glass-card border-white/10">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Target className="w-4 h-4 text-cyan-400" /> Stage Distribution
+                  <Target className="w-4 h-4 text-cyan-400" /> Stage
+                  Distribution
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={PIPELINE_STAGES}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }} />
-                    <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} />
-                    <Tooltip contentStyle={{ background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.1)" }} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.05)"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 10 }}
+                    />
+                    <YAxis
+                      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "#0a0a0a",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                      }}
+                    />
                     <Bar dataKey="count" fill="#06b6d4" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -244,13 +452,22 @@ export default function CRM() {
                 const pct = Math.max(20, 100 - i * 18);
                 return (
                   <div key={stage.name} className="flex items-center gap-3">
-                    <span className="text-xs text-white/40 w-24 text-right">{stage.name}</span>
+                    <span className="text-xs text-white/40 w-24 text-right">
+                      {stage.name}
+                    </span>
                     <div className="flex-1 bg-white/5 rounded-full h-5 overflow-hidden">
-                      <div className={`h-full ${stage.color} rounded-full flex items-center justify-end pr-2`} style={{ width: `${pct}%` }}>
-                        <span className="text-xs font-mono text-white/80">{stage.count}</span>
+                      <div
+                        className={`h-full ${stage.color} rounded-full flex items-center justify-end pr-2`}
+                        style={{ width: `${pct}%` }}
+                      >
+                        <span className="text-xs font-mono text-white/80">
+                          {stage.count}
+                        </span>
                       </div>
                     </div>
-                    <span className="text-xs font-mono text-white/40 w-16">${(stage.value / 1000).toFixed(0)}K</span>
+                    <span className="text-xs font-mono text-white/40 w-16">
+                      ${(stage.value / 1000).toFixed(0)}K
+                    </span>
                   </div>
                 );
               })}
@@ -269,14 +486,19 @@ export default function CRM() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm">{act.contact}</span>
-                    <span className="text-xs text-white/30 font-mono">{act.time}</span>
+                    <span className="text-xs text-white/30 font-mono">
+                      {act.time}
+                    </span>
                   </div>
                   <p className="text-sm text-white/50 mt-0.5">{act.note}</p>
                 </div>
               </CardContent>
             </Card>
           ))}
-          <Button variant="outline" className="w-full border-white/10 text-white/50 gap-2">
+          <Button
+            variant="outline"
+            className="w-full border-white/10 text-white/50 gap-2"
+          >
             <Activity className="w-4 h-4" /> Load More Activity
           </Button>
         </TabsContent>

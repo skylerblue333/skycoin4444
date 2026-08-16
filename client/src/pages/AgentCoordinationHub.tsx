@@ -4,15 +4,29 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
 import {
-  Bot, GitBranch, Zap, Play, Pause, CheckCircle, Clock, AlertCircle,
-  ArrowRight, Network, Cpu, RefreshCw, Plus, Settings, Eye
+  Bot,
+  GitBranch,
+  Zap,
+  Play,
+  Pause,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  ArrowRight,
+  Network,
+  Cpu,
+  RefreshCw,
+  Plus,
+  Settings,
+  Eye,
 } from "lucide-react";
 
 const AGENT_TEAMS = [
   {
     id: "content-team",
     name: "Content Team",
-    description: "Generates, moderates, and distributes content across all channels",
+    description:
+      "Generates, moderates, and distributes content across all channels",
     agents: ["NOVA (Creator)", "PRISM (Social)", "FORGE (Copy)"],
     status: "active",
     tasksCompleted: 1247,
@@ -51,21 +65,36 @@ const WORKFLOW_TEMPLATES = [
   {
     id: "content-pipeline",
     name: "Content Pipeline",
-    steps: ["FORGE generates post", "PRISM schedules", "NOVA distributes", "VECTOR moderates"],
+    steps: [
+      "FORGE generates post",
+      "PRISM schedules",
+      "NOVA distributes",
+      "VECTOR moderates",
+    ],
     trigger: "Every 4 hours",
     status: "running",
   },
   {
     id: "market-alert",
     name: "Market Alert Chain",
-    steps: ["CIPHER detects spike", "ATLAS validates data", "ECHO sends alert", "NEXUS adjusts limits"],
+    steps: [
+      "CIPHER detects spike",
+      "ATLAS validates data",
+      "ECHO sends alert",
+      "NEXUS adjusts limits",
+    ],
     trigger: "Price change > 5%",
     status: "running",
   },
   {
     id: "onboarding-flow",
     name: "User Onboarding Flow",
-    steps: ["TITAN scores user", "OMEGA recommends content", "PULSE suggests creators", "NOVA sends welcome"],
+    steps: [
+      "TITAN scores user",
+      "OMEGA recommends content",
+      "PULSE suggests creators",
+      "NOVA sends welcome",
+    ],
     trigger: "New user signup",
     status: "paused",
   },
@@ -73,7 +102,9 @@ const WORKFLOW_TEMPLATES = [
 
 export default function AgentCoordinationHub() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"teams" | "workflows" | "delegation" | "logs">("teams");
+  const [activeTab, setActiveTab] = useState<
+    "teams" | "workflows" | "delegation" | "logs"
+  >("teams");
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [delegationTask, setDelegationTask] = useState("");
   const [delegationTarget, setDelegationTarget] = useState("content-team");
@@ -86,7 +117,10 @@ export default function AgentCoordinationHub() {
     onError: () => toast.error("Failed to trigger sprint"),
   });
 
-  const totalTasksCompleted = AGENT_TEAMS.reduce((s, t) => s + t.tasksCompleted, 0);
+  const totalTasksCompleted = AGENT_TEAMS.reduce(
+    (s, t) => s + t.tasksCompleted,
+    0
+  );
   const activeTeams = AGENT_TEAMS.filter(t => t.status === "active").length;
 
   return (
@@ -101,10 +135,31 @@ export default function AgentCoordinationHub() {
       {/* Stats bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Active Teams", value: activeTeams, icon: Bot, color: "text-green-400" },
-          { label: "Tasks Completed", value: totalTasksCompleted.toLocaleString(), icon: CheckCircle, color: "text-blue-400" },
-          { label: "Workflows Running", value: WORKFLOW_TEMPLATES.filter(w => w.status === "running").length, icon: GitBranch, color: "text-purple-400" },
-          { label: "Sprint Tasks (7d)", value: (sprintMetrics as any)?.totalTasks ?? "—", icon: Zap, color: "text-yellow-400" },
+          {
+            label: "Active Teams",
+            value: activeTeams,
+            icon: Bot,
+            color: "text-green-400",
+          },
+          {
+            label: "Tasks Completed",
+            value: totalTasksCompleted.toLocaleString(),
+            icon: CheckCircle,
+            color: "text-blue-400",
+          },
+          {
+            label: "Workflows Running",
+            value: WORKFLOW_TEMPLATES.filter(w => w.status === "running")
+              .length,
+            icon: GitBranch,
+            color: "text-purple-400",
+          },
+          {
+            label: "Sprint Tasks (7d)",
+            value: (sprintMetrics as any)?.totalTasks ?? "—",
+            icon: Zap,
+            color: "text-yellow-400",
+          },
         ].map(stat => (
           <div key={stat.label} className="card p-4 flex items-center gap-3">
             <stat.icon className={`w-8 h-8 ${stat.color}`} />
@@ -123,7 +178,9 @@ export default function AgentCoordinationHub() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors border-b-2 -mb-px ${
-              activeTab === tab ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+              activeTab === tab
+                ? "border-primary text-primary"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             {tab}
@@ -138,7 +195,9 @@ export default function AgentCoordinationHub() {
             <div
               key={team.id}
               className={`card p-5 cursor-pointer transition-all hover:border-primary/50 ${selectedTeam === team.id ? "border-primary" : ""}`}
-              onClick={() => setSelectedTeam(selectedTeam === team.id ? null : team.id)}
+              onClick={() =>
+                setSelectedTeam(selectedTeam === team.id ? null : team.id)
+              }
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
@@ -146,17 +205,28 @@ export default function AgentCoordinationHub() {
                     <Bot className="w-4 h-4 text-primary" />
                     {team.name}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">{team.description}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {team.description}
+                  </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                  team.status === "active" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                }`}>
+                <span
+                  className={`text-xs px-2 py-1 rounded-full font-medium ${
+                    team.status === "active"
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-yellow-500/20 text-yellow-400"
+                  }`}
+                >
                   {team.status}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1 mb-3">
                 {team.agents.map(a => (
-                  <span key={a} className="text-xs bg-secondary/50 px-2 py-0.5 rounded-full">{a}</span>
+                  <span
+                    key={a}
+                    className="text-xs bg-secondary/50 px-2 py-0.5 rounded-full"
+                  >
+                    {a}
+                  </span>
                 ))}
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -185,24 +255,38 @@ export default function AgentCoordinationHub() {
                     <GitBranch className="w-4 h-4 text-purple-400" />
                     {wf.name}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">Trigger: {wf.trigger}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Trigger: {wf.trigger}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                    wf.status === "running" ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                  }`}>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      wf.status === "running"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-yellow-500/20 text-yellow-400"
+                    }`}
+                  >
                     {wf.status}
                   </span>
                   <button className="p-1.5 rounded-lg hover:bg-secondary/50 transition-colors">
-                    {wf.status === "running" ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    {wf.status === "running" ? (
+                      <Pause className="w-4 h-4" />
+                    ) : (
+                      <Play className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 {wf.steps.map((step, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-lg">{step}</span>
-                    {i < wf.steps.length - 1 && <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />}
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-lg">
+                      {step}
+                    </span>
+                    {i < wf.steps.length - 1 && (
+                      <ArrowRight className="w-3 h-3 text-muted-foreground shrink-0" />
+                    )}
                   </div>
                 ))}
               </div>
@@ -228,19 +312,25 @@ export default function AgentCoordinationHub() {
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium mb-1 block">Target Team</label>
+                <label className="text-sm font-medium mb-1 block">
+                  Target Team
+                </label>
                 <select
                   value={delegationTarget}
                   onChange={e => setDelegationTarget(e.target.value)}
                   className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm"
                 >
                   {AGENT_TEAMS.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-1 block">Task Description</label>
+                <label className="text-sm font-medium mb-1 block">
+                  Task Description
+                </label>
                 <textarea
                   value={delegationTask}
                   onChange={e => setDelegationTask(e.target.value)}
@@ -251,8 +341,11 @@ export default function AgentCoordinationHub() {
               </div>
               <button
                 onClick={() => {
-                  if (!delegationTask.trim()) return toast.error("Enter a task description");
-                  toast.success(`Task delegated to ${AGENT_TEAMS.find(t => t.id === delegationTarget)?.name}`);
+                  if (!delegationTask.trim())
+                    return toast.error("Enter a task description");
+                  toast.success(
+                    `Task delegated to ${AGENT_TEAMS.find(t => t.id === delegationTarget)?.name}`
+                  );
                   setDelegationTask("");
                 }}
                 className="btn-primary w-full flex items-center justify-center gap-2"
@@ -269,14 +362,23 @@ export default function AgentCoordinationHub() {
               Trigger Autonomous Sprint
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Triggers all 12 bots to run a coordinated autonomous coding sprint. Each bot generates code, tests, and commits changes.
+              Triggers all 12 bots to run a coordinated autonomous coding
+              sprint. Each bot generates code, tests, and commits changes.
             </p>
             <button
-              onClick={() => user ? triggerSprintMut.mutate() : toast.error("Login required")}
+              onClick={() =>
+                user
+                  ? triggerSprintMut.mutate(undefined)
+                  : toast.error("Login required")
+              }
               disabled={triggerSprintMut.isPending}
               className="btn-primary flex items-center gap-2"
             >
-              {triggerSprintMut.isPending ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+              {triggerSprintMut.isPending ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
               {triggerSprintMut.isPending ? "Running..." : "Trigger Sprint"}
             </button>
           </div>
@@ -289,15 +391,27 @@ export default function AgentCoordinationHub() {
           {(sprintHistory as any[])?.map((sprint: any, i: number) => (
             <div key={i} className="card p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${sprint.status === "completed" ? "bg-green-400" : sprint.status === "running" ? "bg-blue-400 animate-pulse" : "bg-red-400"}`} />
+                <div
+                  className={`w-2 h-2 rounded-full ${sprint.status === "completed" ? "bg-green-400" : sprint.status === "running" ? "bg-blue-400 animate-pulse" : "bg-red-400"}`}
+                />
                 <div>
-                  <div className="text-sm font-medium">Sprint #{sprint.id ?? i + 1}</div>
-                  <div className="text-xs text-muted-foreground">{sprint.description ?? "Autonomous coding sprint"}</div>
+                  <div className="text-sm font-medium">
+                    Sprint #{sprint.id ?? i + 1}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {sprint.description ?? "Autonomous coding sprint"}
+                  </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm font-medium">{sprint.linesGenerated ?? "—"} lines</div>
-                <div className="text-xs text-muted-foreground">{sprint.completedAt ? new Date(sprint.completedAt).toLocaleString() : "In progress"}</div>
+                <div className="text-sm font-medium">
+                  {sprint.linesGenerated ?? "—"} lines
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {sprint.completedAt
+                    ? new Date(sprint.completedAt).toLocaleString()
+                    : "In progress"}
+                </div>
               </div>
             </div>
           )) ?? (

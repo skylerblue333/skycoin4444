@@ -45,6 +45,37 @@ const createFeatureRouter = () =>
       )
       .query(() => []),
     get: publicProcedure.input(z.string()).query(({ input }) => ({})),
+    getFeed: publicProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    listVideos: publicProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    getDashboard: protectedProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      metrics: {} as Record<string, number>,
+    })),
+    myActivity: protectedProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    global: publicProcedure.input(z.unknown().optional()).query(() => ({
+      available: false as const,
+      results: [] as Array<Record<string, unknown>>,
+      users: [] as Array<Record<string, unknown>>,
+      posts: [] as Array<Record<string, unknown>>,
+      communities: [] as Array<Record<string, unknown>>,
+    })),
+    history: protectedProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    metrics: protectedProcedure.input(z.unknown().optional()).query(() => ({
+      available: false as const,
+      metrics: {} as Record<string, number>,
+    })),
+    triggerSprint: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
     create: protectedProcedure
       .input(z.object({}))
       .mutation(() => unavailableMutationResult),
@@ -379,6 +410,7 @@ const tokenRouter = router({
     stakingRatio: 0,
     stakingParticipants: 0,
     uniqueHolders: 0,
+    totalStaked: 0,
     available: false as const,
   })),
   burnHistory: publicProcedure.query(
@@ -398,6 +430,16 @@ const tokenRouter = router({
         .optional()
     )
     .query(() => []),
+  vestingSchedules: protectedProcedure.query(
+    () => [] as Array<Record<string, unknown>>
+  ),
+  claimVesting: protectedProcedure
+    .input(z.unknown().optional())
+    .mutation(() => unavailableMutationResult),
+  whaleAlerts: protectedProcedure.query(() => ({
+    available: false as const,
+    alerts: [] as Array<Record<string, unknown>>,
+  })),
   mine: protectedProcedure
     .input(z.unknown().optional())
     .mutation(() => unavailableMutationResult),
@@ -460,6 +502,10 @@ const userRouter = router({
         displayName: z.string().max(120).optional(),
         bio: z.string().max(2000).optional(),
         avatar: z.string().url().optional(),
+        walletAddress: z
+          .string()
+          .regex(/^0x[a-fA-F0-9]{40}$/)
+          .optional(),
       })
     )
     .mutation(() => unavailableMutationResult),
@@ -824,6 +870,14 @@ export const appRouter = router({
       })),
   }),
   hopeIntelligence: router({
+    twin: router({
+      get: protectedProcedure.query(() => ({
+        available: false as const,
+        status: "unavailable" as const,
+        profile: null as Record<string, unknown> | null,
+        goals: [] as Array<Record<string, unknown>>,
+      })),
+    }),
     missions: router({
       list: publicProcedure.input(z.object({}).optional()).query(
         () =>
@@ -993,6 +1047,7 @@ export const appRouter = router({
         communityScore: 0,
         trust: 0,
         trustScore: 0,
+        breakdown: {} as Record<string, number>,
       })),
       leaderboard: publicProcedure
         .input(
@@ -1128,6 +1183,22 @@ export const appRouter = router({
   }),
   community: router({
     list: publicProcedure.input(z.object({}).optional()).query(() => []),
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().trim().min(1).max(120),
+          slug: z
+            .string()
+            .trim()
+            .min(1)
+            .max(120)
+            .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+          description: z.string().trim().max(2000),
+          type: z.enum(["public", "private", "token_gated", "premium"]),
+          category: z.string().trim().min(1).max(80),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
     join: protectedProcedure
       .input(z.object({ communityId: z.string() }))
       .mutation(() => unavailableMutationResult),
@@ -1170,6 +1241,9 @@ export const appRouter = router({
 
   // Marketplace & Commerce Routers
   marketplace: router({
+    myOrders: protectedProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
     getProducts: publicProcedure
       .input(
         z
@@ -1337,11 +1411,25 @@ export const appRouter = router({
         ...unavailableMutationResult,
         url: undefined as string | undefined,
       })),
+    createCheckout: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        url: undefined as string | undefined,
+      })),
+    orderHistory: protectedProcedure.query(
+      () => [] as Array<Record<string, unknown>>
+    ),
   }),
-
   // Blockchain & Crypto Routers
   blockchain: blockchainRouter,
   staking: router({
+    stats: protectedProcedure.query(() => ({
+      available: false as const,
+      totalStaked: 0,
+      participants: 0,
+      apy: 0,
+    })),
     pools: publicProcedure.query(
       () =>
         [] as Array<{
@@ -1469,6 +1557,26 @@ export const appRouter = router({
           .optional()
       )
       .query(() => [] as Array<Record<string, unknown>>),
+    getBattlePass: protectedProcedure.query(() => ({
+      available: false as const,
+      currentTier: 0,
+      progress: {
+        currentTier: 0,
+        isPremium: false,
+        xpEarned: 0,
+        claimedTiers: "[]",
+      },
+      tiers: [] as Array<Record<string, unknown>>,
+    })),
+    claimTier: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        reward: { type: "unavailable", amount: 0 },
+      })),
+    joinTournament: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
     seasonPass: protectedProcedure.query(() => ({
       season: 0,
       endsIn: "Unavailable",
@@ -1781,10 +1889,12 @@ export const appRouter = router({
 
   // Platform & Enterprise Routers
   platform: router({
+    totalStreams: publicProcedure.query(() => 0),
     list: publicProcedure.query(() => []),
     stats: publicProcedure.query(() => ({
       available: false as const,
       status: "unavailable" as const,
+      totalStreams: 0,
       totalUsers: 0,
       totalPosts: 0,
       uptime: "Unavailable",
@@ -1803,6 +1913,9 @@ export const appRouter = router({
     economy: router({
       healthReport: publicProcedure.query(() => ({
         overallHealth: "UNKNOWN",
+        governanceHealth: "UNKNOWN",
+        passRate: 0,
+        totalProposals: 0,
         available: false as const,
         alerts: [] as Array<{
           severity: string;
@@ -1827,13 +1940,16 @@ export const appRouter = router({
     emergent: router({
       digitalNationStatus: publicProcedure.query(() => ({
         mode: "GENESIS",
+        governanceHealth: "UNKNOWN",
         available: false as const,
       })),
     }),
     governanceV2: router({
       health: publicProcedure.query(() => ({
         activeProposals: 0,
+        totalProposals: 0,
         avgParticipation: 0,
+        passRate: 0,
         available: false as const,
       })),
     }),
@@ -1847,6 +1963,51 @@ export const appRouter = router({
       systemSnapshot: publicProcedure.query(() => ({
         available: false as const,
         status: "unavailable" as const,
+        activeGoals: 0,
+        economyHealth: "UNKNOWN",
+        digitalNationStatus: "GENESIS",
+      })),
+      actionLog: protectedProcedure
+        .input(z.unknown().optional())
+        .query(() => [] as Array<Record<string, unknown>>),
+      goals: protectedProcedure.query(
+        () =>
+          [] as Array<{
+            id: string;
+            title: string;
+            status: string;
+            progress: number;
+          }>
+      ),
+    }),
+    memoryGraph: router({
+      snapshot: protectedProcedure.query(() => ({
+        available: false as const,
+        nodes: [] as Array<Record<string, unknown>>,
+        edges: [] as Array<Record<string, unknown>>,
+        nodeCount: 0,
+        edgeCount: 0,
+        topPatterns: [] as string[],
+      })),
+      predictions: protectedProcedure.query(
+        () => [] as Array<Record<string, unknown>>
+      ),
+    }),
+    behavior: router({
+      myProfile: protectedProcedure.query(() => ({
+        available: false as const,
+        primaryArchetype: "unavailable",
+        archetype: "unavailable",
+        archetypeScores: {} as Record<string, number>,
+        breakdown: [] as Array<Record<string, unknown>>,
+      })),
+    }),
+    twin: router({
+      get: protectedProcedure.query(() => ({
+        available: false as const,
+        status: "unavailable" as const,
+        profile: null as Record<string, unknown> | null,
+        goals: [] as Array<Record<string, unknown>>,
       })),
     }),
   }),
@@ -1931,6 +2092,23 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
+    getBattlePass: protectedProcedure.query(() => ({
+      available: false as const,
+      currentTier: 0,
+      progress: {
+        currentTier: 0,
+        isPremium: false,
+        xpEarned: 0,
+        claimedTiers: "[]",
+      },
+      tiers: [] as Array<Record<string, unknown>>,
+    })),
+    claimTier: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        reward: { type: "unavailable", amount: 0 },
+      })),
   }),
   simulation: router({
     getWorldState: publicProcedure.query(() => ({
@@ -2037,8 +2215,9 @@ export const appRouter = router({
       status: "unavailable" as const,
       message:
         "Charity analytics are not connected to a verified production integration.",
-      totalRaised: undefined as number | undefined,
-      totalDonors: undefined as number | undefined,
+      totalRaised: 0,
+      totalDonors: 0,
+      totalCampaigns: 0,
       activeCampaigns: undefined as number | undefined,
     })),
     donate: protectedProcedure
@@ -2060,6 +2239,22 @@ export const appRouter = router({
       .mutation(() => unavailableMutationResult),
   }),
   languageExchange: router({
+    getStats: protectedProcedure.query(() => ({
+      available: false as const,
+      sessionsCompleted: 0,
+      totalSessions: 0,
+      hoursPracticed: 0,
+      totalHours: 0,
+      languagesLearning: 0,
+      averageRating: 0,
+      streakDays: 0,
+    })),
+    getBounties: protectedProcedure
+      .input(z.unknown().optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    completeBounty: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => ({ ...unavailableMutationResult, xpEarned: 0 })),
     getPartners: publicProcedure
       .input(
         z
@@ -2397,6 +2592,7 @@ export const appRouter = router({
           "Server configuration generation is unavailable until a verified deployment service is connected.",
       })),
   }),
+  video: createFeatureRouter(),
   sprint: createFeatureRouter(),
 });
 
