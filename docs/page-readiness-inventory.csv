@@ -639,7 +639,7 @@ PayPalIntegration,client/src/pages/PayPalIntegration.tsx,interactive-review,True
 PaymentConfirmation,client/src/pages/PaymentConfirmation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PaymentInfra,client/src/pages/PaymentInfra.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 PaymentMethods,client/src/pages/PaymentMethods.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-PaymentSetup,client/src/pages/PaymentSetup.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+PaymentSetup,client/src/pages/PaymentSetup.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Payments,client/src/pages/Payments.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PayoutDashboard,client/src/pages/PayoutDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PayoutManagement,client/src/pages/PayoutManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
