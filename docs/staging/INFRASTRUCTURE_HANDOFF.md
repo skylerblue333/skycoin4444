@@ -14,6 +14,11 @@
 | Production-data exclusion | Explicit confirmation that production data is excluded |
 | Network/access controls | Approved network path, allowlist, security-group, or equivalent evidence |
 | Approved staging-only credential process | Secret creation, rotation, grants-review, and revocation process |
+| Correct staging connection verification | Host, database, staging-only user, TLS, and production endpoint exclusion |
+| Backup/restore evidence | Applicable policy or encrypted snapshot and isolated restore evidence |
+| Connection-limit evidence | Provider capacity, application pool usage, bounded test, and recovery |
+| Authorization evidence | Least-privilege migration grants and synthetic cross-account tests |
+| Migration evidence | Sanitized `pnpm run db:push` transcript, schema verification, and actual checksum |
 
 ## Security restrictions
 
@@ -21,6 +26,6 @@ Do not provide the actual password, complete connection string, private key, acc
 
 ## Resume sequence
 
-Once all inputs are available, validate connectivity; verify least-privilege grants; execute the real migration; verify schema and checksum; run bounded connection testing; execute synthetic authorization tests; create and restore an encrypted snapshot; sanitize all artifacts; update the six evidence files; rerun relevant database/security tests; and report `VERIFIED`, `FAILED`, or `BLOCKED` solely from fresh evidence.
+Once all inputs are available, verify staging isolation and production-data exclusion; validate connectivity; verify the staging-only credential and least-privilege grants; confirm network controls and TLS; check backup/restore capability; check connection limits; execute synthetic authorization tests; securely inject `DATABASE_URL`; run exactly `pnpm run db:push`; independently verify the resulting schema; generate an actual deterministic schema checksum; sanitize all artifacts; update the six evidence files; rerun relevant database/security tests; and report `VERIFIED`, `FAILED`, or `BLOCKED` solely from fresh evidence. Migration success alone does not close the staging gate.
 
 **Current blocker:** No approved isolated staging MySQL/TiDB instance and no approved staging `DATABASE_URL` secret-manager reference are available to the execution environment.
