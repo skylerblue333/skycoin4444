@@ -2291,7 +2291,26 @@ export const appRouter = router({
       portfolioValue: 0,
     })),
   }),
-  installer: createFeatureRouter(),
+  installer: router({
+    generateFiles: protectedProcedure
+      .input(
+        z.object({
+          projectName: z.string().min(1),
+          domain: z.string().min(1),
+          adminEmail: z.string().email(),
+          enableSSL: z.boolean(),
+          enableRedis: z.boolean(),
+          enableNginx: z.boolean(),
+          port: z.number().int().min(1).max(65535),
+        })
+      )
+      .mutation(() => ({
+        available: false as const,
+        status: "unavailable" as const,
+        message:
+          "Server configuration generation is unavailable until a verified deployment service is connected.",
+      })),
+  }),
   sprint: createFeatureRouter(),
 });
 
