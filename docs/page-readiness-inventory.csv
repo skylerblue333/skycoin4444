@@ -427,7 +427,7 @@ GamingForCharity,client/src/pages/GamingForCharity.tsx,interactive-review,True,F
 GanttChart,client/src/pages/GanttChart.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GasFeeEstimator,client/src/pages/GasFeeEstimator.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 GasPriceMonitor,client/src/pages/GasPriceMonitor.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
-GasTracker,client/src/pages/GasTracker.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+GasTracker,client/src/pages/GasTracker.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 GeneralSettings,client/src/pages/GeneralSettings.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 GeneratedApiExplorer,client/src/pages/GeneratedApiExplorer.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GeneratedGallery,client/src/pages/GeneratedGallery.tsx,interactive-review,True,False,False,False,False,True,False,False,False
