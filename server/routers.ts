@@ -6,7 +6,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
-import { db } from "./db";
+import { createPost, db, getPosts } from "./db";
 
 // Create a base router template for all feature modules
 const unavailableFeature = (feature: string): never => {
@@ -22,6 +22,28 @@ const createFeatureRouter = () => router({
   create: protectedProcedure.input(z.record(z.string(), z.unknown())).mutation(() => unavailableFeature("This feature creation")),
   update: protectedProcedure.input(z.object({ id: z.string() }).and(z.record(z.string(), z.unknown()))).mutation(() => unavailableFeature("This feature update")),
   delete: protectedProcedure.input(z.string()).mutation(() => unavailableFeature("This feature deletion")),
+});
+
+const feedRouter = router({
+  list: publicProcedure.input(z.object({ limit: z.number().int().positive().max(100).optional(), offset: z.number().int().nonnegative().optional() }).optional()).query(async ({ input }) => {
+    const posts = await getPosts(input?.limit ?? 20, input?.offset ?? 0);
+    return posts.map(post => ({
+      ...post,
+      authorId: post.userId,
+      mediaUrl: post.media,
+      likeCount: post.likes,
+      commentCount: post.comments,
+    }));
+  }),
+  create: protectedProcedure.input(z.object({ content: z.string().trim().min(1).max(255), media: z.string().url().max(255).optional() })).mutation(async ({ input, ctx }) => {
+    const post = await createPost(ctx.user.id, input.content, input.media);
+    if (!post) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Post could not be persisted." });
+    return post;
+  }),
+  get: publicProcedure.input(z.string().min(1)).query(async ({ input }) => {
+    const posts = await getPosts(100, 0);
+    return posts.find(post => post.id === input) ?? null;
+  }),
 });
 
 const userRouter = router({
@@ -84,7 +106,7 @@ export const appRouter = router({
   // Social & Community Routers
   social: createFeatureRouter(),
   socialCore: createFeatureRouter(),
-  feed: createFeatureRouter(),
+  feed: feedRouter,
   community: createFeatureRouter(),
   dm: createFeatureRouter(),
   story: createFeatureRouter(),
