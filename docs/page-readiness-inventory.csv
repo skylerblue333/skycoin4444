@@ -421,7 +421,7 @@ GameLobby,client/src/pages/GameLobby.tsx,interactive-review,True,False,False,Fal
 GameRoom,client/src/pages/GameRoom.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GameSettings,client/src/pages/GameSettings.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GameSlots,client/src/pages/GameSlots.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-GameTokenTap,client/src/pages/GameTokenTap.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+GameTokenTap,client/src/pages/GameTokenTap.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Gaming,client/src/pages/Gaming.tsx,integration-backed-review,True,True,False,False,True,False,False,False,False
 GamingForCharity,client/src/pages/GamingForCharity.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 GanttChart,client/src/pages/GanttChart.tsx,interactive-review,True,False,False,False,False,True,True,False,False
