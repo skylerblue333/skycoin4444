@@ -1,407 +1,177 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebookF, faTwitter, faLinkedinIn, faYoutube } from '@fortawesome/free-brands-svg-icons';
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, Users, TrendingUp, Gamepad2, ShoppingCart, Radio, Brain, Award, Gem, Rocket, Lock, BarChart3, Zap as ZapIcon, Code2, Cpu, Layers } from "lucide-react";
+import {
+  ArrowRight,
+  BrainCircuit,
+  CheckCircle2,
+  GraduationCap,
+  LayoutDashboard,
+  LockKeyhole,
+  MessageCircle,
+  Orbit,
+  ShieldCheck,
+  Sparkles,
+  WalletCards,
+  Waves,
+} from "lucide-react";
 import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
+const pillars = [
+  {
+    title: "Your daily command center",
+    description: "See your next useful action, account state, and shortcuts in one focused dashboard.",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    tone: "from-fuchsia-500/20 to-violet-500/10 border-fuchsia-400/30",
+    status: "Ready to explore",
+  },
+  {
+    title: "Learn and build momentum",
+    description: "Move through SkySchool surfaces and keep progress visible without invented certificates or outcomes.",
+    href: "/school",
+    icon: GraduationCap,
+    tone: "from-cyan-500/20 to-sky-500/10 border-cyan-400/30",
+    status: "Learning surfaces",
+  },
+  {
+    title: "Meet HopeAI",
+    description: "Explore the assistant experience with clear boundaries when a model or provider is unavailable.",
+    href: "/hope-a-i",
+    icon: BrainCircuit,
+    tone: "from-violet-500/20 to-indigo-500/10 border-violet-400/30",
+    status: "Provider-dependent",
+  },
+  {
+    title: "Keep your wallet safe",
+    description: "Review wallet entry points without pretending custody, balances, or transactions exist until verified.",
+    href: "/wallet",
+    icon: WalletCards,
+    tone: "from-emerald-500/20 to-teal-500/10 border-emerald-400/30",
+    status: "Safety-first boundary",
+  },
+];
+
+const quickLinks = [
+  { label: "Profile", href: "/profile", icon: ShieldCheck },
+  { label: "Community", href: "/community", icon: MessageCircle },
+  { label: "Crypto Hub", href: "/crypto-hub", icon: Waves },
+  { label: "Settings", href: "/settings", icon: LockKeyhole },
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-8">
-            <h1 className="text-6xl md:text-7xl font-bold">
-              <span className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-                SKY4444
-              </span>
-            </h1>
-            <p className="text-2xl text-gray-300 max-w-2xl mx-auto">
-              The Strategic Digital Ecosystem Where Every Action Matters
-            </p>
-            <p className="text-lg text-gray-400">
-              Mine. Trade. Create. Earn. All in one platform.
-            </p>
-            
-            <div className="flex gap-4 justify-center pt-8 flex-wrap">
-              <Link href="/dashboard">
-                <Button className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white px-8 py-6 text-lg">
-                  Get Started <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Button variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500/10 px-8 py-6 text-lg">
-                Learn More
-              </Button>
+    <main className="min-h-screen overflow-hidden bg-[#07070c] text-white">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_0%,rgba(217,70,239,0.18),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(34,211,238,0.14),transparent_30%)]" />
+      <section className="relative mx-auto max-w-7xl px-6 pb-16 pt-10 lg:px-10 lg:pt-16">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-fuchsia-400 to-cyan-300 text-slate-950 shadow-[0_0_35px_rgba(217,70,239,0.35)]">
+              <Orbit className="h-5 w-5" />
             </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-12 max-w-3xl mx-auto">
-              <Card className="bg-black/50 border-purple-500/30 p-4">
-                <div className="text-3xl font-bold text-pink-500">1,055</div>
-                <div className="text-sm text-gray-400">Working Screens</div>
-              </Card>
-              <Card className="bg-black/50 border-purple-500/30 p-4">
-                <div className="text-3xl font-bold text-cyan-500">320</div>
-                <div className="text-sm text-gray-400">API Endpoints</div>
-              </Card>
-              <Card className="bg-black/50 border-purple-500/30 p-4">
-                <div className="text-3xl font-bold text-purple-500">1M+</div>
-                <div className="text-sm text-gray-400">Lines of Code</div>
-              </Card>
+            <div>
+              <p className="text-sm font-semibold tracking-[0.28em] text-white">SKYCOIN4444</p>
+              <p className="text-xs text-slate-500">A focused digital ecosystem</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* 1,055 Screens Overview Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-black to-purple-900/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold mb-4">1,055 Fully-Wired Working Screens</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Robust screens across 13 major categories, all connected to real APIs, databases, and blockchain infrastructure
-            </p>
-          </div>
-
-          {/* Screen Categories Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {/* AI & Automation */}
-            <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/30 p-6 hover:border-blue-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🤖 AI & Automation</h3>
-                  <p className="text-gray-300 font-semibold text-lg">42 Screens</p>
-                </div>
-                <Brain className="w-8 h-8 text-blue-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">AI Code Studio, Agent Market, AI Trading, Governance, Persona System, and more</p>
-              <div className="text-xs text-gray-500">✓ Real AI integration ✓ Live automation ✓ Agent coordination</div>
-            </Card>
-
-            {/* Trading & Finance */}
-            <Card className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 border-green-500/30 p-6 hover:border-green-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">💰 Trading & Finance</h3>
-                  <p className="text-gray-300 font-semibold text-lg">13 Screens</p>
-                </div>
-                <TrendingUp className="w-8 h-8 text-green-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Portfolio tracking, Cross-chain swaps, Staking, Day trading, Yield farming</p>
-              <div className="text-xs text-gray-500">✓ Real-time pricing ✓ Live trading ✓ Smart contracts</div>
-            </Card>
-
-            {/* Marketplace & Commerce */}
-            <Card className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border-orange-500/30 p-6 hover:border-orange-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🛍️ Marketplace</h3>
-                  <p className="text-gray-300 font-semibold text-lg">37 Screens</p>
-                </div>
-                <ShoppingCart className="w-8 h-8 text-orange-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Product listings, Orders, Escrow, Bulk ordering, Vendor management</p>
-              <div className="text-xs text-gray-500">✓ Live inventory ✓ Payment processing ✓ Fulfillment</div>
-            </Card>
-
-            {/* Social & Community */}
-            <Card className="bg-gradient-to-br from-pink-900/20 to-rose-900/20 border-pink-500/30 p-6 hover:border-pink-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">👥 Social</h3>
-                  <p className="text-gray-300 font-semibold text-lg">31 Screens</p>
-                </div>
-                <Users className="w-8 h-8 text-pink-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Posts, Comments, Communities, Follows, Direct messaging, Groups</p>
-              <div className="text-xs text-gray-500">✓ Real-time feeds ✓ Notifications ✓ User interactions</div>
-            </Card>
-
-            {/* Gaming & Entertainment */}
-            <Card className="bg-gradient-to-br from-purple-900/20 to-indigo-900/20 border-purple-500/30 p-6 hover:border-purple-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🎮 Gaming</h3>
-                  <p className="text-gray-300 font-semibold text-lg">20 Screens</p>
-                </div>
-                <Gamepad2 className="w-8 h-8 text-purple-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Game lobbies, Tournaments, Quests, Leaderboards, Crypto games</p>
-              <div className="text-xs text-gray-500">✓ Real rewards ✓ Live tournaments ✓ Blockchain scoring</div>
-            </Card>
-
-            {/* Education & Learning */}
-            <Card className="bg-gradient-to-br from-yellow-900/20 to-amber-900/20 border-yellow-500/30 p-6 hover:border-yellow-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🎓 Education</h3>
-                  <p className="text-gray-300 font-semibold text-lg">14 Screens</p>
-                </div>
-                <Zap className="w-8 h-8 text-yellow-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Courses, Lessons, Quizzes, Certificates, Learning paths</p>
-              <div className="text-xs text-gray-500">✓ On-chain certificates ✓ Progress tracking ✓ Live instructors</div>
-            </Card>
-
-            {/* Admin & Management */}
-            <Card className="bg-gradient-to-br from-red-900/20 to-crimson-900/20 border-red-500/30 p-6 hover:border-red-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">⚙️ Admin</h3>
-                  <p className="text-gray-300 font-semibold text-lg">99 Screens</p>
-                </div>
-                <Cpu className="w-8 h-8 text-red-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Dashboards, User management, Moderation, Settings, Audit logs</p>
-              <div className="text-xs text-gray-500">✓ Real-time monitoring ✓ Role-based access ✓ Analytics</div>
-            </Card>
-
-            {/* API & Integration */}
-            <Card className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border-cyan-500/30 p-6 hover:border-cyan-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🔌 API & Integration</h3>
-                  <p className="text-gray-300 font-semibold text-lg">27 Screens</p>
-                </div>
-                <Code2 className="w-8 h-8 text-cyan-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">API docs, Keys management, Webhooks, Integration testing</p>
-              <div className="text-xs text-gray-500">✓ Live API endpoints ✓ Documentation ✓ Rate limiting</div>
-            </Card>
-
-            {/* Analytics & Data */}
-            <Card className="bg-gradient-to-br from-violet-900/20 to-purple-900/20 border-violet-500/30 p-6 hover:border-violet-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">📊 Analytics</h3>
-                  <p className="text-gray-300 font-semibold text-lg">36 Screens</p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-violet-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Dashboards, Reports, Charts, Metrics, Data visualization</p>
-              <div className="text-xs text-gray-500">✓ Real-time data ✓ Custom reports ✓ Exports</div>
-            </Card>
-
-            {/* User & Profile */}
-            <Card className="bg-gradient-to-br from-teal-900/20 to-cyan-900/20 border-teal-500/30 p-6 hover:border-teal-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">👤 User & Profile</h3>
-                  <p className="text-gray-300 font-semibold text-lg">46 Screens</p>
-                </div>
-                <Users className="w-8 h-8 text-teal-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Profiles, Creator economy, Monetization, Followers, Verification</p>
-              <div className="text-xs text-gray-500">✓ Live profiles ✓ Earnings tracking ✓ KYC</div>
-            </Card>
-
-            {/* Wallet & Crypto */}
-            <Card className="bg-gradient-to-br from-lime-900/20 to-green-900/20 border-lime-500/30 p-6 hover:border-lime-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">💳 Wallet</h3>
-                  <p className="text-gray-300 font-semibold text-lg">6 Screens</p>
-                </div>
-                <Lock className="w-8 h-8 text-lime-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Unified wallet, NFT wallet, Balance tracking, Transactions</p>
-              <div className="text-xs text-gray-500">✓ Multi-chain ✓ Hardware wallet ✓ Security</div>
-            </Card>
-
-            {/* Content & Media */}
-            <Card className="bg-gradient-to-br from-fuchsia-900/20 to-pink-900/20 border-fuchsia-500/30 p-6 hover:border-fuchsia-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">🎬 Content</h3>
-                  <p className="text-gray-300 font-semibold text-lg">21 Screens</p>
-                </div>
-                <Radio className="w-8 h-8 text-fuchsia-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Live streaming, Podcasts, Blogs, Media galleries, Video editing</p>
-              <div className="text-xs text-gray-500">✓ Live streaming ✓ Monetization ✓ Analytics</div>
-            </Card>
-
-            {/* Other Features */}
-            <Card className="bg-gradient-to-br from-slate-900/20 to-gray-900/20 border-slate-500/30 p-6 hover:border-slate-500/60 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">⭐ More Features</h3>
-                  <p className="text-gray-300 font-semibold text-lg">663 Screens</p>
-                </div>
-                <Layers className="w-8 h-8 text-slate-500" />
-              </div>
-              <p className="text-gray-400 text-sm mb-4">Advanced features, Testing tools, Utilities, Components, And much more</p>
-              <div className="text-xs text-gray-500">✓ Fully functional ✓ Well documented ✓ Production ready</div>
-            </Card>
-          </div>
-
-          {/* Key Stats */}
-          <div className="bg-gradient-to-r from-pink-900/20 to-purple-900/20 border border-pink-500/30 rounded-lg p-12 text-center mb-12">
-            <h3 className="text-3xl font-bold mb-8">Platform Capabilities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <p className="text-4xl font-bold text-pink-500">1,055</p>
-                <p className="text-gray-400 mt-2">Working Screens</p>
-              </div>
-              <div>
-                <p className="text-4xl font-bold text-purple-500">13</p>
-                <p className="text-gray-400 mt-2">Major Categories</p>
-              </div>
-              <div>
-                <p className="text-4xl font-bold text-cyan-500">320</p>
-                <p className="text-gray-400 mt-2">API Endpoints</p>
-              </div>
-              <div>
-                <p className="text-4xl font-bold text-green-500">∞</p>
-                <p className="text-gray-400 mt-2">Possibilities</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 px-4 bg-gradient-to-b from-purple-900/10 to-black">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">Quick Access to Major Features</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Finance */}
-            <Link href="/walletoverview">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Zap className="w-8 h-8 text-pink-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">💰 Finance</h3>
-                <p className="text-gray-400 text-sm">Mining, trading, staking, and portfolio management</p>
-              </Card>
-            </Link>
-
-            {/* Social */}
-            <Link href="/social">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Users className="w-8 h-8 text-cyan-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">👥 Social</h3>
-                <p className="text-gray-400 text-sm">Connect, share, and build communities</p>
-              </Card>
-            </Link>
-
-            {/* Gaming */}
-            <Link href="/gamelobby">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Gamepad2 className="w-8 h-8 text-purple-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">🎮 Gaming</h3>
-                <p className="text-gray-400 text-sm">Play, compete, and earn rewards</p>
-              </Card>
-            </Link>
-
-            {/* Marketplace */}
-            <Link href="/marketplace">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <ShoppingCart className="w-8 h-8 text-orange-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">🛍️ Marketplace</h3>
-                <p className="text-gray-400 text-sm">Buy, sell, and discover products</p>
-              </Card>
-            </Link>
-
-            {/* Content */}
-            <Link href="/streaming">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Radio className="w-8 h-8 text-red-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">🎬 Content</h3>
-                <p className="text-gray-400 text-sm">Stream, create, and monetize</p>
-              </Card>
-            </Link>
-
-            {/* Education */}
-            <Link href="/school">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Brain className="w-8 h-8 text-green-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">🎓 Education</h3>
-                <p className="text-gray-400 text-sm">Learn blockchain, crypto, and AI</p>
-              </Card>
-            </Link>
-
-            {/* AI */}
-            <Link href="/aiassistant">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <Brain className="w-8 h-8 text-blue-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">🤖 Hope AI</h3>
-                <p className="text-gray-400 text-sm">Advanced AI assistance and automation</p>
-              </Card>
-            </Link>
-
-            {/* Trading */}
-            <Link href="/aitrading">
-              <Card className="bg-black/50 border-purple-500/30 hover:border-purple-500/60 cursor-pointer transition-all p-6 h-full">
-                <TrendingUp className="w-8 h-8 text-green-500 mb-4" />
-                <h3 className="text-xl font-bold mb-2">📈 Trading</h3>
-                <p className="text-gray-400 text-sm">Real-time trading and swaps</p>
-              </Card>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="text-4xl font-bold">Ready to Explore All 1,055 Screens?</h2>
-          <p className="text-xl text-gray-400">
-            Start earning, trading, creating, and building today. Access all features instantly.
-          </p>
-          <Link href="/signup">
-            <Button className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white px-12 py-6 text-lg">
-              Sign Up Now <ArrowRight className="ml-2 w-5 h-5" />
+          <Link href="/dashboard">
+            <Button variant="outline" className="border-white/15 bg-white/5 text-white hover:bg-white/10">
+              Open workspace <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="border-t border-purple-500/20 py-12 px-4 bg-black/50">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
-          <div className="md:col-span-2 space-y-4">
-            <h4 className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">SKY4444 Scalable</h4>
-            <p className="text-gray-400 text-sm">The leading strategic digital ecosystem for Web3, AI, and decentralized finance. 1,055 fully-wired screens powering the future of digital commerce and community.</p>
-            <div className="flex space-x-4 mt-4">
-              <a href="#" className="text-gray-400 hover:text-purple-400"><FontAwesomeIcon icon={faFacebookF} /></a>
-              <a href="#" className="text-gray-400 hover:text-purple-400"><FontAwesomeIcon icon={faTwitter} /></a>
-              <a href="#" className="text-gray-400 hover:text-purple-400"><FontAwesomeIcon icon={faLinkedinIn} /></a>
-              <a href="#" className="text-gray-400 hover:text-purple-400"><FontAwesomeIcon icon={faYoutube} /></a>
+        <div className="grid gap-10 pb-12 pt-20 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-xs font-medium text-emerald-200">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Truthful product status is built in
+            </div>
+            <h1 className="max-w-4xl text-5xl font-semibold leading-[0.98] tracking-[-0.04em] text-white md:text-7xl">
+              One place to
+              <span className="block bg-gradient-to-r from-fuchsia-300 via-violet-300 to-cyan-200 bg-clip-text text-transparent">learn, create, connect.</span>
+            </h1>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-300">
+              SKYCOIN4444 is being shaped into a dependable daily workspace for people who want useful tools, clear progress, and honest boundaries—not a wall of pretend metrics.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/dashboard">
+                <Button className="h-12 rounded-xl bg-white px-6 text-slate-950 hover:bg-slate-200">
+                  Start with your dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/feature-tour">
+                <Button variant="outline" className="h-12 rounded-xl border-white/15 bg-white/5 px-6 text-white hover:bg-white/10">
+                  Explore the ecosystem
+                </Button>
+              </Link>
             </div>
           </div>
-          <div>
-            <h5 className="font-bold mb-4">Platform</h5>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-purple-400">Features</a></li>
-              <li><a href="#" className="hover:text-purple-400">Pricing</a></li>
-              <li><a href="#" className="hover:text-purple-400">Security</a></li>
-              <li><a href="#" className="hover:text-purple-400">Roadmap</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-bold mb-4">Resources</h5>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-purple-400">Documentation</a></li>
-              <li><a href="#" className="hover:text-purple-400">API Docs</a></li>
-              <li><a href="#" className="hover:text-purple-400">Blog</a></li>
-              <li><a href="#" className="hover:text-purple-400">Support</a></li>
-            </ul>
-          </div>
-          <div>
-            <h5 className="font-bold mb-4">Legal</h5>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-purple-400">Privacy</a></li>
-              <li><a href="#" className="hover:text-purple-400">Terms</a></li>
-              <li><a href="#" className="hover:text-purple-400">Compliance</a></li>
-              <li><a href="#" className="hover:text-purple-400">Contact</a></li>
-            </ul>
+
+          <Card className="relative overflow-hidden rounded-3xl border-white/10 bg-white/[0.045] p-6 shadow-2xl shadow-fuchsia-950/20 backdrop-blur-xl">
+            <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
+            <div className="relative">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Launch posture</p>
+                  <h2 className="mt-2 text-xl font-semibold">Build forward, verify everything</h2>
+                </div>
+                <Sparkles className="h-6 w-6 text-fuchsia-300" />
+              </div>
+              <div className="mt-7 space-y-4">
+                {[
+                  ["Core navigation", "Connected"],
+                  ["Truthful unavailable states", "Enabled"],
+                  ["Financial data", "Provider-dependent"],
+                  ["Production infrastructure", "Evidence required"],
+                ].map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between border-b border-white/10 pb-3 last:border-0 last:pb-0">
+                    <span className="text-sm text-slate-400">{label}</span>
+                    <span className="text-sm font-medium text-slate-200">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {pillars.map((pillar) => {
+            const Icon = pillar.icon;
+            return (
+              <Link key={pillar.title} href={pillar.href}>
+                <Card className={`group h-full rounded-3xl bg-gradient-to-br p-6 transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.09] ${pillar.tone}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="grid h-11 w-11 place-items-center rounded-2xl bg-black/20 text-white">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-white/40 transition-transform group-hover:translate-x-1 group-hover:text-white" />
+                  </div>
+                  <h2 className="mt-8 text-xl font-semibold">{pillar.title}</h2>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-slate-300">{pillar.description}</p>
+                  <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-white/50">{pillar.status}</p>
+                </Card>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.035] p-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Quick access</p>
+              <p className="mt-1 text-sm text-slate-300">Jump into the parts you want to use every day.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {quickLinks.map(({ label, href, icon: Icon }) => (
+                <Link key={href} href={href}>
+                  <Button variant="ghost" className="w-full justify-start gap-2 text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Icon className="h-4 w-4" /> {label}
+                  </Button>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto mt-8 pt-8 border-t border-purple-500/20 text-center text-gray-500 text-sm">
-          <p>&copy; 2026 SKY4444 Scalable. All rights reserved. | 1,055 Screens. Infinite Possibilities.</p>
-        </div>
-      </footer>
-    </div>
+      </section>
+    </main>
   );
 }

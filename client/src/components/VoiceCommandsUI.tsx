@@ -27,3 +27,5 @@ export default function VoiceCommandsUI({ onCommand }: VoiceCommandsUIProps) {
     </div>
   );
 }
+
+export { VoiceCommandsUI };
