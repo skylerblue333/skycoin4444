@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { useFileUpload } from "@/hooks/useFileUpload";
 
 export default function Settings() {
   const { user } = useAuth();
@@ -27,33 +26,18 @@ export default function Settings() {
   const [showOnlineStatus, setShowOnlineStatus] = useState(true);
   const [allowDMs, setAllowDMs] = useState(true);
 
-  const { upload, uploading } = useFileUpload();
-
-  const { data: profile } = trpc.user.profile.useQuery(
-    { userId: user?.id || 0 },
-    { enabled: !!user }
-  );
-
   const updateProfile = trpc.user.updateProfile.useMutation({
-    onSuccess: () => toast.success("Profile updated!"),
+    onSuccess: () => toast.info("Profile persistence is not enabled in this release."),
     onError: (err) => toast.error(err.message),
   });
 
   useEffect(() => {
-    if (profile) {
-      setDisplayName(profile.name || "");
-      setBio(profile.bio || "");
-      setEmail(profile.email || "");
-    }
-  }, [profile]);
+    setDisplayName(user?.name ?? "");
+    setEmail(user?.email ?? "");
+  }, [user?.name, user?.email]);
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const result = await upload(file);
-    if (result) {
-      updateProfile.mutate({ avatar: result.url });
-    }
+  const handleAvatarUpload = () => {
+    toast.info("Profile image uploads are not enabled in this release.");
   };
 
   const handleSaveProfile = () => {
@@ -92,8 +76,8 @@ export default function Settings() {
                 <div className="flex items-center gap-4">
                   <div className="relative group">
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl font-bold overflow-hidden">
-                      {profile?.avatar ? (
-                        <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                      {false ? (
+                        <img src="" alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
                         displayName.charAt(0).toUpperCase() || "?"
                       )}
@@ -105,14 +89,14 @@ export default function Settings() {
                         accept="image/*"
                         className="hidden"
                         onChange={handleAvatarUpload}
-                        disabled={uploading}
+                        disabled
                       />
                     </label>
                   </div>
                   <div>
                     <p className="font-medium">{displayName || "Anonymous"}</p>
                     <p className="text-sm text-muted-foreground">
-                      {uploading ? "Uploading..." : "Click avatar to change"}
+                      Profile image uploads are unavailable
                     </p>
                   </div>
                 </div>
@@ -167,19 +151,19 @@ export default function Settings() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.level || 1}</p>
+                    <p className="text-2xl font-bold text-purple-400">—</p>
                     <p className="text-xs text-muted-foreground">Level</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-blue-400">{profile?.xp || 0}</p>
+                    <p className="text-2xl font-bold text-blue-400">—</p>
                     <p className="text-xs text-muted-foreground">XP</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.reputation || 0}</p>
+                    <p className="text-2xl font-bold text-purple-400">—</p>
                     <p className="text-xs text-muted-foreground">Reputation</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-amber-400">{profile?.followerCount || 0}</p>
+                    <p className="text-2xl font-bold text-amber-400">—</p>
                     <p className="text-xs text-muted-foreground">Followers</p>
                   </div>
                 </div>
@@ -335,7 +319,7 @@ export default function Settings() {
                 <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
                   <p className="text-sm text-muted-foreground">Wallet Address</p>
                   <p className="font-mono text-sm mt-1 break-all">
-                    {user?.id ? `0x${user.id.toString(16).padStart(40, '0')}` : "Not connected"}
+                    Not connected — wallet infrastructure is not enabled
                   </p>
                 </div>
                 <Separator />

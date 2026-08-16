@@ -35,12 +35,12 @@ export default function DigitalArtStore() {
     onSuccess: (data) => {
       if (data.url) {
         if (data.mock) {
-          toast.info("Demo mode: Stripe not configured. Opening mock checkout.");
+          toast.error("Checkout is unavailable until a verified payment provider is configured. No order was created.");
         } else {
-          toast.success("Redirecting to Stripe checkout...");
+          toast.success("Redirecting to the verified checkout provider...");
+          window.open(data.url, "_blank");
+          setCart([]);
         }
-        window.open(data.url, "_blank");
-        setCart([]);
       }
       setIsCheckingOut(false);
     },
@@ -86,7 +86,7 @@ export default function DigitalArtStore() {
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + item.price, 0);
-  const totalPrints = prints?.length ?? 144;
+  const totalPrints = prints?.length ?? 0;
 
   return (
     <div className="min-h-screen bg-[#050308] text-white">

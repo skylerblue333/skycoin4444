@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageHeader } from "@/components/PageHeader";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import type { TRPCClientErrorLike } from "@trpc/client";
+import type { AppRouter } from "../../../server/routers";
 import { CreditCard, Lock, ShoppingCart, CheckCircle, ArrowLeft, Zap, Shield } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
@@ -52,13 +54,16 @@ export default function StripeCheckout() {
   const checkoutMut = trpc.payments.createStripeCheckout.useMutation({
     onSuccess: (data) => {
       if (data.mock) {
-        toast.success("Demo checkout — Stripe not configured yet. Redirecting to success page...");
-        setTimeout(() => setStep("success"), 1500);
-      } else if (data.url) {
+        toast.error("Checkout is unavailable until a verified Stripe payment flow is configured. No subscription was created.");
+        return;
+      }
+      if (data.url) {
         window.location.href = data.url;
+      } else {
+        toast.error("The payment provider did not return a checkout URL. No subscription was created.");
       }
     },
-    onError: (e: any) => toast.error(e.message || "Checkout failed"),
+    onError: (e: TRPCClientErrorLike<AppRouter>) => toast.error(e.message || "Checkout failed"),
   });
 
   const handleCheckout = () => {
@@ -213,17 +218,17 @@ export default function StripeCheckout() {
               <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-white/10 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Lock className="w-4 h-4 text-green-400" />
-                  <span className="text-sm text-green-400">Secured by Stripe</span>
+                  <span className="text-sm text-muted-foreground">Payment provider status</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  You'll be redirected to Stripe's secure checkout page to complete your payment.
-                  Your card details are never stored on our servers.
+                  When Stripe is configured and verified, you'll be redirected to its secure checkout page. Until then, no payment or subscription is created.
                 </p>
               </div>
 
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <Shield className="w-4 h-4" />
-                <span>256-bit SSL encryption · PCI DSS compliant · 30-day money-back guarantee</span>
+                <span>Payment security and refund terms will be shown here after the provider and terms are verified.</span>
+
               </div>
 
               <Button
@@ -240,7 +245,7 @@ export default function StripeCheckout() {
 
               {!isAuthenticated && (
                 <p className="text-xs text-center text-amber-400">
-                  Please log in to subscribe
+                  Please log in; checkout remains unavailable until a verified payment provider is configured.
                 </p>
               )}
 
