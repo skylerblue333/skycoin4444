@@ -3,11 +3,25 @@ import mysql from 'mysql2/promise';
 import * as schema from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 
-const poolConnection = mysql.createPool(process.env.DATABASE_URL as string);
+const databaseUrl = process.env.DATABASE_URL?.trim();
+const poolConnection = databaseUrl ? mysql.createPool(databaseUrl) : null;
 
-export const db = drizzle(poolConnection, { schema, mode: 'default' });
+if (!databaseUrl) {
+  console.warn("[Database] DATABASE_URL is not configured; database-backed features are unavailable.");
+}
+
+export const db = poolConnection
+  ? drizzle(poolConnection, { schema, mode: "default" })
+  : (new Proxy({}, {
+      get() {
+        throw new Error("DATABASE_URL is not configured; database-backed feature unavailable");
+      },
+    }) as ReturnType<typeof drizzle>);
 
 export async function getDb() {
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not configured; database-backed feature unavailable");
+  }
   return db;
 }
 

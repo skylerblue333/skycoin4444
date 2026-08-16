@@ -20,3 +20,5 @@ export default function DatingNotificationToast({ message, type = 'message' }: D
     </div>
   );
 }
+
+export { DatingNotificationToast };

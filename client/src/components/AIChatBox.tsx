@@ -333,3 +333,5 @@ export function AIChatBox({
     </div>
   );
 }
+
+export default AIChatBox;
