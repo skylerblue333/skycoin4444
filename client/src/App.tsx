@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
+import { PageSkeleton } from "@/components/PageSkeleton";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 
@@ -1140,9 +1141,14 @@ function Router() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-lg">Loading...</div>
-        </div>
+        <main
+          className="min-h-screen bg-background p-4 sm:p-6"
+          aria-busy="true"
+        >
+          <div className="mx-auto w-full max-w-7xl">
+            <PageSkeleton />
+          </div>
+        </main>
       }
     >
       <Switch>
