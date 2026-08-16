@@ -41,4 +41,39 @@ describe("admin authorization", () => {
       health: "UNAVAILABLE",
     });
   });
+
+  it("rejects non-admin users from user listings and moderation queue", async () => {
+    const caller = appRouter.createCaller(createContext("user"));
+
+    await expect(caller.admin.users()).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+    await expect(caller.admin.moderationQueue()).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+  });
+
+  it("rejects non-admin role mutations", async () => {
+    const caller = appRouter.createCaller(createContext("user"));
+
+    await expect(
+      caller.admin.updateUserRole({ userId: 2, role: "user" })
+    ).rejects.toMatchObject({
+      code: "FORBIDDEN",
+    });
+  });
+
+  it("allows an admin to reach protected listings and role mutation boundary", async () => {
+    const caller = appRouter.createCaller(createContext("admin"));
+
+    await expect(caller.admin.users()).resolves.toEqual([]);
+    await expect(caller.admin.moderationQueue()).resolves.toEqual([]);
+    await expect(
+      caller.admin.updateUserRole({ userId: 1, role: "user" })
+    ).resolves.toMatchObject({
+      available: false,
+      status: "unavailable",
+      success: false,
+    });
+  });
 });
