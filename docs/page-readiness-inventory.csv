@@ -355,7 +355,7 @@ Error500,client/src/pages/Error500.tsx,interactive-review,True,False,False,False
 Error503,client/src/pages/Error503.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ErrorDialog,client/src/pages/ErrorDialog.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ErrorTracking,client/src/pages/ErrorTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-EscrowShop,client/src/pages/EscrowShop.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
+EscrowShop,client/src/pages/EscrowShop.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 EthereumPoolSelector,client/src/pages/EthereumPoolSelector.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 EventAnalytics,client/src/pages/EventAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 EventCalendar,client/src/pages/EventCalendar.tsx,interactive-review,True,False,False,False,False,True,True,False,False
