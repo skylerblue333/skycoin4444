@@ -760,7 +760,7 @@ ResourceLibrary,client/src/pages/ResourceLibrary.tsx,interactive-review,True,Fal
 ResponseTime,client/src/pages/ResponseTime.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 Retention,client/src/pages/Retention.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
 RetentionAnalytics,client/src/pages/RetentionAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-RetentionEngine,client/src/pages/RetentionEngine.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+RetentionEngine,client/src/pages/RetentionEngine.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 RetirementPlanner,client/src/pages/RetirementPlanner.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ReturnManagement,client/src/pages/ReturnManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ReturnsRefunds,client/src/pages/ReturnsRefunds.tsx,interactive-review,True,False,False,False,False,True,False,False,False
