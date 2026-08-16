@@ -641,7 +641,7 @@ PaymentInfra,client/src/pages/PaymentInfra.tsx,interactive-review,True,False,Fal
 PaymentMethods,client/src/pages/PaymentMethods.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PaymentSetup,client/src/pages/PaymentSetup.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 Payments,client/src/pages/Payments.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
-PayoutDashboard,client/src/pages/PayoutDashboard.tsx,integration-backed-review,True,True,False,False,True,True,True,False,True
+PayoutDashboard,client/src/pages/PayoutDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PayoutManagement,client/src/pages/PayoutManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PerformanceMetrics,client/src/pages/PerformanceMetrics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PerformanceTuning,client/src/pages/PerformanceTuning.tsx,static-review,True,False,False,False,False,False,False,False,False
