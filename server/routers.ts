@@ -1653,10 +1653,30 @@ export const appRouter = router({
       healthReport: publicProcedure.query(() => ({
         overallHealth: "UNKNOWN",
         available: false as const,
+        alerts: [] as Array<{
+          severity: string;
+          title: string;
+          message: string;
+        }>,
       })),
       marketStates: protectedProcedure.query(() => ({
         available: false as const,
         states: [] as Array<{ market: string; status: string; value: number }>,
+      })),
+      emissionCaps: protectedProcedure.query(
+        () =>
+          [] as Array<{
+            token: string;
+            cap: number;
+            emitted: number;
+            remaining: number;
+          }>
+      ),
+    }),
+    emergent: router({
+      digitalNationStatus: publicProcedure.query(() => ({
+        mode: "GENESIS",
+        available: false as const,
       })),
     }),
     governanceV2: router({
