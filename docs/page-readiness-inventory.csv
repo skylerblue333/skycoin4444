@@ -877,7 +877,7 @@ StreamAnalytics,client/src/pages/StreamAnalytics.tsx,interactive-review,True,Fal
 StreamClip,client/src/pages/StreamClip.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 StreamGifting,client/src/pages/StreamGifting.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StreamingDashboard,client/src/pages/StreamingDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
-StripeCheckout,client/src/pages/StripeCheckout.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
+StripeCheckout,client/src/pages/StripeCheckout.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 StripeIntegration,client/src/pages/StripeIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StudentProgress,client/src/pages/StudentProgress.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StyleSelector,client/src/pages/StyleSelector.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
