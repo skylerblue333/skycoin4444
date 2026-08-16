@@ -693,7 +693,7 @@ ProductListing,client/src/pages/ProductListing.tsx,interactive-review,True,False
 ProductListings,client/src/pages/ProductListings.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ProductReviews,client/src/pages/ProductReviews.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ProductionArchitecture,client/src/pages/ProductionArchitecture.tsx,static-review,True,False,False,False,False,False,False,False,False
-Profile,client/src/pages/Profile.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+Profile,client/src/pages/Profile.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ProfileCompletion,client/src/pages/ProfileCompletion.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ProfileCreation,client/src/pages/ProfileCreation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ProfileCustomization,client/src/pages/ProfileCustomization.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
