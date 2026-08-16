@@ -444,7 +444,72 @@ export const appRouter = router({
   ai: aiRouter,
   aiEngineer: createFeatureRouter(),
   aiMarket: createFeatureRouter(),
-  aiPersonas: createFeatureRouter(),
+  aiPersonas: router({
+    getBlendedFeed: publicProcedure
+      .input(
+        z
+          .object({
+            limit: z.number().int().min(1).max(100).optional(),
+            offset: z.number().int().min(0).optional(),
+            topic: z.string().optional(),
+          })
+          .optional()
+      )
+      .query(() => ({
+        posts: [] as Array<{
+          id: number;
+          personaAvatar: string;
+          personaName: string;
+          personaHandle: string;
+          content: string;
+          topic: string | null;
+          createdAt: string;
+          blendWeight: number;
+          likes: number;
+          comments: number;
+          shares: number;
+        }>,
+      })),
+    getPersonas: publicProcedure.query(() => ({
+      personas: [] as Array<{
+        id: number;
+        avatar: string;
+        name: string;
+        handle: string;
+        bio: string;
+        personality: string;
+        postFrequency: string;
+        topics: string[];
+      }>,
+    })),
+    getStats: publicProcedure.query(() => ({
+      totalPosts: 0,
+      totalEngagement: 0,
+      totalActivity: 0,
+      byPersona: [] as Array<{
+        personaId: number;
+        personaAvatar: string;
+        personaName: string;
+        postCount: number;
+        totalLikes: number;
+      }>,
+      topTopics: [] as Array<{ topic: string; count: number }>,
+    })),
+    runCycle: protectedProcedure
+      .input(
+        z
+          .object({ count: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .mutation(() => ({ ...unavailableMutationResult, generated: 0 })),
+    seedIfEmpty: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        message:
+          "Persona seeding is unavailable until a verified AI generation integration is connected.",
+      })),
+  }),
   hopeAI: createFeatureRouter(),
   hopeIntelligence: router({
     missions: router({
