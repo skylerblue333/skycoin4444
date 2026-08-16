@@ -626,7 +626,7 @@ OptionsTrading,client/src/pages/OptionsTrading.tsx,truthfully-gated,True,False,F
 OracleNetwork,client/src/pages/OracleNetwork.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 OrderBook,client/src/pages/OrderBook.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 OrderConfirmation,client/src/pages/OrderConfirmation.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-OrderHistory,client/src/pages/OrderHistory.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
+OrderHistory,client/src/pages/OrderHistory.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 OrderPlacement,client/src/pages/OrderPlacement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 OrderTracking,client/src/pages/OrderTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 OrderTypes,client/src/pages/OrderTypes.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
