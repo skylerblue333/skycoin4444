@@ -33,7 +33,7 @@ The current inventory records:
 | Type-check-exempt pages | 0 |
 | Registered routes | 1,070 |
 
-These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, `docs/hard-coded-money-audit.csv`, `docs/dependabot-121-evidence.md`, `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md`, `docs/GA_EXECUTION_PUNCH_LIST.md`, and the blocked staging artifacts under `docs/staging/`, summarized by `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md`.
+These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, `docs/hard-coded-money-audit.csv`, `docs/dependabot-121-evidence.md`, `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md`, `docs/GA_EXECUTION_PUNCH_LIST.md`, and the blocked staging artifacts under `docs/staging/`, summarized by `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md` and `docs/staging/INFRASTRUCTURE_EVIDENCE_41316EF.md`.
 
 ## Security and truthfulness changes in this campaign
 
@@ -47,7 +47,7 @@ Verified account-scoped wallet ledger reads remain distinct from on-chain custod
 
 | Area | Status | Required evidence |
 |---|---|---|
-| Production database | **Not verified / blocked on staging access** | Real isolated staging or production-like database, migration run, schema checksum, backup policy, restore drill, connection limits, least-privilege review, and authorization tests. Current blocked evidence: `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md`. |
+| Production database | **Not verified / blocked on staging access** | Real isolated staging or production-like database, migration run, schema checksum, backup policy, restore drill, connection limits, least-privilege review, and authorization tests. Current blocked evidence: `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md` and `docs/staging/INFRASTRUCTURE_EVIDENCE_41316EF.md`. |
 | OAuth / identity provider | Not verified | Production OAuth configuration, redirect validation, secure cookie/session review, and browser login/logout end-to-end tests. |
 | AWS / EC2 deployment | Not verified | Deployment run, health check, rollback procedure, process supervision, secret injection, and capacity evidence. |
 | DNS / TLS / reverse proxy | Not verified | Production hostname, certificate issuance/renewal, HTTPS redirect, security headers, and edge-to-origin test. |
@@ -67,7 +67,7 @@ The repository is suitable as a **code-green stabilization checkpoint** and cont
 
 1. Preserve the owner-dismissal evidence for Dependabot #121 and reopen the alert if the dependency graph regresses.
 2. Preserve CI evidence for code checkpoint `41316ef` (run `31947291463`) and require a fresh successful run after the next code change.
-3. Provide approved isolated staging MySQL/TiDB access and execute the six evidence artifacts under `docs/staging/`; do not advance the database gate until the final checkpoint report is accepted.
+3. Provide approved isolated staging MySQL/TiDB access and independently verify Phase A items 1–11 in `docs/staging/INFRASTRUCTURE_EVIDENCE_41316EF.md`; do not advance the database gate until the final checkpoint report is accepted.
 4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
 5. Expand critical workflow tests beyond the current six tests and rerun the complete release gate.
 6. Use `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md` to assign an owner, evidence artifact, rollback plan, and acceptance result to every remaining no-go row.
