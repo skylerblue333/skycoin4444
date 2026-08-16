@@ -2,49 +2,72 @@
 
 **Assessment date:** 2026-08-16  
 **Repository:** `skylerblue333/skycoin4444`  
-**Verified checkpoint:** `41db9979e35178f295c73709cb167f78b6a50f25`
+**Verified synchronized checkpoint:** `48e849c` (`48e849c4e8f16e4a9e4d1c11fbd3f7a8b88c0f4b`)
 **Assessment:** **Code validation green; GA release not yet authorized.**
 
-## Verified evidence
+## Verified local evidence
 
-| Gate                    | Result                   | Evidence                                                                                                                                                                                                                 |
-| ----------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Strict TypeScript       | Pass                     | `pnpm run check` completed with zero diagnostics.                                                                                                                                                                        |
-| Production build        | Pass                     | `pnpm run build` completed locally and in GitHub Actions.                                                                                                                                                                |
-| Automated tests         | Pass for available suite | `pnpm run test -- --run` completed successfully; the suite is still smaller than a full GA critical-workflow suite.                                                                                                      |
-| Diff hygiene            | Pass                     | `git diff --check` completed without whitespace errors.                                                                                                                                                                  |
-| Truthful page inventory | Pass                     | `docs/page-readiness-inventory.csv` regenerated for 1,079 routes.                                                                                                                                                        |
-| GitHub CI               | Pass                     | Workflow runs `31937644713` and `31937710216` completed successfully for checkpoints `88235c2` and `41db997`. The latest run included dependency installation, typecheck, tests, production build, and dependency audit. |
-| Remote push             | Pass                     | `master` pushed to GitHub through HTTPS; the remote contains checkpoint `41db997`.                                                                                                                                       |
+| Gate | Result | Evidence |
+|---|---|---|
+| Strict TypeScript | Pass | `pnpm run check` completed with zero diagnostics on the current remediation checkpoints. |
+| Production build | Pass | `pnpm run build` completed successfully on the current remediation checkpoints. |
+| Available automated tests | Pass for available suite | `pnpm run test -- --run` passes **3 tests in 2 test files**: logout cookie clearing and admin authorization allow/deny behavior. This is not a complete GA critical-workflow suite. |
+| Diff hygiene | Pass | `git diff --check` completed without whitespace errors during each verified remediation checkpoint. |
+| Truthful page inventory | Pass | `docs/page-readiness-inventory.csv` regenerated for **1,079 routes**. |
+| Hard-coded-money evidence | Partial, explicitly bounded | `scripts/audit_hard_coded_money.py` produces a reproducible page-level evidence file. It is a machine-generated review aid, not a substitute for manual classification of every signal. |
+| GitHub synchronization | Pass | `master` is synchronized with `origin/master` at `48e849c`. |
+| GitHub Actions for current checkpoint | Not yet verified in this record | Prior CI runs were successful, but a successful CI run for the current checkpoint must be captured before release authorization. |
 
-## Current product boundary
+## Current route classification
 
-The platform now truthfully gates unsupported or placeholder surfaces rather than presenting fabricated success, financial metrics, market activity, wallet custody, exchange execution, AI output, or operational telemetry. The latest inventory records **219 truthfully gated pages**, **120 integration-backed review pages**, **110 pages with hard-coded money signals**, and **0 pages using type-check exemptions**. These categories are readiness classifications, not a claim that all 1,079 routes are production-complete.
+The current inventory records:
 
-Verified account-scoped wallet ledger reads remain distinct from on-chain custody. Wallet connection, signing, sending, exchange, order-book, swap, portfolio, investor, whale-monitoring, market-sentiment, analytics, and projection surfaces are unavailable or gated where verified production integrations are absent.
+| Classification | Count |
+|---|---:|
+| Total routes | 1,079 |
+| Truthfully gated | 273 |
+| Integration-backed review | 102 |
+| Interactive review | 594 |
+| Static review | 110 |
+| Hard-coded-money pages | 90 |
+| Type-check-exempt pages | 0 |
+| Registered routes | 1,070 |
+
+These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, and `docs/hard-coded-money-audit.csv`.
+
+## Security and truthfulness changes in this campaign
+
+The campaign fixed an authorization defect in the admin router by replacing authenticated-user protection with `adminProcedure` for admin statistics, user listings, moderation queues, and role updates. Regression tests verify that non-admin users are rejected and admin users can reach the protected procedure.
+
+The campaign also removed or truthfully gated unsupported public and high-risk surfaces, including wallet USD valuation, HopeAI marketing claims, fabricated search results, trust and observability telemetry, advanced analytics, economy controls, public landing claims, ecosystem valuation, ambient and unified feeds, investor presentation claims, WorldBrain actions, WorldSimulationControl, AgentDebate, GTM metrics, AI Copy Studio, and automation workflows. Unsupported wallet custody, signing, broadcasting, exchange execution, order books, swaps, staking, mining, DeFi, portfolio operations, and on-chain market data remain unavailable or gated where verified integrations are absent.
+
+Verified account-scoped wallet ledger reads remain distinct from on-chain custody. A database ledger balance must not be marketed as a blockchain balance, custodial wallet, market valuation, or successful transaction.
 
 ## No-go items before GA
 
-| Area                       | Status                      | Required evidence                                                                                                                                                                                                |
-| -------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Production database        | Not verified                | A real production database, migration run, backup policy, restore drill, connection limits, and authorization tests.                                                                                             |
-| OAuth / identity provider  | Not verified                | Production OAuth configuration, redirect validation, secure cookie/session review, and login/logout end-to-end tests.                                                                                            |
-| AWS / EC2 deployment       | Not verified                | Deployment run, health check, rollback procedure, process supervision, secret injection, and capacity evidence.                                                                                                  |
-| DNS / TLS / reverse proxy  | Not verified                | Production hostname, certificate issuance/renewal, HTTPS redirect, security headers, and edge-to-origin test.                                                                                                    |
-| Monitoring and alerting    | Not verified                | Structured error collection, uptime checks, database/API alerts, sensitive-data redaction, and on-call ownership.                                                                                                |
-| Backup and restore         | Not verified                | Documented backup schedule, encryption, retention, restore test, and recovery objective evidence.                                                                                                                |
-| Critical workflow coverage | Incomplete                  | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, and admin authorization tests against representative services.                                                            |
-| Dependency advisory        | Open / externally confirmed | GitHub reported one moderate Dependabot advisory, #121. The configured token could not read the alert detail endpoint (HTTP 403), so its package and remediation status require confirmation in GitHub Security. |
-| CI action warning          | Resolved                    | `actions/checkout` and `actions/setup-node` were updated to v5, and workflow run `31937710216` completed successfully for checkpoint `41db997`.                                                                  |
+| Area | Status | Required evidence |
+|---|---|---|
+| Production database | Not verified | Real production database, migration run, backup policy, restore drill, connection limits, and authorization tests. |
+| OAuth / identity provider | Not verified | Production OAuth configuration, redirect validation, secure cookie/session review, and browser login/logout end-to-end tests. |
+| AWS / EC2 deployment | Not verified | Deployment run, health check, rollback procedure, process supervision, secret injection, and capacity evidence. |
+| DNS / TLS / reverse proxy | Not verified | Production hostname, certificate issuance/renewal, HTTPS redirect, security headers, and edge-to-origin test. |
+| Monitoring and alerting | Not verified | Structured error collection, uptime checks, database/API alerts, sensitive-data redaction, and on-call ownership. |
+| Backup and restore | Not verified | Encrypted backup schedule, retention, restore test, and recovery-objective evidence. |
+| Critical workflow coverage | Incomplete | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, admin authorization, and representative service integration tests. |
+| Dependency advisory | Open / externally confirmed | GitHub reports one moderate Dependabot advisory, **#121**. The package detail and remediation status require confirmation in GitHub Security. |
+| Current-checkpoint CI evidence | Pending | Capture successful dependency installation, typecheck, tests, production build, and security audit for the current synchronized checkpoint. |
 
 ## Release decision
 
-The current checkpoint is suitable as a **code-green stabilization checkpoint** and can be used for controlled integration testing. It must not be labeled fully GA or marketed as a complete crypto, financial, AI, or enterprise ecosystem until the no-go items above have verifiable evidence. No feature should be enabled merely to improve the readiness percentage; an integration must provide authenticated, validated, auditable server-side behavior before its UI is released.
+> **GA NOT YET AUTHORIZED.**
 
-## Next verification sequence
+The repository is suitable as a **code-green stabilization checkpoint** and controlled integration-testing baseline. It must not be labeled fully GA or marketed as a complete crypto, financial, AI, or enterprise ecosystem until every no-go item has verifiable evidence. No feature should be enabled merely to improve a readiness percentage; a release feature requires authenticated, validated, auditable server-side behavior and truthful failure states.
 
-1. Confirm the open Dependabot advisory in GitHub Security and remediate or document an accepted risk.
-2. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
-3. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence captured in this document.
-4. Expand critical workflow tests and rerun the complete release gate.
-5. Reassess GA only after every no-go row has an owner, evidence, and rollback plan.
+## Smallest next remediation and verification batch
+
+1. Confirm and remediate or formally accept Dependabot advisory #121.
+2. Run current-checkpoint GitHub CI and capture its run ID and artifacts.
+3. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
+4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
+5. Expand critical workflow tests beyond the current three tests and rerun the complete release gate.
+6. Reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
