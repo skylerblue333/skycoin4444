@@ -2089,6 +2089,27 @@ export const appRouter = router({
     getFavorites: protectedProcedure.query(
       () => [] as Array<{ partnerId: string }>
     ),
+    getProficiency: protectedProcedure
+      .input(z.object({ language: z.string().min(1) }))
+      .query(() => ({
+        level: "",
+        wordsLearned: 0,
+        hoursSpent: 0,
+        streakDays: 0,
+        available: false as const,
+      })),
+    logSession: protectedProcedure
+      .input(
+        z.object({
+          partnerId: z.string().min(1),
+          language: z.string().min(1),
+          durationMinutes: z.number().nonnegative(),
+          topicsDiscussed: z.array(z.string()),
+          rating: z.number().min(0).max(5),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(() => ({ ...unavailableMutationResult, xpEarned: 0 })),
     requestSession: protectedProcedure
       .input(z.object({ partnerId: z.string().min(1) }))
       .mutation(() => unavailableMutationResult),
