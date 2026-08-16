@@ -601,7 +601,7 @@ NFTWallet,client/src/pages/NFTWallet.tsx,truthfully-gated,True,False,False,False
 NLPTools,client/src/pages/NLPTools.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 NSFWFeed,client/src/pages/NSFWFeed.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 NSFWPlatform,client/src/pages/NSFWPlatform.tsx,interactive-review,True,False,False,False,False,True,False,False,True
-NarrativeEngine,client/src/pages/NarrativeEngine.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+NarrativeEngine,client/src/pages/NarrativeEngine.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 NetWorthTracker,client/src/pages/NetWorthTracker.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 NetworkGraph,client/src/pages/NetworkGraph.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 NetworkHealth,client/src/pages/NetworkHealth.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
