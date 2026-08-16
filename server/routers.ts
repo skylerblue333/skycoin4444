@@ -1457,7 +1457,68 @@ export const appRouter = router({
   }),
 
   // Admin & Moderation Routers
-  admin: createFeatureRouter(),
+  admin: router({
+    stats: protectedProcedure.query(() => ({
+      totalUsers: 0,
+      onlineUsers: 0,
+      connections: 0,
+      totalPosts: 0,
+      totalStreams: 0,
+      totalCommunities: 0,
+      totalStakingPositions: 0,
+      health: "UNAVAILABLE",
+    })),
+    users: protectedProcedure
+      .input(
+        z
+          .object({
+            limit: z.number().int().min(1).max(100).optional(),
+            offset: z.number().int().min(0).optional(),
+            search: z.string().optional(),
+          })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            username: string | null;
+            name: string | null;
+            email: string | null;
+            role: string | null;
+            isBanned: boolean;
+            postCount: number;
+            createdAt: string | null;
+          }>
+      ),
+    moderationQueue: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            action: string;
+            moderatorName: string | null;
+            moderatorId: string | null;
+            targetUserId: string | null;
+            targetId: string | null;
+            createdAt: string | null;
+            reason: string | null;
+          }>
+      ),
+    updateUserRole: protectedProcedure
+      .input(
+        z.object({
+          userId: z.union([z.string(), z.number()]),
+          role: z.string().min(1),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+  }),
   trustSafety: router({
     getMyTrustScore: protectedProcedure.query(() => ({
       score: 0,
