@@ -186,7 +186,7 @@ CommunityCreate,client/src/pages/CommunityCreate.tsx,integration-backed-review,T
 CommunityEngagement,client/src/pages/CommunityEngagement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CommunityGuidelines,client/src/pages/CommunityGuidelines.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 CommunityHub,client/src/pages/CommunityHub.tsx,static-review,True,False,False,False,False,False,False,False,False
-CompanySimulator,client/src/pages/CompanySimulator.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+CompanySimulator,client/src/pages/CompanySimulator.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CompetitiveRadar,client/src/pages/CompetitiveRadar.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ComplianceCenter,client/src/pages/ComplianceCenter.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
 ComplianceChecker,client/src/pages/ComplianceChecker.tsx,interactive-review,True,False,False,False,False,True,True,False,False
