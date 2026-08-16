@@ -329,7 +329,7 @@ EarningsTracking,client/src/pages/EarningsTracking.tsx,truthfully-gated,True,Fal
 EconomicLayer,client/src/pages/EconomicLayer.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
 Economics,client/src/pages/Economics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 EconomyControl,client/src/pages/EconomyControl.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Ecosystem,client/src/pages/Ecosystem.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
+Ecosystem,client/src/pages/Ecosystem.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 EditProfile,client/src/pages/EditProfile.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 EmailCampaigns,client/src/pages/EmailCampaigns.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 EmailConfiguration,client/src/pages/EmailConfiguration.tsx,static-review,True,False,False,False,False,False,False,False,False
