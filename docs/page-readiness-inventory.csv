@@ -870,7 +870,7 @@ StakingPortal,client/src/pages/StakingPortal.tsx,truthfully-gated,True,False,Fal
 StatisticsPanel,client/src/pages/StatisticsPanel.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 Status,client/src/pages/Status.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StepperWizard,client/src/pages/StepperWizard.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-StockChart,client/src/pages/StockChart.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+StockChart,client/src/pages/StockChart.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 StockSearch,client/src/pages/StockSearch.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 Stories,client/src/pages/Stories.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 StreamAnalytics,client/src/pages/StreamAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
