@@ -1,7 +1,12 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
+import {
+  adminProcedure,
+  publicProcedure,
+  router,
+  protectedProcedure,
+} from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 
@@ -1653,7 +1658,7 @@ export const appRouter = router({
 
   // Admin & Moderation Routers
   admin: router({
-    stats: protectedProcedure.query(() => ({
+    stats: adminProcedure.query(() => ({
       totalUsers: 0,
       onlineUsers: 0,
       connections: 0,
@@ -1663,7 +1668,7 @@ export const appRouter = router({
       totalStakingPositions: 0,
       health: "UNAVAILABLE",
     })),
-    users: protectedProcedure
+    users: adminProcedure
       .input(
         z
           .object({
@@ -1686,7 +1691,7 @@ export const appRouter = router({
             createdAt: string | null;
           }>
       ),
-    moderationQueue: protectedProcedure
+    moderationQueue: adminProcedure
       .input(
         z
           .object({ limit: z.number().int().min(1).max(100).optional() })
@@ -1705,7 +1710,7 @@ export const appRouter = router({
             reason: string | null;
           }>
       ),
-    updateUserRole: protectedProcedure
+    updateUserRole: adminProcedure
       .input(
         z.object({
           userId: z.union([z.string(), z.number()]),
