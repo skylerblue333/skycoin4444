@@ -7,6 +7,7 @@ import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 import { createPost, db, getPosts } from "./db";
+import { storagePut } from "./storage";
 
 // Create a base router template for all feature modules
 const unavailableFeature = (feature: string): never => {
@@ -78,7 +79,18 @@ const userRouter = router({
     await db.update(schema.users).set(input).where(eq(schema.users.id, ctx.user.id));
     return db.query.users.findFirst({ where: eq(schema.users.id, ctx.user.id) });
   }),
-  uploadAvatar: protectedProcedure.input(z.object({ data: z.string(), type: z.enum(["avatar", "banner"]), mimeType: z.string() })).mutation(() => unavailableFeature("Profile image uploads")),
+  uploadAvatar: protectedProcedure.input(z.object({
+    data: z.string().regex(/^data:[^;]+;base64,[A-Za-z0-9+/=]+$/).max(7_000_000),
+    type: z.enum(["avatar", "banner"]),
+    mimeType: z.string().regex(/^image\/(png|jpeg|jpg|webp|gif)$/),
+  })).mutation(async ({ input, ctx }) => {
+    if (input.type === "banner") return unavailableFeature("Profile banner uploads");
+    const encoded = input.data.split(",", 2)[1];
+    const buffer = Buffer.from(encoded, "base64");
+    const stored = await storagePut(`users/${ctx.user.id}/avatar`, buffer, input.mimeType);
+    await db.update(schema.users).set({ avatar: stored.url }).where(eq(schema.users.id, ctx.user.id));
+    return { type: input.type, url: stored.url };
+  }),
 });
 
 export const appRouter = router({
