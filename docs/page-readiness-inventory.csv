@@ -550,7 +550,7 @@ MealPlans,client/src/pages/MealPlans.tsx,interactive-review,True,False,False,Fal
 MediaCarousel,client/src/pages/MediaCarousel.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 MediaGallery,client/src/pages/MediaGallery.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 MedicationReminder,client/src/pages/MedicationReminder.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-MegaMarketplace,client/src/pages/MegaMarketplace.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+MegaMarketplace,client/src/pages/MegaMarketplace.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MembershipTiers,client/src/pages/MembershipTiers.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 MemoryConstellation,client/src/pages/MemoryConstellation.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 MemoryGraphVisualizer,client/src/pages/MemoryGraphVisualizer.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
