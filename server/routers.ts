@@ -896,7 +896,19 @@ export const appRouter = router({
         })),
     }),
   }),
-  agents44: createFeatureRouter(),
+  agents44: router({
+    getAll: publicProcedure.query(() => ({
+      agents: [] as Array<{
+        id: string;
+        name: string;
+        description: string;
+        category: string;
+        specialty: string;
+      }>,
+      categories: [] as Array<{ id: string; label: string }>,
+      total: 0,
+    })),
+  }),
 
   // Social & Community Routers
   social: createFeatureRouter(),
@@ -946,7 +958,86 @@ export const appRouter = router({
   story: createFeatureRouter(),
 
   // Marketplace & Commerce Routers
-  marketplace: createFeatureRouter(),
+  marketplace: router({
+    getProducts: publicProcedure
+      .input(
+        z
+          .object({
+            category: z.string().optional(),
+            search: z.string().optional(),
+            sort: z.string().optional(),
+            limit: z.number().int().min(1).max(100).optional(),
+            offset: z.number().int().min(0).optional(),
+          })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            title: string;
+            platformPrice: number;
+            rating: number;
+            reviewCount: number;
+            soldCount: number;
+            deliveryDays: string;
+            imageUrl: string;
+          }>
+      ),
+    getHot: publicProcedure.query(
+      () =>
+        [] as Array<{
+          id: string;
+          title: string;
+          platformPrice: number;
+          imageUrl: string;
+        }>
+    ),
+    listings: publicProcedure.input(z.object({}).optional()).query(
+      () =>
+        [] as Array<{
+          id: number;
+          title: string;
+          description: string | null;
+          type: string;
+          price: number;
+          currency: string;
+          imageUrl: string | null;
+          isAuction: boolean;
+        }>
+    ),
+    placeOrder: protectedProcedure
+      .input(
+        z.object({
+          productId: z.string(),
+          quantity: z.number().int().positive(),
+          selectedColor: z.string().optional(),
+          selectedSize: z.string().optional(),
+        })
+      )
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        marketplaceUrl: undefined as string | undefined,
+      })),
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          price: z.number().nonnegative(),
+          type: z.enum([
+            "nft",
+            "digital_asset",
+            "merch",
+            "subscription",
+            "service",
+            "gaming_item",
+          ]),
+          currency: z.string().min(1),
+          imageUrl: z.string().optional(),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+  }),
   creator: router({
     list: publicProcedure.query(() => []),
     get: publicProcedure.input(z.unknown().optional()).query(() => ({})),
@@ -1021,7 +1112,21 @@ export const appRouter = router({
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
   }),
-  payments: createFeatureRouter(),
+  payments: router({
+    createStripeCheckout: protectedProcedure
+      .input(
+        z.object({
+          listingId: z.number(),
+          amount: z.number().int().nonnegative(),
+          successUrl: z.string().url(),
+          cancelUrl: z.string().url(),
+        })
+      )
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        url: undefined as string | undefined,
+      })),
+  }),
 
   // Blockchain & Crypto Routers
   blockchain: blockchainRouter,
