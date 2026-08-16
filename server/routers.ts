@@ -1499,7 +1499,54 @@ export const appRouter = router({
   }),
   proofVault: createFeatureRouter(),
   goc: createFeatureRouter(),
-  notifIntelligence: createFeatureRouter(),
+  notifIntelligence: router({
+    getIntelligentFeed: publicProcedure
+      .input(
+        z
+          .object({
+            limit: z.number().int().min(1).max(100).optional(),
+            filter: z.string().optional(),
+            offset: z.number().int().min(0).optional(),
+          })
+          .optional()
+      )
+      .query(() => ({
+        notifications: [] as Array<{
+          id: number;
+          title: string;
+          message: string;
+          body: string;
+          priority: string;
+          score: number;
+          read: boolean;
+          batchCount: number;
+          createdAt: string;
+        }>,
+        unreadCount: 0,
+      })),
+    getAISummary: publicProcedure.query(() => ({
+      summary: "",
+      highlights: [] as Array<{ type: string; count: number }>,
+    })),
+    getAnalytics: publicProcedure.query(() => ({
+      byPriority: [] as Array<{
+        priority: string;
+        total: number;
+        readRate: number;
+        avgScore: number;
+        avgReadTimeSecs: number | null;
+      }>,
+    })),
+    markRead: protectedProcedure
+      .input(
+        z.object({
+          id: z.number().optional(),
+          ids: z.array(z.number()).optional(),
+          all: z.boolean().optional(),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+  }),
   investor: router({
     kpis: protectedProcedure.query(() => ({
       totalInvested: 0,
