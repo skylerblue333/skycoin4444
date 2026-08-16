@@ -1933,7 +1933,52 @@ export const appRouter = router({
     })),
   }),
   proofVault: createFeatureRouter(),
-  goc: createFeatureRouter(),
+  goc: router({
+    tokenRegistry: publicProcedure.query(() => ({
+      all: [] as Array<{
+        symbol: string;
+        name: string;
+        emoji: string;
+        description: string;
+        stakeable: boolean;
+        burnable: boolean;
+        tippable: boolean;
+        earnable: boolean;
+        swappable: boolean;
+        govWeight: number;
+        newUserAirdrop: number;
+        role: string;
+      }>,
+    })),
+    regions: publicProcedure.query(() => [] as Array<Record<string, unknown>>),
+    ambassadors: publicProcedure
+      .input(z.object({}).optional())
+      .query(() => [] as Array<Record<string, unknown>>),
+    heatmap: publicProcedure.query(
+      () =>
+        [] as Array<{
+          regionCode: string;
+          regionName: string;
+          activeUsers: number;
+          cryptoEnabled: boolean;
+        }>
+    ),
+    growthAnalysis: protectedProcedure.query(() => ({
+      available: false as const,
+      generatedAt: "",
+      metrics: {
+        users: 0,
+        totalUsers: 0,
+        totalPosts: 0,
+        totalTransactions: 0,
+        growthRate: 0,
+        conversionRate: 0,
+      },
+      analysis:
+        "Growth analysis is unavailable until verified analytics are connected.",
+      recommendations: [] as Array<{ title: string; description: string }>,
+    })),
+  }),
   notifIntelligence: router({
     getIntelligentFeed: publicProcedure
       .input(
