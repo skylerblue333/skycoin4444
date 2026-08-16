@@ -874,7 +874,7 @@ StockChart,client/src/pages/StockChart.tsx,truthfully-gated,True,False,False,Fal
 StockSearch,client/src/pages/StockSearch.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 Stories,client/src/pages/Stories.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 StreamAnalytics,client/src/pages/StreamAnalytics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-StreamClip,client/src/pages/StreamClip.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+StreamClip,client/src/pages/StreamClip.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 StreamGifting,client/src/pages/StreamGifting.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StreamingDashboard,client/src/pages/StreamingDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
 StripeCheckout,client/src/pages/StripeCheckout.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
