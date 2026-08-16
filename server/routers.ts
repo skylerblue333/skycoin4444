@@ -1648,9 +1648,45 @@ export const appRouter = router({
         "Platform health telemetry is unavailable until observability storage is connected.",
     })),
   }),
-  enterprise: createFeatureRouter(),
+  enterprise: router({
+    economy: router({
+      healthReport: publicProcedure.query(() => ({
+        overallHealth: "UNKNOWN",
+        available: false as const,
+      })),
+    }),
+    governanceV2: router({
+      health: publicProcedure.query(() => ({
+        activeProposals: 0,
+        avgParticipation: 0,
+        available: false as const,
+      })),
+    }),
+    security: router({
+      myRiskScore: protectedProcedure.query(() => ({
+        riskScore: 0,
+        available: false as const,
+      })),
+    }),
+    freeWill: router({
+      systemSnapshot: publicProcedure.query(() => ({
+        available: false as const,
+        status: "unavailable" as const,
+      })),
+    }),
+  }),
   governance: createFeatureRouter(),
-  orchestrator: createFeatureRouter(),
+  orchestrator: router({
+    status: publicProcedure.query(() => ({
+      platformScore: 0,
+      recommendations: [] as Array<{
+        title: string;
+        description: string;
+        priority: string;
+      }>,
+      available: false as const,
+    })),
+  }),
   search: createFeatureRouter(),
 
   // Gaming & Gamification Routers
