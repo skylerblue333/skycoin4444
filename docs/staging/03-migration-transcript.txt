@@ -1,0 +1,20 @@
+03 — Migration Transcript
+
+Checkpoint: 41316ef
+Assessment date: 2026-08-16
+Status: BLOCKED — APPROVED STAGING DATABASE ACCESS NOT AVAILABLE
+
+Migration command: NOT EXECUTED
+Expected repository command: pnpm run db:push
+Start timestamp: NOT APPLICABLE
+End timestamp: NOT APPLICABLE
+Migration result: NOT VERIFIED
+Warnings/errors: No migration was attempted because no approved staging DATABASE_URL or database service is available.
+Schema verification: NOT VERIFIED
+Schema checksum/state: NOT GENERATED
+
+No production database, mock database, SQLite database, or in-memory substitute was used.
+
+Rollback action: Not applicable because no migration or schema change was executed.
+
+Acceptance: NOT VERIFIED / NOT ACCEPTED.
