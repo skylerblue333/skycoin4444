@@ -715,7 +715,83 @@ export const appRouter = router({
           "Persona seeding is unavailable until a verified AI generation integration is connected.",
       })),
   }),
-  hopeAI: createFeatureRouter(),
+  hopeAI: router({
+    grayArea: protectedProcedure
+      .input(
+        z.object({
+          text: z.string().min(1),
+          sessionDurationMs: z.number().nonnegative().optional(),
+          timeOfDay: z.number().int().min(0).max(23).optional(),
+          dayOfWeek: z.number().int().min(0).max(6).optional(),
+          typingWpm: z.number().optional(),
+          backspaceRate: z.number().optional(),
+          messageCount: z.number().int().nonnegative().optional(),
+          topicHistory: z.array(z.string()).optional(),
+        })
+      )
+      .mutation(() => ({
+        ...aiUnavailableResult,
+        activeSignals: [] as Array<{
+          feature: string;
+          score: number;
+          label: string;
+          severity: string;
+        }>,
+        dominantSignal: "",
+        overallRisk: 0,
+        hopeMode: "companion",
+      })),
+    getChatHistory: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(100).optional(),
+          sessionId: z.string().min(1),
+        })
+      )
+      .query(
+        () =>
+          [] as Array<{
+            role: string;
+            content: string;
+            tone: string | null;
+            emotionalState: string | null;
+            createdAt: number;
+          }>
+      ),
+    saveChatMessage: protectedProcedure
+      .input(
+        z.object({
+          role: z.string(),
+          content: z.string().min(1),
+          tone: z.string().optional(),
+          emotionalState: z.string().optional(),
+          sessionId: z.string().min(1),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+    clearChatHistory: protectedProcedure
+      .input(z.object({ sessionId: z.string().min(1) }).optional())
+      .mutation(() => unavailableMutationResult),
+    chat: protectedProcedure
+      .input(
+        z.object({
+          messageText: z.string().min(1),
+          conversationHistory: z
+            .array(z.object({ role: z.string(), content: z.string() }))
+            .optional(),
+          overrideTone: z.string().optional(),
+          signals: z.record(z.string(), z.unknown()).optional(),
+        })
+      )
+      .mutation(() => ({
+        ...aiUnavailableResult,
+        message: "",
+        tone: "",
+        emotionalState: "neutral",
+        followUpPrompts: [] as string[],
+        innerThought: "",
+      })),
+  }),
   hopeIntelligence: router({
     missions: router({
       list: publicProcedure.input(z.object({}).optional()).query(
