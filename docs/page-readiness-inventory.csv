@@ -934,7 +934,7 @@ TipJar,client/src/pages/TipJar.tsx,integration-backed-review,True,True,False,Tru
 ToastNotifications,client/src/pages/ToastNotifications.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 TodoList,client/src/pages/TodoList.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ToggleSwitchForm,client/src/pages/ToggleSwitchForm.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-TokenDashboard,client/src/pages/TokenDashboard.tsx,integration-backed-review,True,True,False,False,True,False,False,False,False
+TokenDashboard,client/src/pages/TokenDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TokenGovernance,client/src/pages/TokenGovernance.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 TokenInformation,client/src/pages/TokenInformation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TokenMetrics,client/src/pages/TokenMetrics.tsx,static-review,True,False,False,False,False,False,False,False,False
