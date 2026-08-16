@@ -6,7 +6,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
-import { createPost, db, getPosts } from "./db";
+import { createPost, db, getPosts, getTransactions, getWallet } from "./db";
 import { storagePut } from "./storage";
 
 // Create a base router template for all feature modules
@@ -44,6 +44,32 @@ const feedRouter = router({
   get: publicProcedure.input(z.string().min(1)).query(async ({ input }) => {
     const posts = await getPosts(100, 0);
     return posts.find(post => post.id === input) ?? null;
+  }),
+});
+
+const walletRouter = router({
+  overview: protectedProcedure.query(async ({ ctx }) => {
+    const [wallet, transactions] = await Promise.all([
+      getWallet(ctx.user.id),
+      getTransactions(ctx.user.id),
+    ]);
+    return {
+      wallet: wallet ? {
+        id: wallet.id,
+        address: wallet.address,
+        currency: wallet.currency,
+        balance: wallet.balance,
+        createdAt: wallet.createdAt,
+      } : null,
+      transactions: transactions.map(transaction => ({
+        id: transaction.id,
+        type: transaction.type,
+        amount: transaction.amount,
+        status: transaction.status,
+        txHash: transaction.txHash,
+        createdAt: transaction.createdAt,
+      })),
+    };
   }),
 });
 
@@ -132,6 +158,7 @@ export const appRouter = router({
 
   // Blockchain & Crypto Routers
   blockchain: createFeatureRouter(),
+  wallet: walletRouter,
   staking: createFeatureRouter(),
   economy: createFeatureRouter(),
   gamefi: createFeatureRouter(),
@@ -184,7 +211,6 @@ export const appRouter = router({
   trading: createFeatureRouter(),
   trustSafety: createFeatureRouter(),
   video: createFeatureRouter(),
-  wallet: createFeatureRouter(),
   wave2AiCore: createFeatureRouter(),
   wave2Marketplace: createFeatureRouter(),
   wave2Notifications: createFeatureRouter(),
