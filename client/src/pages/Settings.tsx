@@ -42,7 +42,7 @@ export default function Settings() {
 
   const handleSaveProfile = () => {
     updateProfile.mutate({
-      displayName,
+      name: displayName,
       bio,
     });
   };

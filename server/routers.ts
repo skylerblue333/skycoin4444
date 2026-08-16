@@ -4,33 +4,59 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import * as schema from "../drizzle/schema";
+import { db } from "./db";
 
 // Create a base router template for all feature modules
-const createFeatureRouter = () => router({
-  list: publicProcedure.query(() => []),
-  get: publicProcedure.input(z.string()).query(({ input }) => ({})),
-  create: protectedProcedure.input(z.object({})).mutation(({ input }) => ({ success: true })),
-  update: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ input }) => ({ success: true })),
-  delete: protectedProcedure.input(z.string()).mutation(({ input }) => ({ success: true })),
-});
-
-const unavailableUserFeature = (feature: string): never => {
+const unavailableFeature = (feature: string): never => {
   throw new TRPCError({
     code: "NOT_IMPLEMENTED",
     message: `${feature} is unavailable until its verified persistence and authorization contract is configured.`,
   });
 };
 
+const createFeatureRouter = () => router({
+  list: publicProcedure.query(() => [] as const),
+  get: publicProcedure.input(z.string()).query(() => null),
+  create: protectedProcedure.input(z.record(z.string(), z.unknown())).mutation(() => unavailableFeature("This feature creation")),
+  update: protectedProcedure.input(z.object({ id: z.string() }).and(z.record(z.string(), z.unknown()))).mutation(() => unavailableFeature("This feature update")),
+  delete: protectedProcedure.input(z.string()).mutation(() => unavailableFeature("This feature deletion")),
+});
+
 const userRouter = router({
-  profile: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => null),
-  profileByUsername: publicProcedure.input(z.object({ username: z.string().min(1) })).query(() => null),
+  profile: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ input, ctx }) => {
+    if (input.userId !== ctx.user.id) return null;
+    return db.query.users.findFirst({ where: eq(schema.users.id, input.userId) });
+  }),
+  profileByUsername: publicProcedure.input(z.object({ username: z.string().trim().min(1).max(255) })).query(async ({ input }) => {
+    const user = await db.query.users.findFirst({ where: eq(schema.users.username, input.username) });
+    if (!user) return null;
+    return {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      bio: user.bio,
+      avatar: user.avatar,
+      role: user.role,
+      verified: user.verified,
+      createdAt: user.createdAt,
+    };
+  }),
   suggestedFollows: protectedProcedure.query(() => [] as const),
-  followers: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => [] as const),
-  following: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => [] as const),
-  leaderboard: publicProcedure.input(z.object({ type: z.string(), limit: z.number().int().positive().max(100) })).query(() => [] as const),
-  follow: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).mutation(() => unavailableUserFeature("Following users")),
-  updateProfile: protectedProcedure.input(z.record(z.string(), z.string())).mutation(() => unavailableUserFeature("Profile updates")),
-  uploadAvatar: protectedProcedure.input(z.object({ data: z.string(), type: z.enum(["avatar", "banner"]), mimeType: z.string() })).mutation(() => unavailableUserFeature("Profile image uploads")),
+  followers: protectedProcedure.input(z.object({ userId: z.string() })).query(() => [] as const),
+  following: protectedProcedure.input(z.object({ userId: z.string() })).query(() => [] as const),
+  leaderboard: publicProcedure.input(z.object({ type: z.string().min(1), limit: z.number().int().positive().max(100) })).query(() => [] as const),
+  follow: protectedProcedure.input(z.object({ userId: z.string() })).mutation(() => unavailableFeature("Following users")),
+  updateProfile: protectedProcedure.input(z.object({
+    name: z.string().trim().min(1).max(255).optional(),
+    username: z.string().trim().min(1).max(255).regex(/^[A-Za-z0-9_]+$/).optional(),
+    bio: z.string().trim().max(255).optional(),
+  }).refine(input => Object.keys(input).length > 0, "At least one profile field is required")).mutation(async ({ input, ctx }) => {
+    await db.update(schema.users).set(input).where(eq(schema.users.id, ctx.user.id));
+    return db.query.users.findFirst({ where: eq(schema.users.id, ctx.user.id) });
+  }),
+  uploadAvatar: protectedProcedure.input(z.object({ data: z.string(), type: z.enum(["avatar", "banner"]), mimeType: z.string() })).mutation(() => unavailableFeature("Profile image uploads")),
 });
 
 export const appRouter = router({
