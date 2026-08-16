@@ -243,7 +243,7 @@ CreatorOnboarding,client/src/pages/CreatorOnboarding.tsx,interactive-review,True
 CreatorProfile,client/src/pages/CreatorProfile.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
 CreatorSpotlight,client/src/pages/CreatorSpotlight.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 CreatorStudio,client/src/pages/CreatorStudio.tsx,static-review,True,False,False,False,False,False,False,False,False
-CrossChainInterop,client/src/pages/CrossChainInterop.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+CrossChainInterop,client/src/pages/CrossChainInterop.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 CrossChainSwap,client/src/pages/CrossChainSwap.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Crypto,client/src/pages/Crypto.tsx,integration-backed-review,True,True,False,False,True,False,True,False,True
 CryptoEnhancementsPage,client/src/pages/CryptoEnhancementsPage.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
