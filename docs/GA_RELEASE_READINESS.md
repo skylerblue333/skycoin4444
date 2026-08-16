@@ -2,20 +2,20 @@
 
 **Assessment date:** 2026-08-16  
 **Repository:** `skylerblue333/skycoin4444`  
-**Verified checkpoint:** `88235c2b7175985df54dc7e4e279de30928f76d4`  
+**Verified checkpoint:** `41db9979e35178f295c73709cb167f78b6a50f25`
 **Assessment:** **Code validation green; GA release not yet authorized.**
 
 ## Verified evidence
 
-| Gate                    | Result                   | Evidence                                                                                                                                                              |
-| ----------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Strict TypeScript       | Pass                     | `pnpm run check` completed with zero diagnostics.                                                                                                                     |
-| Production build        | Pass                     | `pnpm run build` completed locally and in GitHub Actions.                                                                                                             |
-| Automated tests         | Pass for available suite | `pnpm run test -- --run` completed successfully; the suite is still smaller than a full GA critical-workflow suite.                                                   |
-| Diff hygiene            | Pass                     | `git diff --check` completed without whitespace errors.                                                                                                               |
-| Truthful page inventory | Pass                     | `docs/page-readiness-inventory.csv` regenerated for 1,079 routes.                                                                                                     |
-| GitHub CI               | Pass                     | Workflow run `31937644713` completed successfully for checkpoint `88235c2`. It ran dependency installation, typecheck, tests, production build, and dependency audit. |
-| Remote push             | Pass                     | `master` pushed to GitHub through HTTPS; the remote contains checkpoint `88235c2`.                                                                                    |
+| Gate                    | Result                   | Evidence                                                                                                                                                                                                                 |
+| ----------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Strict TypeScript       | Pass                     | `pnpm run check` completed with zero diagnostics.                                                                                                                                                                        |
+| Production build        | Pass                     | `pnpm run build` completed locally and in GitHub Actions.                                                                                                                                                                |
+| Automated tests         | Pass for available suite | `pnpm run test -- --run` completed successfully; the suite is still smaller than a full GA critical-workflow suite.                                                                                                      |
+| Diff hygiene            | Pass                     | `git diff --check` completed without whitespace errors.                                                                                                                                                                  |
+| Truthful page inventory | Pass                     | `docs/page-readiness-inventory.csv` regenerated for 1,079 routes.                                                                                                                                                        |
+| GitHub CI               | Pass                     | Workflow runs `31937644713` and `31937710216` completed successfully for checkpoints `88235c2` and `41db997`. The latest run included dependency installation, typecheck, tests, production build, and dependency audit. |
+| Remote push             | Pass                     | `master` pushed to GitHub through HTTPS; the remote contains checkpoint `41db997`.                                                                                                                                       |
 
 ## Current product boundary
 
@@ -35,7 +35,7 @@ Verified account-scoped wallet ledger reads remain distinct from on-chain custod
 | Backup and restore         | Not verified                | Documented backup schedule, encryption, retention, restore test, and recovery objective evidence.                                                                                                                |
 | Critical workflow coverage | Incomplete                  | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, and admin authorization tests against representative services.                                                            |
 | Dependency advisory        | Open / externally confirmed | GitHub reported one moderate Dependabot advisory, #121. The configured token could not read the alert detail endpoint (HTTP 403), so its package and remediation status require confirmation in GitHub Security. |
-| CI action warning          | Follow-up                   | GitHub annotated that actions targeting Node.js 20 are being forced onto Node.js 24. Update action versions or document the compatibility decision before the workflow runtime changes again.                    |
+| CI action warning          | Resolved                    | `actions/checkout` and `actions/setup-node` were updated to v5, and workflow run `31937710216` completed successfully for checkpoint `41db997`.                                                                  |
 
 ## Release decision
 
@@ -44,8 +44,7 @@ The current checkpoint is suitable as a **code-green stabilization checkpoint** 
 ## Next verification sequence
 
 1. Confirm the open Dependabot advisory in GitHub Security and remediate or document an accepted risk.
-2. Update the CI action runtime warning and rerun the workflow.
-3. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
-4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence captured in this document.
-5. Expand critical workflow tests and rerun the complete release gate.
-6. Reassess GA only after every no-go row has an owner, evidence, and rollback plan.
+2. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
+3. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence captured in this document.
+4. Expand critical workflow tests and rerun the complete release gate.
+5. Reassess GA only after every no-go row has an owner, evidence, and rollback plan.
