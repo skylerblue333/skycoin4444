@@ -484,7 +484,7 @@ IntegrationSetup,client/src/pages/IntegrationSetup.tsx,interactive-review,True,F
 Integrations,client/src/pages/Integrations.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 InventoryManagement,client/src/pages/InventoryManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 InvestmentGoals,client/src/pages/InvestmentGoals.tsx,static-review,True,False,False,False,False,False,False,False,False
-InvestorMetrics,client/src/pages/InvestorMetrics.tsx,static-review,True,False,False,False,False,False,False,False,True
+InvestorMetrics,client/src/pages/InvestorMetrics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 InvestorPitch,client/src/pages/InvestorPitch.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 InvestorPortal,client/src/pages/InvestorPortal.tsx,integration-backed-review,True,True,False,True,True,True,False,False,True
 InvestorRoom,client/src/pages/InvestorRoom.tsx,integration-backed-review,True,True,False,False,True,False,False,False,True
