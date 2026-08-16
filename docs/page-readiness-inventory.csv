@@ -1036,7 +1036,7 @@ WalkthroughPage,client/src/pages/WalkthroughPage.tsx,interactive-review,True,Fal
 Wallet,client/src/pages/Wallet.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
 WalletConnect,client/src/pages/WalletConnect.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WalletIntegration,client/src/pages/WalletIntegration.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-WalletOverview,client/src/pages/WalletOverview.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+WalletOverview,client/src/pages/WalletOverview.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WarningDialog,client/src/pages/WarningDialog.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 WatchEarn,client/src/pages/WatchEarn.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WatchList,client/src/pages/WatchList.tsx,interactive-review,True,False,False,False,False,True,True,False,False
