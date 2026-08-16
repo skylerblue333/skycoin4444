@@ -944,7 +944,7 @@ TournamentBracket,client/src/pages/TournamentBracket.tsx,integration-backed-revi
 TournamentBrackets,client/src/pages/TournamentBrackets.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Tournaments,client/src/pages/Tournaments.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TradeHistory,client/src/pages/TradeHistory.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-Trading,client/src/pages/Trading.tsx,static-review,True,False,False,False,False,False,False,False,True
+Trading,client/src/pages/Trading.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TradingBots,client/src/pages/TradingBots.tsx,static-review,True,False,False,False,False,False,False,False,False
 TradingHistory,client/src/pages/TradingHistory.tsx,static-review,True,False,False,False,False,False,False,False,False
 TradingTerminal,client/src/pages/TradingTerminal.tsx,interactive-review,True,False,False,False,False,True,True,False,True
