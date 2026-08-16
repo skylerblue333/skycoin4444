@@ -518,7 +518,7 @@ LiquidityPools,client/src/pages/LiquidityPools.tsx,static-review,True,False,Fals
 ListView,client/src/pages/ListView.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 Live,client/src/pages/Live.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LiveChat,client/src/pages/LiveChat.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-LiveGifting,client/src/pages/LiveGifting.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+LiveGifting,client/src/pages/LiveGifting.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 LiveReactions,client/src/pages/LiveReactions.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LiveStreamSetup,client/src/pages/LiveStreamSetup.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LiveStreaming,client/src/pages/LiveStreaming.tsx,static-review,True,False,False,False,False,False,False,False,False
