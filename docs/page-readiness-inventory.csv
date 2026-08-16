@@ -930,7 +930,7 @@ TimePickerDialog,client/src/pages/TimePickerDialog.tsx,interactive-review,True,F
 TimeTracking,client/src/pages/TimeTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TimelineView,client/src/pages/TimelineView.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 TimeoutError,client/src/pages/TimeoutError.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-TipJar,client/src/pages/TipJar.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
+TipJar,client/src/pages/TipJar.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ToastNotifications,client/src/pages/ToastNotifications.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 TodoList,client/src/pages/TodoList.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ToggleSwitchForm,client/src/pages/ToggleSwitchForm.tsx,interactive-review,True,False,False,False,False,True,False,False,False
