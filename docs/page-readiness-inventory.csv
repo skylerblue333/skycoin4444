@@ -49,7 +49,7 @@ AddressBook,client/src/pages/AddressBook.tsx,interactive-review,True,False,False
 AddressLookup,client/src/pages/AddressLookup.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Admin,client/src/pages/Admin.tsx,integration-backed-review,True,True,False,False,True,False,False,False,False
 AdminDashboard,client/src/pages/AdminDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
-AdminOrders,client/src/pages/AdminOrders.tsx,interactive-review,True,False,False,False,False,True,True,False,False
+AdminOrders,client/src/pages/AdminOrders.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdminPanel,client/src/pages/AdminPanel.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdminWalletManager,client/src/pages/AdminWalletManager.tsx,integration-backed-review,True,False,True,False,False,True,True,False,False
 AdvancedAdminPanel,client/src/pages/AdvancedAdminPanel.tsx,interactive-review,True,False,False,False,False,True,True,False,False
