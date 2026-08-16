@@ -55,14 +55,14 @@ export default function School() {
         <div className="container py-16">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono mb-6">
-              <GraduationCap className="h-3.5 w-3.5" /> SKY SCHOOL — LEARN. EARN. BUILD.
+              <GraduationCap className="h-3.5 w-3.5" /> SKY SCHOOL — LEARN. PRACTICE. BUILD.
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Master <span className="text-primary">Web3</span> &amp; <span className="text-purple-400">AI</span><br />Earn While You Learn
+              Learn <span className="text-primary">Web3</span> &amp; <span className="text-purple-400">AI</span><br />Build useful foundations
             </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl">World-class courses on blockchain, DeFi, AI trading, and Web3 development. Complete courses to earn SKY444 rewards and verifiable on-chain certificates.</p>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl">Explore structured lessons on blockchain, DeFi, AI, and Web3 development. Course progress, rewards, and certificates are shown only when their underlying services are verified and connected.</p>
             <div className="flex flex-wrap gap-6 text-sm">
-              {[{ icon: BookOpen, label: "18 Courses", color: "text-primary" }, { icon: Users, label: "543K+ Students", color: "text-blue-400" }, { icon: Trophy, label: "On-Chain Certs", color: "text-yellow-400" }, { icon: Coins, label: "Earn SKY444", color: "text-purple-400" }].map(({ icon: Icon, label, color }) => (
+              {[{ icon: BookOpen, label: "Course catalog", color: "text-primary" }, { icon: Users, label: "Learner accounts", color: "text-blue-400" }, { icon: Trophy, label: "Certificates: provider-dependent", color: "text-yellow-400" }, { icon: Coins, label: "Rewards: not configured", color: "text-purple-400" }].map(({ icon: Icon, label, color }) => (
                 <div key={label} className="flex items-center gap-2"><Icon className={`h-4 w-4 ${color}`} /><span className="font-medium">{label}</span></div>
               ))}
             </div>
@@ -73,7 +73,7 @@ export default function School() {
       <div className="container py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[{ label: "Total Students", value: "543K+", icon: Users, color: "text-blue-400" }, { label: "Courses Available", value: "18", icon: BookOpen, color: "text-primary" }, { label: "SKY444 Earned", value: "12.8M", icon: Coins, color: "text-yellow-400" }, { label: "Certificates Issued", value: "89K", icon: Award, color: "text-purple-400" }].map(({ label, value, icon: Icon, color }) => (
+          {[{ label: "Learner count", value: "Unavailable", icon: Users, color: "text-blue-400" }, { label: "Catalog state", value: "Available", icon: BookOpen, color: "text-primary" }, { label: "Rewards", value: "Not configured", icon: Coins, color: "text-yellow-400" }, { label: "Certificates", value: "Provider-dependent", icon: Award, color: "text-purple-400" }].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="rounded-xl border border-border/50 bg-card/50 p-4 text-center">
               <Icon className={`h-5 w-5 ${color} mx-auto mb-2`} />
               <div className="text-2xl font-bold font-mono">{value}</div>

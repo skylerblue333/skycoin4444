@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRightIcon, LightningBoltIcon, RocketIcon, StarIcon } from '@radix-ui/react-icons';
+import { ArrowRight as ArrowRightIcon, Zap as LightningBoltIcon, Rocket as RocketIcon, Star as StarIcon } from 'lucide-react';
 
 const LandingPage = () => {
   return (

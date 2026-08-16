@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
@@ -21,17 +20,8 @@ const SKYLER_PHOTOS = {
   innovativeIT: "/manus-storage/innovative-it_e43e1089.png",
 };
 
-// Live activity feed items
-const LIVE_ACTIVITIES = [
-  { icon: TrendingUp, color: "bg-amber-900/60 text-amber-400", title: "BTC/USDT trade executed: +$2,400 profit", sub: "Market order filled at $67,400", time: "2s ago" },
-  { icon: Bot, color: "bg-teal-900/60 text-teal-400", title: "HOPE AI: Market breakout detected — BTC", sub: "Automated trading signal generated", time: "14s ago" },
-  { icon: Heart, color: "bg-rose-900/60 text-rose-400", title: "New match: Alex Rivera (98% compatibility)", sub: "Profile view and message sent", time: "1m ago" },
-  { icon: Coins, color: "bg-purple-900/60 text-purple-400", title: "Staking reward claimed: +847 SKY444", sub: "Auto-compound enabled — 18.4% APY", time: "3m ago" },
-  { icon: Trophy, color: "bg-yellow-900/60 text-yellow-400", title: "Tournament win: Crypto Quiz Blitz", sub: "Earned 2,500 SKY444 prize", time: "7m ago" },
-  { icon: Store, color: "bg-blue-900/60 text-blue-400", title: "Order shipped: AirPods Pro Clone", sub: "Tracking: YT847291CN — Est. 7 days", time: "12m ago" },
-  { icon: GraduationCap, color: "bg-emerald-900/60 text-emerald-400", title: "Course completed: DeFi Fundamentals", sub: "Certificate minted on-chain", time: "1h ago" },
-  { icon: Radio, color: "bg-red-900/60 text-red-400", title: "Stream went live: Crypto Market Analysis", sub: "247 viewers joined in first 5 minutes", time: "2h ago" },
-];
+// Live activity is intentionally empty until backed by a verified server event stream.
+const LIVE_ACTIVITIES: never[] = [];
 
 // Crypto price data (simulated sparkline)
 const generateSparkline = (base: number, volatility: number, points = 20) => {
@@ -44,12 +34,8 @@ const generateSparkline = (base: number, volatility: number, points = 20) => {
   return data;
 };
 
-const CRYPTO_CARDS = [
-  { symbol: "TRUMP", name: "Trump Coin", price: 8.72, change: 18.2, held: "10.0K", color: "#f59e0b", data: generateSparkline(8, 0.04) },
-  { symbol: "SKY444", name: "SkyCoin 4444", price: 0.01, change: 44.4, held: "1.2M", color: "#06b6d4", data: generateSparkline(0.01, 0.06) },
-  { symbol: "BTC", name: "Bitcoin", price: 67400, change: 3.2, held: "0.042", color: "#f97316", data: generateSparkline(67400, 0.02) },
-  { symbol: "ETH", name: "Ethereum", price: 3240, change: -1.8, held: "1.5", color: "#8b5cf6", data: generateSparkline(3240, 0.03) },
-];
+// Portfolio data is intentionally empty until a verified wallet and market-data provider are configured.
+const CRYPTO_CARDS: never[] = [];
 
 function SparklineChart({ data, color, positive }: { data: number[]; color: string; positive: boolean }) {
   const min = Math.min(...data);
@@ -81,22 +67,14 @@ const QUICK_LINKS = [
 ];
 
 const PLATFORM_STATS = [
-  { label: "Total Users", value: "847K", change: "+12.4%", icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
-  { label: "SKY444 Price", value: "$0.01", change: "+44.4%", icon: Coins, color: "text-amber-400", bg: "bg-amber-500/10" },
-  { label: "Total Staked", value: "$4.2M", change: "+8.7%", icon: Shield, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  { label: "Daily Volume", value: "$1.8M", change: "+23.1%", icon: Activity, color: "text-purple-400", bg: "bg-purple-500/10" },
+  { label: "Users", value: "Unavailable", change: "Verified backend required", icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
+  { label: "Market data", value: "Unavailable", change: "Provider required", icon: Coins, color: "text-amber-400", bg: "bg-amber-500/10" },
+  { label: "Wallet state", value: "Unavailable", change: "Custody not configured", icon: Shield, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+  { label: "Activity", value: "Unavailable", change: "Event stream required", icon: Activity, color: "text-purple-400", bg: "bg-purple-500/10" },
 ];
 
 export default function Dashboard() {
   const { user, loading: isLoading } = useAuth();
-  const [activityIdx, setActivityIdx] = useState(0);
-  const [onlineCount] = useState(() => Math.floor(Math.random() * 5000) + 12000);
-
-  useEffect(() => {
-    const t = setInterval(() => setActivityIdx(i => (i + 1) % LIVE_ACTIVITIES.length), 4000);
-    return () => clearInterval(t);
-  }, []);
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
@@ -113,7 +91,7 @@ export default function Dashboard() {
             <Zap className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-3xl font-black text-white mb-3">Welcome to SkyCoin4444</h1>
-          <p className="text-slate-400 mb-8">The world's most advanced Web3 social ecosystem. AI · DeFi · Gaming · Creator Economy.</p>
+          <p className="text-slate-400 mb-8">A focused digital workspace for learning, community, and provider-backed ecosystem features. Authentication is required for personalized data.</p>
           <a href={getLoginUrl()} className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold px-8 py-4 rounded-2xl text-lg hover:opacity-90 transition-opacity">
             <Zap className="h-5 w-5" /> Enter the Ecosystem
           </a>
@@ -122,7 +100,7 @@ export default function Dashboard() {
     );
   }
 
-  const isOwner = user.name === "Skyler blue" || user.openId === user.openId;
+  const isOwner = user.name === "Skyler blue";
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white pb-24">
@@ -213,55 +191,23 @@ export default function Dashboard() {
             <h2 className="font-bold text-white">Portfolio</h2>
             <Link href="/wallet" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1">View All <ChevronRight className="h-3 w-3" /></Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {CRYPTO_CARDS.map(c => (
-              <div key={c.symbol} className="rounded-2xl border border-slate-800/60 bg-slate-900/60 p-4 hover:border-slate-700 transition-colors cursor-pointer">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <div className="text-xs text-slate-500 mb-0.5">{c.name}</div>
-                    <div className="font-black text-white text-lg">{c.symbol}</div>
-                  </div>
-                  <Badge className={`text-xs border-0 font-bold ${c.change >= 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
-                    {c.change >= 0 ? "+" : ""}{c.change}%
-                  </Badge>
-                </div>
-                <SparklineChart data={c.data} color={c.color} positive={c.change >= 0} />
-                <div className="mt-3 flex justify-between text-sm">
-                  <span className="text-slate-400">Price</span>
-                  <span className="font-bold text-white">${c.price.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-slate-400">Held</span>
-                  <span className="font-bold text-white">{c.held} held</span>
-                </div>
-              </div>
-            ))}
+          <div className="rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/30 p-6 text-center">
+            <Wallet className="mx-auto h-8 w-8 text-slate-500" />
+            <p className="mt-3 font-medium text-slate-300">Portfolio data is unavailable</p>
+            <p className="mt-1 text-sm text-slate-500">Connect a verified wallet and market-data provider before balances, prices, or performance are shown.</p>
+            <Link href="/wallet">
+              <Button variant="outline" size="sm" className="mt-4 border-slate-700 text-slate-300 hover:bg-slate-800">Review wallet boundary</Button>
+            </Link>
           </div>
         </div>
 
         {/* Live Activity Feed */}
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-white flex items-center gap-2">
-              Live Activity
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            </h2>
-            <span className="text-xs text-slate-500">{onlineCount.toLocaleString()} online now</span>
+        <div className="rounded-2xl border border-dashed border-slate-700/70 bg-slate-900/30 p-5">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="font-bold text-white flex items-center gap-2">Live activity</h2>
+            <Badge variant="outline" className="border-slate-700 text-slate-500">Not connected</Badge>
           </div>
-          <div className="space-y-3">
-            {LIVE_ACTIVITIES.slice(0, 5).map((a, i) => (
-              <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border border-slate-800/40 bg-slate-950/40 transition-all ${i === 0 ? "border-cyan-500/20 bg-cyan-500/5" : ""}`}>
-                <div className={`w-10 h-10 rounded-xl ${a.color} flex items-center justify-center shrink-0`}>
-                  <a.icon className="h-5 w-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white leading-tight">{a.title}</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{a.sub}</p>
-                </div>
-                <span className="text-xs text-slate-600 shrink-0">{a.time}</span>
-              </div>
-            ))}
-          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-500">A verified server event stream will appear here when configured. No synthetic trades, rewards, viewers, or user counts are shown.</p>
         </div>
 
         {/* Quick Links Grid */}

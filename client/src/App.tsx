@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useParams } from "wouter";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -844,7 +844,7 @@ const ShippingManagement = lazy(() => import('./pages/ShippingManagement'));
 const ShoppingCart = lazy(() => import('./pages/ShoppingCart'));
 const SidebarNavigation = lazy(() => import('./pages/SidebarNavigation'));
 const SignUp = lazy(() => import('./pages/SignUp'));
-const SignUpFlow = lazy(() => import('./pages/SignUpFlow'));
+const SignUpFlow = lazy(() => import('./pages/SignUpFlow').then((module) => ({ default: module.SignUpFlow })));
 const SignUp_old = lazy(() => import('./pages/SignUp_old'));
 const Signin = lazy(() => import('./pages/Signin'));
 const SituationRoom = lazy(() => import('./pages/SituationRoom'));
@@ -1038,7 +1038,7 @@ const VideoUploader = lazy(() => import('./pages/VideoUploader'));
 const ViewerMetrics = lazy(() => import('./pages/ViewerMetrics'));
 const VirtualTour = lazy(() => import('./pages/VirtualTour'));
 const VoiceCloning = lazy(() => import('./pages/VoiceCloning'));
-const VoiceCommands = lazy(() => import('./pages/VoiceCommands'));
+const VoiceCommands = lazy(() => import('./pages/VoiceCommands').then((module) => ({ default: module.VoiceCommandsPage })));
 const VoiceCommandsRegistry = lazy(() => import('./pages/VoiceCommandsRegistry'));
 const VoiceMessages = lazy(() => import('./pages/VoiceMessages'));
 const WalkthroughPage = lazy(() => import('./pages/WalkthroughPage'));
@@ -1065,6 +1065,11 @@ const WorldSimulationControl = lazy(() => import('./pages/WorldSimulationControl
 const YieldFarming = lazy(() => import('./pages/YieldFarming'));
 const ZapierIntegration = lazy(() => import('./pages/ZapierIntegration'));
 const ZeroKnowledgeProof = lazy(() => import('./pages/ZeroKnowledgeProof'));
+
+function SkySchoolQuizRoute() {
+  const params = useParams<{ lessonId?: string; id?: string }>();
+  return <SkySchoolQuiz lessonId={params.lessonId ?? params.id ?? "blockchain-101-lesson-0"} />;
+}
 
 function Router() {
   return (
@@ -1914,7 +1919,8 @@ function Router() {
         <Route path="/skill-badges" component={SkillBadges} />
         <Route path="/sky-school" component={SkySchool} />
         <Route path="/sky-school-a-i" component={SkySchoolAI} />
-        <Route path="/sky-school-quiz" component={SkySchoolQuiz} />
+        <Route path="/sky-school-quiz/:lessonId" component={SkySchoolQuizRoute} />
+        <Route path="/sky-school-quiz" component={SkySchoolQuizRoute} />
         <Route path="/sky-store" component={SkyStore} />
         <Route path="/slack-integration" component={SlackIntegration} />
         <Route path="/sleep-tracking" component={SleepTracking} />
