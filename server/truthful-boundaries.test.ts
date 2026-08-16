@@ -31,6 +31,10 @@ describe("truthful capability boundaries", () => {
     expect(source).toContain("const feedRouter");
     expect(source).toContain("createPost(ctx.user.id");
     expect(source).toContain("storagePut(`users/${ctx.user.id}/avatar`");
+    const profile = readProjectFile("client/src/pages/Profile.tsx");
+    expect(profile).toContain("trpc.feed.create.useMutation");
+    expect(profile).toContain("createPost.isPending");
+    expect(profile).toContain("utils.feed.list.invalidate");
   });
 
   it("does not return synthetic users or balances when database records are absent", () => {
