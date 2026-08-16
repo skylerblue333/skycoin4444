@@ -231,7 +231,7 @@ CreateArticle,client/src/pages/CreateArticle.tsx,interactive-review,True,False,F
 CreateAudio,client/src/pages/CreateAudio.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 CreateDrop,client/src/pages/CreateDrop.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 CreateReel,client/src/pages/CreateReel.tsx,integration-backed-review,True,True,True,True,False,True,True,False,False
-CreatorAnalytics,client/src/pages/CreatorAnalytics.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
+CreatorAnalytics,client/src/pages/CreatorAnalytics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CreatorDashboard,client/src/pages/CreatorDashboard.tsx,integration-backed-review,True,True,False,False,True,False,False,False,True
 CreatorEconomy,client/src/pages/CreatorEconomy.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 CreatorFunding,client/src/pages/CreatorFunding.tsx,static-review,True,False,False,False,False,False,False,False,False
