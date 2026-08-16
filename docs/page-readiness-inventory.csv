@@ -1077,4 +1077,4 @@ CreatorStudio,client/src/pages/wave4/CreatorStudio.tsx,blocked-by-type-safety,Tr
 Explore,client/src/pages/wave4/Explore.tsx,blocked-by-type-safety,True,True,False,False,True,False,False,True,True
 Payments,client/src/pages/wave4/Payments.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,True
 Security,client/src/pages/wave4/Security.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
-Settings,client/src/pages/wave4/Settings.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
+Settings,client/src/pages/wave4/Settings.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
