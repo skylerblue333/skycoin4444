@@ -855,7 +855,7 @@ SocialEvents,client/src/pages/SocialEvents.tsx,static-review,True,False,False,Fa
 SocialFeed,client/src/pages/SocialFeed.tsx,static-review,True,False,False,False,False,False,False,False,False
 SocialFeedV2,client/src/pages/SocialFeedV2.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SocialGraph,client/src/pages/SocialGraph.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
-SocialMedia,client/src/pages/SocialMedia.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
+SocialMedia,client/src/pages/SocialMedia.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SocialMediaCampaigns,client/src/pages/SocialMediaCampaigns.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SolanaValidatorSetup,client/src/pages/SolanaValidatorSetup.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SortOptions,client/src/pages/SortOptions.tsx,interactive-review,True,False,False,False,False,True,False,False,False
