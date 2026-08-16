@@ -4,49 +4,49 @@ This inventory is a screening report, not a production-readiness certification. 
 
 | Category | Pages | Explicitly unavailable | Active or unclassified | Screening markers |
 |---|---:|---:|---:|---:|
-| wallet | 32 | 15 | 17 | 23 |
+| wallet | 32 | 28 | 4 | 10 |
 | exchange | 50 | 24 | 26 | 40 |
-| payments | 26 | 12 | 14 | 18 |
+| payments | 26 | 22 | 4 | 8 |
 | mining | 11 | 6 | 5 | 7 |
 | marketplace | 42 | 18 | 24 | 31 |
-| ai | 52 | 18 | 34 | 25 |
+| ai | 52 | 19 | 33 | 24 |
 | education | 24 | 5 | 19 | 15 |
-| admin_security | 36 | 16 | 20 | 28 |
+| admin_security | 36 | 17 | 19 | 27 |
 
 ## wallet
 
 | Page | Classification | Screening signal |
 |---|---|---|
-| `AdminWalletManager` | active-or-unclassified | mock-marker |
+| `AdminWalletManager` | unavailable | no-screening-marker |
 | `Crypto` | unavailable | mock-marker |
 | `CryptoEnhancementsPage` | unavailable | no-screening-marker |
 | `CryptoExchange` | unavailable | no-screening-marker |
 | `CryptoHub` | unavailable | mock-marker |
 | `CryptoNews` | unavailable | mock-marker |
-| `CryptoResearchHub` | active-or-unclassified | mock-marker |
+| `CryptoResearchHub` | unavailable | no-screening-marker |
 | `GameCryptoQuiz` | active-or-unclassified | no-screening-marker |
 | `GameTokenTap` | active-or-unclassified | no-screening-marker |
-| `LiquidStaking` | active-or-unclassified | mock-marker |
-| `MobileWallet` | active-or-unclassified | mock-marker |
-| `NFTGallery` | active-or-unclassified | mock-marker |
-| `NFTMinting` | active-or-unclassified | mock-marker |
+| `LiquidStaking` | unavailable | no-screening-marker |
+| `MobileWallet` | unavailable | no-screening-marker |
+| `NFTGallery` | unavailable | no-screening-marker |
+| `NFTMinting` | unavailable | no-screening-marker |
 | `NFTWallet` | unavailable | mock-marker |
 | `ProfileWallet` | unavailable | no-screening-marker |
 | `ReceiveCrypto` | unavailable | mock-marker |
 | `SendCrypto` | unavailable | mock-marker |
-| `StakingDashboard` | active-or-unclassified | mock-marker |
+| `StakingDashboard` | unavailable | no-screening-marker |
 | `StakingHub` | unavailable | mock-marker |
-| `StakingOptions` | active-or-unclassified | mock-marker |
+| `StakingOptions` | unavailable | no-screening-marker |
 | `StakingPortal` | unavailable | no-screening-marker |
 | `TokenDashboard` | unavailable | mock-marker |
 | `TokenGovernance` | active-or-unclassified | no-screening-marker |
-| `TokenInformation` | active-or-unclassified | mock-marker |
+| `TokenInformation` | unavailable | no-screening-marker |
 | `TokenMetrics` | unavailable | mock-marker |
-| `TokenomicsCalculator` | active-or-unclassified | mock-marker |
-| `UnifiedWallet` | active-or-unclassified | mock-marker |
+| `TokenomicsCalculator` | unavailable | no-screening-marker |
+| `UnifiedWallet` | unavailable | no-screening-marker |
 | `Wallet` | unavailable | no-screening-marker |
-| `WalletConnect` | active-or-unclassified | mock-marker |
-| `WalletIntegration` | active-or-unclassified | mock-marker |
+| `WalletConnect` | unavailable | no-screening-marker |
+| `WalletIntegration` | unavailable | no-screening-marker |
 | `WalletOverview` | active-or-unclassified | no-screening-marker |
 | `YieldFarming` | unavailable | mock-marker |
 
@@ -111,30 +111,30 @@ This inventory is a screening report, not a production-readiness certification. 
 |---|---|---|
 | `AddBankAccount` | unavailable | mock-marker |
 | `AddCreditCard` | unavailable | mock-marker |
-| `BillingHistory` | active-or-unclassified | mock-marker |
-| `Checkout` | active-or-unclassified | mock-marker |
-| `CheckoutFlow` | active-or-unclassified | mock-marker |
+| `BillingHistory` | unavailable | no-screening-marker |
+| `Checkout` | unavailable | no-screening-marker |
+| `CheckoutFlow` | unavailable | no-screening-marker |
 | `DatingSubscription` | active-or-unclassified | no-screening-marker |
-| `EnterpriseBilling` | active-or-unclassified | mock-marker |
+| `EnterpriseBilling` | unavailable | no-screening-marker |
 | `InvoiceDetails` | unavailable | mock-marker |
-| `InvoiceManagement` | active-or-unclassified | mock-marker |
+| `InvoiceManagement` | unavailable | no-screening-marker |
 | `PaymentConfirmation` | unavailable | mock-marker |
 | `PaymentInfra` | active-or-unclassified | no-screening-marker |
 | `PaymentMethods` | unavailable | mock-marker |
 | `PaymentSetup` | unavailable | mock-marker |
 | `Payments` | unavailable | no-screening-marker |
 | `PayoutDashboard` | unavailable | no-screening-marker |
-| `PayoutManagement` | active-or-unclassified | mock-marker |
+| `PayoutManagement` | unavailable | no-screening-marker |
 | `RefundRequests` | unavailable | mock-marker |
 | `ReturnsRefunds` | unavailable | mock-marker |
 | `SKY444CentralBank` | unavailable | no-screening-marker |
 | `StripeCheckout` | unavailable | no-screening-marker |
-| `SubscriptionManagement` | active-or-unclassified | mock-marker |
-| `SubscriptionPlans` | active-or-unclassified | mock-marker |
-| `SubscriptionSetup` | active-or-unclassified | mock-marker |
+| `SubscriptionManagement` | unavailable | no-screening-marker |
+| `SubscriptionPlans` | unavailable | no-screening-marker |
+| `SubscriptionSetup` | unavailable | no-screening-marker |
 | `Subscriptions` | active-or-unclassified | no-screening-marker |
 | `UnifiedPaymentLedger` | active-or-unclassified | no-screening-marker |
-| `Payments` | active-or-unclassified | mock-marker |
+| `Payments` | unavailable | no-screening-marker |
 
 ## mining
 
@@ -247,7 +247,7 @@ This inventory is a screening report, not a production-readiness certification. 
 | `HopeAI` | unavailable | no-screening-marker |
 | `HopeAIAdvanced` | active-or-unclassified | mock-marker |
 | `HopeAIMeta` | active-or-unclassified | mock-marker |
-| `HopeAIPage` | active-or-unclassified | mock-marker |
+| `HopeAIPage` | unavailable | no-screening-marker |
 | `HopeAIUpgrades` | active-or-unclassified | mock-marker |
 | `NotificationIntelligence` | unavailable | no-screening-marker |
 | `PromptBuilder` | active-or-unclassified | mock-marker |
@@ -294,7 +294,7 @@ This inventory is a screening report, not a production-readiness certification. 
 | `AdminDashboard` | unavailable | mock-marker |
 | `AdminOrders` | active-or-unclassified | mock-marker |
 | `AdminPanel` | unavailable | no-screening-marker |
-| `AdminWalletManager` | active-or-unclassified | mock-marker |
+| `AdminWalletManager` | unavailable | no-screening-marker |
 | `AdvancedAdminPanel` | active-or-unclassified | mock-marker |
 | `AuditLog` | unavailable | mock-marker |
 | `AuditLogs` | active-or-unclassified | mock-marker |

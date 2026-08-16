@@ -37,8 +37,8 @@ The repository contains the frontend page files and route registrations, but **t
 |---|---:|---|
 | Frontend page files | 1,057 | Files exist; this does not prove their features work. |
 | Route lines | 1,061 | Route registrations exist; this does not prove authorization, data, or end-to-end behavior. |
-| Explicit unavailable boundaries | 372 | These pages are honest but intentionally not active until their contracts are verified. |
-| Mock/demo/placeholder markers | 925 | These require manual classification and likely repair; the count is a screening signal, not a defect count. |
+| Explicit unavailable boundaries | 394 | These pages are honest but intentionally not active until their contracts are verified. |
+| Mock/demo/placeholder markers | 902 | These require manual classification and likely repair; the count is a screening signal, not a defect count. |
 | Pages with API/data signals | 378 | A fetch or API reference does not prove a working backend contract or real provider. |
 | Pages with form/mutation signals | 17 | This highlights the limited visible mutation surface and the need for workflow testing. |
 
