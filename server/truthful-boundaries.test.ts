@@ -21,6 +21,15 @@ describe("truthful capability boundaries", () => {
     expect(source).not.toMatch(/useState|<button|onClick|progress\s*[:=]/i);
   });
 
+  it("keeps generic feature routers from returning fabricated success", () => {
+    const source = readProjectFile("server/routers.ts");
+
+    expect(source).toContain("const createFeatureRouter");
+    expect(source).not.toMatch(/mutation\(\(\) => \(\{ success: true \}\)/);
+    expect(source).toContain("updateProfile");
+    expect(source).toContain("schema.users.username");
+  });
+
   it("does not return synthetic users or balances when database records are absent", () => {
     const source = readProjectFile("server/db.ts");
 
