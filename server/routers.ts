@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -13,8 +14,28 @@ const createFeatureRouter = () => router({
   delete: protectedProcedure.input(z.string()).mutation(({ input }) => ({ success: true })),
 });
 
+const unavailableUserFeature = (feature: string): never => {
+  throw new TRPCError({
+    code: "NOT_IMPLEMENTED",
+    message: `${feature} is unavailable until its verified persistence and authorization contract is configured.`,
+  });
+};
+
+const userRouter = router({
+  profile: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => null),
+  profileByUsername: publicProcedure.input(z.object({ username: z.string().min(1) })).query(() => null),
+  suggestedFollows: protectedProcedure.query(() => [] as const),
+  followers: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => [] as const),
+  following: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).query(() => [] as const),
+  leaderboard: publicProcedure.input(z.object({ type: z.string(), limit: z.number().int().positive().max(100) })).query(() => [] as const),
+  follow: protectedProcedure.input(z.object({ userId: z.union([z.string(), z.number()]) })).mutation(() => unavailableUserFeature("Following users")),
+  updateProfile: protectedProcedure.input(z.record(z.string(), z.string())).mutation(() => unavailableUserFeature("Profile updates")),
+  uploadAvatar: protectedProcedure.input(z.object({ data: z.string(), type: z.enum(["avatar", "banner"]), mimeType: z.string() })).mutation(() => unavailableUserFeature("Profile image uploads")),
+});
+
 export const appRouter = router({
   system: systemRouter,
+  user: userRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
