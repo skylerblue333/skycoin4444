@@ -260,7 +260,7 @@ DAOTreasury,client/src/pages/DAOTreasury.tsx,interactive-review,True,False,False
 DCACalculator,client/src/pages/DCACalculator.tsx,static-review,True,False,False,False,False,False,False,False,False
 DEXDepthChart,client/src/pages/DEXDepthChart.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 DMInbox,client/src/pages/DMInbox.tsx,interactive-review,True,False,False,False,False,True,True,False,True
-Dashboard,client/src/pages/Dashboard.tsx,static-review,True,False,False,False,False,False,False,False,True
+Dashboard,client/src/pages/Dashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 DashboardOverview,client/src/pages/DashboardOverview.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 DataExport,client/src/pages/DataExport.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 DataGrid,client/src/pages/DataGrid.tsx,interactive-review,True,False,False,False,False,True,False,False,False
