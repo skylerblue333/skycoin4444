@@ -658,7 +658,7 @@ PlaylistManager,client/src/pages/PlaylistManager.tsx,interactive-review,True,Fal
 PodcastStudio,client/src/pages/PodcastStudio.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PolicyManagement,client/src/pages/PolicyManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PoolPerformance,client/src/pages/PoolPerformance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Portfolio,client/src/pages/Portfolio.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+Portfolio,client/src/pages/Portfolio.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioComparison,client/src/pages/PortfolioComparison.tsx,static-review,True,False,False,False,False,False,False,False,False
 PortfolioOptimization,client/src/pages/PortfolioOptimization.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioOverview,client/src/pages/PortfolioOverview.tsx,interactive-review,True,False,False,False,False,True,True,False,False
