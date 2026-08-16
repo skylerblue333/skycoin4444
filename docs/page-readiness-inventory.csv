@@ -937,7 +937,7 @@ ToggleSwitchForm,client/src/pages/ToggleSwitchForm.tsx,interactive-review,True,F
 TokenDashboard,client/src/pages/TokenDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TokenGovernance,client/src/pages/TokenGovernance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TokenInformation,client/src/pages/TokenInformation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-TokenMetrics,client/src/pages/TokenMetrics.tsx,static-review,True,False,False,False,False,False,False,False,False
+TokenMetrics,client/src/pages/TokenMetrics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 TokenomicsCalculator,client/src/pages/TokenomicsCalculator.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TorBridge,client/src/pages/TorBridge.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 TournamentBracket,client/src/pages/TournamentBracket.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
