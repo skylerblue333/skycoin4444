@@ -703,7 +703,7 @@ ProfilePicture,client/src/pages/ProfilePicture.tsx,interactive-review,True,False
 ProfilePreview,client/src/pages/ProfilePreview.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ProfileView,client/src/pages/ProfileView.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ProfileWallet,client/src/pages/ProfileWallet.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
-Profitability,client/src/pages/Profitability.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+Profitability,client/src/pages/Profitability.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ProgressBar,client/src/pages/ProgressBar.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ProgressTracking,client/src/pages/ProgressTracking.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
 ProjectBoard,client/src/pages/ProjectBoard.tsx,interactive-review,True,False,False,False,False,True,True,False,False
