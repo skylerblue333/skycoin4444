@@ -2,28 +2,28 @@
 
 **Assessment date:** August 16, 2026  
 **Branch:** `restore/error-free-baseline`  
-**Latest checkpoint:** `4ab0739`  
+**Latest checkpoint:** `5cec3b7`  
 **Release label:** **Code-green launch candidate; GA not authorized**
 
 ## Honest percentage
 
-The current **directional launch-readiness estimate is 42%**. This is not a marketing claim, uptime metric, or formal certification. It is a weighted engineering score that prevents a green local build from hiding unverified infrastructure and critical workflows. The increase reflects the verified account/profile core, database-backed feed workflow with hardened ordering and IDs, read-only wallet ledger overview, fabricated-persistence fallback removal, expanded regression coverage, high-risk route classification, Admin Wallet Manager truthfulness repair, 12 additional wallet/crypto truthfulness boundaries and 10 payment truthfulness boundaries, a HopeAI production-claims boundary, and conversion of exact generic placeholder routes into truthful boundaries.
+The current **directional launch-readiness estimate is 43%**. This is not a marketing claim, uptime metric, or formal certification. It is a weighted engineering score that prevents a green local build from hiding unverified infrastructure and critical workflows. The increase reflects the verified account/profile core, database-backed feed workflow with hardened ordering and IDs, read-only wallet ledger overview, fabricated-persistence fallback removal, expanded regression coverage, high-risk route classification, Admin Wallet Manager truthfulness repair, 12 additional wallet/crypto truthfulness boundaries and 10 payment truthfulness boundaries, a HopeAI production-claims boundary, and conversion of exact generic placeholder routes into truthful boundaries.
 
 | Area | Weight | Current score | Basis |
 |---|---:|---:|---|
-| Code correctness and build health | 25% | 24% | Zero strict TypeScript diagnostics, passing production build, clean diff, and five passing tests. The score is not full because test depth remains limited. |
+| Code correctness and build health | 25% | 24% | Zero strict TypeScript diagnostics, passing production build, clean diff, and seven passing tests. The score is not full because test depth remains limited. |
 | Frontend inventory and navigation scope | 10% | 8% | All 1,057 page files and 1,061 route lines were inventoried. Inventory completeness is not feature completeness. |
-| Frontend feature truthfulness and usability | 25% | 7% | 372 pages are explicitly bounded as unavailable after the exact generic-placeholder batch; 925 contain mock/demo/placeholder-style markers requiring classification or repair. Portfolio, exchange, mining, marketplace, progress tracking, dashboard, and generic placeholder boundaries were improved. |
-| Critical workflow verification | 15% | 3% | Logout, profile contract boundaries, feed contract boundaries, and truthful-boundary regressions pass. Registration, login, wallet ledger, education, admin authorization, and representative integrations still need real integration or staging tests. |
+| Frontend feature truthfulness and usability | 25% | 7% | 394 pages are explicitly bounded as unavailable after the exact generic-placeholder and high-risk boundary batches; 902 contain mock/demo/placeholder-style markers requiring classification or repair. Portfolio, exchange, mining, marketplace, progress tracking, dashboard, and generic placeholder boundaries were improved. |
+| Critical workflow verification | 15% | 4% | Logout, profile contract boundaries, feed contract boundaries, and truthful-boundary regressions pass. Registration, login, wallet ledger, education, admin authorization, and representative integrations still need real integration or staging tests. |
 | Staging and production infrastructure | 20% | 0% | No approved staging database, OAuth, AWS/EC2 deployment, DNS/TLS, monitoring, backup/restore, or rollback evidence is verified in this environment. |
 | Operational/security acceptance | 5% | 0% | Repository-level checks and truthful-state controls exist, but production secrets, least privilege, alerting, recovery objectives, and owner acceptance remain unverified. |
-| **Total** | **100%** | **42%** | **Directional launch-readiness estimate** |
+| **Total** | **100%** | **43%** | **Directional launch-readiness estimate** |
 
 > The percentage will increase only when real evidence is produced. Replacing unavailable states with invented data would make the percentage less trustworthy, not more complete.
 
 ## What has been completed
 
-The strict TypeScript baseline is green at zero diagnostics. Production builds, the available automated suite, and diff hygiene pass. The test suite now contains five passing tests across two files: the existing logout test and four account-core/truthful-boundary regressions covering generic routers, profile persistence, feed persistence, avatar storage, and fabricated-data prevention.
+The strict TypeScript baseline is green at zero diagnostics. Production builds, the available automated suite, and diff hygiene pass. The test suite now contains seven passing tests across two files: the existing logout test and four account-core/truthful-boundary regressions covering generic routers, profile persistence, feed persistence, avatar storage, and fabricated-data prevention.
 
 The server contract repairs include the existing storage helper import, a schema-compatible cron identity, a correct Express wildcard parameter type, a typed generic relational query boundary, and a corrected OAuth lookup using `users.openId`. Fabricated user identities, `user@example.com`, synthetic ID `1`, and fabricated user balances were removed from failed user lookups. A synthetic post ID fallback was also removed so failed persistence returns `null` rather than fake success.
 
