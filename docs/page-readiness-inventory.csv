@@ -661,7 +661,7 @@ PoolPerformance,client/src/pages/PoolPerformance.tsx,truthfully-gated,True,False
 Portfolio,client/src/pages/Portfolio.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioComparison,client/src/pages/PortfolioComparison.tsx,static-review,True,False,False,False,False,False,False,False,False
 PortfolioOptimization,client/src/pages/PortfolioOptimization.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-PortfolioOverview,client/src/pages/PortfolioOverview.tsx,interactive-review,True,False,False,False,False,True,True,False,False
+PortfolioOverview,client/src/pages/PortfolioOverview.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioRebalance,client/src/pages/PortfolioRebalance.tsx,static-review,True,False,False,False,False,False,False,False,False
 PortfolioTracker,client/src/pages/PortfolioTracker.tsx,static-review,True,False,False,False,False,False,False,False,False
 PortfolioTracking,client/src/pages/PortfolioTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
