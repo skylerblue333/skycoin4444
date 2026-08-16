@@ -24,9 +24,10 @@ export async function getUserById(id: string) {
     const user = await db.query.users.findFirst({
       where: eq(schema.users.id, id),
     });
-    return user || { id, name: "User", email: "user@example.com", balance: 0 };
+    return user ?? null;
   } catch (error) {
-    return { id, name: "User", email: "user@example.com", balance: 0 };
+    console.error("[DB] Failed to read user by id", error);
+    return null;
   }
 }
 
@@ -35,9 +36,10 @@ export async function getUserByEmail(email: string) {
     const user = await db.query.users.findFirst({
       where: eq(schema.users.email, email),
     });
-    return user || { id: "1", name: "User", email, balance: 0 };
+    return user ?? null;
   } catch (error) {
-    return { id: "1", name: "User", email, balance: 0 };
+    console.error("[DB] Failed to read user by email", error);
+    return null;
   }
 }
 
@@ -60,11 +62,13 @@ export async function upsertUser(data: any) {
 
 export async function getUserByOpenId(openId: string) {
   try {
-    // Note: users table doesn't have openId field, using email as fallback
-    return await db.query.users.findFirst({
-      where: eq(schema.users.email, openId),
-    });
+    return (
+      (await db.query.users.findFirst({
+        where: eq(schema.users.openId, openId),
+      })) ?? null
+    );
   } catch (error) {
+    console.error("[DB] Failed to read user by open id", error);
     return null;
   }
 }
@@ -241,23 +245,5 @@ export async function createWallet(data: any) {
     return data;
   } catch (error) {
     return data;
-  }
-}
-
-// ============ GENERIC HELPERS ============
-export async function getAllRecords(table: any) {
-  try {
-    return await db.query[table].findMany();
-  } catch (error) {
-    return [];
-  }
-}
-
-export async function deleteRecord(table: any, id: string) {
-  try {
-    await db.delete(table).where(eq(table.id, id));
-    return { success: true };
-  } catch (error) {
-    return { success: false };
   }
 }
