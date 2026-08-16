@@ -1182,7 +1182,21 @@ export const appRouter = router({
       .mutation(() => unavailableMutationResult),
   }),
   community: router({
-    list: publicProcedure.input(z.object({}).optional()).query(() => []),
+    list: publicProcedure.input(z.object({}).optional()).query(
+      () =>
+        [] as Array<{
+          id: string;
+          name: string;
+          slug: string;
+          description: string;
+          type: "public" | "private" | "token_gated" | "premium";
+          category: string;
+          icon?: string;
+          members?: number;
+          memberCount?: number;
+          tokenGated?: boolean;
+        }>
+    ),
     create: protectedProcedure
       .input(
         z.object({
