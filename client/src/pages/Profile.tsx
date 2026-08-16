@@ -15,20 +15,6 @@ import {
   Star, Trophy, Flame, TrendingUp, BarChart3, Users,
   Grid3X3, Play, Sparkles, Shield, DollarSign
 } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-
-// Creator analytics mock data (30 days)
-const CREATOR_ANALYTICS = (() => {
-  const pts = [];
-  let earnings = 120; let views = 4000;
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    earnings = Math.round(earnings * (1 + (Math.random() - 0.35) * 0.12));
-    views = Math.round(views * (1 + (Math.random() - 0.3) * 0.15));
-    pts.push({ date: d.toLocaleDateString("en", { month: "short", day: "numeric" }), earnings, views });
-  }
-  return pts;
-})();
 
 function timeAgo(date: Date | string) {
   const d = new Date(date);
@@ -66,10 +52,6 @@ function LevelBadge({ level }: { level: number }) {
 }
 
 function PostCard({ post }: { post: any }) {
-  const likePost = trpc.feed.like.useMutation();
-  const [liked, setLiked] = useState(false);
-  const [likes, setLikes] = useState(post.likeCount || 0);
-
   return (
     <div className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4 hover:border-white/10 transition-all">
       {post.mediaUrl && (
@@ -89,10 +71,7 @@ function PostCard({ post }: { post: any }) {
         </p>
       )}
       <div className="flex items-center gap-3 text-xs text-white/30">
-        <button onClick={() => { setLiked(p => !p); setLikes((c: number) => liked ? c - 1 : c + 1); likePost.mutate({ postId: post.id }); }}
-          className={`flex items-center gap-1 transition-colors ${liked ? "text-pink-400" : "hover:text-pink-400"}`}>
-          <Heart className={`w-3.5 h-3.5 ${liked ? "fill-pink-400" : ""}`} /> {likes}
-        </button>
+        <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5" /> {post.likeCount ?? "—"}</span>
         <span className="flex items-center gap-1"><MessageCircle className="w-3.5 h-3.5" /> {post.commentCount || 0}</span>
         <span className="flex items-center gap-1"><Share2 className="w-3.5 h-3.5" /></span>
         <span className="ml-auto">{timeAgo(post.createdAt)}</span>
@@ -111,8 +90,7 @@ export default function Profile() {
     ? trpc.user.profileByUsername.useQuery({ username }, { enabled: !!username })
     : { data: me, isLoading: false };
 
-  const { data: myPosts } = trpc.feed.list.useQuery({ limit: 20, offset: 0 });
-  const { data: achievements } = trpc.gamefi.achievements.useQuery(undefined, { enabled: isAuthenticated });
+  const { data: myPosts } = trpc.feed.list.useQuery();
 
   const followUser = trpc.user.follow.useMutation({
     onSuccess: () => toast.success("Following!"),
@@ -314,25 +292,6 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Achievements */}
-        {achievements && achievements.length > 0 && (
-          <div className="mb-6 bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Trophy className="w-4 h-4 text-yellow-400" />
-              <h3 className="text-sm font-bold text-white">Achievements</h3>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {achievements.slice(0, 12).map((a: any) => (
-                <div key={a.id} title={a.description || a.name}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/8 transition-colors cursor-default">
-                  <span className="text-base">{ACHIEVEMENT_ICONS[a.type || a.id] || "🏆"}</span>
-                  <span className="text-xs text-white/60">{a.name || a.type}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Tabs */}
         <Tabs defaultValue="posts" className="pb-12">
           <TabsList className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-1 mb-4 w-full">
@@ -340,7 +299,6 @@ export default function Profile() {
               { value: "posts", label: "Posts", icon: Grid3X3 },
               { value: "media", label: "Media", icon: Play },
               { value: "likes", label: "Liked", icon: Heart },
-              { value: "analytics", label: "Analytics", icon: BarChart3 },
             ].map(t => (
               <TabsTrigger key={t.value} value={t.value}
                 className="flex-1 flex items-center justify-center gap-1.5 text-sm data-[state=active]:bg-white/8 data-[state=active]:text-white text-white/40 rounded-xl transition-all">
@@ -392,60 +350,10 @@ export default function Profile() {
             )}
           </TabsContent>
 
-          <TabsContent value="likes">
+                    <TabsContent value="likes">
             <div className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-12 text-center">
               <Heart className="w-10 h-10 text-pink-400/40 mx-auto mb-3" />
               <p className="text-white/40 text-sm">Liked posts are private.</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="analytics">
-            <div className="space-y-4">
-              {/* Stats row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[
-                  { label: "Total Earnings", value: "$4,280", icon: DollarSign, color: "text-green-400" },
-                  { label: "Total Views", value: "142K", icon: TrendingUp, color: "text-blue-400" },
-                  { label: "Subscribers", value: "2,847", icon: Users, color: "text-purple-400" },
-                  { label: "Avg Engagement", value: "8.4%", icon: Flame, color: "text-orange-400" },
-                ].map(s => (
-                  <div key={s.label} className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4">
-                    <s.icon className={`w-4 h-4 ${s.color} mb-2`} />
-                    <div className="text-xl font-bold font-mono text-white">{s.value}</div>
-                    <div className="text-xs text-white/40 mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              {/* Earnings chart */}
-              <div className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4">
-                <h3 className="text-sm font-bold text-white mb-4">Earnings (30d)</h3>
-                <ResponsiveContainer width="100%" height={160}>
-                  <AreaChart data={CREATOR_ANALYTICS} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="earningsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="date" tick={{ fill: "#ffffff40", fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
-                    <YAxis tick={{ fill: "#ffffff40", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `$${v}`} />
-                    <Tooltip contentStyle={{ background: "#0e0a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} formatter={(v: any) => [`$${v}`, "Earnings"]} />
-                    <Area type="monotone" dataKey="earnings" stroke="#a855f7" strokeWidth={2} fill="url(#earningsGrad)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-              {/* Views chart */}
-              <div className="bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-4">
-                <h3 className="text-sm font-bold text-white mb-4">Views (30d)</h3>
-                <ResponsiveContainer width="100%" height={140}>
-                  <BarChart data={CREATOR_ANALYTICS.filter((_, i) => i % 3 === 0)} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
-                    <XAxis dataKey="date" tick={{ fill: "#ffffff40", fontSize: 10 }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fill: "#ffffff40", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip contentStyle={{ background: "#0e0a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8 }} formatter={(v: any) => [v.toLocaleString(), "Views"]} />
-                    <Bar dataKey="views" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
             </div>
           </TabsContent>
         </Tabs>
