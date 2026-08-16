@@ -54,7 +54,7 @@ AdminPanel,client/src/pages/AdminPanel.tsx,integration-backed-review,True,True,F
 AdminWalletManager,client/src/pages/AdminWalletManager.tsx,integration-backed-review,True,False,True,False,False,True,True,False,False
 AdvancedAdminPanel,client/src/pages/AdvancedAdminPanel.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AdvancedAnalytics,client/src/pages/AdvancedAnalytics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
-AdvancedOrders,client/src/pages/AdvancedOrders.tsx,static-review,True,False,False,False,False,False,False,False,False
+AdvancedOrders,client/src/pages/AdvancedOrders.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdvancedSearch,client/src/pages/AdvancedSearch.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AffiliateDashboard,client/src/pages/AffiliateDashboard.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
 AffiliateProgram,client/src/pages/AffiliateProgram.tsx,static-review,True,False,False,False,False,False,False,False,False
