@@ -574,7 +574,81 @@ export const appRouter = router({
         linesGenerated: 0,
       })),
   }),
-  aiMarket: createFeatureRouter(),
+  aiMarket: router({
+    getIcoStats: publicProcedure.query(() => ({
+      currentRound: "",
+      roundBonus: 0,
+      rarityStatus: "unknown",
+      rarityLabel: "Unavailable",
+      totalRaisedUsd: 0,
+      totalInvestors: 0,
+      tokenPriceUsd: 0,
+      trendDirection: "flat",
+      priceChange24h: 0,
+      rewardApy: 0,
+      rewardPoolSky: 0,
+      percentRaised: 0,
+      hardCapUsd: 0,
+      momentumScore: 0,
+      sentimentScore: 0,
+      rarityScore: 0,
+    })),
+    getAgents: publicProcedure.query(
+      () =>
+        [] as Array<{
+          agentId: string;
+          name: string;
+          role: string;
+          persona: string;
+          specialty: string;
+          totalSignals: number;
+          isActive: boolean;
+        }>
+    ),
+    getSignals: publicProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: number;
+            agentId: string;
+            signalType: string;
+            title: string;
+            commentary: string;
+            confidenceScore: number;
+            tags: string[];
+            createdAt: string;
+          }>
+      ),
+    getActivity: publicProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: number;
+            agentId: string;
+            summary: string;
+            activityType: string;
+            impactScore: number;
+            createdAt: string;
+          }>
+      ),
+    triggerCycle: protectedProcedure
+      .input(z.object({ agentId: z.string().min(1) }))
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        agentName: "",
+        signalsGenerated: 0,
+      })),
+  }),
   aiPersonas: router({
     getBlendedFeed: publicProcedure
       .input(
