@@ -615,7 +615,7 @@ NotificationPreferences,client/src/pages/NotificationPreferences.tsx,interactive
 NotificationSettings,client/src/pages/NotificationSettings.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 Notifications,client/src/pages/Notifications.tsx,static-review,True,False,False,False,False,False,False,False,False
 NotificationsCenter,client/src/pages/NotificationsCenter.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-NotificationsHub,client/src/pages/NotificationsHub.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
+NotificationsHub,client/src/pages/NotificationsHub.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 NumberInputForm,client/src/pages/NumberInputForm.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 NutritionTracker,client/src/pages/NutritionTracker.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 OAuthProviders,client/src/pages/OAuthProviders.tsx,interactive-review,True,False,False,False,False,True,True,False,False
