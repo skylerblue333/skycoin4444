@@ -27,7 +27,7 @@ The test-only URL was used only to satisfy the application’s explicit startup 
 **Suite result:** 7 tests passed.
 **Strict TypeScript check:** PASS (`pnpm run check`).
 **Production build:** PASS (`pnpm run build`).
-**Remote CI:** Pending for the middleware hardening checkpoint; the prior remote CI run `31951086123` passed for `c4706fb`.
+**Remote CI:** PASS — run `31951455311` for commit `486db382a27a28b15506b2f6c4989c89e77d0671`.
 
 ## Remaining evidence gaps
 
