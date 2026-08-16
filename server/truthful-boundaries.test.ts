@@ -35,6 +35,10 @@ describe("truthful capability boundaries", () => {
     expect(profile).toContain("trpc.feed.create.useMutation");
     expect(profile).toContain("createPost.isPending");
     expect(profile).toContain("utils.feed.list.invalidate");
+    const wallet = readProjectFile("client/src/pages/WalletOverview.tsx");
+    expect(wallet).toContain("trpc.wallet.overview.useQuery");
+    expect(wallet).toContain("No wallet has been provisioned");
+    expect(wallet).not.toMatch(/transfer|send/i);
   });
 
   it("does not return synthetic users or balances when database records are absent", () => {
