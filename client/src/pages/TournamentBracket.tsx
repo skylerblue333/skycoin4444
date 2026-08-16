@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { getLoginUrl } from "@/const";
 
 export default function TournamentBracket() {
+  const { user, isAuthenticated } = useAuth();
   
   const [selectedTournament, setSelectedTournament] = useState<number | null>(null);
 

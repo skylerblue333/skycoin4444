@@ -65,6 +65,7 @@ function usd(balance: number, price: number): string {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CryptoHub() {
+  const { user, isAuthenticated } = useAuth();
   
   const utils = trpc.useUtils();
 

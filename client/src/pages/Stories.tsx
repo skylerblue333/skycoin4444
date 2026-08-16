@@ -63,6 +63,7 @@ const DEMO_STORY_GROUPS = [
 ];
 
 export default function Stories() {
+  const { user, isAuthenticated } = useAuth();
   
 
   // Age / NSFW state

@@ -41,6 +41,7 @@ const ROLES = [
 ];
 
 export default function Community() {
+  const { user, isAuthenticated } = useAuth();
   
   const { data: communities, isLoading } = trpc.community.list.useQuery({});
   const [searchQuery, setSearchQuery] = useState("");

@@ -15,6 +15,20 @@ const unavailableMutationResult = {
   url: undefined as string | undefined,
   mock: true as const,
   tierName: undefined as string | undefined,
+  success: false as const,
+  error:
+    "This capability is unavailable until a verified production integration is connected.",
+  hashRate: 0,
+  reward: 0,
+  hashesFound: 0,
+  token: "",
+  fromAmount: 0,
+  fromToken: "",
+  toAmount: 0,
+  toToken: "",
+  apy: 0,
+  lockDays: 0,
+  burned: 0,
 };
 
 const createFeatureRouter = () =>
@@ -116,6 +130,58 @@ const walletRouter = router({
         token: z.string().min(1).optional(),
       })
     )
+    .mutation(() => unavailableMutationResult),
+});
+
+const tokenRouter = router({
+  balances: protectedProcedure.query(async ({ ctx }) => {
+    const rows = await db.db.query.tokenBalances.findMany({
+      where: (table, operators) => operators.eq(table.userId, ctx.user.id),
+    });
+    return rows.map(row => ({
+      token: row.tokenSymbol,
+      balance: row.balance ?? 0,
+      stakedBalance: row.stakedBalance ?? 0,
+      lockedBalance: row.lockedBalance ?? 0,
+    }));
+  }),
+  allBalances: protectedProcedure.query(async ({ ctx }) => {
+    const rows = await db.db.query.tokenBalances.findMany({
+      where: (table, operators) => operators.eq(table.userId, ctx.user.id),
+    });
+    return rows.map(row => ({
+      token: row.tokenSymbol,
+      balance: row.balance ?? 0,
+      stakedBalance: row.stakedBalance ?? 0,
+      lockedBalance: row.lockedBalance ?? 0,
+    }));
+  }),
+  transactions: protectedProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(100).default(20) }))
+    .query(async ({ ctx, input }) =>
+      db.db.query.transactions.findMany({
+        where: (table, operators) => operators.eq(table.userId, ctx.user.id),
+        limit: input.limit,
+      })
+    ),
+  priceHistory: protectedProcedure
+    .input(
+      z
+        .object({ token: z.string().min(1), period: z.string().min(1) })
+        .optional()
+    )
+    .query(() => []),
+  mine: protectedProcedure
+    .input(z.unknown().optional())
+    .mutation(() => unavailableMutationResult),
+  multiSwap: protectedProcedure
+    .input(z.unknown().optional())
+    .mutation(() => unavailableMutationResult),
+  multiStake: protectedProcedure
+    .input(z.unknown().optional())
+    .mutation(() => unavailableMutationResult),
+  burn: protectedProcedure
+    .input(z.unknown().optional())
     .mutation(() => unavailableMutationResult),
 });
 
@@ -249,6 +315,7 @@ export const appRouter = router({
   dm: dmRouter,
   user: userRouter,
   wallet: walletRouter,
+  token: tokenRouter,
   story: createFeatureRouter(),
 
   // Marketplace & Commerce Routers

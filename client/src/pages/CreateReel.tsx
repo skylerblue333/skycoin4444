@@ -24,6 +24,7 @@ const AUDIO_TRACKS = [
 ];
 
 export default function CreateReel() {
+  const { user, isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   
   const fileRef = useRef<HTMLInputElement>(null);

@@ -17,6 +17,7 @@ const TOKENS = [
 ];
 
 export default function Crypto() {
+  const { user, isAuthenticated } = useAuth();
   
   const { data: balances } = trpc.token.balances.useQuery(undefined, { enabled: isAuthenticated });
   const { data: transactions } = trpc.token.transactions.useQuery({ limit: 10 }, { enabled: isAuthenticated });

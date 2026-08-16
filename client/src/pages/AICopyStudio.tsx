@@ -8,28 +8,124 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import {
-  Sparkles, Copy, RefreshCw, Zap, Globe, TrendingUp,
-  FileText, Mail, Share2 as TwitterIcon, Megaphone, Tag, BookOpen,
-  MousePointer, Newspaper, Hash, CheckCircle, Loader2,
-  ChevronRight, Star, BarChart3, Languages, Wand2
+  Sparkles,
+  Copy,
+  RefreshCw,
+  Zap,
+  Globe,
+  TrendingUp,
+  FileText,
+  Mail,
+  Share2 as TwitterIcon,
+  Megaphone,
+  Tag,
+  BookOpen,
+  MousePointer,
+  Newspaper,
+  Hash,
+  CheckCircle,
+  Loader2,
+  ChevronRight,
+  Star,
+  BarChart3,
+  Languages,
+  Wand2,
 } from "lucide-react";
 
 const COPY_TYPES = [
-  { id: "social_post", label: "Social Post", icon: Hash, color: "text-blue-400", desc: "Engaging posts for any platform" },
-  { id: "ad_headline", label: "Ad Headlines", icon: Megaphone, color: "text-orange-400", desc: "5 high-converting A/B variants" },
-  { id: "product_description", label: "Product Description", icon: Tag, color: "text-purple-400", desc: "Feature-rich product copy" },
-  { id: "email_subject", label: "Email Subject", icon: Mail, color: "text-purple-400", desc: "5 high-open-rate subject lines" },
-  { id: "email_body", label: "Email Body", icon: Mail, color: "text-emerald-400", desc: "Full email with CTA" },
-  { id: "seo_title", label: "SEO Title", icon: Globe, color: "text-cyan-400", desc: "3 keyword-optimized titles" },
-  { id: "seo_description", label: "SEO Description", icon: Globe, color: "text-teal-400", desc: "3 meta descriptions" },
-  { id: "tweet", label: "Tweets", icon: Share2 as TwitterIcon, color: "text-sky-400", desc: "5 shareable tweet variants" },
-  { id: "blog_intro", label: "Blog Intro", icon: BookOpen, color: "text-indigo-400", desc: "Hook + value preview" },
-  { id: "cta", label: "CTA Buttons", icon: MousePointer, color: "text-pink-400", desc: "10 action-driving CTAs" },
-  { id: "press_release", label: "Press Release", icon: Newspaper, color: "text-yellow-400", desc: "Professional announcement" },
-  { id: "tagline", label: "Taglines", icon: Star, color: "text-rose-400", desc: "10 memorable brand taglines" },
+  {
+    id: "social_post",
+    label: "Social Post",
+    icon: Hash,
+    color: "text-blue-400",
+    desc: "Engaging posts for any platform",
+  },
+  {
+    id: "ad_headline",
+    label: "Ad Headlines",
+    icon: Megaphone,
+    color: "text-orange-400",
+    desc: "5 high-converting A/B variants",
+  },
+  {
+    id: "product_description",
+    label: "Product Description",
+    icon: Tag,
+    color: "text-purple-400",
+    desc: "Feature-rich product copy",
+  },
+  {
+    id: "email_subject",
+    label: "Email Subject",
+    icon: Mail,
+    color: "text-purple-400",
+    desc: "5 high-open-rate subject lines",
+  },
+  {
+    id: "email_body",
+    label: "Email Body",
+    icon: Mail,
+    color: "text-emerald-400",
+    desc: "Full email with CTA",
+  },
+  {
+    id: "seo_title",
+    label: "SEO Title",
+    icon: Globe,
+    color: "text-cyan-400",
+    desc: "3 keyword-optimized titles",
+  },
+  {
+    id: "seo_description",
+    label: "SEO Description",
+    icon: Globe,
+    color: "text-teal-400",
+    desc: "3 meta descriptions",
+  },
+  {
+    id: "tweet",
+    label: "Tweets",
+    icon: TwitterIcon,
+    color: "text-sky-400",
+    desc: "5 shareable tweet variants",
+  },
+  {
+    id: "blog_intro",
+    label: "Blog Intro",
+    icon: BookOpen,
+    color: "text-indigo-400",
+    desc: "Hook + value preview",
+  },
+  {
+    id: "cta",
+    label: "CTA Buttons",
+    icon: MousePointer,
+    color: "text-pink-400",
+    desc: "10 action-driving CTAs",
+  },
+  {
+    id: "press_release",
+    label: "Press Release",
+    icon: Newspaper,
+    color: "text-yellow-400",
+    desc: "Professional announcement",
+  },
+  {
+    id: "tagline",
+    label: "Taglines",
+    icon: Star,
+    color: "text-rose-400",
+    desc: "10 memorable brand taglines",
+  },
 ] as const;
 
 const TONES = [
@@ -64,15 +160,18 @@ interface CopyHistoryItem {
 }
 
 export default function AICopyStudio() {
-  const [selectedType, setSelectedType] = useState<typeof COPY_TYPES[number]["id"]>("social_post");
+  const [selectedType, setSelectedType] =
+    useState<(typeof COPY_TYPES)[number]["id"]>("social_post");
   const [topic, setTopic] = useState("");
-  const [tone, setTone] = useState<typeof TONES[number]["id"]>("professional");
+  const [tone, setTone] =
+    useState<(typeof TONES)[number]["id"]>("professional");
   const [keywords, setKeywords] = useState("");
   const [length, setLength] = useState<"short" | "medium" | "long">("medium");
   const [generatedCopy, setGeneratedCopy] = useState("");
   const [copyHistory, setCopyHistory] = useState<CopyHistoryItem[]>([]);
   const [improveCopy, setImproveCopy] = useState("");
-  const [improveGoal, setImproveGoal] = useState<typeof IMPROVE_GOALS[number]["id"]>("more_engaging");
+  const [improveGoal, setImproveGoal] =
+    useState<(typeof IMPROVE_GOALS)[number]["id"]>("more_engaging");
   const [improvedCopy, setImprovedCopy] = useState("");
   const [analyzeCopyText, setAnalyzeCopyText] = useState("");
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -83,44 +182,47 @@ export default function AICopyStudio() {
   const { data: templates } = trpc.ai.getCopyTemplates.useQuery();
 
   const generateMutation = trpc.ai.generateCopy.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setGeneratedCopy(data.copy);
-      setCopyHistory(prev => [{
-        id: Date.now(),
-        type: selectedType,
-        topic,
-        copy: data.copy,
-        tone: data.tone,
-        wordCount: data.wordCount,
-        timestamp: new Date(),
-      }, ...prev.slice(0, 19)]);
+      setCopyHistory(prev => [
+        {
+          id: Date.now(),
+          type: selectedType,
+          topic,
+          copy: data.copy,
+          tone: data.tone,
+          wordCount: data.wordCount,
+          timestamp: new Date(),
+        },
+        ...prev.slice(0, 19),
+      ]);
       toast.success(`Copy generated! ${data.wordCount} words`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const improveMutation = trpc.ai.improveCopy.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setImprovedCopy(data.improved);
       toast.success("Copy improved!");
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const analyzeMutation = trpc.ai.analyzeCopy.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setAnalysisResult(data);
       toast.success(`Analysis complete! Score: ${data.score}/100`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const translateMutation = trpc.ai.translateCopy.useMutation({
-    onSuccess: (data) => {
+    onSuccess: data => {
       setTranslatedCopy(data.translated);
       toast.success(`Translated to ${data.language}!`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   const handleGenerate = () => {
@@ -132,7 +234,12 @@ export default function AICopyStudio() {
       type: selectedType,
       topic: topic.trim(),
       tone,
-      keywords: keywords ? keywords.split(",").map(k => k.trim()).filter(Boolean) : undefined,
+      keywords: keywords
+        ? keywords
+            .split(",")
+            .map(k => k.trim())
+            .filter(Boolean)
+        : undefined,
       length,
     });
   };
@@ -155,23 +262,47 @@ export default function AICopyStudio() {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <Tabs defaultValue="generate" className="space-y-6">
           <TabsList className="bg-gray-900/60 border border-gray-700/50 p-1 flex-wrap h-auto gap-1">
-            <TabsTrigger value="generate" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Sparkles className="w-3.5 h-3.5 mr-1.5" />Generate
+            <TabsTrigger
+              value="generate"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+              Generate
             </TabsTrigger>
-            <TabsTrigger value="improve" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Wand2 className="w-3.5 h-3.5 mr-1.5" />Improve
+            <TabsTrigger
+              value="improve"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <Wand2 className="w-3.5 h-3.5 mr-1.5" />
+              Improve
             </TabsTrigger>
-            <TabsTrigger value="analyze" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <BarChart3 className="w-3.5 h-3.5 mr-1.5" />Analyze
+            <TabsTrigger
+              value="analyze"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
+              Analyze
             </TabsTrigger>
-            <TabsTrigger value="translate" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <Languages className="w-3.5 h-3.5 mr-1.5" />Translate
+            <TabsTrigger
+              value="translate"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <Languages className="w-3.5 h-3.5 mr-1.5" />
+              Translate
             </TabsTrigger>
-            <TabsTrigger value="templates" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <FileText className="w-3.5 h-3.5 mr-1.5" />Templates
+            <TabsTrigger
+              value="templates"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <FileText className="w-3.5 h-3.5 mr-1.5" />
+              Templates
             </TabsTrigger>
-            <TabsTrigger value="history" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
-              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />History
+            <TabsTrigger
+              value="history"
+              className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
+            >
+              <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+              History
             </TabsTrigger>
           </TabsList>
 
@@ -183,7 +314,9 @@ export default function AICopyStudio() {
                 {/* Copy Type Selector */}
                 <Card className="bg-gray-900/60 border-gray-700/50">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-gray-300">Copy Type</CardTitle>
+                    <CardTitle className="text-sm text-gray-300">
+                      Copy Type
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-2">
                     {COPY_TYPES.map(type => {
@@ -199,7 +332,9 @@ export default function AICopyStudio() {
                           }`}
                         >
                           <Icon className={`w-3.5 h-3.5 mb-1 ${type.color}`} />
-                          <div className="text-xs font-medium text-white leading-tight">{type.label}</div>
+                          <div className="text-xs font-medium text-white leading-tight">
+                            {type.label}
+                          </div>
                         </button>
                       );
                     })}
@@ -209,7 +344,9 @@ export default function AICopyStudio() {
                 {/* Tone Selector */}
                 <Card className="bg-gray-900/60 border-gray-700/50">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-gray-300">Tone</CardTitle>
+                    <CardTitle className="text-sm text-gray-300">
+                      Tone
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-2">
                     {TONES.map(t => (
@@ -231,10 +368,12 @@ export default function AICopyStudio() {
                 {/* Length */}
                 <Card className="bg-gray-900/60 border-gray-700/50">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-gray-300">Length</CardTitle>
+                    <CardTitle className="text-sm text-gray-300">
+                      Length
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="flex gap-2">
-                    {(["short","medium","long"] as const).map(l => (
+                    {(["short", "medium", "long"] as const).map(l => (
                       <button
                         key={l}
                         onClick={() => setLength(l)}
@@ -256,13 +395,19 @@ export default function AICopyStudio() {
                 <Card className="bg-gray-900/60 border-gray-700/50">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm text-gray-300 flex items-center gap-2">
-                      {selectedTypeInfo && <selectedTypeInfo.icon className={`w-4 h-4 ${selectedTypeInfo.color}`} />}
+                      {selectedTypeInfo && (
+                        <selectedTypeInfo.icon
+                          className={`w-4 h-4 ${selectedTypeInfo.color}`}
+                        />
+                      )}
                       {selectedTypeInfo?.label} — {selectedTypeInfo?.desc}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="text-xs text-gray-400 mb-1.5 block">Topic / Product / Brand *</Label>
+                      <Label className="text-xs text-gray-400 mb-1.5 block">
+                        Topic / Product / Brand *
+                      </Label>
                       <Input
                         value={topic}
                         onChange={e => setTopic(e.target.value)}
@@ -272,7 +417,9 @@ export default function AICopyStudio() {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-400 mb-1.5 block">Keywords (comma-separated, optional)</Label>
+                      <Label className="text-xs text-gray-400 mb-1.5 block">
+                        Keywords (comma-separated, optional)
+                      </Label>
                       <Input
                         value={keywords}
                         onChange={e => setKeywords(e.target.value)}
@@ -286,9 +433,15 @@ export default function AICopyStudio() {
                       className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold"
                     >
                       {generateMutation.isPending ? (
-                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Generating...</>
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
                       ) : (
-                        <><Sparkles className="w-4 h-4 mr-2" />Generate Copy</>
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Generate Copy
+                        </>
                       )}
                     </Button>
                   </CardContent>
@@ -310,7 +463,8 @@ export default function AICopyStudio() {
                             onClick={() => handleCopy(generatedCopy)}
                             className="border-gray-600 text-gray-300 hover:bg-gray-800 h-7 text-xs"
                           >
-                            <Copy className="w-3 h-3 mr-1" />Copy All
+                            <Copy className="w-3 h-3 mr-1" />
+                            Copy All
                           </Button>
                         )}
                       </div>
@@ -319,7 +473,9 @@ export default function AICopyStudio() {
                       {generateMutation.isPending ? (
                         <div className="flex items-center gap-3 py-8 justify-center">
                           <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-                          <span className="text-gray-400">AI is writing your copy...</span>
+                          <span className="text-gray-400">
+                            AI is writing your copy...
+                          </span>
                         </div>
                       ) : (
                         <div className="bg-gray-800/50 rounded-xl p-4 text-sm text-gray-200 whitespace-pre-wrap leading-relaxed font-mono">
@@ -338,7 +494,9 @@ export default function AICopyStudio() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-gray-900/60 border-gray-700/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-gray-300">Paste Your Copy</CardTitle>
+                  <CardTitle className="text-sm text-gray-300">
+                    Paste Your Copy
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
@@ -348,7 +506,9 @@ export default function AICopyStudio() {
                     className="bg-gray-800/60 border-gray-600 text-white placeholder:text-gray-500 min-h-[200px]"
                   />
                   <div>
-                    <Label className="text-xs text-gray-400 mb-2 block">Improvement Goal</Label>
+                    <Label className="text-xs text-gray-400 mb-2 block">
+                      Improvement Goal
+                    </Label>
                     <div className="grid grid-cols-2 gap-2">
                       {IMPROVE_GOALS.map(g => (
                         <button
@@ -366,11 +526,26 @@ export default function AICopyStudio() {
                     </div>
                   </div>
                   <Button
-                    onClick={() => improveMutation.mutate({ copy: improveCopy, goal: improveGoal })}
+                    onClick={() =>
+                      improveMutation.mutate({
+                        copy: improveCopy,
+                        goal: improveGoal,
+                      })
+                    }
                     disabled={improveMutation.isPending || !improveCopy.trim()}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700"
                   >
-                    {improveMutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Improving...</> : <><Wand2 className="w-4 h-4 mr-2" />Improve Copy</>}
+                    {improveMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Improving...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4 mr-2" />
+                        Improve Copy
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -379,10 +554,18 @@ export default function AICopyStudio() {
                 <Card className="bg-gray-900/60 border-purple-500/30">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm text-purple-400">Improved Copy</CardTitle>
+                      <CardTitle className="text-sm text-purple-400">
+                        Improved Copy
+                      </CardTitle>
                       {improvedCopy && (
-                        <Button size="sm" variant="outline" onClick={() => handleCopy(improvedCopy)} className="border-gray-600 text-gray-300 h-7 text-xs">
-                          <Copy className="w-3 h-3 mr-1" />Copy
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleCopy(improvedCopy)}
+                          className="border-gray-600 text-gray-300 h-7 text-xs"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
                         </Button>
                       )}
                     </div>
@@ -391,7 +574,9 @@ export default function AICopyStudio() {
                     {improveMutation.isPending ? (
                       <div className="flex items-center gap-3 py-8 justify-center">
                         <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-                        <span className="text-gray-400">Improving your copy...</span>
+                        <span className="text-gray-400">
+                          Improving your copy...
+                        </span>
                       </div>
                     ) : (
                       <div className="bg-gray-800/50 rounded-xl p-4 text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
@@ -409,7 +594,9 @@ export default function AICopyStudio() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-gray-900/60 border-gray-700/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-gray-300">Analyze Copy Quality</CardTitle>
+                  <CardTitle className="text-sm text-gray-300">
+                    Analyze Copy Quality
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
@@ -419,11 +606,25 @@ export default function AICopyStudio() {
                     className="bg-gray-800/60 border-gray-600 text-white placeholder:text-gray-500 min-h-[200px]"
                   />
                   <Button
-                    onClick={() => analyzeMutation.mutate({ copy: analyzeCopyText })}
-                    disabled={analyzeMutation.isPending || !analyzeCopyText.trim()}
+                    onClick={() =>
+                      analyzeMutation.mutate({ copy: analyzeCopyText })
+                    }
+                    disabled={
+                      analyzeMutation.isPending || !analyzeCopyText.trim()
+                    }
                     className="w-full bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700"
                   >
-                    {analyzeMutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing...</> : <><BarChart3 className="w-4 h-4 mr-2" />Analyze Copy</>}
+                    {analyzeMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        Analyze Copy
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -431,44 +632,87 @@ export default function AICopyStudio() {
               {analysisResult && (
                 <Card className="bg-gray-900/60 border-purple-500/30">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm text-purple-400">Analysis Results</CardTitle>
+                    <CardTitle className="text-sm text-purple-400">
+                      Analysis Results
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="text-center">
-                      <div className="text-5xl font-bold text-purple-400">{analysisResult.score}</div>
-                      <div className="text-xs text-gray-400 mt-1">Overall Score / 100</div>
+                      <div className="text-5xl font-bold text-purple-400">
+                        {analysisResult.score}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        Overall Score / 100
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { label: "Readability", value: analysisResult.readability, color: "text-blue-400" },
-                        { label: "Persuasion", value: analysisResult.persuasion, color: "text-purple-400" },
-                        { label: "Clarity", value: analysisResult.clarity, color: "text-cyan-400" },
-                        { label: "Emotional Impact", value: analysisResult.emotionalImpact, color: "text-pink-400" },
+                        {
+                          label: "Readability",
+                          value: analysisResult.readability,
+                          color: "text-blue-400",
+                        },
+                        {
+                          label: "Persuasion",
+                          value: analysisResult.persuasion,
+                          color: "text-purple-400",
+                        },
+                        {
+                          label: "Clarity",
+                          value: analysisResult.clarity,
+                          color: "text-cyan-400",
+                        },
+                        {
+                          label: "Emotional Impact",
+                          value: analysisResult.emotionalImpact,
+                          color: "text-pink-400",
+                        },
                       ].map(m => (
-                        <div key={m.label} className="bg-gray-800/50 rounded-lg p-3">
-                          <div className={`text-xl font-bold ${m.color}`}>{m.value}</div>
+                        <div
+                          key={m.label}
+                          className="bg-gray-800/50 rounded-lg p-3"
+                        >
+                          <div className={`text-xl font-bold ${m.color}`}>
+                            {m.value}
+                          </div>
                           <div className="text-xs text-gray-400">{m.label}</div>
                         </div>
                       ))}
                     </div>
                     {analysisResult.strengths?.length > 0 && (
                       <div>
-                        <div className="text-xs text-purple-400 font-medium mb-2">Strengths</div>
-                        {analysisResult.strengths.map((s: string, i: number) => (
-                          <div key={i} className="text-xs text-gray-300 flex items-start gap-1.5 mb-1">
-                            <CheckCircle className="w-3 h-3 text-purple-400 mt-0.5 shrink-0" />{s}
-                          </div>
-                        ))}
+                        <div className="text-xs text-purple-400 font-medium mb-2">
+                          Strengths
+                        </div>
+                        {analysisResult.strengths.map(
+                          (s: string, i: number) => (
+                            <div
+                              key={i}
+                              className="text-xs text-gray-300 flex items-start gap-1.5 mb-1"
+                            >
+                              <CheckCircle className="w-3 h-3 text-purple-400 mt-0.5 shrink-0" />
+                              {s}
+                            </div>
+                          )
+                        )}
                       </div>
                     )}
                     {analysisResult.improvements?.length > 0 && (
                       <div>
-                        <div className="text-xs text-yellow-400 font-medium mb-2">Improvements</div>
-                        {analysisResult.improvements.map((s: string, i: number) => (
-                          <div key={i} className="text-xs text-gray-300 flex items-start gap-1.5 mb-1">
-                            <ChevronRight className="w-3 h-3 text-yellow-400 mt-0.5 shrink-0" />{s}
-                          </div>
-                        ))}
+                        <div className="text-xs text-yellow-400 font-medium mb-2">
+                          Improvements
+                        </div>
+                        {analysisResult.improvements.map(
+                          (s: string, i: number) => (
+                            <div
+                              key={i}
+                              className="text-xs text-gray-300 flex items-start gap-1.5 mb-1"
+                            >
+                              <ChevronRight className="w-3 h-3 text-yellow-400 mt-0.5 shrink-0" />
+                              {s}
+                            </div>
+                          )
+                        )}
                       </div>
                     )}
                   </CardContent>
@@ -482,7 +726,9 @@ export default function AICopyStudio() {
             <div className="grid lg:grid-cols-2 gap-6">
               <Card className="bg-gray-900/60 border-gray-700/50">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-sm text-gray-300">Translate Copy</CardTitle>
+                  <CardTitle className="text-sm text-gray-300">
+                    Translate Copy
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
@@ -492,24 +738,66 @@ export default function AICopyStudio() {
                     className="bg-gray-800/60 border-gray-600 text-white placeholder:text-gray-500 min-h-[150px]"
                   />
                   <div>
-                    <Label className="text-xs text-gray-400 mb-1.5 block">Target Language</Label>
+                    <Label className="text-xs text-gray-400 mb-1.5 block">
+                      Target Language
+                    </Label>
                     <Select value={targetLang} onValueChange={setTargetLang}>
                       <SelectTrigger className="bg-gray-800/60 border-gray-600 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-gray-800 border-gray-600">
-                        {["Spanish","French","German","Portuguese","Japanese","Korean","Chinese","Arabic","Hindi","Russian","Italian","Dutch","Turkish","Polish","Swedish"].map(lang => (
-                          <SelectItem key={lang} value={lang} className="text-white hover:bg-gray-700">{lang}</SelectItem>
+                        {[
+                          "Spanish",
+                          "French",
+                          "German",
+                          "Portuguese",
+                          "Japanese",
+                          "Korean",
+                          "Chinese",
+                          "Arabic",
+                          "Hindi",
+                          "Russian",
+                          "Italian",
+                          "Dutch",
+                          "Turkish",
+                          "Polish",
+                          "Swedish",
+                        ].map(lang => (
+                          <SelectItem
+                            key={lang}
+                            value={lang}
+                            className="text-white hover:bg-gray-700"
+                          >
+                            {lang}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <Button
-                    onClick={() => translateMutation.mutate({ copy: translateText, targetLanguage: targetLang, preserveTone: true })}
-                    disabled={translateMutation.isPending || !translateText.trim()}
+                    onClick={() =>
+                      translateMutation.mutate({
+                        copy: translateText,
+                        targetLanguage: targetLang,
+                        preserveTone: true,
+                      })
+                    }
+                    disabled={
+                      translateMutation.isPending || !translateText.trim()
+                    }
                     className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
                   >
-                    {translateMutation.isPending ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Translating...</> : <><Languages className="w-4 h-4 mr-2" />Translate</>}
+                    {translateMutation.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Translating...
+                      </>
+                    ) : (
+                      <>
+                        <Languages className="w-4 h-4 mr-2" />
+                        Translate
+                      </>
+                    )}
                   </Button>
                 </CardContent>
               </Card>
@@ -518,10 +806,18 @@ export default function AICopyStudio() {
                 <Card className="bg-gray-900/60 border-blue-500/30">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm text-blue-400">Translated to {targetLang}</CardTitle>
+                      <CardTitle className="text-sm text-blue-400">
+                        Translated to {targetLang}
+                      </CardTitle>
                       {translatedCopy && (
-                        <Button size="sm" variant="outline" onClick={() => handleCopy(translatedCopy)} className="border-gray-600 text-gray-300 h-7 text-xs">
-                          <Copy className="w-3 h-3 mr-1" />Copy
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleCopy(translatedCopy)}
+                          className="border-gray-600 text-gray-300 h-7 text-xs"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy
                         </Button>
                       )}
                     </div>
@@ -547,7 +843,9 @@ export default function AICopyStudio() {
           <TabsContent value="templates">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {(templates || []).map((t: any) => (
-                <Card key={t.id} className="bg-gray-900/60 border-gray-700/50 hover:border-cyan-500/30 transition-all cursor-pointer group"
+                <Card
+                  key={t.id}
+                  className="bg-gray-900/60 border-gray-700/50 hover:border-cyan-500/30 transition-all cursor-pointer group"
                   onClick={() => {
                     setTopic(t.name);
                     setSelectedType(t.type as any);
@@ -556,13 +854,26 @@ export default function AICopyStudio() {
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-2">
-                      <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs">{t.type.replace(/_/g, " ")}</Badge>
-                      <Badge className="bg-gray-700/50 text-gray-400 border-gray-600/30 text-xs">{t.tone}</Badge>
+                      <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs">
+                        {t.type.replace(/_/g, " ")}
+                      </Badge>
+                      <Badge className="bg-gray-700/50 text-gray-400 border-gray-600/30 text-xs">
+                        {t.tone}
+                      </Badge>
                     </div>
-                    <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors">{t.name}</h3>
-                    <p className="text-xs text-gray-400 mb-3">{t.description}</p>
-                    <div className="bg-gray-800/50 rounded-lg p-2 text-xs text-gray-300 font-mono">{t.template}</div>
-                    <Button size="sm" className="w-full mt-3 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30 text-xs">
+                    <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors">
+                      {t.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 mb-3">
+                      {t.description}
+                    </p>
+                    <div className="bg-gray-800/50 rounded-lg p-2 text-xs text-gray-300 font-mono">
+                      {t.template}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full mt-3 bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/30 text-xs"
+                    >
                       Use Template <ChevronRight className="w-3 h-3 ml-1" />
                     </Button>
                   </CardContent>
@@ -577,27 +888,47 @@ export default function AICopyStudio() {
               <div className="text-center py-16 text-gray-500">
                 <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p className="text-sm">No copy generated yet</p>
-                <p className="text-xs mt-1">Generate copy to see your history here</p>
+                <p className="text-xs mt-1">
+                  Generate copy to see your history here
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {copyHistory.map(item => (
-                  <Card key={item.id} className="bg-gray-900/60 border-gray-700/50">
+                  <Card
+                    key={item.id}
+                    className="bg-gray-900/60 border-gray-700/50"
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs">{item.type.replace(/_/g, " ")}</Badge>
-                          <Badge className="bg-gray-700/50 text-gray-400 border-gray-600/30 text-xs">{item.tone}</Badge>
-                          <span className="text-xs text-gray-500">{item.wordCount} words</span>
+                          <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs">
+                            {item.type.replace(/_/g, " ")}
+                          </Badge>
+                          <Badge className="bg-gray-700/50 text-gray-400 border-gray-600/30 text-xs">
+                            {item.tone}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            {item.wordCount} words
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">{item.timestamp.toLocaleTimeString()}</span>
-                          <Button size="sm" variant="outline" onClick={() => handleCopy(item.copy)} className="border-gray-600 text-gray-300 h-6 text-xs px-2">
+                          <span className="text-xs text-gray-500">
+                            {item.timestamp.toLocaleTimeString()}
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCopy(item.copy)}
+                            className="border-gray-600 text-gray-300 h-6 text-xs px-2"
+                          >
                             <Copy className="w-3 h-3" />
                           </Button>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-400 mb-2">Topic: {item.topic}</div>
+                      <div className="text-xs text-gray-400 mb-2">
+                        Topic: {item.topic}
+                      </div>
                       <div className="bg-gray-800/50 rounded-lg p-3 text-xs text-gray-300 whitespace-pre-wrap line-clamp-4">
                         {item.copy}
                       </div>
