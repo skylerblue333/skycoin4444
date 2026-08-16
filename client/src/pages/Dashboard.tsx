@@ -209,7 +209,7 @@ export default function Dashboard() {
     );
   }
 
-  const isOwner = user.name === "Skyler blue" || user.openId === user.openId;
+  const isOwner = user.name === "Skyler blue";
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white pb-24">
@@ -231,9 +231,7 @@ export default function Dashboard() {
             </Badge>
             <button className="relative text-slate-400 hover:text-white transition-colors">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">
-                3
-              </span>
+              <span className="sr-only">Notifications</span>
             </button>
           </div>
         </div>
@@ -401,13 +399,13 @@ export default function Dashboard() {
                 <div>
                   <h3 className="font-bold text-white">Sky School</h3>
                   <p className="text-xs text-slate-500">
-                    12 courses · 847 students
+                    Course catalog status unavailable
                   </p>
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-3">
-                Master Web3, AI, DeFi, and blockchain development with on-chain
-                certificates.
+                Course catalog and certification status are unavailable until
+                verified education data is connected.
               </p>
               <div className="flex items-center gap-1 text-blue-400 text-xs font-medium group-hover:gap-2 transition-all">
                 Start Learning <ArrowUpRight className="h-3 w-3" />
@@ -425,13 +423,13 @@ export default function Dashboard() {
                 <div>
                   <h3 className="font-bold text-white">HOPE AI</h3>
                   <p className="text-xs text-slate-500">
-                    Voice · Avatar · 44 Agents
+                    Voice · Avatar · Availability pending
                   </p>
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-3">
-                Your AI companion with voice commands, real-time market
-                analysis, and autonomous agents.
+                AI companion capabilities and market-data integrations are
+                unavailable until verified services are connected.
               </p>
               <div className="flex items-center gap-1 text-teal-400 text-xs font-medium group-hover:gap-2 transition-all">
                 Talk to HOPE <ArrowUpRight className="h-3 w-3" />
@@ -448,12 +446,14 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h3 className="font-bold text-white">44 Games</h3>
-                  <p className="text-xs text-slate-500">Play · Earn · Donate</p>
+                  <p className="text-xs text-slate-500">
+                    Play · Charity status unavailable
+                  </p>
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-3">
-                44 playable browser games where gameplay earns SKY444 and funds
-                real charities.
+                Game catalog and charity settlement status are unavailable until
+                verified game and donation integrations are connected.
               </p>
               <div className="flex items-center gap-1 text-yellow-400 text-xs font-medium group-hover:gap-2 transition-all">
                 Play Now <ArrowUpRight className="h-3 w-3" />
