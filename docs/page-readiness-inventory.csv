@@ -16,7 +16,7 @@ AIModerationQueue,client/src/pages/AIModerationQueue.tsx,integration-backed-revi
 AIPersonaFeed,client/src/pages/AIPersonaFeed.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
 AIPersonaSystem,client/src/pages/AIPersonaSystem.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 AIToolsHub,client/src/pages/AIToolsHub.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-AITrading,client/src/pages/AITrading.tsx,integration-backed-review,True,True,False,False,True,False,False,False,False
+AITrading,client/src/pages/AITrading.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AITrainingLoops,client/src/pages/AITrainingLoops.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 APIDocs,client/src/pages/APIDocs.tsx,integration-backed-review,True,False,True,False,False,True,False,False,False
 APIDocumentation,client/src/pages/APIDocumentation.tsx,interactive-review,True,False,False,False,False,True,True,False,False
