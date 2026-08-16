@@ -28,6 +28,9 @@ describe("truthful capability boundaries", () => {
     expect(source).not.toMatch(/mutation\(\(\) => \(\{ success: true \}\)/);
     expect(source).toContain("updateProfile");
     expect(source).toContain("schema.users.username");
+    expect(source).toContain("const feedRouter");
+    expect(source).toContain("createPost(ctx.user.id");
+    expect(source).toContain("storagePut(`users/${ctx.user.id}/avatar`");
   });
 
   it("does not return synthetic users or balances when database records are absent", () => {
