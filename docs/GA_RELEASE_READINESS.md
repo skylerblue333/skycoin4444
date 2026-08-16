@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-08-16  
 **Repository:** `skylerblue333/skycoin4444`  
-**Verified synchronized checkpoint:** `48e849c` (`48e849c4e8f16e4a9e4d1c11fbd3f7a8b88c0f4b`)
+**Verified synchronized checkpoint:** `6bbed61` (`6bbed617dd57de3e9eaf96c7f88d5773ee5f226c`)
 **Assessment:** **Code validation green; GA release not yet authorized.**
 
 ## Verified local evidence
@@ -25,8 +25,8 @@ The current inventory records:
 | Classification | Count |
 |---|---:|
 | Total routes | 1,079 |
-| Truthfully gated | 273 |
-| Integration-backed review | 102 |
+| Truthfully gated | 274 |
+| Integration-backed review | 101 |
 | Interactive review | 594 |
 | Static review | 110 |
 | Hard-coded-money pages | 90 |
