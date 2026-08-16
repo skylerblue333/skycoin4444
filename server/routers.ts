@@ -32,13 +32,13 @@ const createFeatureRouter = () =>
     get: publicProcedure.input(z.string()).query(({ input }) => ({})),
     create: protectedProcedure
       .input(z.object({}))
-      .mutation(({ input }) => ({ success: true })),
+      .mutation(() => unavailableMutationResult),
     update: protectedProcedure
       .input(z.object({ id: z.string() }))
-      .mutation(({ input }) => ({ success: true })),
+      .mutation(() => unavailableMutationResult),
     delete: protectedProcedure
       .input(z.string())
-      .mutation(({ input }) => ({ success: true })),
+      .mutation(() => unavailableMutationResult),
   });
 
 const walletRouter = router({
