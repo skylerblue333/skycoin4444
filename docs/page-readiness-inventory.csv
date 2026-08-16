@@ -281,7 +281,7 @@ DatingPremium,client/src/pages/DatingPremium.tsx,interactive-review,True,False,F
 DatingProfile,client/src/pages/DatingProfile.tsx,integration-backed-review,True,False,True,False,False,True,True,False,False
 DatingProfileSetup,client/src/pages/DatingProfileSetup.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 DatingSubscription,client/src/pages/DatingSubscription.tsx,integration-backed-review,True,False,True,False,False,True,False,False,True
-DayTradeRoom,client/src/pages/DayTradeRoom.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,True
+DayTradeRoom,client/src/pages/DayTradeRoom.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 DeFi,client/src/pages/DeFi.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 DecentralizedIdentity,client/src/pages/DecentralizedIdentity.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 DefensibilityMoat,client/src/pages/DefensibilityMoat.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
