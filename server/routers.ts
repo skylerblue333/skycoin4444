@@ -488,7 +488,92 @@ export const appRouter = router({
 
   // AI & Agents Routers
   ai: aiRouter,
-  aiEngineer: createFeatureRouter(),
+  aiEngineer: router({
+    getBots: publicProcedure.query(
+      () => [] as Array<{ id: string; name: string; specialty: string }>
+    ),
+    generateCode: protectedProcedure
+      .input(
+        z.object({
+          botId: z.string(),
+          prompt: z.string().min(1),
+          language: z.string().min(1),
+          context: z.string().optional(),
+          targetFile: z.string().optional(),
+          mode: z.string().optional(),
+        })
+      )
+      .mutation(() => ({
+        ...aiUnavailableResult,
+        code: "",
+        explanation: "",
+        linesGenerated: 0,
+        suggestions: [] as string[],
+      })),
+    analyzeCode: protectedProcedure
+      .input(
+        z.object({
+          code: z.string().min(1),
+          language: z.string().min(1),
+          analysisType: z.string().min(1),
+        })
+      )
+      .mutation(() => ({
+        ...aiUnavailableResult,
+        score: 0,
+        summary: "",
+        issues: [] as Array<{
+          severity: string;
+          title: string;
+          description: string;
+          line?: number;
+        }>,
+      })),
+    getStats: protectedProcedure.query(() => ({
+      isAutonomousRunning: false,
+      nextTaskTitle: "",
+      tasksCompleted: 0,
+      linesGenerated: 0,
+      totalLinesGenerated: 0,
+      totalTasksCompleted: 0,
+      totalPushes: 0,
+      activeBots: 0,
+    })),
+    getLog: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () => [] as Array<{ id: number; message: string; createdAt: string }>
+      ),
+    getPushHistory: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: number;
+            branch: string;
+            commit: string;
+            createdAt: string;
+          }>
+      ),
+    getSessions: protectedProcedure.query(
+      () => [] as Array<{ id: number; status: string; createdAt: string }>
+    ),
+    runAutonomousCycle: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        tasksRun: 0,
+        linesGenerated: 0,
+      })),
+  }),
   aiMarket: createFeatureRouter(),
   aiPersonas: router({
     getBlendedFeed: publicProcedure
