@@ -1063,7 +1063,7 @@ ReputationSection,client/src/pages/mission-control/ReputationSection.tsx,integra
 StartupSection,client/src/pages/mission-control/StartupSection.tsx,integration-backed-review,False,True,False,True,True,True,True,False,True
 TodaySection,client/src/pages/mission-control/TodaySection.tsx,integration-backed-review,False,True,False,False,True,True,False,False,False
 shared,client/src/pages/mission-control/shared.tsx,static-review,False,False,False,False,False,False,False,False,False
-Phase20Hub,client/src/pages/phase20/Phase20Hub.tsx,blocked-by-type-safety,False,True,False,False,True,False,False,True,True
+Phase20Hub,client/src/pages/phase20/Phase20Hub.tsx,truthfully-gated,False,False,False,False,False,False,True,False,False
 AiCore,client/src/pages/wave2/AiCore.tsx,truthfully-gated,False,False,False,False,False,False,True,False,False
 Marketplace,client/src/pages/wave2/Marketplace.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Notifications,client/src/pages/wave2/Notifications.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
