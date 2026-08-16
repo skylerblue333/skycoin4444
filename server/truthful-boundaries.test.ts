@@ -41,6 +41,29 @@ describe("truthful capability boundaries", () => {
     expect(wallet).not.toMatch(/transfer|send/i);
   });
 
+  it("bounds high-risk financial and AI pages without replacing them with fake workflows", () => {
+    for (const page of [
+      "client/src/pages/Portfolio.tsx",
+      "client/src/pages/CryptoExchange.tsx",
+      "client/src/pages/MiningDashboard.tsx",
+      "client/src/pages/AdminWalletManager.tsx",
+      "client/src/pages/HopeAIPage.tsx",
+    ]) {
+      const source = readProjectFile(page);
+      expect(source).toContain("FeatureUnavailable");
+      expect(source).not.toMatch(/toast\\.success|transfer successful|reward sent|live users/i);
+    }
+  });
+
+  it("keeps wallet and payment surfaces read-only or explicitly unavailable", () => {
+    const wallet = readProjectFile("client/src/pages/WalletOverview.tsx");
+    const checkout = readProjectFile("client/src/pages/Checkout.tsx");
+    expect(wallet).toContain("trpc.wallet.overview.useQuery");
+    expect(wallet).not.toMatch(/transfer|send/i);
+    expect(checkout).toContain("FeatureUnavailable");
+    expect(checkout).not.toMatch(/charge\(\)|payment successful|checkout completed/i);
+  });
+
   it("does not return synthetic users or balances when database records are absent", () => {
     const source = readProjectFile("server/db.ts");
 
