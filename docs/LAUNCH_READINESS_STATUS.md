@@ -2,7 +2,7 @@
 
 **Assessment date:** August 16, 2026  
 **Branch:** `restore/error-free-baseline`  
-**Latest checkpoint:** `066578a`  
+**Latest checkpoint:** `b2f6543`  
 **Release label:** **Code-green launch candidate; GA not authorized**
 
 ## Honest percentage
@@ -23,11 +23,11 @@ The current **directional launch-readiness estimate is 40%**. This is not a mark
 
 ## What has been completed
 
-The strict TypeScript baseline is green at zero diagnostics. Production builds, the available automated suite, and diff hygiene pass. The test suite now contains five passing tests across two files: the existing logout test, four truthful-boundary regressions, and account-core contract protection.
+The strict TypeScript baseline is green at zero diagnostics. Production builds, the available automated suite, and diff hygiene pass. The test suite now contains five passing tests across two files: the existing logout test and four account-core/truthful-boundary regressions covering generic routers, profile persistence, feed persistence, avatar storage, and fabricated-data prevention.
 
 The server contract repairs include the existing storage helper import, a schema-compatible cron identity, a correct Express wildcard parameter type, a typed generic relational query boundary, and a corrected OAuth lookup using `users.openId`. Fabricated user identities, `user@example.com`, synthetic ID `1`, and fabricated user balances were removed from failed user lookups. A synthetic post ID fallback was also removed so failed persistence returns `null` rather than fake success.
 
-Several high-risk frontend routes were repaired. The AI Agent Market no longer shows fabricated prices, ratings, usage counts, paid outputs, or payment-success behavior. Portfolio no longer displays hard-coded holdings, prices, balances, performance history, or fake asset actions. Crypto Exchange no longer claims live data, active users, transaction counts, success rates, or response times. Mining Dashboard no longer simulates coins, rewards, USD earnings, or mining activity. Progress Tracking remains bounded until verified education records exist. MainDashboard is now a usable truthful launch hub rather than a generic placeholder with an Activate button. The account core now has database-backed profile reads and validated profile updates, and the feed router reads and persists posts through the existing posts table. Generic feature mutations no longer return fabricated success.
+Several high-risk frontend routes were repaired. The AI Agent Market no longer shows fabricated prices, ratings, usage counts, paid outputs, or payment-success behavior. Portfolio no longer displays hard-coded holdings, prices, balances, performance history, or fake asset actions. Crypto Exchange no longer claims live data, active users, transaction counts, success rates, or response times. Mining Dashboard no longer simulates coins, rewards, USD earnings, or mining activity. Progress Tracking remains bounded until verified education records exist. MainDashboard is now a usable truthful launch hub rather than a generic placeholder with an Activate button. The account core now has database-backed profile reads, validated profile updates, and verified avatar storage through the existing storage helper. The feed router reads and persists posts through the existing posts table. Generic feature mutations no longer return fabricated success.
 
 ## Frontend answer
 
