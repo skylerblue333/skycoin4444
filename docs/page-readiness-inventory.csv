@@ -494,7 +494,7 @@ KYCVerification,client/src/pages/KYCVerification.tsx,truthfully-gated,True,False
 KnowledgeBase,client/src/pages/KnowledgeBase.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LDAPIntegration,client/src/pages/LDAPIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LTVAnalysis,client/src/pages/LTVAnalysis.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-LandingPage,client/src/pages/LandingPage.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
+LandingPage,client/src/pages/LandingPage.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 LanguageExchangeAdmin,client/src/pages/LanguageExchangeAdmin.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 LanguagePartnerDiscovery,client/src/pages/LanguagePartnerDiscovery.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 LanguageSelector,client/src/pages/LanguageSelector.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
