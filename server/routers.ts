@@ -2188,7 +2188,51 @@ export const appRouter = router({
       verifiedReveal: false,
     })),
   }),
-  proofVault: createFeatureRouter(),
+  proofVault: router({
+    revenue: publicProcedure.query(() => ({
+      source: "",
+      status: "static" as const,
+      lastUpdated: null as string | null,
+      data: {
+        totalRevenue: 0,
+        subscriptions: 0,
+        marketplace: 0,
+        tips: 0,
+        streamDonations: 0,
+        charityDonations: 0,
+      },
+      available: false as const,
+    })),
+    treasury: publicProcedure.query(() => ({
+      source: "",
+      status: "static" as const,
+      lastUpdated: null as string | null,
+      data: {
+        total: 0,
+        stakingPool: 0,
+        ecosystemFund: 0,
+        liquidityPool: 0,
+        creatorFund: 0,
+        operations: 0,
+        emergencyReserve: 0,
+      },
+      available: false as const,
+    })),
+    security: publicProcedure.query(() => ({
+      source: "",
+      status: "static" as const,
+      lastUpdated: null as string | null,
+      data: {
+        wafStatus: "Unavailable",
+        sslGrade: "Unavailable",
+        aiModerationActions: 0,
+        totalModerationActions: 0,
+        uptime30d: 0,
+        last30dActions: 0,
+      },
+      available: false as const,
+    })),
+  }),
   goc: router({
     tokenRegistry: publicProcedure.query(() => ({
       all: [] as Array<{
