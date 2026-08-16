@@ -1252,7 +1252,47 @@ export const appRouter = router({
       .input(z.string())
       .mutation(() => unavailableMutationResult),
   }),
-  ico: createFeatureRouter(),
+  ico: router({
+    createCheckout: protectedProcedure
+      .input(
+        z.object({
+          tierId: z.string(),
+          usdAmount: z.number().positive(),
+          origin: z.string().url(),
+          referralCode: z.string().optional(),
+        })
+      )
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        checkoutUrl: undefined as string | undefined,
+      })),
+    getStats: publicProcedure.query(() => ({
+      totalRaisedUSD: 0,
+      totalParticipants: 0,
+      totalTokensSold: 0,
+    })),
+    getMyPurchases: protectedProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          tier_id: string;
+          token_amount: string;
+          bonus_tokens: string;
+          tokens_released: string;
+          usd_amount: string;
+        }>
+    ),
+    getMyReferralCode: protectedProcedure.query(
+      () => undefined as { code: string } | undefined
+    ),
+    getLeaderboard: publicProcedure.query(
+      () =>
+        [] as Array<{ id: number; name: string; tokens: number; rank: number }>
+    ),
+    claimVested: protectedProcedure
+      .input(z.object({ purchaseId: z.number() }))
+      .mutation(() => ({ ...unavailableMutationResult, claimed: 0 })),
+  }),
 
   // Admin & Moderation Routers
   admin: createFeatureRouter(),
@@ -1460,7 +1500,14 @@ export const appRouter = router({
   proofVault: createFeatureRouter(),
   goc: createFeatureRouter(),
   notifIntelligence: createFeatureRouter(),
-  investor: createFeatureRouter(),
+  investor: router({
+    kpis: protectedProcedure.query(() => ({
+      totalInvested: 0,
+      tokenBalance: 0,
+      vestedTokens: 0,
+      portfolioValue: 0,
+    })),
+  }),
   installer: createFeatureRouter(),
   sprint: createFeatureRouter(),
 });
