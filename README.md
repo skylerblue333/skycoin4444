@@ -101,14 +101,14 @@ The current branch is a **stabilization checkpoint**, not a GA authorization. Th
 | Local source stabilization | Active |
 | Truthful unsupported-feature states | Implemented in key high-risk surfaces |
 | Production build and tests | Must be rerun after each checkpoint |
-| Strict TypeScript completion | In progress; remaining diagnostics are being repaired by domain |
+| Strict TypeScript completion | **Verified: 0 diagnostics at the latest checkpoint** |
 | Staging database | Blocked pending approved infrastructure evidence |
 | OAuth and secure sessions | Not verified in the intended staging environment |
 | AWS/EC2 deployment and rollback | Not verified |
 | Production DNS, TLS, and reverse proxy | Not verified |
 | Monitoring, alerting, and sensitive-data redaction | Not verified as a production operation |
 | Encrypted backup and restore drill | Not verified |
-| Critical workflow coverage | Expanding; registration, login, profile, wallet ledger, education, admin, and integration paths require evidence |
+| Critical workflow coverage | Expanding; profile/feed contract checks pass; registration, login, wallet ledger, education, admin, and integration paths still require evidence |
 | **GA decision** | **Not authorized until the no-go gates are verified** |
 
 See [`docs/ENTERPRISE_READINESS.md`](./docs/ENTERPRISE_READINESS.md) for the current engineering priorities. Release evidence should identify an owner, artifact, rollback plan, and acceptance result for every no-go item.
@@ -121,8 +121,13 @@ For local development:
 
 ```bash
 pnpm install
+pnpm run check
+pnpm run test
+pnpm run build
 pnpm run dev
 ```
+
+The currently usable launch slice is the truthful launch hub plus the database-backed account/profile and feed contracts. Profile updates require an authenticated user and an approved `DATABASE_URL`; avatar uploads additionally require the configured storage provider. If those providers are absent, the application must show an explicit unavailable or configuration error rather than fabricate a saved record. The repository does not provide a substitute production database, and `pnpm run db:push` must not be run until the approved staging gate is cleared.
 
 Environment variables belong in the approved secret-management path or a local untracked environment file. Use the repository configuration documentation and deployment templates as the safe configuration reference, and never commit real credentials.
 
