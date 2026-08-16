@@ -409,7 +409,7 @@ FrameworkTemplates,client/src/pages/FrameworkTemplates.tsx,truthfully-gated,True
 FreeWillDashboard,client/src/pages/FreeWillDashboard.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 FundraiserTools,client/src/pages/FundraiserTools.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 GDPR,client/src/pages/GDPR.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-GTMStrategy,client/src/pages/GTMStrategy.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+GTMStrategy,client/src/pages/GTMStrategy.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 GainLossTracking,client/src/pages/GainLossTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 GameBlackjack,client/src/pages/GameBlackjack.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 GameBlockBuilder,client/src/pages/GameBlockBuilder.tsx,interactive-review,True,False,False,False,False,True,False,False,False
