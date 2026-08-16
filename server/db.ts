@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from '../drizzle/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc } from 'drizzle-orm';
 
 const poolConnection = mysql.createPool(process.env.DATABASE_URL as string);
 
@@ -88,7 +88,7 @@ export async function updateUserBalance(userId: string, amount: number) {
 // ============ POST HELPERS ============
 export async function getPosts(limit = 20, offset = 0) {
   try {
-    return await db.query.posts.findMany({ limit, offset });
+    return await db.query.posts.findMany({ limit, offset, orderBy: desc(schema.posts.createdAt) });
   } catch (error) {
     return [];
   }
@@ -104,7 +104,7 @@ export async function getPostsByUser(userId: string) {
 
 export async function createPost(userId: string, content: string, media?: string) {
   try {
-    const id = `post-${Date.now()}`;
+    const id = `post-${crypto.randomUUID()}`;
     await db.insert(schema.posts).values({ id, userId, content, media });
     return { id, userId, content, media };
   } catch (error) {
