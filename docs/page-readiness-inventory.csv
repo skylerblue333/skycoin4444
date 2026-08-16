@@ -444,7 +444,7 @@ GroupChats,client/src/pages/GroupChats.tsx,static-review,True,False,False,False,
 GroupDirectory,client/src/pages/GroupDirectory.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GroupEvents,client/src/pages/GroupEvents.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 GroupManagement,client/src/pages/GroupManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-Growth,client/src/pages/Growth.tsx,static-review,True,False,False,False,False,False,False,False,True
+Growth,client/src/pages/Growth.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Guilds,client/src/pages/Guilds.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 HIPAA,client/src/pages/HIPAA.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 HOPEAIControl,client/src/pages/HOPEAIControl.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
