@@ -487,7 +487,7 @@ InvestmentGoals,client/src/pages/InvestmentGoals.tsx,static-review,True,False,Fa
 InvestorMetrics,client/src/pages/InvestorMetrics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 InvestorPitch,client/src/pages/InvestorPitch.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 InvestorPortal,client/src/pages/InvestorPortal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-InvestorRoom,client/src/pages/InvestorRoom.tsx,integration-backed-review,True,True,False,False,True,False,False,False,True
+InvestorRoom,client/src/pages/InvestorRoom.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 InvoiceDetails,client/src/pages/InvoiceDetails.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 InvoiceManagement,client/src/pages/InvoiceManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 KYCVerification,client/src/pages/KYCVerification.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
