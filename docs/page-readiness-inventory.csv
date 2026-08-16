@@ -1046,7 +1046,7 @@ WebhookManagement,client/src/pages/WebhookManagement.tsx,static-review,True,Fals
 WebhookManager,client/src/pages/WebhookManager.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 Webhooks,client/src/pages/Webhooks.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 WelcomeScreen,client/src/pages/WelcomeScreen.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-WhaleMonitor,client/src/pages/WhaleMonitor.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
+WhaleMonitor,client/src/pages/WhaleMonitor.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WhitelistManagement,client/src/pages/WhitelistManagement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WishlistManagement,client/src/pages/WishlistManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 WorkflowAutomation,client/src/pages/WorkflowAutomation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
