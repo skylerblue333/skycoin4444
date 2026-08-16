@@ -676,7 +676,7 @@ PremiumFeatures,client/src/pages/PremiumFeatures.tsx,truthfully-gated,True,False
 PresentationWithChat,client/src/pages/PresentationWithChat.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 PriceAlerts,client/src/pages/PriceAlerts.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 Pricing,client/src/pages/Pricing.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-PricingEngine,client/src/pages/PricingEngine.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+PricingEngine,client/src/pages/PricingEngine.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PricingManagement,client/src/pages/PricingManagement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PricingRules,client/src/pages/PricingRules.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PriorityMatrix,client/src/pages/PriorityMatrix.tsx,interactive-review,True,False,False,False,False,True,True,False,False
