@@ -293,6 +293,52 @@ const aiRouter = router({
   learnTopic: protectedProcedure
     .input(z.object({ topic: z.string().min(1) }))
     .mutation(() => aiUnavailableResult),
+  getCopyTemplates: publicProcedure.query(
+    () =>
+      [] as Array<{
+        id: string;
+        name: string;
+        type: string;
+        description: string;
+        template: string;
+      }>
+  ),
+  generateCopy: protectedProcedure
+    .input(
+      z.object({
+        type: z.string().min(1),
+        topic: z.string().min(1),
+        tone: z.string().min(1),
+        keywords: z.array(z.string()).optional(),
+        length: z.string().optional(),
+      })
+    )
+    .mutation(() => ({
+      ...aiUnavailableResult,
+      copy: "",
+      tone: "",
+      wordCount: 0,
+    })),
+  improveCopy: protectedProcedure
+    .input(z.object({ copy: z.string().min(1), goal: z.string().min(1) }))
+    .mutation(() => ({ ...aiUnavailableResult, improved: "" })),
+  analyzeCopy: protectedProcedure
+    .input(z.object({ copy: z.string().min(1) }))
+    .mutation(() => ({
+      ...aiUnavailableResult,
+      score: 0,
+      analysis: "",
+      suggestions: [] as string[],
+    })),
+  translateCopy: protectedProcedure
+    .input(
+      z.object({
+        copy: z.string().min(1),
+        targetLanguage: z.string().min(1),
+        preserveTone: z.boolean().optional(),
+      })
+    )
+    .mutation(() => ({ ...aiUnavailableResult, translated: "", language: "" })),
 });
 
 const tokenRouter = router({
