@@ -1819,7 +1819,55 @@ export const appRouter = router({
       })),
     }),
   }),
-  governance: createFeatureRouter(),
+  governance: router({
+    proposals: publicProcedure
+      .input(z.object({ status: z.string().optional() }).optional())
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            status: string;
+            category: string;
+            title: string;
+            description: string;
+            deadline: string;
+            endsAt: string;
+            votesFor: number;
+            votesAgainst: number;
+            abstain: number;
+            quorum: number;
+          }>
+      ),
+    stats: publicProcedure.query(() => ({
+      activeProposals: 0,
+      passedProposals: 0,
+      uniqueVoters: 0,
+      treasuryBalance: 0,
+      available: false as const,
+    })),
+    treasury: publicProcedure.query(() => ({
+      balance: 0,
+      available: false as const,
+    })),
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          description: z.string().min(1),
+          category: z.string().min(1),
+          votingPeriodDays: z.number().int().min(1).max(365),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+    vote: protectedProcedure
+      .input(
+        z.object({
+          proposalId: z.string().min(1),
+          choice: z.enum(["for", "against", "abstain"]),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+  }),
   orchestrator: router({
     status: publicProcedure.query(() => ({
       platformScore: 0,
