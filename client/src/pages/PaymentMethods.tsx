@@ -1,25 +1,10 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import UnavailableFeature from "@/components/UnavailableFeature";
 
-export default function PaymentMethods() {
-  const [state, setState] = useState(false);
-
+export default function PaymentMethodsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-black p-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">PaymentMethods</h1>
-        <p className="text-slate-400 mb-8">manage payment methods</p>
-        
-        <Card className="bg-slate-900 border-slate-800 p-8">
-          <div className="space-y-6">
-            <p className="text-slate-300">Content for PaymentMethods page</p>
-            <Button onClick={() => setState(!state)}>
-              {state ? "Deactivate" : "Activate"}
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
+    <UnavailableFeature
+      name="Payment methods"
+      reason="Secure payment-provider setup, tokenized instrument storage, verification, removal, billing authorization, and PCI-scoped handling are not connected to a production payments integration. The current route is only a local placeholder, so it is gated until those security-sensitive controls are implemented and audited."
+    />
   );
 }
