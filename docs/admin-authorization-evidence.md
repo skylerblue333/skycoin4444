@@ -1,7 +1,7 @@
 # Admin Authorization Evidence
 
 **Assessment checkpoint:** `41316ef`  
-**Code checkpoint under test:** `c4706fb`
+**Code checkpoint under test:** `486db38`
 **Status:** **PARTIALLY VERIFIED**
 
 ## Automated evidence
@@ -20,16 +20,18 @@ The test-only URL was used only to satisfy the application’s explicit startup 
 | Admin reaches `admin.stats` unavailable boundary | PASS |
 | Non-admin denied from `admin.users` and `admin.moderationQueue` | PASS |
 | Non-admin denied from `admin.updateUserRole` | PASS |
-| Admin reaches listings and role-mutation unavailable boundary | PASS |
+| Unauthenticated denied from `admin.updateUserRole` | PASS (`UNAUTHORIZED`) |
+| Invalid role mutation input rejected | PASS (`BAD_REQUEST`) |
+| Admin reaches listings and role-mutation unavailable boundary | PASS; mutation remains truthfully unavailable, not fake success |
 
-**Suite result:** 5 tests passed.
+**Suite result:** 7 tests passed.
 **Strict TypeScript check:** PASS (`pnpm run check`).
 **Production build:** PASS (`pnpm run build`).
-**Remote CI:** PASS — run `31951086123` for commit `c4706fbd7e4be42601e682f644c1e68accad8462`.
+**Remote CI:** Pending for the middleware hardening checkpoint; the prior remote CI run `31951086123` passed for `c4706fb`.
 
 ## Remaining evidence gaps
 
-The router-level authorization behavior is verified for the covered procedures. This does not yet prove browser/session behavior, audit-log persistence, production identity-provider behavior, or staging database authorization. Those remain **NOT VERIFIED** and require their respective approved environments and evidence.
+The router-level authorization behavior is verified for the covered procedures. The middleware now distinguishes unauthenticated requests (`UNAUTHORIZED`) from authenticated non-admin requests (`FORBIDDEN`). This does not yet prove browser/session behavior, audit-log persistence, production identity-provider behavior, or staging database authorization. Those remain **NOT VERIFIED** and require their respective approved environments and evidence.
 
 ## Rollback plan
 
