@@ -896,7 +896,7 @@ Synthetics,client/src/pages/Synthetics.tsx,truthfully-gated,True,False,False,Fal
 SystemArchitecture,client/src/pages/SystemArchitecture.tsx,static-review,True,False,False,False,False,False,False,False,True
 SystemLogs,client/src/pages/SystemLogs.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SystemMonitoring,client/src/pages/SystemMonitoring.tsx,static-review,True,False,False,False,False,False,False,False,False
-SystemObservability,client/src/pages/SystemObservability.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+SystemObservability,client/src/pages/SystemObservability.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SystemSettings,client/src/pages/SystemSettings.tsx,static-review,True,False,False,False,False,False,False,False,False
 SystemStatus,client/src/pages/SystemStatus.tsx,integration-backed-review,True,False,True,False,False,True,False,False,False
 TabsNavigation,client/src/pages/TabsNavigation.tsx,interactive-review,True,False,False,False,False,True,False,False,False
