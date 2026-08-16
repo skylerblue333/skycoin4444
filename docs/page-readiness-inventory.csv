@@ -1069,7 +1069,7 @@ Marketplace,client/src/pages/wave2/Marketplace.tsx,truthfully-gated,True,False,F
 Notifications,client/src/pages/wave2/Notifications.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Profile,client/src/pages/wave2/Profile.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Analytics,client/src/pages/wave3/Analytics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Gaming,client/src/pages/wave3/Gaming.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
+Gaming,client/src/pages/wave3/Gaming.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Governance,client/src/pages/wave3/Governance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Learning,client/src/pages/wave3/Learning.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
 Admin,client/src/pages/wave4/Admin.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
