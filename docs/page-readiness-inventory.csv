@@ -673,7 +673,7 @@ PredictiveModels,client/src/pages/PredictiveModels.tsx,interactive-review,True,F
 PredictiveSystems,client/src/pages/PredictiveSystems.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 PreferencesSetup,client/src/pages/PreferencesSetup.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PremiumFeatures,client/src/pages/PremiumFeatures.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-PresentationWithChat,client/src/pages/PresentationWithChat.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+PresentationWithChat,client/src/pages/PresentationWithChat.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PriceAlerts,client/src/pages/PriceAlerts.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 Pricing,client/src/pages/Pricing.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PricingEngine,client/src/pages/PricingEngine.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
