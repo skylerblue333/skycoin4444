@@ -194,7 +194,7 @@ ComplianceChecking,client/src/pages/ComplianceChecking.tsx,truthfully-gated,True
 ComplianceDashboard,client/src/pages/ComplianceDashboard.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ComplianceReports,client/src/pages/ComplianceReports.tsx,static-review,True,False,False,False,False,False,False,False,False
 ComponentShowcase,client/src/pages/ComponentShowcase.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
-ComprehensiveEcosystemLanding,client/src/pages/ComprehensiveEcosystemLanding.tsx,static-review,True,False,False,False,False,False,False,False,True
+ComprehensiveEcosystemLanding,client/src/pages/ComprehensiveEcosystemLanding.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ConfirmationDialog,client/src/pages/ConfirmationDialog.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ConnectedApps,client/src/pages/ConnectedApps.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 ConnectionError,client/src/pages/ConnectionError.tsx,interactive-review,True,False,False,False,False,True,False,False,False
