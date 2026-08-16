@@ -33,7 +33,7 @@ The current inventory records:
 | Type-check-exempt pages | 0 |
 | Registered routes | 1,070 |
 
-These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, and `docs/hard-coded-money-audit.csv`.
+These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, `docs/hard-coded-money-audit.csv`, `docs/dependabot-121-evidence.md`, and `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md`.
 
 ## Security and truthfulness changes in this campaign
 
@@ -54,7 +54,7 @@ Verified account-scoped wallet ledger reads remain distinct from on-chain custod
 | Monitoring and alerting | Not verified | Structured error collection, uptime checks, database/API alerts, sensitive-data redaction, and on-call ownership. |
 | Backup and restore | Not verified | Encrypted backup schedule, retention, restore test, and recovery-objective evidence. |
 | Critical workflow coverage | Incomplete | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, admin authorization, and representative service integration tests. |
-| Dependency advisory | Open in GitHub; local audit clean | GitHub reports one moderate Dependabot advisory, **#121**, but its alert endpoint is permission-restricted in this session. `pnpm audit --json` reports zero vulnerabilities across 670 resolved dependencies; the GitHub alert still requires owner-level confirmation or dismissal/remediation in GitHub Security. |
+| Dependency advisory | **Remediated and owner-dismissed** | Authenticated GitHub Security evidence confirms alert **#121** affected esbuild `<=0.24.2`; the patched version is `0.25.0`. The repository resolves `esbuild@0.25.12`, local `pnpm audit --json` reports zero vulnerabilities, and `skylerblue333` dismissed the alert as **A fix has already been started**. Evidence: `docs/dependabot-121-evidence.md`. |
 | Current-checkpoint CI evidence | Pass | CI run `31947291463` succeeded for `41316ef`, including the expanded truthful-boundary test suite. |
 
 ## Release decision
@@ -65,9 +65,10 @@ The repository is suitable as a **code-green stabilization checkpoint** and cont
 
 ## Smallest next remediation and verification batch
 
-1. Confirm and remediate or formally accept Dependabot advisory #121 in GitHub Security; local `pnpm audit` alone is not sufficient to close the alert.
+1. Preserve the owner-dismissal evidence for Dependabot #121 and reopen the alert if the dependency graph regresses.
 2. Preserve CI evidence for code checkpoint `41316ef` (run `31947291463`) and require a fresh successful run after the next code change.
 3. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
 4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
 5. Expand critical workflow tests beyond the current six tests and rerun the complete release gate.
-6. Reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
+6. Use `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md` to assign an owner, evidence artifact, rollback plan, and acceptance result to every remaining no-go row.
+7. Reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
