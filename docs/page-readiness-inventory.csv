@@ -373,7 +373,7 @@ Explore,client/src/pages/Explore.tsx,integration-backed-review,True,True,False,F
 ExportData,client/src/pages/ExportData.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 FAQManagement,client/src/pages/FAQManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 FAQPage,client/src/pages/FAQPage.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-Farming,client/src/pages/Farming.tsx,integration-backed-review,True,True,False,False,True,False,False,False,True
+Farming,client/src/pages/Farming.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 Favorites,client/src/pages/Favorites.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 FeatureRequests,client/src/pages/FeatureRequests.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 FeatureTour,client/src/pages/FeatureTour.tsx,interactive-review,True,False,False,False,False,True,False,False,False
