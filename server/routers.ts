@@ -384,6 +384,13 @@ const tokenRouter = router({
   burnHistory: publicProcedure.query(
     () => [] as Array<{ date: string; amount: number; type: string }>
   ),
+  tokenomics: publicProcedure.query(() => ({
+    available: false as const,
+    totalSupply: 0,
+    circulatingSupply: 0,
+    burnedTokens: 0,
+    stakingRatio: 0,
+  })),
   priceHistory: protectedProcedure
     .input(
       z
@@ -2354,6 +2361,20 @@ export const appRouter = router({
       tokenBalance: 0,
       vestedTokens: 0,
       portfolioValue: 0,
+    })),
+    revenue: protectedProcedure.query(() => ({
+      available: false as const,
+      total: 0,
+      monthly: 0,
+      quarterly: 0,
+      annual: 0,
+    })),
+    treasury: protectedProcedure.query(() => ({
+      available: false as const,
+      total: 0,
+      liquid: 0,
+      locked: 0,
+      reserve: 0,
     })),
   }),
   installer: router({
