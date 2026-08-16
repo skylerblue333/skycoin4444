@@ -14,19 +14,17 @@ export async function getDb() {
 // ============ USER HELPERS ============
 export async function getUserById(id: string) {
   try {
-    const user = await db.query.users.findFirst({ where: eq(schema.users.id, id) });
-    return user || { id, name: "User", email: "user@example.com", balance: 0 };
+    return (await db.query.users.findFirst({ where: eq(schema.users.id, id) })) ?? null;
   } catch (error) {
-    return { id, name: "User", email: "user@example.com", balance: 0 };
+    return null;
   }
 }
 
 export async function getUserByEmail(email: string) {
   try {
-    const user = await db.query.users.findFirst({ where: eq(schema.users.email, email) });
-    return user || { id: "1", name: "User", email, balance: 0 };
+    return (await db.query.users.findFirst({ where: eq(schema.users.email, email) })) ?? null;
   } catch (error) {
-    return { id: "1", name: "User", email, balance: 0 };
+    return null;
   }
 }
 
@@ -46,8 +44,7 @@ export async function upsertUser(data: any) {
 
 export async function getUserByOpenId(openId: string) {
   try {
-    // Note: users table doesn't have openId field, using email as fallback
-    return await db.query.users.findFirst({ where: eq(schema.users.email, openId) });
+    return (await db.query.users.findFirst({ where: eq(schema.users.openId, openId) })) ?? null;
   } catch (error) {
     return null;
   }
