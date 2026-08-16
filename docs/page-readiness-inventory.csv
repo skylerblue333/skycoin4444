@@ -100,7 +100,7 @@ AuditTrail,client/src/pages/AuditTrail.tsx,interactive-review,True,False,False,F
 AutoResponder,client/src/pages/AutoResponder.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AutomationEngine,client/src/pages/AutomationEngine.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 AutomationRules,client/src/pages/AutomationRules.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-AutomationWorkflows,client/src/pages/AutomationWorkflows.tsx,static-review,True,False,False,False,False,False,False,False,True
+AutomationWorkflows,client/src/pages/AutomationWorkflows.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 BackupManagement,client/src/pages/BackupManagement.tsx,static-review,True,False,False,False,False,False,False,False,False
 Badges,client/src/pages/Badges.tsx,static-review,True,False,False,False,False,False,False,False,False
 BanSuspendUser,client/src/pages/BanSuspendUser.tsx,interactive-review,True,False,False,False,False,True,False,False,False
