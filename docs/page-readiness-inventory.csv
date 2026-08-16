@@ -1076,5 +1076,5 @@ Admin,client/src/pages/wave4/Admin.tsx,truthfully-gated,True,False,False,False,F
 CreatorStudio,client/src/pages/wave4/CreatorStudio.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,True
 Explore,client/src/pages/wave4/Explore.tsx,blocked-by-type-safety,True,True,False,False,True,False,False,True,True
 Payments,client/src/pages/wave4/Payments.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Security,client/src/pages/wave4/Security.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
+Security,client/src/pages/wave4/Security.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Settings,client/src/pages/wave4/Settings.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
