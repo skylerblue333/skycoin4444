@@ -808,7 +808,7 @@ SearchHistory,client/src/pages/SearchHistory.tsx,interactive-review,True,False,F
 SearchResults,client/src/pages/SearchResults.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SearchSuggestions,client/src/pages/SearchSuggestions.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SeasonalEvents,client/src/pages/SeasonalEvents.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Security,client/src/pages/Security.tsx,static-review,True,False,False,False,False,False,False,False,True
+Security,client/src/pages/Security.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SecurityAudit,client/src/pages/SecurityAudit.tsx,static-review,True,False,False,False,False,False,False,False,False
 SecurityCompliance,client/src/pages/SecurityCompliance.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SecurityDashboard,client/src/pages/SecurityDashboard.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
