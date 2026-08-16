@@ -172,7 +172,7 @@ CodeCompletion,client/src/pages/CodeCompletion.tsx,truthfully-gated,True,False,F
 CodeFormatter,client/src/pages/CodeFormatter.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 CodeHighlighting,client/src/pages/CodeHighlighting.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CodeQuality,client/src/pages/CodeQuality.tsx,static-review,True,False,False,False,False,False,False,False,False
-CodeQualityDashboard,client/src/pages/CodeQualityDashboard.tsx,blocked-by-type-safety,True,True,False,True,False,True,True,True,False
+CodeQualityDashboard,client/src/pages/CodeQualityDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CodeRepository,client/src/pages/CodeRepository.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 CodeSamples,client/src/pages/CodeSamples.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 CohortAnalysis,client/src/pages/CohortAnalysis.tsx,interactive-review,True,False,False,False,False,True,True,False,False
