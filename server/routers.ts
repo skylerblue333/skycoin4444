@@ -1761,7 +1761,42 @@ export const appRouter = router({
       .input(z.object({}).optional())
       .mutation(() => unavailableMutationResult),
   }),
-  legendary: createFeatureRouter(),
+  legendary: router({
+    founderProfile: publicProcedure.query(() => ({
+      name: "",
+      title: "",
+      role: "",
+      company: "",
+      faith: "",
+      family: "",
+      degrees: [] as Array<{ level: string; field: string }>,
+      socialLinks: { github: "" },
+      platformStats: {
+        pagesBuilt: 0,
+        linesOfCode: 0,
+        testsWritten: 0,
+        dbTables: 0,
+        routerNamespaces: 0,
+        yearsBuilding: 0,
+      },
+      achievements: [] as Array<{
+        id: string;
+        icon: string;
+        label: string;
+        desc: string;
+      }>,
+      skills: [] as string[],
+      reputationScore: 0,
+      available: false as const,
+    })),
+    platformMetrics: publicProcedure.query(() => ({
+      totalUsers: 0,
+      totalPosts: 0,
+      platformValue: "Unavailable",
+      uptime: "Unavailable",
+      available: false as const,
+    })),
+  }),
 
   // Additional Feature Routers
   charity: router({
