@@ -943,7 +943,7 @@ TorBridge,client/src/pages/TorBridge.tsx,interactive-review,True,False,False,Fal
 TournamentBracket,client/src/pages/TournamentBracket.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
 TournamentBrackets,client/src/pages/TournamentBrackets.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Tournaments,client/src/pages/Tournaments.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-TradeHistory,client/src/pages/TradeHistory.tsx,interactive-review,True,False,False,False,False,True,True,False,False
+TradeHistory,client/src/pages/TradeHistory.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Trading,client/src/pages/Trading.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TradingBots,client/src/pages/TradingBots.tsx,static-review,True,False,False,False,False,False,False,False,False
 TradingHistory,client/src/pages/TradingHistory.tsx,static-review,True,False,False,False,False,False,False,False,False
