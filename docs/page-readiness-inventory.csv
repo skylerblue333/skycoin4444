@@ -327,7 +327,7 @@ ENSResolver,client/src/pages/ENSResolver.tsx,interactive-review,True,False,False
 EarningsTracker,client/src/pages/EarningsTracker.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 EarningsTracking,client/src/pages/EarningsTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 EconomicLayer,client/src/pages/EconomicLayer.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
-Economics,client/src/pages/Economics.tsx,static-review,True,False,False,False,False,False,False,False,True
+Economics,client/src/pages/Economics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 EconomyControl,client/src/pages/EconomyControl.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
 Ecosystem,client/src/pages/Ecosystem.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
 EditProfile,client/src/pages/EditProfile.tsx,interactive-review,True,False,False,False,False,True,False,False,False
