@@ -1313,7 +1313,45 @@ export const appRouter = router({
   }),
   languageExchange: createFeatureRouter(),
   audienceLockIn: createFeatureRouter(),
-  shadowIdentity: createFeatureRouter(),
+  shadowIdentity: router({
+    getMyIdentity: protectedProcedure.query(() => ({
+      displayName: "",
+      displayAvatar: null as string | null,
+      shadowId: "",
+      reputationTier: "UNKNOWN",
+      identityMode: "shadow",
+      verifiedReveal: false,
+      scores: { behavior: 0, contribution: 0, reliability: 0, toxicity: 0 },
+    })),
+    getReputationAnalysis: protectedProcedure.query(() => ({
+      tier: "UNKNOWN",
+      insight:
+        "Reputation analysis is unavailable until verified activity analytics are connected.",
+      recommendations: [] as string[],
+      scores: {} as Record<string, number>,
+    })),
+    getReputationLeaderboard: publicProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          displayAvatar: string | null;
+          displayName: string;
+          shadowId: string;
+          reputationTier: string;
+          composite: number;
+        }>
+    ),
+    setIdentityMode: protectedProcedure
+      .input(z.object({ mode: z.enum(["shadow", "semi", "social", "public"]) }))
+      .mutation(({ input }) => ({
+        ...unavailableMutationResult,
+        mode: input.mode,
+      })),
+    toggleVerifiedReveal: protectedProcedure.mutation(() => ({
+      ...unavailableMutationResult,
+      verifiedReveal: false,
+    })),
+  }),
   proofVault: createFeatureRouter(),
   goc: createFeatureRouter(),
   notifIntelligence: createFeatureRouter(),
