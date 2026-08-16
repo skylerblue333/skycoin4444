@@ -444,7 +444,7 @@ const userRouter = router({
     .query(() => []),
   suggestedFollows: publicProcedure.query(() => []),
   follow: protectedProcedure
-    .input(z.unknown().optional())
+    .input(z.object({ userId: z.number().int().nonnegative() }))
     .mutation(() => unavailableMutationResult),
   updateProfile: protectedProcedure
     .input(
