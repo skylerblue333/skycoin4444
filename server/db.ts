@@ -108,7 +108,7 @@ export async function createPost(userId: string, content: string, media?: string
     await db.insert(schema.posts).values({ id, userId, content, media });
     return { id, userId, content, media };
   } catch (error) {
-    return { id: "1", userId, content, media };
+    return null;
   }
 }
 
