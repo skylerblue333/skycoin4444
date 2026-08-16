@@ -64,7 +64,7 @@ AgentBuilder,client/src/pages/AgentBuilder.tsx,interactive-review,True,False,Fal
 AgentCity,client/src/pages/AgentCity.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
 AgentCoordination,client/src/pages/AgentCoordination.tsx,static-review,True,False,False,False,False,False,False,False,True
 AgentCoordinationHub,client/src/pages/AgentCoordinationHub.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
-AgentDebate,client/src/pages/AgentDebate.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+AgentDebate,client/src/pages/AgentDebate.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AgentDetail,client/src/pages/AgentDetail.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AgentMarketplace,client/src/pages/AgentMarketplace.tsx,integration-backed-review,True,True,False,False,True,True,True,False,False
 AgentPerformance,client/src/pages/AgentPerformance.tsx,interactive-review,True,False,False,False,False,True,True,False,False
