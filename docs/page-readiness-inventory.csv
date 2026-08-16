@@ -866,7 +866,7 @@ StakeDelegation,client/src/pages/StakeDelegation.tsx,truthfully-gated,True,False
 StakingDashboard,client/src/pages/StakingDashboard.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StakingHub,client/src/pages/StakingHub.tsx,static-review,True,False,False,False,False,False,False,False,False
 StakingOptions,client/src/pages/StakingOptions.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-StakingPortal,client/src/pages/StakingPortal.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+StakingPortal,client/src/pages/StakingPortal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 StatisticsPanel,client/src/pages/StatisticsPanel.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 Status,client/src/pages/Status.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 StepperWizard,client/src/pages/StepperWizard.tsx,interactive-review,True,False,False,False,False,True,False,False,False
