@@ -2,12 +2,12 @@
 
 **Assessment date:** August 16, 2026  
 **Branch:** `restore/error-free-baseline`  
-**Latest checkpoint:** `0bc991f`  
+**Latest checkpoint:** `4ab0739`  
 **Release label:** **Code-green launch candidate; GA not authorized**
 
 ## Honest percentage
 
-The current **directional launch-readiness estimate is 42%**. This is not a marketing claim, uptime metric, or formal certification. It is a weighted engineering score that prevents a green local build from hiding unverified infrastructure and critical workflows. The increase reflects the verified account/profile core, database-backed feed workflow with hardened ordering and IDs, read-only wallet ledger overview, fabricated-persistence fallback removal, expanded regression coverage, high-risk route classification, Admin Wallet Manager truthfulness repair, 12 additional wallet/crypto truthfulness boundaries and 10 payment truthfulness boundaries, and conversion of exact generic placeholder routes into truthful boundaries.
+The current **directional launch-readiness estimate is 42%**. This is not a marketing claim, uptime metric, or formal certification. It is a weighted engineering score that prevents a green local build from hiding unverified infrastructure and critical workflows. The increase reflects the verified account/profile core, database-backed feed workflow with hardened ordering and IDs, read-only wallet ledger overview, fabricated-persistence fallback removal, expanded regression coverage, high-risk route classification, Admin Wallet Manager truthfulness repair, 12 additional wallet/crypto truthfulness boundaries and 10 payment truthfulness boundaries, a HopeAI production-claims boundary, and conversion of exact generic placeholder routes into truthful boundaries.
 
 | Area | Weight | Current score | Basis |
 |---|---:|---:|---|
