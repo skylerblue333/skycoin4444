@@ -864,7 +864,7 @@ SpinWheel,client/src/pages/SpinWheel.tsx,integration-backed-review,True,True,Fal
 Sponsorships,client/src/pages/Sponsorships.tsx,static-review,True,False,False,False,False,False,False,False,False
 StakeDelegation,client/src/pages/StakeDelegation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 StakingDashboard,client/src/pages/StakingDashboard.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-StakingHub,client/src/pages/StakingHub.tsx,static-review,True,False,False,False,False,False,False,False,False
+StakingHub,client/src/pages/StakingHub.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 StakingOptions,client/src/pages/StakingOptions.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 StakingPortal,client/src/pages/StakingPortal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 StatisticsPanel,client/src/pages/StatisticsPanel.tsx,interactive-review,True,False,False,False,False,True,False,False,False
