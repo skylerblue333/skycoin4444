@@ -214,7 +214,7 @@ const blockchainRouter = router({
       z.object({
         from: z.string().min(1),
         to: z.string().min(1),
-        valueWei: z.string().regex(/^\\d+$/),
+        valueWei: z.string().regex(/^\d+$/),
         chainId: z.number().int().positive(),
       })
     )
@@ -266,7 +266,7 @@ const blockchainRouter = router({
     .input(
       z.object({
         to: z.string().min(1),
-        valueWei: z.string().regex(/^\\d+$/),
+        valueWei: z.string().regex(/^\d+$/),
         chainId: z.number().int().positive(),
       })
     )
