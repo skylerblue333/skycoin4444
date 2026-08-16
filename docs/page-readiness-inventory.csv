@@ -631,7 +631,7 @@ OrderPlacement,client/src/pages/OrderPlacement.tsx,truthfully-gated,True,False,F
 OrderTracking,client/src/pages/OrderTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 OrderTypes,client/src/pages/OrderTypes.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 OrganizationSettings,client/src/pages/OrganizationSettings.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-P2EShop,client/src/pages/P2EShop.tsx,integration-backed-review,True,True,False,False,True,True,False,False,True
+P2EShop,client/src/pages/P2EShop.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Pagination,client/src/pages/Pagination.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PasswordInputForm,client/src/pages/PasswordInputForm.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PasswordReset,client/src/pages/PasswordReset.tsx,interactive-review,True,False,False,False,False,True,False,False,False
