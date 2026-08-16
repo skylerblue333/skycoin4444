@@ -947,7 +947,7 @@ TradeHistory,client/src/pages/TradeHistory.tsx,interactive-review,True,False,Fal
 Trading,client/src/pages/Trading.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TradingBots,client/src/pages/TradingBots.tsx,static-review,True,False,False,False,False,False,False,False,False
 TradingHistory,client/src/pages/TradingHistory.tsx,static-review,True,False,False,False,False,False,False,False,False
-TradingTerminal,client/src/pages/TradingTerminal.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+TradingTerminal,client/src/pages/TradingTerminal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TransactionExplorer,client/src/pages/TransactionExplorer.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TransactionHistory,client/src/pages/TransactionHistory.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TransactionViewer,client/src/pages/TransactionViewer.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
