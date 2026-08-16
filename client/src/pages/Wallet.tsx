@@ -61,9 +61,6 @@ const TOKEN_META: Record<string, { name: string; color: string }> = {
   MATIC: { name: "Polygon", color: "#8247E5" },
 };
 
-// SKY444 price in USD (platform-set rate, not external oracle)
-const SKY444_USD_RATE = 0.5;
-
 function CryptoHubNav() {
   const [loc] = useLocation();
   return (
@@ -169,21 +166,18 @@ export default function WalletPage() {
     return balances.map((b: any) => {
       const meta = TOKEN_META[b.token] ?? { name: b.token, color: "#6b7280" };
       const bal = Number(b.balance ?? 0);
-      const usdRate =
-        b.token === "SKY444" ? SKY444_USD_RATE : b.token === "USDC" ? 1 : 0;
       return {
         symbol: b.token,
         name: meta.name,
         color: meta.color,
         balance: bal,
-        usdValue: bal * usdRate,
+        usdValue: undefined as number | undefined,
         staked: Number(b.stakedBalance ?? 0),
         pending: Number(b.pendingRewards ?? 0),
       };
     });
   }, [walletData]);
 
-  const totalUsdValue = liveTokens.reduce((s, t) => s + t.usdValue, 0);
   const sky444Balance =
     liveTokens.find(t => t.symbol === "SKY444")?.balance ?? 0;
 
@@ -339,11 +333,10 @@ export default function WalletPage() {
                     {sky444Balance.toLocaleString()}{" "}
                     <span className="text-2xl text-violet-300">SKY444</span>
                   </div>
-                  {totalUsdValue > 0 && (
-                    <div className="text-sm text-emerald-400 mt-1">
-                      ≈ ${totalUsdValue.toFixed(2)} USD
-                    </div>
-                  )}
+                  <div className="text-xs text-zinc-500 mt-1">
+                    USD valuation unavailable until verified market data is
+                    connected.
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-zinc-400 mb-1">Platform ID</div>
@@ -532,11 +525,9 @@ export default function WalletPage() {
                     <div className="font-medium">
                       {token.balance.toLocaleString()} {token.symbol}
                     </div>
-                    {token.usdValue > 0 && (
-                      <div className="text-sm text-zinc-400">
-                        ${token.usdValue.toFixed(2)}
-                      </div>
-                    )}
+                    <span className="text-xs text-zinc-500">
+                      USD value unavailable
+                    </span>
                     {token.staked > 0 && (
                       <div className="text-xs text-violet-400">
                         {token.staked.toLocaleString()} staked
