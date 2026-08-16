@@ -640,7 +640,7 @@ PaymentConfirmation,client/src/pages/PaymentConfirmation.tsx,interactive-review,
 PaymentInfra,client/src/pages/PaymentInfra.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 PaymentMethods,client/src/pages/PaymentMethods.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PaymentSetup,client/src/pages/PaymentSetup.tsx,interactive-review,True,False,False,False,False,True,False,False,False
-Payments,client/src/pages/Payments.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+Payments,client/src/pages/Payments.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PayoutDashboard,client/src/pages/PayoutDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PayoutManagement,client/src/pages/PayoutManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 PerformanceMetrics,client/src/pages/PerformanceMetrics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
