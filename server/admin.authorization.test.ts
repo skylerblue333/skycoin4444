@@ -4,19 +4,21 @@ import type { TrpcContext } from "./_core/context";
 
 type UserRole = NonNullable<TrpcContext["user"]>["role"];
 
-function createContext(role: UserRole): TrpcContext {
+function createContext(role?: UserRole): TrpcContext {
   return {
-    user: {
-      id: role === "admin" ? 2 : 1,
-      openId: `${role}-user`,
-      email: `${role}@example.com`,
-      name: role === "admin" ? "Admin User" : "Regular User",
-      loginMethod: "manus",
-      role,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastSignedIn: new Date(),
-    },
+    user: role
+      ? {
+          id: role === "admin" ? 2 : 1,
+          openId: `${role}-user`,
+          email: `${role}@example.com`,
+          name: role === "admin" ? "Admin User" : "Regular User",
+          loginMethod: "manus",
+          role,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastSignedIn: new Date(),
+        }
+      : undefined,
     req: {
       protocol: "https",
       headers: {},
@@ -53,6 +55,16 @@ describe("admin authorization", () => {
     });
   });
 
+  it("rejects unauthenticated role mutations", async () => {
+    const caller = appRouter.createCaller(createContext());
+
+    await expect(
+      caller.admin.updateUserRole({ userId: 2, role: "user" })
+    ).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+  });
+
   it("rejects non-admin role mutations", async () => {
     const caller = appRouter.createCaller(createContext("user"));
 
@@ -60,6 +72,16 @@ describe("admin authorization", () => {
       caller.admin.updateUserRole({ userId: 2, role: "user" })
     ).rejects.toMatchObject({
       code: "FORBIDDEN",
+    });
+  });
+
+  it("rejects invalid role mutation input", async () => {
+    const caller = appRouter.createCaller(createContext("admin"));
+
+    await expect(
+      caller.admin.updateUserRole({ userId: 2, role: "" })
+    ).rejects.toMatchObject({
+      code: "BAD_REQUEST",
     });
   });
 
