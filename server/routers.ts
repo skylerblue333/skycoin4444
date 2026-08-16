@@ -133,6 +133,167 @@ const walletRouter = router({
     .mutation(() => unavailableMutationResult),
 });
 
+const aiUnavailableResult = {
+  available: false as const,
+  status: "unavailable" as const,
+  message:
+    "AI generation is unavailable until a verified model integration is connected.",
+  reply: "",
+  model: "",
+  code: "",
+  fixed: "",
+  review: "",
+  optimized: "",
+  lesson: "",
+  score: 0,
+  issues: [] as string[],
+};
+
+const blockchainRouter = router({
+  onChainBalance: protectedProcedure
+    .input(
+      z.object({
+        address: z.string().min(1),
+        chainId: z.number().int().positive(),
+      })
+    )
+    .query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      balance: "0",
+      message:
+        "On-chain balance is unavailable until a verified RPC integration is connected.",
+    })),
+  validateAddress: publicProcedure
+    .input(z.object({ address: z.string() }))
+    .query(({ input }) => ({
+      valid: /^0x[a-fA-F0-9]{40}$/.test(input.address),
+      errorMessage: /^0x[a-fA-F0-9]{40}$/.test(input.address)
+        ? undefined
+        : "Invalid EVM address format.",
+    })),
+  estimateGas: protectedProcedure
+    .input(
+      z.object({
+        from: z.string().min(1),
+        to: z.string().min(1),
+        valueWei: z.string().regex(/^\\d+$/),
+        chainId: z.number().int().positive(),
+      })
+    )
+    .query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      estimatedCostEth: "0",
+      maxFeePerGas: "0",
+      message:
+        "Gas estimation is unavailable until a verified RPC integration is connected.",
+    })),
+  myWallets: protectedProcedure.query(
+    () =>
+      [] as Array<{
+        id: number;
+        address: string;
+        chainId: number;
+        chainName: string;
+        label: string | null;
+        isPrimary: boolean;
+        cachedBalanceWei: string | null;
+      }>
+  ),
+  myTransactions: protectedProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(100).default(50) }))
+    .query(
+      () =>
+        [] as Array<{
+          id: number;
+          chainId: number;
+          status: string;
+          toAddress: string;
+          txHash: string | null;
+          valueWei: string;
+          createdAt: string;
+        }>
+    ),
+  supportedChains: publicProcedure.query(
+    () =>
+      [] as Array<{
+        chainId: number;
+        name: string;
+        symbol: string;
+        key: string;
+        nativeCurrency: string;
+      }>
+  ),
+  buildAndSign: protectedProcedure
+    .input(
+      z.object({
+        to: z.string().min(1),
+        valueWei: z.string().regex(/^\\d+$/),
+        chainId: z.number().int().positive(),
+      })
+    )
+    .mutation(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      txId: 0,
+      txHash: "",
+      estimatedGasCost: "0",
+      message:
+        "Transaction signing is unavailable until secure custody infrastructure is connected.",
+    })),
+  broadcast: protectedProcedure
+    .input(z.object({ txId: z.number().int().nonnegative() }))
+    .mutation(() => ({
+      available: false as const,
+      status: "unavailable" as string,
+      errorMessage:
+        "Transaction broadcasting is unavailable until a verified signer and RPC integration are connected.",
+    })),
+  registerWallet: protectedProcedure
+    .input(z.object({ chain: z.enum(["ethereum", "polygon", "bsc", "base"]) }))
+    .mutation(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      chainName: "",
+      message:
+        "Wallet registration is unavailable until verified wallet custody infrastructure is connected.",
+    })),
+});
+
+const aiRouter = router({
+  getModels: publicProcedure.query(
+    () => [] as Array<{ id: string; name: string }>
+  ),
+  chat: protectedProcedure
+    .input(
+      z.object({
+        message: z.string().min(1),
+        model: z.string().optional(),
+        systemPrompt: z.string().optional(),
+        history: z
+          .array(z.object({ role: z.string(), content: z.string() }))
+          .optional(),
+      })
+    )
+    .mutation(() => aiUnavailableResult),
+  generateCode: protectedProcedure
+    .input(z.object({ prompt: z.string().min(1), language: z.string().min(1) }))
+    .mutation(() => aiUnavailableResult),
+  debugCode: protectedProcedure
+    .input(z.object({ code: z.string().min(1), error: z.string().optional() }))
+    .mutation(() => aiUnavailableResult),
+  reviewCode: protectedProcedure
+    .input(z.object({ code: z.string().min(1) }))
+    .mutation(() => aiUnavailableResult),
+  optimizeCode: protectedProcedure
+    .input(z.object({ code: z.string().min(1) }))
+    .mutation(() => aiUnavailableResult),
+  learnTopic: protectedProcedure
+    .input(z.object({ topic: z.string().min(1) }))
+    .mutation(() => aiUnavailableResult),
+});
+
 const tokenRouter = router({
   balances: protectedProcedure.query(async ({ ctx }) => {
     const rows = await db.db.query.tokenBalances.findMany({
@@ -279,7 +440,7 @@ export const appRouter = router({
   }),
 
   // AI & Agents Routers
-  ai: createFeatureRouter(),
+  ai: aiRouter,
   aiEngineer: createFeatureRouter(),
   aiMarket: createFeatureRouter(),
   aiPersonas: createFeatureRouter(),
@@ -342,7 +503,7 @@ export const appRouter = router({
   payments: createFeatureRouter(),
 
   // Blockchain & Crypto Routers
-  blockchain: createFeatureRouter(),
+  blockchain: blockchainRouter,
   staking: createFeatureRouter(),
   economy: createFeatureRouter(),
   gamefi: router({
@@ -363,7 +524,33 @@ export const appRouter = router({
 
   // Admin & Moderation Routers
   admin: createFeatureRouter(),
-  moderation: createFeatureRouter(),
+  moderation: router({
+    list: publicProcedure.query(() => []),
+    stats: protectedProcedure.input(z.object({}).optional()).query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      totalActions: 0,
+      accuracy: undefined as number | undefined,
+      message:
+        "Moderation telemetry is unavailable until observability storage is connected.",
+    })),
+    queue: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(() => []),
+    logs: protectedProcedure.query(() => []),
+    resolve: protectedProcedure
+      .input(
+        z.object({ reportId: z.string().min(1), action: z.string().min(1) })
+      )
+      .mutation(() => unavailableMutationResult),
+    banUser: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+  }),
   auditLogs: createFeatureRouter(),
   security: createFeatureRouter(),
   complianceIntelligence: router({
@@ -427,7 +614,22 @@ export const appRouter = router({
   }),
 
   // Platform & Enterprise Routers
-  platform: createFeatureRouter(),
+  platform: router({
+    list: publicProcedure.query(() => []),
+    stats: publicProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      totalUsers: 0,
+      message:
+        "Platform metrics are unavailable until observability storage is connected.",
+    })),
+    health: publicProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      message:
+        "Platform health telemetry is unavailable until observability storage is connected.",
+    })),
+  }),
   enterprise: createFeatureRouter(),
   governance: createFeatureRouter(),
   orchestrator: createFeatureRouter(),
