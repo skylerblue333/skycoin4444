@@ -3,12 +3,12 @@
 **Assessment date:** August 16, 2026  
 **Repository:** `skylerblue333/skycoin4444`  
 **Branch:** `restore/error-free-baseline`  
-**Checkpoint:** `e2bb221`  
+**Checkpoint:** `3ff5fd3`  
 **Release decision:** **GA NOT AUTHORIZED — CODE-GREEN, INFRASTRUCTURE-UNVERIFIED**
 
 ## Executive assessment
 
-The application has reached a materially stronger code baseline. The latest checkpoint removes the final four strict TypeScript diagnostics, preserves a successful production build, preserves passing automated tests, and removes fabricated user identity and balance fallbacks from the server database helpers. Missing database users now resolve to `null`, and OAuth lookup uses the actual `users.openId` column.
+The application has reached a materially stronger code baseline. The latest checkpoint also bounds the unsupported AI Agent Market so it no longer presents fabricated prices, usage counts, ratings, paid outputs, or payment-success states. The latest checkpoint removes the final four strict TypeScript diagnostics, preserves a successful production build, preserves passing automated tests, and removes fabricated user identity and balance fallbacks from the server database helpers. Missing database users now resolve to `null`, and OAuth lookup uses the actual `users.openId` column.
 
 This checkpoint is **not a production deployment certificate**. No staging database, OAuth provider, AWS/EC2 deployment, production DNS/TLS path, monitoring stack, encrypted backup restore, or external production capacity evidence has been independently verified in the current environment. The correct release label remains a truthful stabilization checkpoint rather than GA.
 
@@ -36,7 +36,7 @@ The server storage path now imports the existing `storagePut` implementation rat
 
 A source-only scan excluding `node_modules`, `.git`, `dist`, `build`, and `coverage` inspected **1,196 TypeScript/TSX/JavaScript/JSX files**. It detected **48 route-like declarations** using repository syntax patterns. This is a static inventory signal, not proof that every route is reachable, authorized, tested, or production-ready.
 
-The same scan surfaced **972 money-like lines** requiring classification. Most are schema declarations, legitimate financial-domain fields, CSS values, map coordinates, type definitions, or unavailable-state boundaries. The count must not be interpreted as 972 defects. The remaining manual audit must classify every financial-domain use into one of four categories: verified provider data, persisted ledger data, explicitly labeled demo data, or unavailable/error state.
+The latest scan surfaced **937 money-like lines** requiring classification. Most are schema declarations, legitimate financial-domain fields, CSS values, map coordinates, type definitions, or unavailable-state boundaries. The count must not be interpreted as 937 defects. The remaining manual audit must classify every financial-domain use into one of four categories: verified provider data, persisted ledger data, explicitly labeled demo data, or unavailable/error state.
 
 Build artifacts are excluded from the source count. Generated route files, stale reports, and documentation claims must not be treated as runtime implementation evidence.
 
@@ -66,6 +66,7 @@ Until those artifacts exist, the release decision must remain **GA NOT AUTHORIZE
 | `a4ee151` | Truthful Progress Tracking boundary | Build, tests, and diff hygiene passed. |
 | `b7774c9` | Final four strict TypeScript contract repairs | `pnpm run check` reached zero diagnostics; build and tests passed. |
 | `e2bb221` | Removal of fabricated database user and balance fallbacks | Zero diagnostics, build, tests, and diff hygiene passed; pushed cleanly. |
+| `3ff5fd3` | Truthful AI marketplace boundary | Zero diagnostics, build, tests, and diff hygiene passed; fabricated commercial UI was removed. |
 
 ## Acceptance rule
 
