@@ -99,7 +99,7 @@ export default function WalletPage() {
   const [sendAmount, setSendAmount] = useState("");
   const [copied, setCopied] = useState(false);
 
-  // Live DB queries — no mock data
+  // Account-scoped database ledger queries; not on-chain custody data
   const {
     data: walletData,
     isLoading: balanceLoading,
@@ -163,7 +163,7 @@ export default function WalletPage() {
     }
   };
 
-  // Derive live token list from DB balances
+  // Derive account-ledger token list from database balances
   const liveTokens = useMemo(() => {
     const balances: any[] = (walletData as any)?.balances ?? [];
     return balances.map((b: any) => {
@@ -203,7 +203,7 @@ export default function WalletPage() {
     toast.success("Address copied!");
   };
 
-  // Build 30-day portfolio history from real transactions
+  // Build 30-day account-ledger history from stored transactions
   const portfolioHistory = useMemo(() => {
     const txs: any[] = Array.isArray(txHistory) ? txHistory : [];
     const days: { date: string; value: number }[] = [];
@@ -244,7 +244,9 @@ export default function WalletPage() {
           <AlertCircle className="w-10 h-10 text-violet-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Sign In Required</h2>
           <p className="text-zinc-400 text-sm mb-4">
-            Connect your account to view your live wallet.
+            Connect your account to view its database ledger balances. On-chain
+            custody is unavailable until a verified wallet integration is
+            connected.
           </p>
           <Link href="/">
             <Button className="bg-violet-600 hover:bg-violet-700">
@@ -284,8 +286,8 @@ export default function WalletPage() {
                     Connect External Wallet
                   </p>
                   <p className="text-slate-400 text-xs">
-                    Link MetaMask to view on-chain balances and sign
-                    transactions
+                    Linking an external wallet is unavailable until verified
+                    connection and signer infrastructure is connected.
                   </p>
                 </div>
               </div>
@@ -306,20 +308,20 @@ export default function WalletPage() {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-green-400 text-sm font-medium">
-                  MetaMask Connected
+                  External wallet record
                 </span>
                 <span className="text-slate-400 text-xs font-mono">
                   {walletAddress}
                 </span>
               </div>
               <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">
-                On-Chain
+                Not verified on-chain
               </Badge>
             </CardContent>
           </Card>
         )}
 
-        {/* Balance Card — live data */}
+        {/* Balance Card — database ledger data */}
         <Card className="bg-gradient-to-br from-violet-900/40 to-blue-900/40 border-violet-700/50">
           <CardContent className="p-6">
             {balanceLoading ? (
@@ -331,7 +333,7 @@ export default function WalletPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <div className="text-sm text-zinc-400 mb-1">
-                    SKY444 Balance (Live)
+                    SKY444 Balance (Account Ledger)
                   </div>
                   <div className="text-4xl font-bold">
                     {sky444Balance.toLocaleString()}{" "}
@@ -396,7 +398,7 @@ export default function WalletPage() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base">
-                SKY444 Balance History (30d)
+                SKY444 Account Ledger History (30d)
               </CardTitle>
               <span className="text-xs text-zinc-500">
                 Reconstructed from transactions
