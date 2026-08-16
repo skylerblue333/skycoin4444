@@ -971,7 +971,7 @@ TriggersActions,client/src/pages/TriggersActions.tsx,interactive-review,True,Fal
 TripPlanner,client/src/pages/TripPlanner.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TrumpMining,client/src/pages/TrumpMining.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 TrustSafetyDashboard,client/src/pages/TrustSafetyDashboard.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
-TrustSystem,client/src/pages/TrustSystem.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+TrustSystem,client/src/pages/TrustSystem.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 TwoFactorAuth,client/src/pages/TwoFactorAuth.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 TwoFactorSetup,client/src/pages/TwoFactorSetup.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 TypingIndicators,client/src/pages/TypingIndicators.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
