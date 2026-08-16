@@ -208,7 +208,7 @@ ContentCollaboration,client/src/pages/ContentCollaboration.tsx,static-review,Tru
 ContentFlagging,client/src/pages/ContentFlagging.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ContentLibrary,client/src/pages/ContentLibrary.tsx,static-review,True,False,False,False,False,False,False,False,False
 ContentModeration,client/src/pages/ContentModeration.tsx,static-review,True,False,False,False,False,False,False,False,False
-ContentScheduler,client/src/pages/ContentScheduler.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+ContentScheduler,client/src/pages/ContentScheduler.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 ContentScheduling,client/src/pages/ContentScheduling.tsx,static-review,True,False,False,False,False,False,False,False,False
 ContentUpload,client/src/pages/ContentUpload.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 ContentVault,client/src/pages/ContentVault.tsx,interactive-review,True,False,False,False,False,True,True,False,False
