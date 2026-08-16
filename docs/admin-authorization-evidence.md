@@ -31,7 +31,29 @@ The test-only URL was used only to satisfy the application’s explicit startup 
 
 ## Remaining evidence gaps
 
-The router-level authorization behavior is verified for the covered procedures. The middleware now distinguishes unauthenticated requests (`UNAUTHORIZED`) from authenticated non-admin requests (`FORBIDDEN`). This does not yet prove browser/session behavior, audit-log persistence, production identity-provider behavior, or staging database authorization. Those remain **NOT VERIFIED** and require their respective approved environments and evidence.
+The router-level authorization behavior is verified for the covered procedures. The middleware now distinguishes unauthenticated requests (`UNAUTHORIZED`) from authenticated non-admin requests (`FORBIDDEN`).
+
+### Audit logging
+
+The schema contains a `moderation_logs` table, but repository inspection found no server-side write from `admin.updateUserRole` or another administrative mutation into an audit event store. The `auditLogs` router is a generic unavailable/empty feature boundary rather than persistence evidence. Therefore:
+
+| Audit requirement | Status |
+|---|---|
+| Actor identity recorded | NOT VERIFIED |
+| Action recorded | NOT VERIFIED |
+| Target/resource recorded | NOT VERIFIED |
+| Timestamp recorded | Schema field exists; behavior NOT VERIFIED |
+| Outcome recorded | NOT VERIFIED |
+| Denied attempt handled in audit log | NOT VERIFIED |
+| Sensitive-data redaction test | NOT VERIFIED |
+
+### Browser/session authorization
+
+No Playwright, Cypress, or browser end-to-end harness is present in the repository, and no approved staging identity provider is available. Browser/session authorization, secure cookie behavior, logout invalidation, and identity-provider behavior therefore remain **NOT VERIFIED**. Router tests are not browser evidence.
+
+### Staging authorization
+
+Staging database authorization remains **BLOCKED** pending approved staging infrastructure, least-privilege grants, and synthetic cross-account tests.
 
 ## Rollback plan
 
@@ -39,4 +61,4 @@ If a later authorization regression appears, revert the authorization middleware
 
 ## Acceptance
 
-**Partial acceptance only.** The automated router boundary is verified; the overall admin authorization workstream remains **PARTIALLY COMPLETE** until browser evidence, mutation audit logging, and environment-backed verification are supplied.
+**Partial acceptance only.** The automated router boundary is verified; the overall admin authorization workstream remains **PARTIALLY COMPLETE** until an actual audit-event implementation/test and browser/session evidence are supplied. Staging authorization is a separate blocked gate.
