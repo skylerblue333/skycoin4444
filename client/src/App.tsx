@@ -1914,7 +1914,7 @@ function Router() {
         <Route path="/skill-badges" component={SkillBadges} />
         <Route path="/sky-school" component={SkySchool} />
         <Route path="/sky-school-a-i" component={SkySchoolAI} />
-        <Route path="/sky-school-quiz" component={SkySchoolQuiz} />
+        <Route path="/sky-school-quiz" component={() => <SkySchoolQuiz lessonId="blockchain-101-lesson-0" />} />
         <Route path="/sky-store" component={SkyStore} />
         <Route path="/slack-integration" component={SlackIntegration} />
         <Route path="/sleep-tracking" component={SleepTracking} />
