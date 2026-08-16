@@ -366,7 +366,65 @@ export const appRouter = router({
   moderation: createFeatureRouter(),
   auditLogs: createFeatureRouter(),
   security: createFeatureRouter(),
-  complianceIntelligence: createFeatureRouter(),
+  complianceIntelligence: router({
+    getComplianceSummary: protectedProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      score: 0,
+      consentsGranted: 0,
+      consentsTotal: 0,
+      issues: ["Compliance integration is unavailable."],
+    })),
+    getKYCStatus: protectedProcedure.query(() => ({
+      available: false as const,
+      status: "not_started" as string,
+      level: undefined as string | undefined,
+      riskScore: undefined as number | undefined,
+      rejectionReason: undefined as string | undefined,
+    })),
+    getConsents: protectedProcedure.query(() => ({
+      consents: [] as Array<{
+        type: string;
+        required: boolean;
+        granted: boolean;
+        grantedAt?: string;
+      }>,
+    })),
+    getDataRequests: protectedProcedure.query(() => ({
+      requests: [] as Array<{
+        id: string;
+        type: string;
+        status: string;
+        createdAt: string;
+        scheduledAt?: string;
+      }>,
+    })),
+    getAuditLog: protectedProcedure
+      .input(z.object({ limit: z.number().int().min(1).max(100).default(30) }))
+      .query(() => ({
+        events: [] as Array<{
+          id: string;
+          action: string;
+          status: string;
+          createdAt: string;
+        }>,
+      })),
+    submitKYC: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+    updateConsent: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+    requestDataExport: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => unavailableMutationResult),
+    requestDeletion: protectedProcedure
+      .input(z.object({ type: z.string().min(1), reason: z.string().min(1) }))
+      .mutation(() => unavailableMutationResult),
+    cancelDeletionRequest: protectedProcedure
+      .input(z.object({ requestId: z.string().min(1) }))
+      .mutation(() => unavailableMutationResult),
+  }),
 
   // Platform & Enterprise Routers
   platform: createFeatureRouter(),
