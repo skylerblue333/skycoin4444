@@ -2,7 +2,7 @@
 
 **Assessment date:** 2026-08-16  
 **Repository:** `skylerblue333/skycoin4444`  
-**Verified synchronized checkpoint:** `398c408` (`398c408053fe9a94bf3d78b6bf5006f77bce3c19f`)
+**Verified synchronized checkpoint:** `41316ef` (`41316eff93f5654748158e1cdc2d1a9705df828a`)
 **Assessment:** **Code validation green; GA release not yet authorized.**
 
 ## Verified local evidence
@@ -11,12 +11,12 @@
 |---|---|---|
 | Strict TypeScript | Pass | `pnpm run check` completed with zero diagnostics on the current remediation checkpoints. |
 | Production build | Pass | `pnpm run build` completed successfully on the current remediation checkpoints. |
-| Available automated tests | Pass for available suite | `pnpm run test -- --run` passes **3 tests in 2 test files**: logout cookie clearing and admin authorization allow/deny behavior. This is not a complete GA critical-workflow suite. |
+| Available automated tests | Pass for available suite | `pnpm run test -- --run` passes **6 tests in 3 test files**: logout cookie clearing, admin authorization allow/deny behavior, and truthful wallet/signing/AI unavailable boundaries. This is not a complete GA critical-workflow suite. |
 | Diff hygiene | Pass | `git diff --check` completed without whitespace errors during each verified remediation checkpoint. |
 | Truthful page inventory | Pass | `docs/page-readiness-inventory.csv` regenerated for **1,079 routes**. |
 | Hard-coded-money evidence | Pass for scanned signals; manual review remains required | `scripts/audit_hard_coded_money.py` reports **0 unresolved rows** on the current checkpoint. The result is a reproducible scan and does not replace manual review of financial claims outside the scanner's patterns. |
-| GitHub synchronization | Pass | `master` is synchronized with `origin/master` at `398c408`. |
-| GitHub Actions for current code checkpoint | Pass | GitHub Actions CI run `31947159493` completed successfully for code checkpoint `398c408`; the later `133b349` change only refreshes release documentation. |
+| GitHub synchronization | Pass | `master` is synchronized with `origin/master` at `41316ef`. |
+| GitHub Actions for current code checkpoint | Pass | GitHub Actions CI run `31947291463` completed successfully for code checkpoint `41316ef`. |
 
 ## Current route classification
 
@@ -55,7 +55,7 @@ Verified account-scoped wallet ledger reads remain distinct from on-chain custod
 | Backup and restore | Not verified | Encrypted backup schedule, retention, restore test, and recovery-objective evidence. |
 | Critical workflow coverage | Incomplete | Registration, login, logout, profile, wallet ledger, AI unavailable states, education, admin authorization, and representative service integration tests. |
 | Dependency advisory | Open in GitHub; local audit clean | GitHub reports one moderate Dependabot advisory, **#121**, but its alert endpoint is permission-restricted in this session. `pnpm audit --json` reports zero vulnerabilities across 670 resolved dependencies; the GitHub alert still requires owner-level confirmation or dismissal/remediation in GitHub Security. |
-| Current-checkpoint CI evidence | Pass for code checkpoint; documentation checkpoint follows | CI run `31947159493` succeeded for `398c408`. The documentation-only checkpoint `133b349` was locally revalidated with typecheck, build, tests, and diff hygiene. |
+| Current-checkpoint CI evidence | Pass | CI run `31947291463` succeeded for `41316ef`, including the expanded truthful-boundary test suite. |
 
 ## Release decision
 
@@ -66,8 +66,8 @@ The repository is suitable as a **code-green stabilization checkpoint** and cont
 ## Smallest next remediation and verification batch
 
 1. Confirm and remediate or formally accept Dependabot advisory #121 in GitHub Security; local `pnpm audit` alone is not sufficient to close the alert.
-2. Preserve CI evidence for code checkpoint `398c408` (run `31947159493`) and require a fresh successful run after the next code change.
+2. Preserve CI evidence for code checkpoint `41316ef` (run `31947291463`) and require a fresh successful run after the next code change.
 3. Provision or connect the intended production database and identity provider in a non-destructive staging environment.
 4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
-5. Expand critical workflow tests beyond the current three tests and rerun the complete release gate.
+5. Expand critical workflow tests beyond the current six tests and rerun the complete release gate.
 6. Reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
