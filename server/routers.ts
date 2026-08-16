@@ -1654,6 +1654,10 @@ export const appRouter = router({
         overallHealth: "UNKNOWN",
         available: false as const,
       })),
+      marketStates: protectedProcedure.query(() => ({
+        available: false as const,
+        states: [] as Array<{ market: string; status: string; value: number }>,
+      })),
     }),
     governanceV2: router({
       health: publicProcedure.query(() => ({
