@@ -3,12 +3,12 @@
 **Assessment date:** August 16, 2026  
 **Repository:** `skylerblue333/skycoin4444`  
 **Branch:** `restore/error-free-baseline`  
-**Checkpoint:** `3eaf91a`  
+**Checkpoint:** `142c931`  
 **Release decision:** **GA NOT AUTHORIZED — CODE-GREEN, INFRASTRUCTURE-UNVERIFIED**
 
 ## Executive assessment
 
-The application has reached a materially stronger code baseline. The latest checkpoint also bounds the unsupported AI Agent Market and adds regression tests for the highest-risk truthful boundaries so it no longer presents fabricated prices, usage counts, ratings, paid outputs, or payment-success states. The latest checkpoint removes the final four strict TypeScript diagnostics, preserves a successful production build, preserves passing automated tests, and removes fabricated user identity and balance fallbacks from the server database helpers. Missing database users now resolve to `null`, and OAuth lookup uses the actual `users.openId` column.
+The application has reached a materially stronger code baseline. The latest work also classified high-risk route families, bounded additional wallet/crypto/payment/AI pages with mock or unverified behavior, and expanded safety regressions to seven passing tests. The latest checkpoint also bounds the unsupported AI Agent Market and adds regression tests for the highest-risk truthful boundaries so it no longer presents fabricated prices, usage counts, ratings, paid outputs, or payment-success states. The latest checkpoint removes the final four strict TypeScript diagnostics, preserves a successful production build, preserves passing automated tests, and removes fabricated user identity and balance fallbacks from the server database helpers. Missing database users now resolve to `null`, and OAuth lookup uses the actual `users.openId` column.
 
 This checkpoint is **not a production deployment certificate**. No staging database, OAuth provider, AWS/EC2 deployment, production DNS/TLS path, monitoring stack, encrypted backup restore, or external production capacity evidence has been independently verified in the current environment. The correct release label remains a truthful stabilization checkpoint rather than GA.
 
@@ -18,11 +18,11 @@ This checkpoint is **not a production deployment certificate**. No staging datab
 
 | Gate | Result | Evidence |
 |---|---|---|
-| Strict TypeScript | **PASS** | `pnpm run check` completed with `0` diagnostics at `3eaf91a`. |
+| Strict TypeScript | **PASS** | `pnpm run check` completed with `0` diagnostics at `142c931`. |
 | Production build | **PASS** | `pnpm run build` completed successfully after the final server repairs. |
-| Automated tests | **PASS, LIMITED** | `pnpm run test` passed: 2 test files and 4 tests, including logout and truthful-boundary regressions. This remains insufficient for GA workflow certification. |
+| Automated tests | **PASS, LIMITED** | `pnpm run test` passed: 2 test files and 7 tests, including logout plus account-core and high-risk truthful-boundary regressions. This remains insufficient for GA workflow certification. |
 | Diff hygiene | **PASS** | `git diff --check` completed without errors. |
-| Git checkpoint | **PASS** | Commit `3eaf91a` is pushed to `origin/restore/error-free-baseline`; working tree is clean. |
+| Git checkpoint | **PASS** | Commit `142c931` is pushed to `origin/restore/error-free-baseline`; working tree is clean. |
 | Truthful unsupported states | **PASS for audited boundary** | Progress Tracking and previously bounded unsupported modules do not present unavailable education, financial, AI, or reward capabilities as completed facts. |
 | Fabricated database identity fallback | **REMOVED** | `server/db.ts` no longer returns synthetic `User`, `user@example.com`, ID `1`, or balance `0` records when lookup fails. |
 
@@ -67,7 +67,7 @@ Until those artifacts exist, the release decision must remain **GA NOT AUTHORIZE
 | `b7774c9` | Final four strict TypeScript contract repairs | `pnpm run check` reached zero diagnostics; build and tests passed. |
 | `e2bb221` | Removal of fabricated database user and balance fallbacks | Zero diagnostics, build, tests, and diff hygiene passed; pushed cleanly. |
 | `3ff5fd3` | Truthful AI marketplace boundary | Zero diagnostics, build, tests, and diff hygiene passed; fabricated commercial UI was removed. |
-| `3eaf91a` | Truthful-boundary regression tests and synthetic post fallback removal | Zero diagnostics, build, tests, and diff hygiene passed; 4 tests now pass across 2 files. |
+| `142c931` | High-risk route truthfulness batches and expanded safety regressions | Zero diagnostics, build, tests, and diff hygiene passed; 7 tests now pass across 2 files. |
 
 ## Acceptance rule
 
