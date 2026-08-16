@@ -33,7 +33,7 @@ The current inventory records:
 | Type-check-exempt pages | 0 |
 | Registered routes | 1,070 |
 
-These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, `docs/hard-coded-money-audit.csv`, `docs/dependabot-121-evidence.md`, `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md`, and the blocked staging artifacts under `docs/staging/`, summarized by `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md`.
+These are **readiness classifications**, not a claim that all 1,079 routes are production-complete. The detailed evidence is maintained in `docs/page-readiness-inventory.csv`, `docs/critical-workflow-evidence.md`, `docs/critical-workflow-matrix.md`, `docs/hard-coded-money-audit.csv`, `docs/dependabot-121-evidence.md`, `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md`, `docs/GA_EXECUTION_PUNCH_LIST.md`, and the blocked staging artifacts under `docs/staging/`, summarized by `docs/staging/STAGING_DATABASE_CHECKPOINT_REPORT.md`.
 
 ## Security and truthfulness changes in this campaign
 
@@ -71,4 +71,4 @@ The repository is suitable as a **code-green stabilization checkpoint** and cont
 4. Execute deployment, DNS/TLS, monitoring, backup, restore, and rollback drills with evidence.
 5. Expand critical workflow tests beyond the current six tests and rerun the complete release gate.
 6. Use `docs/GA_PRODUCTION_EVIDENCE_MATRIX.md` to assign an owner, evidence artifact, rollback plan, and acceptance result to every remaining no-go row.
-7. Reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
+7. Use `docs/GA_EXECUTION_PUNCH_LIST.md` for all progress percentages; reassess GA only after every no-go row has an owner, evidence, rollback plan, and documented acceptance result.
