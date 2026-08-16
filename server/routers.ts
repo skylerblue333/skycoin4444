@@ -1859,7 +1859,53 @@ export const appRouter = router({
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
   }),
-  languageExchange: createFeatureRouter(),
+  languageExchange: router({
+    getPartners: publicProcedure
+      .input(
+        z
+          .object({
+            search: z.string().optional(),
+            interests: z.array(z.string()).optional(),
+            proficiency: z.array(z.string()).optional(),
+            availability: z.array(z.string()).optional(),
+            sortBy: z.string().optional(),
+          })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            name: string;
+            nativeLang: string;
+            learningLang: string;
+            proficiency: string;
+            bio: string;
+            avatar: string;
+            responseTime: string;
+            sessionsCompleted: number;
+            rating: number;
+            availability: string;
+            interests: string[];
+            location: string;
+            age: number;
+            joinedDate: string;
+            videoUrl?: string;
+          }>
+      ),
+    getFavorites: protectedProcedure.query(
+      () => [] as Array<{ partnerId: string }>
+    ),
+    requestSession: protectedProcedure
+      .input(z.object({ partnerId: z.string().min(1) }))
+      .mutation(() => unavailableMutationResult),
+    saveFavorite: protectedProcedure
+      .input(z.object({ partnerId: z.string().min(1) }))
+      .mutation(() => unavailableMutationResult),
+    removeFavorite: protectedProcedure
+      .input(z.object({ partnerId: z.string().min(1) }))
+      .mutation(() => unavailableMutationResult),
+  }),
   audienceLockIn: router({
     getStreak: protectedProcedure.query(() => ({
       current: 0,
