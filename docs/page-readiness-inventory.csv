@@ -663,7 +663,7 @@ PortfolioComparison,client/src/pages/PortfolioComparison.tsx,truthfully-gated,Tr
 PortfolioOptimization,client/src/pages/PortfolioOptimization.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioOverview,client/src/pages/PortfolioOverview.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioRebalance,client/src/pages/PortfolioRebalance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-PortfolioTracker,client/src/pages/PortfolioTracker.tsx,static-review,True,False,False,False,False,False,False,False,False
+PortfolioTracker,client/src/pages/PortfolioTracker.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PortfolioTracking,client/src/pages/PortfolioTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PositionManagement,client/src/pages/PositionManagement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PowerUserTools,client/src/pages/PowerUserTools.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
