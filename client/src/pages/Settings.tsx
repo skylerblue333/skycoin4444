@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -36,7 +42,7 @@ export default function Settings() {
 
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => toast.success("Profile updated!"),
-    onError: (err) => toast.error(err.message),
+    onError: err => toast.error(err.message),
   });
 
   useEffect(() => {
@@ -68,7 +74,9 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
+          <p className="text-muted-foreground mt-1">
+            Manage your account and preferences
+          </p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
@@ -85,7 +93,9 @@ export default function Settings() {
             <Card className="bg-card/50 border-border">
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
-                <CardDescription>Update your public profile details</CardDescription>
+                <CardDescription>
+                  Update your public profile details
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Avatar */}
@@ -93,7 +103,11 @@ export default function Settings() {
                   <div className="relative group">
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl font-bold overflow-hidden">
                       {profile?.avatar ? (
-                        <img src={profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                        <img
+                          src={profile.avatar}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         displayName.charAt(0).toUpperCase() || "?"
                       )}
@@ -125,7 +139,7 @@ export default function Settings() {
                     <Label>Display Name</Label>
                     <Input
                       value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
+                      onChange={e => setDisplayName(e.target.value)}
                       placeholder="Your display name"
                       className="mt-1"
                     />
@@ -134,7 +148,7 @@ export default function Settings() {
                     <Label>Bio</Label>
                     <Textarea
                       value={bio}
-                      onChange={(e) => setBio(e.target.value)}
+                      onChange={e => setBio(e.target.value)}
                       placeholder="Tell people about yourself..."
                       className="mt-1"
                       rows={3}
@@ -144,16 +158,21 @@ export default function Settings() {
                     <Label>Email</Label>
                     <Input
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={e => setEmail(e.target.value)}
                       placeholder="your@email.com"
                       className="mt-1"
                       disabled
                     />
-                    <p className="text-xs text-muted-foreground mt-1">Email is managed by your OAuth provider</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Email is managed by your OAuth provider
+                    </p>
                   </div>
                 </div>
 
-                <Button onClick={handleSaveProfile} disabled={updateProfile.isPending}>
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={updateProfile.isPending}
+                >
                   {updateProfile.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </CardContent>
@@ -167,19 +186,27 @@ export default function Settings() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.level || 1}</p>
+                    <p className="text-2xl font-bold text-purple-400">
+                      {profile?.level || 1}
+                    </p>
                     <p className="text-xs text-muted-foreground">Level</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-blue-400">{profile?.xp || 0}</p>
+                    <p className="text-2xl font-bold text-blue-400">
+                      {profile?.xp || 0}
+                    </p>
                     <p className="text-xs text-muted-foreground">XP</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-purple-400">{profile?.reputation || 0}</p>
+                    <p className="text-2xl font-bold text-purple-400">
+                      {profile?.reputation || 0}
+                    </p>
                     <p className="text-xs text-muted-foreground">Reputation</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted/30">
-                    <p className="text-2xl font-bold text-amber-400">{profile?.followerCount || 0}</p>
+                    <p className="text-2xl font-bold text-amber-400">
+                      {profile?.followerCount || 0}
+                    </p>
                     <p className="text-xs text-muted-foreground">Followers</p>
                   </div>
                 </div>
@@ -192,39 +219,61 @@ export default function Settings() {
             <Card className="bg-card/50 border-border">
               <CardHeader>
                 <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>Choose what notifications you receive</CardDescription>
+                <CardDescription>
+                  Choose what notifications you receive
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Tip Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When someone sends you a tip</p>
+                    <p className="text-xs text-muted-foreground">
+                      When someone sends you a tip
+                    </p>
                   </div>
-                  <Switch checked={notifyTips} onCheckedChange={setNotifyTips} />
+                  <Switch
+                    checked={notifyTips}
+                    onCheckedChange={setNotifyTips}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Follow Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When someone follows you</p>
+                    <p className="text-xs text-muted-foreground">
+                      When someone follows you
+                    </p>
                   </div>
-                  <Switch checked={notifyFollows} onCheckedChange={setNotifyFollows} />
+                  <Switch
+                    checked={notifyFollows}
+                    onCheckedChange={setNotifyFollows}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Message Notifications</Label>
-                    <p className="text-xs text-muted-foreground">When you receive a direct message</p>
+                    <p className="text-xs text-muted-foreground">
+                      When you receive a direct message
+                    </p>
                   </div>
-                  <Switch checked={notifyMessages} onCheckedChange={setNotifyMessages} />
+                  <Switch
+                    checked={notifyMessages}
+                    onCheckedChange={setNotifyMessages}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>System Notifications</Label>
-                    <p className="text-xs text-muted-foreground">Platform updates and announcements</p>
+                    <p className="text-xs text-muted-foreground">
+                      Platform updates and announcements
+                    </p>
                   </div>
-                  <Switch checked={notifySystem} onCheckedChange={setNotifySystem} />
+                  <Switch
+                    checked={notifySystem}
+                    onCheckedChange={setNotifySystem}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -235,29 +284,43 @@ export default function Settings() {
             <Card className="bg-card/50 border-border">
               <CardHeader>
                 <CardTitle>Privacy Settings</CardTitle>
-                <CardDescription>Control who can see your activity</CardDescription>
+                <CardDescription>
+                  Control who can see your activity
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Privacy Mode</Label>
-                    <p className="text-xs text-muted-foreground">Hide your activity from public feeds</p>
+                    <p className="text-xs text-muted-foreground">
+                      Hide your activity from public feeds
+                    </p>
                   </div>
-                  <Switch checked={privacyMode} onCheckedChange={setPrivacyMode} />
+                  <Switch
+                    checked={privacyMode}
+                    onCheckedChange={setPrivacyMode}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Online Status</Label>
-                    <p className="text-xs text-muted-foreground">Let others see when you're online</p>
+                    <p className="text-xs text-muted-foreground">
+                      Let others see when you're online
+                    </p>
                   </div>
-                  <Switch checked={showOnlineStatus} onCheckedChange={setShowOnlineStatus} />
+                  <Switch
+                    checked={showOnlineStatus}
+                    onCheckedChange={setShowOnlineStatus}
+                  />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Allow Direct Messages</Label>
-                    <p className="text-xs text-muted-foreground">Let anyone send you messages</p>
+                    <p className="text-xs text-muted-foreground">
+                      Let anyone send you messages
+                    </p>
                   </div>
                   <Switch checked={allowDMs} onCheckedChange={setAllowDMs} />
                 </div>
@@ -272,9 +335,15 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium">Delete Account</p>
-                    <p className="text-xs text-muted-foreground">Permanently delete your account and all data</p>
+                    <p className="text-xs text-muted-foreground">
+                      Permanently delete your account and all data
+                    </p>
                   </div>
-                  <Button variant="outline" size="sm" className="text-red-400 border-red-400/50 hover:bg-red-500/10">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-400 border-red-400/50 hover:bg-red-500/10"
+                  >
                     Delete
                   </Button>
                 </div>
@@ -293,11 +362,20 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Two-Factor Authentication</Label>
-                    <p className="text-xs text-muted-foreground">Add an extra layer of security</p>
+                    <p className="text-xs text-muted-foreground">
+                      Add an extra layer of security
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    {twoFactorEnabled && <Badge className="bg-purple-600/20 text-purple-400">Active</Badge>}
-                    <Switch checked={twoFactorEnabled} onCheckedChange={setTwoFactorEnabled} />
+                    {twoFactorEnabled && (
+                      <Badge className="bg-purple-600/20 text-purple-400">
+                        Active
+                      </Badge>
+                    )}
+                    <Switch
+                      checked={twoFactorEnabled}
+                      onCheckedChange={setTwoFactorEnabled}
+                    />
                   </div>
                 </div>
                 <Separator />
@@ -307,9 +385,13 @@ export default function Settings() {
                     <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                       <div>
                         <p className="text-sm font-medium">Current Session</p>
-                        <p className="text-xs text-muted-foreground">Chrome on macOS • Last active now</p>
+                        <p className="text-xs text-muted-foreground">
+                          Chrome on macOS • Last active now
+                        </p>
                       </div>
-                      <Badge className="bg-purple-600/20 text-purple-400">Active</Badge>
+                      <Badge className="bg-purple-600/20 text-purple-400">
+                        Active
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -317,7 +399,8 @@ export default function Settings() {
                 <div>
                   <Label>Login History</Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Last login: {new Date().toLocaleDateString()} from your current device
+                    Last login: {new Date().toLocaleDateString()} from your
+                    current device
                   </p>
                 </div>
               </CardContent>
@@ -333,16 +416,22 @@ export default function Settings() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-                  <p className="text-sm text-muted-foreground">Wallet Address</p>
+                  <p className="text-sm text-muted-foreground">
+                    Wallet Address
+                  </p>
                   <p className="font-mono text-sm mt-1 break-all">
-                    {user?.id ? `0x${user.id.toString(16).padStart(40, '0')}` : "Not connected"}
+                    {user?.id
+                      ? `0x${String(user.id).padStart(40, "0")}`
+                      : "Not connected"}
                   </p>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Auto-stake Rewards</Label>
-                    <p className="text-xs text-muted-foreground">Automatically stake earned tokens</p>
+                    <p className="text-xs text-muted-foreground">
+                      Automatically stake earned tokens
+                    </p>
                   </div>
                   <Switch />
                 </div>
@@ -350,7 +439,9 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Transaction Notifications</Label>
-                    <p className="text-xs text-muted-foreground">Get notified for all wallet activity</p>
+                    <p className="text-xs text-muted-foreground">
+                      Get notified for all wallet activity
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>

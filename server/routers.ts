@@ -399,7 +399,12 @@ const userRouter = router({
     .query(({ input }) => db.getUserByEmail(input.username)),
   profile: publicProcedure
     .input(z.object({ userId: z.union([z.string(), z.number()]) }))
-    .query(({ input }) => db.getUserById(String(input.userId))),
+    .query(async ({ input }) => {
+      const profile = await db.getUserById(String(input.userId));
+      return profile
+        ? { ...profile, level: 0, xp: 0, reputation: 0, followerCount: 0 }
+        : profile;
+    }),
   leaderboard: publicProcedure
     .input(
       z.object({
@@ -430,7 +435,14 @@ const userRouter = router({
     .input(z.unknown().optional())
     .mutation(() => unavailableMutationResult),
   updateProfile: protectedProcedure
-    .input(z.unknown().optional())
+    .input(
+      z.object({
+        name: z.string().max(120).optional(),
+        displayName: z.string().max(120).optional(),
+        bio: z.string().max(2000).optional(),
+        avatar: z.string().url().optional(),
+      })
+    )
     .mutation(() => unavailableMutationResult),
   uploadAvatar: protectedProcedure
     .input(
