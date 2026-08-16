@@ -1,2 +1,1 @@
-route_or_file,line,hard_coded_value,source_text,purpose,classification,remediation,validation_result
-client/src/pages/VideoArea.tsx,27,$1000,"{ id: 3, user: ""DeFiMaster"", avatar: ""🏦"", title: ""How to Earn $1000/day with Yield Farming"", views: ""342K"", likes: 28400, duration: ""32:11"", thumb: ""https://picsum.photos/seed/vid3/640/360"", category: ""Strategy"" },",static UI or data claim,REVIEW-REQUIRED,Verify authoritative source; otherwise remove or replace with truthful unavailable/empty state.,inventory-generated; manual review required
+route_or_file

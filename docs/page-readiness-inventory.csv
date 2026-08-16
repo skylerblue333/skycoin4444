@@ -1017,7 +1017,7 @@ VerificationSteps,client/src/pages/VerificationSteps.tsx,interactive-review,True
 VerificationSystem,client/src/pages/VerificationSystem.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 VersionManagement,client/src/pages/VersionManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 VestingSchedule,client/src/pages/VestingSchedule.tsx,integration-backed-review,True,True,False,True,True,True,False,False,False
-VideoArea,client/src/pages/VideoArea.tsx,integration-backed-review,True,True,False,False,True,True,True,False,True
+VideoArea,client/src/pages/VideoArea.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 VideoCall,client/src/pages/VideoCall.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 VideoChat,client/src/pages/VideoChat.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 VideoEditor,client/src/pages/VideoEditor.tsx,static-review,True,False,False,False,False,False,False,False,False
