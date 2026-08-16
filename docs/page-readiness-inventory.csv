@@ -52,7 +52,7 @@ AdminDashboard,client/src/pages/AdminDashboard.tsx,static-review,True,False,Fals
 AdminOrders,client/src/pages/AdminOrders.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdminPanel,client/src/pages/AdminPanel.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdminWalletManager,client/src/pages/AdminWalletManager.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-AdvancedAdminPanel,client/src/pages/AdvancedAdminPanel.tsx,interactive-review,True,False,False,False,False,True,True,False,False
+AdvancedAdminPanel,client/src/pages/AdvancedAdminPanel.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdvancedAnalytics,client/src/pages/AdvancedAnalytics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 AdvancedOrders,client/src/pages/AdvancedOrders.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AdvancedSearch,client/src/pages/AdvancedSearch.tsx,interactive-review,True,False,False,False,False,True,True,False,False
