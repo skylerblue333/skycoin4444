@@ -27,7 +27,7 @@ export default function Settings() {
   const [allowDMs, setAllowDMs] = useState(true);
 
   const updateProfile = trpc.user.updateProfile.useMutation({
-    onSuccess: () => toast.info("Profile persistence is not enabled in this release."),
+    onSuccess: () => toast.success("Profile saved."),
     onError: (err) => toast.error(err.message),
   });
 
