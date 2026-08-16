@@ -18,8 +18,47 @@
  * - Market intelligence
  */
 import { useState } from "react";
-import type { SimEntity, WorldEvent, MarketSignal, TrendSignal } from "../../../server/simulationEngine";
-import { Brain, Zap, TrendingUp, Eye, Activity, Sparkles, ChevronRight, BarChart2, Heart, MessageCircle, DollarSign, Users, Globe, Shield, Star } from "lucide-react";
+type SimEntity = {
+  id: string;
+  name: string;
+  state: string;
+  energy: number;
+  momentum: number;
+  traits: Record<string, number>;
+};
+type WorldEvent = {
+  id: string;
+  type: string;
+  impact: number;
+  entityName: string;
+  payload: Record<string, unknown>;
+  timestamp: string;
+};
+type MarketSignal = {
+  symbol: string;
+  sentiment: number;
+  price: number;
+  change24h: number;
+  momentum: number;
+};
+type TrendSignal = { topic: string; score: number };
+import {
+  Brain,
+  Zap,
+  TrendingUp,
+  Eye,
+  Activity,
+  Sparkles,
+  ChevronRight,
+  BarChart2,
+  Heart,
+  MessageCircle,
+  DollarSign,
+  Users,
+  Globe,
+  Shield,
+  Star,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -96,18 +135,36 @@ const ACTION_PREVIEWS: ActionPreview[] = [
 ];
 
 // Pulsing ambient indicator
-function AmbientPulse({ color, size = "md" }: { color: string; size?: "sm" | "md" | "lg" }) {
+function AmbientPulse({
+  color,
+  size = "md",
+}: {
+  color: string;
+  size?: "sm" | "md" | "lg";
+}) {
   const sizes = { sm: "w-2 h-2", md: "w-3 h-3", lg: "w-4 h-4" };
   return (
     <div className="relative flex items-center justify-center">
-      <div className={`${sizes[size]} rounded-full`} style={{ backgroundColor: color }} />
-      <div className={`absolute ${sizes[size]} rounded-full animate-ping opacity-40`} style={{ backgroundColor: color }} />
+      <div
+        className={`${sizes[size]} rounded-full`}
+        style={{ backgroundColor: color }}
+      />
+      <div
+        className={`absolute ${sizes[size]} rounded-full animate-ping opacity-40`}
+        style={{ backgroundColor: color }}
+      />
     </div>
   );
 }
 
 // Action cost → impact → result preview card
-function ActionPreviewCard({ action, onExecute }: { action: ActionPreview; onExecute: (a: ActionPreview) => void }) {
+function ActionPreviewCard({
+  action,
+  onExecute,
+}: {
+  action: ActionPreview;
+  onExecute: (a: ActionPreview) => void;
+}) {
   return (
     <div
       className="card p-3 cursor-pointer hover:scale-[1.01] transition-all"
@@ -115,13 +172,18 @@ function ActionPreviewCard({ action, onExecute }: { action: ActionPreview; onExe
       onClick={() => onExecute(action)}
     >
       <div className="flex items-start gap-3">
-        <div className="p-2 rounded-lg" style={{ backgroundColor: `${action.color}20`, color: action.color }}>
+        <div
+          className="p-2 rounded-lg"
+          style={{ backgroundColor: `${action.color}20`, color: action.color }}
+        >
           {action.icon}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <span className="font-medium text-sm">{action.label}</span>
-            <span className="text-xs font-bold" style={{ color: action.color }}>{action.confidence}%</span>
+            <span className="text-xs font-bold" style={{ color: action.color }}>
+              {action.confidence}%
+            </span>
           </div>
           {/* Cost → Impact → Result chain */}
           <div className="flex items-center gap-1.5 mt-1.5 text-xs">
@@ -129,11 +191,16 @@ function ActionPreviewCard({ action, onExecute }: { action: ActionPreview; onExe
               {action.cost > 0 ? `$${action.cost}` : "Free"}
             </span>
             <ChevronRight className="w-3 h-3 text-muted-foreground" />
-            <span className="px-1.5 py-0.5 rounded bg-secondary/60" style={{ color: action.color }}>
+            <span
+              className="px-1.5 py-0.5 rounded bg-secondary/60"
+              style={{ color: action.color }}
+            >
               {action.impact}
             </span>
             <ChevronRight className="w-3 h-3 text-muted-foreground" />
-            <span className="text-muted-foreground truncate">{action.result}</span>
+            <span className="text-muted-foreground truncate">
+              {action.result}
+            </span>
           </div>
         </div>
       </div>
@@ -142,7 +209,9 @@ function ActionPreviewCard({ action, onExecute }: { action: ActionPreview; onExe
 }
 
 export default function WorldBrain() {
-  const [activeTab, setActiveTab] = useState<"brain" | "entities" | "events" | "market">("brain");
+  const [activeTab, setActiveTab] = useState<
+    "brain" | "entities" | "events" | "market"
+  >("brain");
   const [autoRefresh, setAutoRefresh] = useState(true);
 
   const worldState = trpc.simulation.getWorldState.useQuery(undefined, {
@@ -151,9 +220,12 @@ export default function WorldBrain() {
   const trends = trpc.simulation.getTrends.useQuery(undefined, {
     refetchInterval: autoRefresh ? 8000 : false,
   });
-  const events = trpc.simulation.getEvents.useQuery({ limit: 15 }, {
-    refetchInterval: autoRefresh ? 5000 : false,
-  });
+  const events = trpc.simulation.getEvents.useQuery(
+    { limit: 15 },
+    {
+      refetchInterval: autoRefresh ? 5000 : false,
+    }
+  );
   const marketSignals = trpc.simulation.getMarketSignals.useQuery(undefined, {
     refetchInterval: autoRefresh ? 10000 : false,
   });
@@ -251,19 +323,46 @@ export default function WorldBrain() {
           <div className="card p-4">
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-purple-400" />
-              <span className="font-semibold text-sm">Ambient Intelligence</span>
+              <span className="font-semibold text-sm">
+                Ambient Intelligence
+              </span>
               <AmbientPulse color="#a855f7" size="sm" />
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              {([
-                { label: "Active Entities", value: entities.filter((e: SimEntity) => e.state === "active").length, color: "#22c55e" },
-                { label: "World Tick", value: worldState.data?.tick ?? 0, color: "#a855f7" },
-                { label: "Live Events", value: recentEvents.length, color: "#06b6d4" },
-                { label: "Trending Topics", value: trendData.length, color: "#f59e0b" },
-              ] as { label: string; value: number; color: string }[]).map(s => (
-                <div key={s.label} className="p-2 rounded-lg bg-secondary/50 flex items-center justify-between">
+              {(
+                [
+                  {
+                    label: "Active Entities",
+                    value: entities.filter(
+                      (e: SimEntity) => e.state === "active"
+                    ).length,
+                    color: "#22c55e",
+                  },
+                  {
+                    label: "World Tick",
+                    value: worldState.data?.tick ?? 0,
+                    color: "#a855f7",
+                  },
+                  {
+                    label: "Live Events",
+                    value: recentEvents.length,
+                    color: "#06b6d4",
+                  },
+                  {
+                    label: "Trending Topics",
+                    value: trendData.length,
+                    color: "#f59e0b",
+                  },
+                ] as { label: string; value: number; color: string }[]
+              ).map(s => (
+                <div
+                  key={s.label}
+                  className="p-2 rounded-lg bg-secondary/50 flex items-center justify-between"
+                >
                   <span className="text-muted-foreground">{s.label}</span>
-                  <span className="font-bold" style={{ color: s.color }}>{s.value}</span>
+                  <span className="font-bold" style={{ color: s.color }}>
+                    {s.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -279,16 +378,25 @@ export default function WorldBrain() {
               <div className="space-y-2">
                 {trendData.slice(0, 5).map((trend: TrendSignal, i: number) => (
                   <div key={trend.topic} className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground w-4">{i + 1}</span>
+                    <span className="text-xs text-muted-foreground w-4">
+                      {i + 1}
+                    </span>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-sm font-medium text-cyan-400">{trend.topic}</span>
-                        <span className="text-xs text-muted-foreground">{Math.round(trend.score)}</span>
+                        <span className="text-sm font-medium text-cyan-400">
+                          {trend.topic}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(trend.score)}
+                        </span>
                       </div>
                       <div className="h-1 rounded-full bg-secondary/50 overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${trend.score}%`, backgroundColor: "#06b6d4" }}
+                          style={{
+                            width: `${trend.score}%`,
+                            backgroundColor: "#06b6d4",
+                          }}
                         />
                       </div>
                     </div>
@@ -303,11 +411,17 @@ export default function WorldBrain() {
             <div className="flex items-center gap-2 mb-3">
               <Brain className="w-4 h-4 text-purple-400" />
               <span className="font-semibold text-sm">AI Suggests</span>
-              <span className="text-xs text-muted-foreground ml-auto">Tap to execute</span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                Tap to execute
+              </span>
             </div>
             <div className="space-y-2">
               {ACTION_PREVIEWS.map(action => (
-                <ActionPreviewCard key={action.id} action={action} onExecute={handleExecuteAction} />
+                <ActionPreviewCard
+                  key={action.id}
+                  action={action}
+                  onExecute={handleExecuteAction}
+                />
               ))}
             </div>
           </div>
@@ -329,34 +443,65 @@ export default function WorldBrain() {
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-cyan-500/30 flex items-center justify-center font-bold text-sm">
                       {entity.name.charAt(0)}
                     </div>
-                    <AmbientPulse color={stateColors[entity.state] ?? "#888"} size="sm" />
+                    <AmbientPulse
+                      color={stateColors[entity.state] ?? "#888"}
+                      size="sm"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">{entity.name}</span>
-                      <Badge variant="outline" className="text-xs" style={{ borderColor: `${stateColors[entity.state]}40`, color: stateColors[entity.state] }}>
+                      <Badge
+                        variant="outline"
+                        className="text-xs"
+                        style={{
+                          borderColor: `${stateColors[entity.state]}40`,
+                          color: stateColors[entity.state],
+                        }}
+                      >
                         {entity.state}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <span>Energy: <span className="text-foreground font-medium">{entity.energy}</span></span>
-                      <span>Momentum: <span className={`font-medium ${entity.momentum > 0 ? "text-green-400" : "text-red-400"}`}>{entity.momentum > 0 ? "+" : ""}{entity.momentum.toFixed(2)}</span></span>
+                      <span>
+                        Energy:{" "}
+                        <span className="text-foreground font-medium">
+                          {entity.energy}
+                        </span>
+                      </span>
+                      <span>
+                        Momentum:{" "}
+                        <span
+                          className={`font-medium ${entity.momentum > 0 ? "text-green-400" : "text-red-400"}`}
+                        >
+                          {entity.momentum > 0 ? "+" : ""}
+                          {entity.momentum.toFixed(2)}
+                        </span>
+                      </span>
                     </div>
                     {/* Energy bar */}
                     <div className="mt-2 h-1.5 rounded-full bg-secondary/50 overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-1000"
-                        style={{ width: `${entity.energy}%`, backgroundColor: stateColors[entity.state] }}
+                        style={{
+                          width: `${entity.energy}%`,
+                          backgroundColor: stateColors[entity.state],
+                        }}
                       />
                     </div>
                     {/* Traits */}
                     {Object.keys(entity.traits).length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {Object.entries(entity.traits).slice(0, 4).map(([key, val]: [string, number]) => (
-                          <span key={key} className="px-1.5 py-0.5 rounded bg-secondary/60 text-xs text-muted-foreground">
-                            {key}: {String(val)}
-                          </span>
-                        ))}
+                        {Object.entries(entity.traits)
+                          .slice(0, 4)
+                          .map(([key, val]) => (
+                            <span
+                              key={key}
+                              className="px-1.5 py-0.5 rounded bg-secondary/60 text-xs text-muted-foreground"
+                            >
+                              {key}: {String(val)}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </div>
@@ -399,9 +544,16 @@ export default function WorldBrain() {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        by <span className="text-foreground">{event.entityName}</span>
-                        {event.payload.content ? ` · "${String(event.payload.content).substring(0, 60)}..."` : null}
-                        {event.payload.topic ? ` · ${String(event.payload.topic)}` : null}
+                        by{" "}
+                        <span className="text-foreground">
+                          {event.entityName}
+                        </span>
+                        {event.payload.content
+                          ? ` · "${String(event.payload.content).substring(0, 60)}..."`
+                          : null}
+                        {event.payload.topic
+                          ? ` · ${String(event.payload.topic)}`
+                          : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {new Date(event.timestamp).toLocaleTimeString()}
@@ -428,16 +580,31 @@ export default function WorldBrain() {
                   <div>
                     <div className="font-semibold">{signal.symbol}</div>
                     <div className="text-xs text-muted-foreground">
-                      Sentiment: <span className={signal.sentiment > 60 ? "text-green-400" : "text-red-400"}>{Math.round(signal.sentiment)}</span>
+                      Sentiment:{" "}
+                      <span
+                        className={
+                          signal.sentiment > 60
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }
+                      >
+                        {Math.round(signal.sentiment)}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-bold">
-                    ${signal.price < 1 ? signal.price.toFixed(4) : signal.price.toFixed(2)}
+                    $
+                    {signal.price < 1
+                      ? signal.price.toFixed(4)
+                      : signal.price.toFixed(2)}
                   </div>
-                  <div className={`text-xs font-medium ${signal.change24h >= 0 ? "text-green-400" : "text-red-400"}`}>
-                    {signal.change24h >= 0 ? "+" : ""}{signal.change24h.toFixed(2)}%
+                  <div
+                    className={`text-xs font-medium ${signal.change24h >= 0 ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {signal.change24h >= 0 ? "+" : ""}
+                    {signal.change24h.toFixed(2)}%
                   </div>
                 </div>
               </div>
@@ -452,8 +619,12 @@ export default function WorldBrain() {
                     className="h-full rounded-full transition-all duration-1000"
                     style={{
                       width: `${Math.abs(signal.momentum) * 100}%`,
-                      backgroundColor: signal.momentum > 0 ? "#22c55e" : "#ef4444",
-                      marginLeft: signal.momentum < 0 ? `${(1 - Math.abs(signal.momentum)) * 100}%` : "0",
+                      backgroundColor:
+                        signal.momentum > 0 ? "#22c55e" : "#ef4444",
+                      marginLeft:
+                        signal.momentum < 0
+                          ? `${(1 - Math.abs(signal.momentum)) * 100}%`
+                          : "0",
                     }}
                   />
                 </div>

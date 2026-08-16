@@ -1655,7 +1655,52 @@ export const appRouter = router({
 
   // Gaming & Gamification Routers
   gamification: createFeatureRouter(),
-  simulation: createFeatureRouter(),
+  simulation: router({
+    getWorldState: publicProcedure.query(() => ({
+      tick: 0,
+      entities: [] as Array<{
+        id: string;
+        name: string;
+        state: string;
+        energy: number;
+        momentum: number;
+        traits: Record<string, number>;
+      }>,
+    })),
+    getTrends: publicProcedure.query(
+      () => [] as Array<{ topic: string; score: number }>
+    ),
+    getEvents: publicProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(
+        () =>
+          [] as Array<{
+            id: string;
+            type: string;
+            impact: number;
+            entityName: string;
+            payload: Record<string, unknown>;
+            timestamp: string;
+          }>
+      ),
+    getMarketSignals: publicProcedure.query(
+      () =>
+        [] as Array<{
+          symbol: string;
+          sentiment: number;
+          price: number;
+          change24h: number;
+          momentum: number;
+        }>
+    ),
+    tick: protectedProcedure
+      .input(z.object({}).optional())
+      .mutation(() => unavailableMutationResult),
+  }),
   legendary: createFeatureRouter(),
 
   // Additional Feature Routers
