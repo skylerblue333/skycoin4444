@@ -464,7 +464,7 @@ HopeAIPage,client/src/pages/HopeAIPage.tsx,truthfully-gated,True,False,False,Fal
 HopeAIUpgrades,client/src/pages/HopeAIUpgrades.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 HotelSearch,client/src/pages/HotelSearch.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 HubSpotIntegration,client/src/pages/HubSpotIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-ICOLaunchpad,client/src/pages/ICOLaunchpad.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+ICOLaunchpad,client/src/pages/ICOLaunchpad.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 IFTTT,client/src/pages/IFTTT.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 IITR,client/src/pages/IITR.tsx,static-review,True,False,False,False,False,False,False,False,True
 ITServicesLanding,client/src/pages/ITServicesLanding.tsx,static-review,True,False,False,False,False,False,False,False,True
