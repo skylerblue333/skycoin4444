@@ -1446,6 +1446,30 @@ export const appRouter = router({
     list: publicProcedure.query(() => []),
     get: publicProcedure.input(z.unknown().optional()).query(() => ({})),
     achievements: protectedProcedure.query(() => []),
+    tournaments: publicProcedure.query(
+      () => [] as Array<Record<string, unknown>>
+    ),
+    quests: protectedProcedure.query(
+      () => [] as Array<Record<string, unknown>>
+    ),
+    leaderboard: publicProcedure
+      .input(
+        z
+          .object({
+            type: z.string().optional(),
+            limit: z.number().int().min(1).max(100).optional(),
+          })
+          .optional()
+      )
+      .query(() => [] as Array<Record<string, unknown>>),
+    seasonPass: protectedProcedure.query(() => ({
+      season: 0,
+      endsIn: "Unavailable",
+      name: "",
+      currentTier: 0,
+      tiers: 0,
+      available: false as const,
+    })),
     create: protectedProcedure
       .input(z.object({}))
       .mutation(() => unavailableMutationResult),
