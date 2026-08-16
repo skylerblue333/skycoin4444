@@ -84,7 +84,7 @@ ApprovalWorkflows,client/src/pages/ApprovalWorkflows.tsx,truthfully-gated,True,F
 ArbitrageBot,client/src/pages/ArbitrageBot.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Arcade,client/src/pages/Arcade.tsx,integration-backed-review,True,True,False,False,True,False,True,False,False
 ArchiveManagement,client/src/pages/ArchiveManagement.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-AssetAllocation,client/src/pages/AssetAllocation.tsx,static-review,True,False,False,False,False,False,False,False,False
+AssetAllocation,client/src/pages/AssetAllocation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AssetManagement,client/src/pages/AssetManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AssetTracking,client/src/pages/AssetTracking.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AssignmentTracker,client/src/pages/AssignmentTracker.tsx,interactive-review,True,False,False,False,False,True,True,False,False
