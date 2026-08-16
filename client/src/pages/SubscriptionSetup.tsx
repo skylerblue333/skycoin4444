@@ -1,20 +1,12 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import FeatureUnavailable from "@/components/FeatureUnavailable";
 
-const SubscriptionSetup = () => {
+export default function SubscriptionSetup() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">SubscriptionSetup</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            SubscriptionSetup feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
+    <FeatureUnavailable
+      title="Subscription Setup is not active"
+      description="Payment, billing, subscription, payout, or checkout behavior requires a verified provider account, authenticated ownership, authorization, webhook reconciliation, refund handling, idempotency, audit logging, and operational evidence. No charge, payout, subscription, or payment-success state is presented as real here."
+      capability="Subscription Setup"
+      nextStep="Return to the launch hub"
+    />
   );
-};
-
-export default SubscriptionSetup;
+}
