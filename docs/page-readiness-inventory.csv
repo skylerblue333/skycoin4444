@@ -978,7 +978,7 @@ TypingIndicators,client/src/pages/TypingIndicators.tsx,truthfully-gated,True,Fal
 UnhiddenInterface,client/src/pages/UnhiddenInterface.tsx,integration-backed-review,True,True,False,False,True,True,True,False,True
 UnhiddenMode,client/src/pages/UnhiddenMode.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 UnifiedFeed,client/src/pages/UnifiedFeed.tsx,interactive-review,True,False,False,False,False,True,False,False,True
-UnifiedIdentity,client/src/pages/UnifiedIdentity.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+UnifiedIdentity,client/src/pages/UnifiedIdentity.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 UnifiedMessaging,client/src/pages/UnifiedMessaging.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 UnifiedPaymentLedger,client/src/pages/UnifiedPaymentLedger.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 UnifiedPlatformDashboard,client/src/pages/UnifiedPlatformDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
