@@ -74,7 +74,7 @@ AlertConfiguration,client/src/pages/AlertConfiguration.tsx,interactive-review,Tr
 AlertDialog,client/src/pages/AlertDialog.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 AlertManagement,client/src/pages/AlertManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AmbientFeed,client/src/pages/AmbientFeed.tsx,integration-backed-review,True,True,False,False,True,True,True,False,True
-Analytics,client/src/pages/Analytics.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+Analytics,client/src/pages/Analytics.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AnalyticsDashboard,client/src/pages/AnalyticsDashboard.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 AnalyticsProducts,client/src/pages/AnalyticsProducts.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 AnalyticsReports,client/src/pages/AnalyticsReports.tsx,interactive-review,True,False,False,False,False,True,True,False,False
