@@ -1129,7 +1129,37 @@ export const appRouter = router({
   user: userRouter,
   wallet: walletRouter,
   token: tokenRouter,
-  story: createFeatureRouter(),
+  story: router({
+    feed: protectedProcedure.query(
+      () =>
+        [] as Array<{
+          id: string;
+          userId: string;
+          userName: string;
+          stories: Array<{
+            id: string;
+            content: string;
+            mediaUrl: string | null;
+            type: string;
+            createdAt: string;
+            viewed: boolean;
+          }>;
+        }>
+    ),
+    view: protectedProcedure
+      .input(z.object({ storyId: z.union([z.string(), z.number()]) }))
+      .mutation(() => unavailableMutationResult),
+    create: protectedProcedure
+      .input(
+        z.object({
+          content: z.string().min(1),
+          mediaUrl: z.string().optional(),
+          type: z.enum(["text", "image", "video"]).optional(),
+          isNSFW: z.boolean().optional(),
+        })
+      )
+      .mutation(() => unavailableMutationResult),
+  }),
 
   // Marketplace & Commerce Routers
   marketplace: router({
