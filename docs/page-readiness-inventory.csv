@@ -885,7 +885,7 @@ SubscriberManagement,client/src/pages/SubscriberManagement.tsx,static-review,Tru
 SubscriptionManagement,client/src/pages/SubscriptionManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 SubscriptionPlans,client/src/pages/SubscriptionPlans.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SubscriptionSetup,client/src/pages/SubscriptionSetup.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Subscriptions,client/src/pages/Subscriptions.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+Subscriptions,client/src/pages/Subscriptions.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 SuccessDialog,client/src/pages/SuccessDialog.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SuccessScreen,client/src/pages/SuccessScreen.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 SupportMetrics,client/src/pages/SupportMetrics.tsx,interactive-review,True,False,False,False,False,True,True,False,False
