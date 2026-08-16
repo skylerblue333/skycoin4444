@@ -372,6 +372,18 @@ const tokenRouter = router({
         limit: input.limit,
       })
     ),
+  metrics: publicProcedure.query(() => ({
+    totalSupply: 0,
+    circulatingSupply: 0,
+    burnedTokens: 0,
+    stakingRatio: 0,
+    stakingParticipants: 0,
+    uniqueHolders: 0,
+    available: false as const,
+  })),
+  burnHistory: publicProcedure.query(
+    () => [] as Array<{ date: string; amount: number; type: string }>
+  ),
   priceHistory: protectedProcedure
     .input(
       z
