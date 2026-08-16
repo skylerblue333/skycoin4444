@@ -2,7 +2,7 @@ page,path,readiness,route_registered,uses_trpc,uses_fetch,has_mutation,has_query
 ABTesting,client/src/pages/ABTesting.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 ABTestingAdvanced,client/src/pages/ABTestingAdvanced.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AIAgentEconomy,client/src/pages/AIAgentEconomy.tsx,integration-backed-review,True,True,False,False,True,True,False,False,False
-AIAgentMarket,client/src/pages/AIAgentMarket.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+AIAgentMarket,client/src/pages/AIAgentMarket.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 AIAssistant,client/src/pages/AIAssistant.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 AIBrain,client/src/pages/AIBrain.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
 AICodeStudio,client/src/pages/AICodeStudio.tsx,integration-backed-review,True,True,False,True,True,True,True,False,False
