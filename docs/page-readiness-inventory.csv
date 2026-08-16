@@ -1051,7 +1051,7 @@ WhitelistManagement,client/src/pages/WhitelistManagement.tsx,truthfully-gated,Tr
 WishlistManagement,client/src/pages/WishlistManagement.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 WorkflowAutomation,client/src/pages/WorkflowAutomation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 WorkflowBuilder,client/src/pages/WorkflowBuilder.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-WorldBrain,client/src/pages/WorldBrain.tsx,integration-backed-review,True,True,False,True,True,True,False,False,True
+WorldBrain,client/src/pages/WorldBrain.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 WorldSimulationControl,client/src/pages/WorldSimulationControl.tsx,integration-backed-review,True,True,False,True,False,True,True,False,True
 YieldFarming,client/src/pages/YieldFarming.tsx,truthfully-gated,True,False,False,False,False,False,True,False,True
 ZapierIntegration,client/src/pages/ZapierIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
