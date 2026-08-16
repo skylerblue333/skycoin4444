@@ -982,7 +982,7 @@ UnifiedIdentity,client/src/pages/UnifiedIdentity.tsx,interactive-review,True,Fal
 UnifiedMessaging,client/src/pages/UnifiedMessaging.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 UnifiedPaymentLedger,client/src/pages/UnifiedPaymentLedger.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 UnifiedPlatformDashboard,client/src/pages/UnifiedPlatformDashboard.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-UnifiedWallet,client/src/pages/UnifiedWallet.tsx,interactive-review,True,False,False,False,False,True,True,False,True
+UnifiedWallet,client/src/pages/UnifiedWallet.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 UniversalSearch,client/src/pages/UniversalSearch.tsx,integration-backed-review,True,True,False,False,True,True,True,False,True
 UpdatedLandingPage,client/src/pages/UpdatedLandingPage.tsx,static-review,True,False,False,False,False,False,False,False,True
 UpgradeDowngradePlan,client/src/pages/UpgradeDowngradePlan.tsx,interactive-review,True,False,False,False,False,True,False,False,False
