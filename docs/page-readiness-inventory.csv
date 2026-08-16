@@ -248,7 +248,7 @@ CrossChainSwap,client/src/pages/CrossChainSwap.tsx,truthfully-gated,True,False,F
 Crypto,client/src/pages/Crypto.tsx,integration-backed-review,True,True,False,False,True,False,True,False,True
 CryptoEnhancementsPage,client/src/pages/CryptoEnhancementsPage.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CryptoExchange,client/src/pages/CryptoExchange.tsx,static-review,True,False,False,False,False,False,False,False,False
-CryptoHub,client/src/pages/CryptoHub.tsx,integration-backed-review,True,True,False,True,True,True,True,False,True
+CryptoHub,client/src/pages/CryptoHub.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 CryptoNews,client/src/pages/CryptoNews.tsx,static-review,True,False,False,False,False,False,False,False,False
 CryptoResearchHub,client/src/pages/CryptoResearchHub.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 CustomDashboard,client/src/pages/CustomDashboard.tsx,interactive-review,True,False,False,False,False,True,True,False,False
