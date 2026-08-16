@@ -1,20 +1,12 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import FeatureUnavailable from "@/components/FeatureUnavailable";
 
-const StakingOptions = () => {
+export default function StakingOptions() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">StakingOptions</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            StakingOptions feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
+    <FeatureUnavailable
+      title="Staking Options is not active"
+      description="This wallet or crypto capability contains unverified provider behavior or financial data. It remains gated until authenticated ownership, network/provider validation, transaction status, reconciliation, secure key handling, error recovery, and operational evidence are complete."
+      capability="Staking Options"
+      nextStep="Use the read-only Wallet Overview for persisted account records"
+    />
   );
-};
-
-export default StakingOptions;
+}
