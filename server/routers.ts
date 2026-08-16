@@ -1296,6 +1296,102 @@ export const appRouter = router({
 
   // Admin & Moderation Routers
   admin: createFeatureRouter(),
+  trustSafety: router({
+    getMyTrustScore: protectedProcedure.query(() => ({
+      score: 0,
+      riskLevel: "medium",
+      breakdown: {
+        accountAgeDays: 0,
+        postCount: 0,
+        followersCount: 0,
+        reportCount: 0,
+      },
+    })),
+    getModerationRules: protectedProcedure.query(() => ({
+      rules: [] as Array<{
+        id: number;
+        name: string;
+        ruleType: string;
+        pattern: string;
+        action: string;
+        severity: string;
+        isActive: boolean;
+        triggerCount: number;
+        createdAt: number;
+      }>,
+    })),
+    getModerationActions: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(() => ({
+        actions: [] as Array<{
+          id: number;
+          userId: number;
+          userName: string;
+          userUsername: string;
+          actionType: string;
+          reason: string;
+          contentId: number | null;
+          contentType: string | null;
+          isActive: boolean;
+          expiresAt: number | null;
+          createdAt: number;
+        }>,
+      })),
+    getAuditLog: protectedProcedure
+      .input(
+        z
+          .object({
+            limit: z.number().int().min(1).max(100).optional(),
+            severity: z.string().optional(),
+          })
+          .optional()
+      )
+      .query(() => ({
+        events: [] as Array<{
+          id: number;
+          actorId: number | null;
+          actorName: string;
+          actorType: string;
+          action: string;
+          targetId: number | null;
+          targetType: string | null;
+          details: Record<string, unknown>;
+          ipAddress: string | null;
+          severity: string;
+          createdAt: number;
+        }>,
+      })),
+    getRateLimitStats: protectedProcedure.query(() => ({
+      totalBlockedLastHour: 0,
+      byAction: [] as Array<{
+        actionType: string;
+        eventCount: number;
+        totalRequests: number;
+        blockedCount: number;
+        uniqueUsers: number;
+      }>,
+    })),
+    getSafetyStats: protectedProcedure.query(() => ({
+      trustScores: {
+        avgScore: 0,
+        totalScored: 0,
+        highRisk: 0,
+        criticalRisk: 0,
+      },
+      moderationActions24h: [] as Array<{ count: number }>,
+      totalReports: 0,
+      resolvedReports: 0,
+      activeActions: 0,
+      blockedRequests: 0,
+    })),
+    toggleRule: protectedProcedure
+      .input(z.object({ ruleId: z.number(), isActive: z.boolean() }))
+      .mutation(() => unavailableMutationResult),
+  }),
   moderation: router({
     list: publicProcedure.query(() => []),
     stats: protectedProcedure.input(z.object({}).optional()).query(() => ({
