@@ -1073,7 +1073,7 @@ Gaming,client/src/pages/wave3/Gaming.tsx,blocked-by-type-safety,True,True,False,
 Governance,client/src/pages/wave3/Governance.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Learning,client/src/pages/wave3/Learning.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
 Admin,client/src/pages/wave4/Admin.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-CreatorStudio,client/src/pages/wave4/CreatorStudio.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,True
+CreatorStudio,client/src/pages/wave4/CreatorStudio.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Explore,client/src/pages/wave4/Explore.tsx,blocked-by-type-safety,True,True,False,False,True,False,False,True,True
 Payments,client/src/pages/wave4/Payments.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Security,client/src/pages/wave4/Security.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
