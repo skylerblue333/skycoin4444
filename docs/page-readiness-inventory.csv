@@ -1067,7 +1067,7 @@ Phase20Hub,client/src/pages/phase20/Phase20Hub.tsx,blocked-by-type-safety,False,
 AiCore,client/src/pages/wave2/AiCore.tsx,blocked-by-type-safety,False,True,False,True,True,True,True,True,False
 Marketplace,client/src/pages/wave2/Marketplace.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,True
 Notifications,client/src/pages/wave2/Notifications.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
-Profile,client/src/pages/wave2/Profile.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
+Profile,client/src/pages/wave2/Profile.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 Analytics,client/src/pages/wave3/Analytics.tsx,blocked-by-type-safety,True,True,False,False,True,True,False,True,True
 Gaming,client/src/pages/wave3/Gaming.tsx,blocked-by-type-safety,True,True,False,True,True,True,False,True,False
 Governance,client/src/pages/wave3/Governance.tsx,blocked-by-type-safety,True,True,False,True,True,True,True,True,False
