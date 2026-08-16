@@ -29,6 +29,7 @@ const unavailableMutationResult = {
   apy: 0,
   lockDays: 0,
   burned: 0,
+  id: undefined as string | undefined,
 };
 
 const createFeatureRouter = () =>
@@ -445,12 +446,276 @@ export const appRouter = router({
   aiMarket: createFeatureRouter(),
   aiPersonas: createFeatureRouter(),
   hopeAI: createFeatureRouter(),
-  hopeIntelligence: createFeatureRouter(),
+  hopeIntelligence: router({
+    missions: router({
+      list: publicProcedure.input(z.object({}).optional()).query(
+        () =>
+          [] as Array<{
+            id: number;
+            title: string;
+            description: string;
+            category: string;
+            progress: number;
+            status: string;
+            steps: Array<{
+              id: number;
+              title: string;
+              done: boolean;
+              detail: string;
+            }>;
+          }>
+      ),
+      get: publicProcedure.input(z.object({ id: z.number() })).query(
+        () =>
+          undefined as
+            | {
+                id: number;
+                title: string;
+                description: string;
+                category: string;
+                status: string;
+                steps: Array<{
+                  id: number;
+                  title: string;
+                  done: boolean;
+                  detail: string;
+                }>;
+              }
+            | undefined
+      ),
+      create: protectedProcedure
+        .input(
+          z.object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+            category: z.string().optional(),
+          })
+        )
+        .mutation(() => unavailableMutationResult),
+      toggleStep: protectedProcedure
+        .input(
+          z.object({
+            missionId: z.number(),
+            stepId: z.number(),
+            done: z.boolean(),
+          })
+        )
+        .mutation(() => unavailableMutationResult),
+    }),
+    aiMarketplace: router({
+      list: publicProcedure
+        .input(
+          z
+            .object({ limit: z.number().int().min(1).max(100).optional() })
+            .optional()
+        )
+        .query(
+          () =>
+            [] as Array<{
+              id: number;
+              title: string;
+              description: string;
+              kind: string;
+              priceCents: number;
+              creatorName: string;
+              ratingSum: number;
+              ratingCount: number;
+              sales: number;
+            }>
+        ),
+      balance: protectedProcedure.query(() => ({
+        available: false as const,
+        status: "unavailable" as const,
+        balance: 0,
+        message:
+          "Marketplace balance is unavailable until a verified billing integration is connected.",
+      })),
+      purchase: protectedProcedure
+        .input(z.object({ listingId: z.number() }))
+        .mutation(() => ({
+          ...unavailableMutationResult,
+          content: undefined as string | undefined,
+        })),
+      myPurchases: protectedProcedure.query(
+        () =>
+          [] as Array<{ listingId: number; title: string; purchasedAt: string }>
+      ),
+      rate: protectedProcedure
+        .input(
+          z.object({
+            listingId: z.number(),
+            stars: z.number().int().min(1).max(5),
+            review: z.string().optional(),
+          })
+        )
+        .mutation(() => unavailableMutationResult),
+      create: protectedProcedure
+        .input(
+          z.object({
+            title: z.string().optional(),
+            description: z.string().optional(),
+            kind: z.string().optional(),
+            content: z.string().optional(),
+            priceCents: z.number().int().nonnegative().optional(),
+          })
+        )
+        .mutation(() => unavailableMutationResult),
+    }),
+    opportunities: router({
+      myMatches: protectedProcedure
+        .input(
+          z
+            .object({ limit: z.number().int().min(1).max(100).optional() })
+            .optional()
+        )
+        .query(
+          () =>
+            [] as Array<{
+              id: string;
+              score: number;
+              reasoning: string;
+              opportunityId: string;
+              status: string;
+              opportunity: { title: string; description: string };
+            }>
+        ),
+      network: protectedProcedure
+        .input(
+          z
+            .object({ limit: z.number().int().min(1).max(100).optional() })
+            .optional()
+        )
+        .query(
+          () =>
+            [] as Array<{
+              userId: string;
+              name: string;
+              username: string;
+              avatar: string;
+              mutualCount: number;
+              reputation: number;
+            }>
+        ),
+      refresh: protectedProcedure
+        .input(z.object({}).optional())
+        .mutation(() => ({ ...unavailableMutationResult, scored: 0 })),
+      setStatus: protectedProcedure
+        .input(z.object({ opportunityId: z.string(), status: z.string() }))
+        .mutation(() => unavailableMutationResult),
+    }),
+    reputation: router({
+      me: protectedProcedure.query(() => ({
+        overall: 0,
+        learning: 0,
+        learningScore: 0,
+        builder: 0,
+        builderScore: 0,
+        teaching: 0,
+        teachingScore: 0,
+        community: 0,
+        communityScore: 0,
+        trust: 0,
+        trustScore: 0,
+      })),
+      leaderboard: publicProcedure
+        .input(
+          z
+            .object({ limit: z.number().int().min(1).max(100).optional() })
+            .optional()
+        )
+        .query(
+          () =>
+            [] as Array<{
+              userId: string;
+              name: string;
+              username: string;
+              avatar: string;
+              overall: number;
+            }>
+        ),
+      recompute: protectedProcedure.mutation(() => unavailableMutationResult),
+    }),
+    startup: router({
+      list: protectedProcedure
+        .input(z.object({}).optional())
+        .query(() => [] as Array<{ id: string; name: string; idea: string }>),
+      get: protectedProcedure.input(z.object({ id: z.string() })).query(
+        () =>
+          undefined as
+            | {
+                id: string;
+                name: string;
+                tagline: string;
+                businessPlan: Record<string, unknown>;
+                branding: Record<string, unknown>;
+                marketing: Record<string, unknown>;
+                mvpRoadmap: Array<{ phase: string; items: string[] }>;
+                teamPlan: Array<{ role: string; focus: string }>;
+              }
+            | undefined
+      ),
+      generate: protectedProcedure
+        .input(z.object({ idea: z.string().min(1) }))
+        .mutation(() => unavailableMutationResult),
+    }),
+    missionControl: router({
+      today: protectedProcedure
+        .input(z.object({ withSuggestions: z.boolean().optional() }).optional())
+        .query(() => ({
+          greetingName: "",
+          goals: [] as Array<{ id: string; title: string; status: string }>,
+          activeMissions: [] as Array<{ id: string; title: string }>,
+          learning: [] as Array<{ id: string; title: string }>,
+          unreadMessages: 0,
+          communities: 0,
+          revenue: 0,
+          suggestions: [] as string[],
+          topOpportunities: [] as Array<{
+            id: string;
+            score: number;
+            reasoning: string;
+            opportunity?: { title: string };
+          }>,
+          reputation: {
+            overall: 0,
+            learning: 0,
+            learningScore: 0,
+            builder: 0,
+            builderScore: 0,
+            teaching: 0,
+            teachingScore: 0,
+            community: 0,
+            communityScore: 0,
+            trust: 0,
+            trustScore: 0,
+          },
+          networkSuggestions: [] as Array<{
+            userId: string;
+            name: string;
+            username: string;
+            avatar: string;
+            mutualCount: number;
+            reputation: number;
+          }>,
+        })),
+    }),
+  }),
   agents44: createFeatureRouter(),
 
   // Social & Community Routers
   social: createFeatureRouter(),
-  socialCore: createFeatureRouter(),
+  socialCore: router({
+    list: publicProcedure.query(() => []),
+    createReel: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+    reelsFeed: publicProcedure.query(
+      () => [] as Array<{ id: string; url: string; caption: string }>
+    ),
+    recordEngagement: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+  }),
   feed: router({
     list: publicProcedure
       .input(
@@ -472,7 +737,12 @@ export const appRouter = router({
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
   }),
-  community: createFeatureRouter(),
+  community: router({
+    list: publicProcedure.input(z.object({}).optional()).query(() => []),
+    join: protectedProcedure
+      .input(z.object({ communityId: z.string() }))
+      .mutation(() => unavailableMutationResult),
+  }),
   dm: dmRouter,
   user: userRouter,
   wallet: walletRouter,
@@ -487,8 +757,18 @@ export const appRouter = router({
     subscribeWithStripe: protectedProcedure
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
-    analytics: protectedProcedure.query(() => ({})),
-    earnings: protectedProcedure.query(() => ({})),
+    analytics: protectedProcedure.query(() => ({
+      totalRevenue: 0,
+      subRevenue: 0,
+      tipRevenue: 0,
+      subscriptions: [] as Array<{ id: string; amount: number }>,
+    })),
+    earnings: protectedProcedure.query(() => ({
+      totalRevenue: 0,
+      subRevenue: 0,
+      tipRevenue: 0,
+      subscriptions: 0,
+    })),
     fanScores: protectedProcedure.query(() => []),
     milestones: protectedProcedure.query(() => []),
     mySubscriptions: protectedProcedure.query(() => []),
@@ -498,14 +778,165 @@ export const appRouter = router({
       .input(z.unknown().optional())
       .mutation(() => unavailableMutationResult),
   }),
-  creatorGrowth: createFeatureRouter(),
-  digitalArt: createFeatureRouter(),
+  creatorGrowth: router({
+    list: publicProcedure.query(() => []),
+    getReferralStats: protectedProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      totalReferrals: 0,
+      totalEarned: 0,
+      pendingEarned: 0,
+      message:
+        "Referral data is unavailable until a verified attribution integration is connected.",
+    })),
+    getReferralTree: protectedProcedure.query(() => ({
+      children: [] as Array<{ id: string; name: string }>,
+    })),
+    getMilestones: protectedProcedure.query(() => []),
+    getGrowthAdvice: protectedProcedure.query(() => ({
+      available: false as const,
+      status: "unavailable" as const,
+      advice: [] as string[],
+      message:
+        "Growth advice is unavailable until a verified creator analytics integration is connected.",
+    })),
+  }),
+  digitalArt: router({
+    list: publicProcedure.query(() => []),
+    getPrints: publicProcedure.input(z.object({}).optional()).query(
+      () =>
+        [] as Array<{
+          id: string;
+          title: string;
+          imageUrl: string;
+          series: string;
+          totalEdition: number;
+          edition: number;
+          medium: string;
+          price: number;
+          year: string;
+          dimensions: string;
+        }>
+    ),
+    getSeries: publicProcedure
+      .input(z.object({}).optional())
+      .query(() => [] as Array<{ id: string; title: string }>),
+    checkout: protectedProcedure
+      .input(z.unknown().optional())
+      .mutation(() => unavailableMutationResult),
+  }),
   payments: createFeatureRouter(),
 
   // Blockchain & Crypto Routers
   blockchain: blockchainRouter,
-  staking: createFeatureRouter(),
-  economy: createFeatureRouter(),
+  staking: router({
+    pools: publicProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          name: string;
+          apy: number;
+          lockDays: number;
+          minStake: number;
+          totalStaked: number;
+          participants: number;
+        }>
+    ),
+    userPositions: protectedProcedure.query(
+      () =>
+        [] as Array<{
+          id: number;
+          poolName: string;
+          apy: number;
+          amount: number;
+          earned: number;
+          unlockDate: string;
+          progress: number;
+        }>
+    ),
+    stake: protectedProcedure
+      .input(z.object({ poolId: z.number(), amount: z.number().positive() }))
+      .mutation(() => unavailableMutationResult),
+    claimRewards: protectedProcedure.mutation(() => unavailableMutationResult),
+  }),
+  economy: router({
+    getBalance: protectedProcedure.query(() => ({
+      balance: 0,
+      totalEarned: 0,
+      totalFeesPaid: 0,
+    })),
+    getLedger: protectedProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(() => ({
+        transactions: [] as Array<{
+          id: number;
+          actionType: string;
+          amount: number;
+          fee: number;
+          netAmount: number;
+          direction: string;
+          referenceId: string | null;
+          referenceType: string | null;
+          description: string | null;
+          balanceAfter: number;
+          createdAt: number;
+        }>,
+      })),
+    getFeeSchedule: publicProcedure.query(() => ({
+      flatFees: {} as Record<string, number>,
+      percentageFees: {} as Record<string, number>,
+    })),
+    getTreasuryStats: publicProcedure.query(() => ({
+      grandTotal: 0,
+      byAction: [] as Array<{ action: string; total: number }>,
+    })),
+    getEconomicStats: publicProcedure.query(() => ({
+      activeWallets: 0,
+      totalCirculating: 0,
+      dailyTxCount: 0,
+      dailyTxVolume: 0,
+    })),
+    getRichList: publicProcedure
+      .input(
+        z
+          .object({ limit: z.number().int().min(1).max(100).optional() })
+          .optional()
+      )
+      .query(() => ({
+        richList: [] as Array<{
+          rank: number;
+          userId: number;
+          name: string;
+          username: string;
+          balance: number;
+          totalEarned: number;
+        }>,
+      })),
+    claimWelcomeBonus: protectedProcedure.mutation(() => ({
+      ...unavailableMutationResult,
+      success: false as const,
+      message:
+        "Welcome bonus is unavailable until verified economic persistence is connected.",
+    })),
+    chargeActionFee: protectedProcedure
+      .input(
+        z.object({
+          actionType: z.string().min(1),
+          description: z.string().optional(),
+        })
+      )
+      .mutation(() => ({
+        ...unavailableMutationResult,
+        success: false as const,
+        fee: 0,
+        message:
+          "Action fees are unavailable until verified economic persistence is connected.",
+      })),
+  }),
   gamefi: router({
     list: publicProcedure.query(() => []),
     get: publicProcedure.input(z.unknown().optional()).query(() => ({})),
