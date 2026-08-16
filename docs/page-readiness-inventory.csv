@@ -562,7 +562,7 @@ Messages,client/src/pages/Messages.tsx,integration-backed-review,True,True,False
 MetaversePortal,client/src/pages/MetaversePortal.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MilestoneTracking,client/src/pages/MilestoneTracking.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 MinerDashboard,client/src/pages/MinerDashboard.tsx,static-review,True,False,False,False,False,False,False,False,False
-MiningCalculator,client/src/pages/MiningCalculator.tsx,interactive-review,True,False,False,False,False,True,False,False,True
+MiningCalculator,client/src/pages/MiningCalculator.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MiningDashboard,client/src/pages/MiningDashboard.tsx,integration-backed-review,True,False,True,False,False,True,False,False,False
 MiningPoolSelector,client/src/pages/MiningPoolSelector.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 MissionControl,client/src/pages/MissionControl.tsx,static-review,True,False,False,False,False,False,False,False,False
