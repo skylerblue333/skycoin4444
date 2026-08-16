@@ -597,7 +597,7 @@ MyLearning,client/src/pages/MyLearning.tsx,interactive-review,True,False,False,F
 MyTrips,client/src/pages/MyTrips.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 NFTGallery,client/src/pages/NFTGallery.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 NFTMinting,client/src/pages/NFTMinting.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-NFTWallet,client/src/pages/NFTWallet.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+NFTWallet,client/src/pages/NFTWallet.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 NLPTools,client/src/pages/NLPTools.tsx,interactive-review,True,False,False,False,False,True,True,False,False
 NSFWFeed,client/src/pages/NSFWFeed.tsx,interactive-review,True,False,False,False,False,True,True,False,True
 NSFWPlatform,client/src/pages/NSFWPlatform.tsx,interactive-review,True,False,False,False,False,True,False,False,True
