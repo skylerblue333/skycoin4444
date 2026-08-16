@@ -636,7 +636,7 @@ Pagination,client/src/pages/Pagination.tsx,interactive-review,True,False,False,F
 PasswordInputForm,client/src/pages/PasswordInputForm.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PasswordReset,client/src/pages/PasswordReset.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PayPalIntegration,client/src/pages/PayPalIntegration.tsx,interactive-review,True,False,False,False,False,True,True,False,False
-PaymentConfirmation,client/src/pages/PaymentConfirmation.tsx,interactive-review,True,False,False,False,False,True,False,False,False
+PaymentConfirmation,client/src/pages/PaymentConfirmation.tsx,truthfully-gated,True,False,False,False,False,False,True,False,False
 PaymentInfra,client/src/pages/PaymentInfra.tsx,interactive-review,True,False,False,False,False,True,False,False,True
 PaymentMethods,client/src/pages/PaymentMethods.tsx,interactive-review,True,False,False,False,False,True,False,False,False
 PaymentSetup,client/src/pages/PaymentSetup.tsx,interactive-review,True,False,False,False,False,True,False,False,False
