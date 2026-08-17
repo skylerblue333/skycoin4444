@@ -23,3 +23,7 @@ The screen rendered successfully after the accessibility checkpoint. The visual 
 ## Notification interaction checkpoint
 
 The notification preference controls were exercised in the browser. Changing a preference exposed the `Save changes` action, and activating it produced the success message `Notification preferences saved` with the description `Your delivery choices are applied on this device.` The action then returned to the `Saved` state, confirming the intended loading/success feedback path for this local-only preference workflow.
+
+## Final validation
+
+The focused TypeScript run reports no diagnostics in `AccessibilitySettings.tsx` or `NotificationSettings.tsx`; its non-zero exit is caused by pre-existing shared UI dependency errors in `calendar.tsx`, `chart.tsx`, and `resizable.tsx`. The existing unit-test suite passes: one test file and one test passed. The direct Vite build remains blocked by nine pre-existing unresolved imports in unrelated modules, including missing action types, authentication hooks, shared cards, and empty-state components. The GitHub worktree is clean on branch `manus/accessibility-notification-upgrade` at commit `6e88936`.
