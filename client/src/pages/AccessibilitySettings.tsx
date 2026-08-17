@@ -47,7 +47,34 @@ const defaults: AccessibilityPreferences = {
 function readPreferences(): AccessibilityPreferences {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? { ...defaults, ...JSON.parse(stored) } : defaults;
+    if (!stored) return defaults;
+    const parsed: unknown = JSON.parse(stored);
+    if (!parsed || typeof parsed !== "object") return defaults;
+    const value = parsed as Partial<AccessibilityPreferences>;
+    return {
+      reducedMotion:
+        typeof value.reducedMotion === "boolean"
+          ? value.reducedMotion
+          : defaults.reducedMotion,
+      highContrast:
+        typeof value.highContrast === "boolean"
+          ? value.highContrast
+          : defaults.highContrast,
+      focusIndicators:
+        typeof value.focusIndicators === "boolean"
+          ? value.focusIndicators
+          : defaults.focusIndicators,
+      keyboardShortcuts:
+        typeof value.keyboardShortcuts === "boolean"
+          ? value.keyboardShortcuts
+          : defaults.keyboardShortcuts,
+      textScale:
+        typeof value.textScale === "number" &&
+        value.textScale >= 90 &&
+        value.textScale <= 125
+          ? value.textScale
+          : defaults.textScale,
+    };
   } catch {
     return defaults;
   }
@@ -92,6 +119,9 @@ export default function AccessibilitySettings() {
   const [preferences, setPreferences] =
     useState<AccessibilityPreferences>(defaults);
   const [saved, setSaved] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(
+    "Accessibility preferences are saved."
+  );
 
   useEffect(() => {
     setPreferences(readPreferences());
@@ -108,11 +138,13 @@ export default function AccessibilitySettings() {
   ) => {
     setPreferences(current => ({ ...current, [key]: value }));
     setSaved(false);
+    setStatusMessage("Unsaved accessibility changes.");
   };
 
   const savePreferences = () => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
     setSaved(true);
+    setStatusMessage("Accessibility preferences saved on this device.");
     toast.success("Accessibility preferences saved", {
       description: "Your preferences are applied on this device.",
     });
@@ -122,12 +154,19 @@ export default function AccessibilitySettings() {
     setPreferences(defaults);
     window.localStorage.removeItem(STORAGE_KEY);
     setSaved(true);
+    setStatusMessage("Accessibility preferences reset to defaults.");
     toast.success("Accessibility preferences reset");
   };
 
   return (
-    <div className="min-h-screen bg-muted/20">
+    <div
+      className="min-h-screen bg-muted/20"
+      style={{ fontSize: `${preferences.textScale}%` }}
+    >
       <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-6 lg:p-10">
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {statusMessage}
+        </div>
         <header className="flex flex-col gap-5 border-b border-border/70 pb-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-4">
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
@@ -210,7 +249,10 @@ export default function AccessibilitySettings() {
                         </p>
                       </div>
                     </div>
-                    <span className="rounded-md bg-muted px-2 py-1 text-sm font-medium tabular-nums">
+                    <span
+                      className="rounded-md bg-muted px-2 py-1 text-sm font-medium tabular-nums"
+                      aria-live="polite"
+                    >
                       {preferences.textScale}%
                     </span>
                   </div>

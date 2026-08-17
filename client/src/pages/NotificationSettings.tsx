@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   Check,
+  Clock3,
   Mail,
   MessageSquare,
   RotateCcw,
@@ -36,6 +37,8 @@ type NotificationPreferences = {
   email: boolean;
   push: boolean;
   quietHours: boolean;
+  quietStart: string;
+  quietEnd: string;
 };
 
 const defaults: NotificationPreferences = {
@@ -47,12 +50,47 @@ const defaults: NotificationPreferences = {
   email: true,
   push: true,
   quietHours: false,
+  quietStart: "22:00",
+  quietEnd: "07:00",
 };
 
 function readPreferences(): NotificationPreferences {
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? { ...defaults, ...JSON.parse(stored) } : defaults;
+    if (!stored) return defaults;
+    const parsed: unknown = JSON.parse(stored);
+    if (!parsed || typeof parsed !== "object") return defaults;
+    const value = parsed as Partial<NotificationPreferences>;
+    return {
+      account:
+        typeof value.account === "boolean" ? value.account : defaults.account,
+      security:
+        typeof value.security === "boolean"
+          ? value.security
+          : defaults.security,
+      messages:
+        typeof value.messages === "boolean"
+          ? value.messages
+          : defaults.messages,
+      community:
+        typeof value.community === "boolean"
+          ? value.community
+          : defaults.community,
+      product:
+        typeof value.product === "boolean" ? value.product : defaults.product,
+      email: typeof value.email === "boolean" ? value.email : defaults.email,
+      push: typeof value.push === "boolean" ? value.push : defaults.push,
+      quietHours:
+        typeof value.quietHours === "boolean"
+          ? value.quietHours
+          : defaults.quietHours,
+      quietStart:
+        typeof value.quietStart === "string"
+          ? value.quietStart
+          : defaults.quietStart,
+      quietEnd:
+        typeof value.quietEnd === "string" ? value.quietEnd : defaults.quietEnd,
+    };
   } catch {
     return defaults;
   }
@@ -97,6 +135,9 @@ export default function NotificationSettings() {
   const [preferences, setPreferences] =
     useState<NotificationPreferences>(defaults);
   const [saved, setSaved] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(
+    "Notification preferences are saved."
+  );
 
   useEffect(() => {
     setPreferences(readPreferences());
@@ -112,10 +153,12 @@ export default function NotificationSettings() {
   ) => {
     setPreferences(current => ({ ...current, [key]: value }));
     setSaved(false);
+    setStatusMessage("Unsaved notification changes.");
   };
   const savePreferences = () => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
     setSaved(true);
+    setStatusMessage("Notification preferences saved on this device.");
     toast.success("Notification preferences saved", {
       description: "Your delivery choices are applied on this device.",
     });
@@ -124,12 +167,24 @@ export default function NotificationSettings() {
     setPreferences(defaults);
     window.localStorage.removeItem(STORAGE_KEY);
     setSaved(true);
+    setStatusMessage("Notification preferences reset to defaults.");
     toast.success("Notification preferences reset");
   };
+
+  const enabledCategories = [
+    preferences.security,
+    preferences.account,
+    preferences.messages,
+    preferences.community,
+    preferences.product,
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen bg-muted/20">
       <div className="mx-auto max-w-5xl space-y-8 p-4 sm:p-6 lg:p-10">
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {statusMessage}
+        </div>
         <header className="flex flex-col gap-5 border-b border-border/70 pb-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-4">
             <div className="rounded-2xl bg-primary/10 p-3 text-primary">
@@ -249,12 +304,54 @@ export default function NotificationSettings() {
                   onCheckedChange={value => update("push", value)}
                 />
                 <PreferenceRow
-                  icon={Bell}
+                  icon={Clock3}
                   label="Quiet hours"
                   description="Pause non-essential push notifications during your configured quiet period."
                   checked={preferences.quietHours}
                   onCheckedChange={value => update("quietHours", value)}
                 />
+                {preferences.quietHours && (
+                  <div className="grid gap-4 py-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="quiet-start">Starts</Label>
+                      <select
+                        id="quiet-start"
+                        value={preferences.quietStart}
+                        onChange={event =>
+                          update("quietStart", event.target.value)
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {["20:00", "21:00", "22:00", "23:00", "00:00"].map(
+                          time => (
+                            <option key={time} value={time}>
+                              {time}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="quiet-end">Ends</Label>
+                      <select
+                        id="quiet-end"
+                        value={preferences.quietEnd}
+                        onChange={event =>
+                          update("quietEnd", event.target.value)
+                        }
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {["05:00", "06:00", "07:00", "08:00", "09:00"].map(
+                          time => (
+                            <option key={time} value={time}>
+                              {time}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -278,6 +375,9 @@ export default function NotificationSettings() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Delivery summary</CardTitle>
+                <CardDescription>
+                  {enabledCategories} of 5 notification categories enabled.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
@@ -297,7 +397,9 @@ export default function NotificationSettings() {
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Quiet hours</span>
                   <span className="font-medium">
-                    {preferences.quietHours ? "On" : "Off"}
+                    {preferences.quietHours
+                      ? `${preferences.quietStart}–${preferences.quietEnd}`
+                      : "Off"}
                   </span>
                 </div>
               </CardContent>
