@@ -103,26 +103,21 @@ export default function Profile() {
     onError: (err) => toast.error(err.message),
   });
 
-  const followUser = trpc.user.follow.useMutation({
-    onSuccess: () => toast.success("Following!"),
-    onError: () => toast.error("Failed to follow"),
-  });
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => toast.success("Profile updated!"),
     onError: () => toast.error("Update failed"),
   });
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const bannerInputRef = useRef<HTMLInputElement>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
   const isOwnProfile = !username || (me && (profileData as any)?.id === me.id);
   const profile = (profileData as any) || me;
 
   const uploadAvatar = trpc.user.uploadAvatar.useMutation({
-    onSuccess: (data, vars) => {
-      toast.success(vars.type === "avatar" ? "Avatar updated!" : "Banner updated!");
+    onSuccess: () => {
+      toast.success("Avatar updated!");
+      void utils.user.profile.invalidate();
     },
     onError: (err) => toast.error("Upload failed: " + err.message),
   });
@@ -136,19 +131,6 @@ export default function Profile() {
       const dataUrl = ev.target?.result as string;
       setAvatarPreview(dataUrl);
       uploadAvatar.mutate({ data: dataUrl, type: "avatar", mimeType: file.type || "image/jpeg" });
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const dataUrl = ev.target?.result as string;
-      setBannerPreview(dataUrl);
-      uploadAvatar.mutate({ data: dataUrl, type: "banner", mimeType: file.type || "image/jpeg" });
     };
     reader.readAsDataURL(file);
   };
@@ -174,10 +156,9 @@ export default function Profile() {
     );
   }
 
-  const displayName = profile.displayName || profile.name || "User";
-  const handle = profile.username ? `@${profile.username}` : `@user${profile.id}`;
+  const displayName = profile.name || "User";
+  const handle = profile.username ? `@${profile.username}` : "@unclaimed";
   const avatar = avatarPreview || profile.avatar;
-  const banner = bannerPreview || profile.banner;
 
   const ACHIEVEMENT_ICONS: Record<string, string> = {
     first_post: "📝", first_follow: "👥", first_like: "❤️", verified: "✅",
@@ -189,21 +170,9 @@ export default function Profile() {
     <div className="min-h-screen bg-[#07050f]">
       {/* Banner */}
       <div className="relative h-48 md:h-64 overflow-hidden">
-        {banner ? (
-          <img src={banner} alt="Banner" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full" style={{ background: "linear-gradient(135deg, oklch(0.25 0.15 305), oklch(0.20 0.12 340), oklch(0.18 0.10 200))" }} />
-        )}
+        <div className="w-full h-full" style={{ background: "linear-gradient(135deg, oklch(0.25 0.15 305), oklch(0.20 0.12 340), oklch(0.18 0.10 200))" }} />
         <div className="absolute inset-0 bg-gradient-to-t from-[#07050f] via-transparent to-transparent" />
-        {isOwnProfile && (
-          <>
-            <input ref={bannerInputRef} type="file" accept="image/*" className="hidden" onChange={handleBannerChange} />
-            <button onClick={() => bannerInputRef.current?.click()}
-              className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur text-white/70 hover:text-white text-xs font-medium transition-all hover:bg-black/70">
-              <Camera className="w-3.5 h-3.5" /> Edit Banner
-            </button>
-          </>
-        )}
+
       </div>
 
       <div className="max-w-screen-xl mx-auto px-4">
@@ -242,9 +211,8 @@ export default function Profile() {
                   </Button>
                 </Link>
               ) : isAuthenticated ? (
-                <Button size="sm" onClick={() => followUser.mutate({ userId: profile.id })}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white border-0 gap-1.5">
-                  <UserPlus className="w-3.5 h-3.5" /> Follow
+                <Button size="sm" disabled variant="outline" className="border-white/10 text-white/40 bg-transparent gap-1.5">
+                  <UserPlus className="w-3.5 h-3.5" /> Follow unavailable
                 </Button>
               ) : (
                 <a href={getLoginUrl()}>
@@ -264,15 +232,9 @@ export default function Profile() {
               <h1 className="text-2xl font-bold text-white">{displayName}</h1>
               {profile.verified && <CheckCircle2 className="w-5 h-5 text-blue-400" />}
               {profile.role === "admin" && <Shield className="w-4 h-4 text-yellow-400" />}
-              {profile.level >= 5 && <Crown className="w-4 h-4 text-yellow-400" />}
             </div>
             <p className="text-sm text-white/40 mb-2">{handle}</p>
-            <div className="flex items-center gap-2 flex-wrap mb-3">
-              <LevelBadge level={profile.level || 1} />
-              <ReputationBadge score={profile.reputation || 0} />
-              {profile.isCreator && <Badge className="text-xs bg-pink-500/10 text-pink-400 border-pink-500/20">Creator</Badge>}
-              {profile.isStreamer && <Badge className="text-xs bg-red-500/10 text-red-400 border-red-500/20">Streamer</Badge>}
-            </div>
+            <div className="mb-3 text-xs text-white/40">Account metadata is limited to verified profile records.</div>
 
             {profile.bio && <p className="text-sm text-white/70 leading-relaxed mb-3 max-w-xl">{profile.bio}</p>}
 
@@ -286,20 +248,7 @@ export default function Profile() {
               {profile.createdAt && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Joined {new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span>}
             </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-6 text-sm">
-              {[
-                { label: "Posts", value: profile.postCount || userPosts.length || 0 },
-                { label: "Followers", value: profile.followerCount || 0 },
-                { label: "Following", value: profile.followingCount || 0 },
-                { label: "XP", value: profile.xp || 0, icon: <Zap className="w-3 h-3 text-yellow-400" /> },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <div className="flex items-center gap-1 font-bold text-white">{s.icon}{s.value.toLocaleString()}</div>
-                  <div className="text-xs text-white/40">{s.label}</div>
-                </div>
-              ))}
-            </div>
+            <div className="text-sm text-white/50">{userPosts.length} persisted post{userPosts.length === 1 ? "" : "s"}</div>
           </div>
         </div>
 
