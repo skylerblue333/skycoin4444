@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "client/src/pages/AccessibilitySettings.tsx",
+    "client/src/pages/NotificationSettings.tsx",
+    "client/src/components/ui/**/*.tsx",
+    "client/src/lib/**/*.ts"
+  ]
+}
