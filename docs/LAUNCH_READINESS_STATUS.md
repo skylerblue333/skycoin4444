@@ -2,7 +2,7 @@
 
 **Assessment date:** August 16, 2026  
 **Branch:** `restore/error-free-baseline`  
-**Latest checkpoint:** `5551376`  
+**Latest checkpoint:** `b55220c`  
 **Release label:** **Code-green launch candidate; GA not authorized**
 
 ## Honest percentage
