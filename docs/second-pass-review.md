@@ -33,3 +33,7 @@ The second-pass screen renders successfully. The live region exposes the initial
 **Screenshot:** `/home/ubuntu/screenshots/127_0_0_1_2026-08-17_09-13-41_8413.webp`
 
 The second-pass screen renders successfully. The delivery summary now reports `4 of 5 notification categories enabled`, the quiet-hours switch reveals labeled `Starts` and `Ends` selectors, the summary reflects the real `22:00–07:00` local window, and the live region reports `Unsaved notification changes.` after interaction. The browser checkpoint confirms the new controls are discoverable and the layout remains readable, with expected content extending below the viewport rather than being compressed.
+
+## Validation
+
+Prettier reports all second-pass files formatted. The existing unit-test suite passes with one test file and one test. The focused TypeScript run reports no diagnostics in either upgraded page; its non-zero exit remains attributable to pre-existing shared UI dependency errors in `calendar.tsx`, `chart.tsx`, and `resizable.tsx`. The branch remains isolated to the two settings screens and review documentation.
