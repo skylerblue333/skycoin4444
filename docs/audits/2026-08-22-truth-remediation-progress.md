@@ -92,3 +92,7 @@ Checkpoint `1e31d67` replaces fabricated creator monetization charts, payout his
 ## ShadowChat-Core portfolio metrics safety remediation (2026-08-22)
 
 ShadowChat-Core checkpoint `9f9d287` disables unverifiable portfolio metrics in the phase-21 realtime router rather than presenting fabricated values. GitHub Actions run `32575543084` completed successfully with install, typecheck, tests, and production build. This is a safety correction and does not establish a live portfolio data provider or financial reporting system.
+
+## Latest creator-contract remote status (2026-08-22)
+
+The creator monetization truth-boundary change remains published at `1e31d67`. Its Pages deployment run `32575633984` completed successfully, while CI run `32575634866` completed with failure from the unresolved repository-wide legacy TypeScript contract backlog. This confirms deployability of the audit site but not full application CI health.
