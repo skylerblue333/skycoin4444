@@ -272,3 +272,7 @@ Canonical checkpoint `c31584c` replaces the mock VideoArea with a typed unavaila
 ## WhaleMonitor Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `b167f3d` replaces the simulated WhaleMonitor with a typed unavailable-state page. It removes fabricated transactions, wallet addresses, token amounts, USD valuations, impact labels, live-feed status, volume totals, and largest-transaction claims. Local `pnpm run check` reduced the reproducible backlog from 451 to 450 errors. Remote Actions run `32592581636` failed on remaining `TokenDashboard`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts; WhaleMonitor and its former token.whaleAlerts procedure error are absent from the reported failures.
+
+## TokenDashboard Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `fbb726a` replaces the unsupported TokenDashboard with a typed unavailable-state page. It removes hard-coded token allocation, supply, burn history, holder counts, staking ratio, governance activity, and unsupported token metrics claims. Local `pnpm run check` reduced the reproducible backlog from 450 to 446 errors. Remote Actions run `32592644021` failed on remaining `TipJar`, `TournamentBracket`, `UniversalSearch`, `StartupSection`, and other unrelated contracts; TokenDashboard and its former token metrics/burnHistory errors are absent from the reported failures.
