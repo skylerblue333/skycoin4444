@@ -188,3 +188,7 @@ Canonical checkpoint `d250f60` replaces the unsupported Economic Layer with a ty
 ## Staking Portal Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `381d45d` replaces the unsupported Staking Portal with a typed unavailable-state page. It removes hard-coded APY history, reward projections, pool totals, participant counts, audited-security claims, unlock schedules, and staking or reward-claim mutation claims. Local `pnpm run check` reduced the reproducible backlog from 627 to 610 errors. Remote Actions run `32590523043` failed on unrelated remaining client tRPC contracts; StakingPortal and its former staking procedure errors are absent from the reported failures.
+
+## Blockchain Custody Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `e6ccf98` replaces the unsupported Blockchain Custody page with a typed unavailable-state page. It removes unverified non-custodial, HD-derivation, ephemeral-key, on-chain-balance, signing, transaction-hash, confirmation, and network-broadcast claims. Local `pnpm run check` reduced the reproducible backlog from 610 to 587 errors. Remote Actions run `32590593784` failed on unrelated remaining client tRPC contracts; BlockchainCustody and its former blockchain procedure errors are absent from the reported failures.
