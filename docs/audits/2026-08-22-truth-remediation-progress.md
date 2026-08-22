@@ -88,3 +88,7 @@ ShadowChat-Core checkpoint `0176609` disables unverifiable wallet operations ins
 ## Creator monetization truth boundary checkpoint (2026-08-22)
 
 Checkpoint `1e31d67` replaces fabricated creator monetization charts, payout history, revenue totals, subscriptions, milestones, and AI advice with an explicit unavailable state. GitHub Pages deployment run `32575487738` succeeded. CI run `32575488250` remains failed because the repository-wide legacy TypeScript contract backlog persists; this targeted screen no longer calls the nonexistent creator procedures. The checkpoint is published, but the canonical repository is not fully green.
+
+## ShadowChat-Core portfolio metrics safety remediation (2026-08-22)
+
+ShadowChat-Core checkpoint `9f9d287` disables unverifiable portfolio metrics in the phase-21 realtime router rather than presenting fabricated values. GitHub Actions run `32575543084` completed successfully with install, typecheck, tests, and production build. This is a safety correction and does not establish a live portfolio data provider or financial reporting system.
