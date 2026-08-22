@@ -256,3 +256,7 @@ Canonical checkpoint `074d99d` replaces the mock translated social feed with a t
 ## Trading Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `2c2c2c6` replaces the mock Trading terminal with a typed unavailable-state page. It removes hard-coded market prices, volumes, portfolio value, P&L, open orders, bot counts, signals, and trading-entry claims. Local `pnpm run check` reduced the reproducible backlog from 455 to 454 errors. Remote Actions run `32592126174` failed on remaining `AITrading`, `CodeQuality`, `Growth`, `TournamentBracket`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; Trading and its former StatCard mismatch are absent from the reported failures.
+
+## AI Trading Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `70fd02f` replaces the mock AI Trading page with a typed unavailable-state page. It removes fabricated performance metrics, active capability claims, automated execution promises, wallet-optimization claims, and the unsupported token metrics query. Local `pnpm run check` reduced the reproducible backlog from 454 to 453 errors. Remote Actions run `32592198990` failed on remaining `TournamentBracket`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; AITrading and its former token metrics error are absent from the reported failures.
