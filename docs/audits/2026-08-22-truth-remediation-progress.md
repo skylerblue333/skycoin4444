@@ -216,3 +216,7 @@ Canonical checkpoint `af44801` replaces the unsupported OpportunitiesSection wit
 ## Mission-control MissionsSection Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `9270f99` replaces the unsupported MissionsSection with a typed unavailable-state page. It removes unverified mission creation, AI step-plan generation, progress values, completion state, and step mutations. Local `pnpm run check` reduced the reproducible backlog from 515 to 502 errors. Remote Actions run `32591351867` failed on remaining `MarketplaceSection` and `StartupSection` contracts; MissionsSection and its former missions procedure errors are absent from the reported failures.
+
+## Mission-control MarketplaceSection Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `5be3ac5` replaces the unsupported MarketplaceSection with a typed unavailable-state page. It removes unverified token balances, listings, prices, sales, ratings, purchases, unlocked content, creator earnings, and payment-settlement claims. Local `pnpm run check` reduced the reproducible backlog from 502 to 487 errors. Remote Actions run `32591414764` failed on remaining `WorldBrain`, `WorldSimulationControl`, and `StartupSection` contracts; MarketplaceSection and its former aiMarketplace procedure errors are absent from the reported failures.
