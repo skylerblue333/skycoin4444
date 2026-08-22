@@ -311,52 +311,39 @@ function LearnPanel() {
 }
 
 function ModulesPanel() {
-  const { data: modStats } = trpc.moderation.stats.useQuery();
-  const { data: platformStats } = trpc.platform.stats.useQuery();
-  const totalUsers = platformStats?.totalUsers || 0;
+  const { data: models, isLoading } = trpc.ai.getModels.useQuery();
+  const availableModels = models ?? [];
 
   return (
     <div className="p-4 overflow-y-auto h-full">
       <div className="grid grid-cols-2 gap-3 mb-6">
-        {[
-          { label: "AI Models Active", value: "3", sub: "GPT-4o · Claude · Gemini", color: "text-primary" },
-          { label: "Total Users Served", value: totalUsers.toLocaleString(), sub: "Platform-wide", color: "text-purple-400" },
-          { label: "Moderation Actions", value: (modStats?.totalActions || 0).toLocaleString(), sub: "Auto-flagged", color: "text-yellow-400" },
-          { label: "Avg Response Time", value: "<200ms", sub: "Edge inference", color: "text-cyan-400" },
-        ].map((stat, i) => (
-          <div key={i} className="p-4 rounded-xl bg-secondary/30 border border-border/40">
-            <div className={`text-2xl font-bold font-mono mb-1 ${stat.color}`}>{stat.value}</div>
-            <div className="text-xs font-medium">{stat.label}</div>
-            <div className="text-[10px] text-muted-foreground">{stat.sub}</div>
+        <div className="p-4 rounded-xl bg-secondary/30 border border-border/40 col-span-2">
+          <div className="text-2xl font-bold font-mono mb-1 text-primary">
+            {isLoading ? "…" : availableModels.length}
           </div>
-        ))}
+          <div className="text-xs font-medium">Provider models available</div>
+          <div className="text-[10px] text-muted-foreground">
+            {availableModels.length > 0 ? "Reported by the configured server-side provider" : "No configured provider model list is available"}
+          </div>
+        </div>
       </div>
-      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">AI Modules</p>
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">AI modules</p>
       <div className="grid grid-cols-1 gap-3">
         {AI_MODULES.map((mod, i) => {
           const Icon = mod.icon;
-          const realAccuracy = mod.name === "Content Moderation" && modStats?.accuracy ? Math.round(modStats.accuracy * 100) : mod.accuracy;
           return (
-            <div key={i} className="p-4 rounded-xl bg-secondary/20 border border-border/40 hover:border-border/60 transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: `${mod.color}22` }}>
+            <div key={i} className="p-4 rounded-xl bg-secondary/20 border border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: `${mod.color}22` }}>
                   <Icon className="w-4 h-4" style={{ color: mod.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium">{mod.name}</span>
-                    <Badge variant="outline" className="text-[10px] border-purple-500/30 text-purple-400">ACTIVE</Badge>
+                    <Badge variant="outline" className="text-[10px] border-border/40 text-muted-foreground">Provider-backed when configured</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">{mod.description}</p>
+                  <p className="text-xs text-muted-foreground">{mod.description}</p>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-secondary/50 rounded-full h-1.5">
-                  <div className="h-1.5 rounded-full bg-gradient-to-r from-primary to-primary/60 transition-all"
-                    style={{ width: `${realAccuracy}%` }} />
-                </div>
-                <span className="text-xs font-mono text-muted-foreground shrink-0">{realAccuracy}%</span>
               </div>
             </div>
           );

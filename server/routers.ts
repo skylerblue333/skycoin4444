@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
+import { aiRouter } from "./routers/ai";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -26,7 +27,7 @@ export const appRouter = router({
   }),
 
   // AI & Agents Routers
-  ai: createFeatureRouter(),
+  ai: aiRouter,
   aiEngineer: createFeatureRouter(),
   aiMarket: createFeatureRouter(),
   aiPersonas: createFeatureRouter(),
