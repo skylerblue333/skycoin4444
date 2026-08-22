@@ -22,6 +22,8 @@ Every repository listed below was checked after publication by comparing the loc
 | `ShadowChat-Pro` | `main` | PASS |
 | `Skycoin-Migration-Tools` | `main` | PASS |
 
+The five missing repositories were created as private repositories and received their initial commits on `main`: `Elite-FullStack-Production-App`, `Skycoin-v44-Protocol`, `ShadowChat-Gateway`, `ShadowChat-Pro`, and `Skycoin-Migration-Tools`. Each local `HEAD` matched the remote branch after publication.
+
 The `frontendpages` audit commit was also verified after resolving a non-fast-forward push caused by concurrent remote commits. The final local and remote `master` SHA matched, and the screen inventory document was confirmed present on GitHub.
 
 ## Frontendpages measured state
