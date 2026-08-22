@@ -108,3 +108,7 @@ ShadowChat-Core checkpoint `2026757` integrates the validated messaging foundati
 ## Creator dashboard remote status (2026-08-22)
 
 Checkpoint `3735e0a` removes fabricated creator dashboard metrics and nonexistent creator API calls; targeted CreatorDashboard errors are zero and the production build passes locally. GitHub Pages deployment run `32575976385` succeeded. Canonical CI run `32575976861` failed because 715 unrelated legacy TypeScript errors remain elsewhere in the repository. The change is published and SHA-verified, but the repository-wide gate is not green.
+
+## Current canonical audit gate status (2026-08-22)
+
+For audit checkpoint `aba4b98`, Pages deployment run `32576030548` completed successfully, while CI run `32576031268` completed with failure from the remaining repository-wide legacy TypeScript contract backlog. ShadowChat-Core remains remote-green at product checkpoint `2026757` with Actions run `32575769807` successful. Deployment availability and application validation are intentionally reported as separate metrics.
