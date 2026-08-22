@@ -13,6 +13,8 @@ This checkpoint records real changes that were implemented, tested, and verified
 | `TS-React-Dashboard` | Removed fabricated users, revenue, uptime, and chart data; introduced an explicit metrics-provider boundary and unavailable response | TypeScript build and 2 Jest tests pass | [`193da18`](https://github.com/skylerblue333/TS-React-Dashboard/commit/193da1890d31514567af05ef61c097d01c5949f5) |
 | `TS-Express-API` | Typed payload validation, bounded JSON body, controlled CORS, request IDs, safe error behavior, corrected build boundary | TypeScript build and 4 Jest tests pass | [`3c7e582`](https://github.com/skylerblue333/TS-Express-API/commit/3c7e58281a25c0a55f43db2d3ab420091794b1bb) |
 | `skycoin-security` | Typed AES-256-GCM primitive, strict validation, real package scripts, executable tamper tests, explicit exclusion of broken AI drafts | Build, lint, and encryption tests pass | [`9f7639a`](https://github.com/skylerblue333/skycoin-security/commit/9f7639a0b0bbebdf2294e65c53c437fb6e43febc) |
+| `Go-Rate-Limiter` | Fractional token refill, stoppable cleanup, positive configuration validation, client-IP parsing, race-safe tests | `go test -race ./...` and `go vet ./...` pass | [`402b05e`](https://github.com/skylerblue333/Go-Rate-Limiter/commit/402b05ef17028d4827d2772880da36e150ddad63) |
+| `Python-Feature-Flag-Service` | Validated flag schemas, deterministic SHA-256 rollout, duplicate protection, safe defaults | 5 pytest tests pass; legacy FastAPI deprecation warnings remain in a separate app | [`ff4f489`](https://github.com/skylerblue333/Python-Feature-Flag-Service/commit/ff4f489531e81cc9e7714f35e9f155498f215c3b) |
 
 ## Remaining truth gaps
 
