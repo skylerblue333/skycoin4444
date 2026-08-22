@@ -208,3 +208,7 @@ Canonical checkpoint `d83e818` replaces the unsupported mission-control TodaySec
 ## Mission-control ReputationSection Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `0a63461` replaces the unsupported ReputationSection with a typed unavailable-state page. It removes unverified overall and category reputation scores, leaderboard rankings, and recomputation claims. Local `pnpm run check` reduced the reproducible backlog from 534 to 526 errors. Remote Actions run `32590901481` failed on remaining `OpportunitiesSection` and `StartupSection` contracts; ReputationSection and its former reputation procedure errors are absent from the reported failures.
+
+## Mission-control OpportunitiesSection Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `af44801` replaces the unsupported OpportunitiesSection with a typed unavailable-state page. It removes unverified AI match scores, reasoning, network suggestions, reputation values, and saved/dismissed mutations. Local `pnpm run check` reduced the reproducible backlog from 526 to 515 errors. Remote Actions run `32591285286` failed on remaining `MissionsSection` and `StartupSection` contracts; OpportunitiesSection and its former opportunities procedure errors are absent from the reported failures.
