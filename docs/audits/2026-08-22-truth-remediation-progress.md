@@ -60,3 +60,7 @@ The persisted conversation query now returns messages in both directions between
 ## ShadowChat-Core authenticated realtime stream checkpoint (2026-08-22)
 
 ShadowChat-Core now exposes an authenticated SSE endpoint for a selected conversation, backed by a typed in-process subscriber hub. Persisted direct-message sends publish to both participants, and hub tests cover participant fan-out and unsubscribe cleanup. Checkpoint `bd35e2b` passed GitHub Actions run `32574773129` with locked install, typecheck, full tests, and production build. The transport is explicitly in-process only; cross-instance delivery, live deployment, and human two-browser acceptance remain unverified.
+
+## ShadowChat-Core notification consistency checkpoint (2026-08-22)
+
+The latest concurrent ShadowChat-Core checkpoint clears persisted user notifications through the real notification path rather than leaving stale records. Checkpoint `bca7c64` passed GitHub Actions run `32574865680`; local validation measured 15 test files and 73 tests, with typecheck and production build passing. The product branch is SHA-verified; the canonical audit repository itself still has a separate legacy typecheck failure unrelated to this checkpoint.
