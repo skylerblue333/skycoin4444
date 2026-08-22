@@ -136,3 +136,7 @@ ShadowChat-Core checkpoint `f8d0190` disables unverifiable bot trades rather tha
 ## ShadowChat-Core missing trading-bot reporting checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `8696df7` reports missing trading-bot state explicitly instead of manufacturing rows. GitHub Actions run `32578264149` completed successfully with install, typecheck, tests, and production build. This is a truthful unavailable-state improvement and does not establish live bot execution, exchange connectivity, or trading performance.
+
+## Canonical CI contract finding (2026-08-22)
+
+Actions run `32578238382` for audit commit `6a3cddb` failed during TypeScript validation. The current failure includes stale mission-control callers (`hopeIntelligence.missionControl.today` and `hopeIntelligence.startup.*`) against a generic feature router that does not expose those procedures, plus missing `server/storage` resolution, an `AuthenticatedUser` shape mismatch, an unsafe dynamic database index, and additional legacy implicit-any errors. These findings are recorded as unresolved technical debt; no claim of canonical-repository CI readiness is made.
