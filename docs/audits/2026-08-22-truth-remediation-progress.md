@@ -248,3 +248,7 @@ Canonical checkpoint `cce5a78` replaces the unrestricted UnhiddenInterface with 
 ## TrustSafetyDashboard Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `3b81020` replaces the unsupported TrustSafetyDashboard with a typed availability page. It removes unverified trust scores, risk levels, moderation rules and actions, audit events, rate-limit telemetry, and security-coverage claims. Local `pnpm run check` reduced the reproducible backlog from 465 to 456 errors. Remote Actions run `32591973411` failed on remaining `StatCard` typing, `TranslationLayer` import, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; TrustSafetyDashboard and its former trustSafety procedure errors are absent from the reported failures.
+
+## TranslationEnabledSocialFeed Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `074d99d` replaces the mock translated social feed with a typed unavailable-state page. It removes fabricated posts, translations, authors, timestamps, engagement counts, and social mutations until verified feed and translation procedures exist. Local `pnpm run check` reduced the reproducible backlog from 456 to 455 errors. Remote Actions run `32592056765` failed on remaining `TournamentBracket`, `Trading`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; TranslationEnabledSocialFeed and its former missing TranslationLayer error are absent from the reported failures.
