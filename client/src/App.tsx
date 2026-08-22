@@ -851,7 +851,7 @@ const SituationRoom = lazy(() => import('./pages/SituationRoom'));
 const SkillBadges = lazy(() => import('./pages/SkillBadges'));
 const SkySchool = lazy(() => import('./pages/SkySchool'));
 const SkySchoolAI = lazy(() => import('./pages/SkySchoolAI'));
-const SkySchoolQuiz = lazy(() => import('./pages/SkySchoolQuiz'));
+const SkySchoolQuiz = lazy(() => import('./pages/SkySchoolQuiz').then(({ default: QuizPage }) => ({ default: () => <QuizPage lessonId="blockchain-101-lesson-0" /> })));
 const SkyStore = lazy(() => import('./pages/SkyStore'));
 const SlackIntegration = lazy(() => import('./pages/SlackIntegration'));
 const SleepTracking = lazy(() => import('./pages/SleepTracking'));
