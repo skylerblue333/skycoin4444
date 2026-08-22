@@ -100,3 +100,7 @@ The creator monetization truth-boundary change remains published at `1e31d67`. I
 ## ShadowChat-Core market-feed safety remediation (2026-08-22)
 
 ShadowChat-Core checkpoint `76a4ff2` disables unverifiable market feeds in the phase-21 realtime router instead of presenting unsupported market data as live. GitHub Actions run `32575654579` completed successfully with install, typecheck, tests, and production build. This is a safety correction and does not establish a live market-data provider, exchange integration, or financial reporting system.
+
+## ShadowChat-Core integrated product baseline (2026-08-22)
+
+ShadowChat-Core checkpoint `2026757` integrates the validated messaging foundation with concurrent safety corrections: duplicate stub-router removal, disabled unverifiable wallet operations, disabled unsupported portfolio and market feeds, explicit alert-source labeling, and query-aware social search. Local validation passed typecheck, production build, and 15 test files with 73 tests. GitHub Actions run `32575769807` completed successfully. This baseline still does not claim live custody, exchange settlement, market-data coverage, cross-instance realtime scale, or production deployment.
