@@ -204,3 +204,7 @@ Canonical checkpoint `ae183ba` replaces the unsupported AIBrain surface with a t
 ## Mission-control TodaySection Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `d83e818` replaces the unsupported mission-control TodaySection with a typed unavailable-state page. It removes unverified revenue, reputation, opportunity-ranking, activity-count, community-count, and AI recommendation claims. Local `pnpm run check` reduced the reproducible backlog from 539 to 534 errors. Remote Actions run `32590829834` failed on remaining `ReputationSection` and `StartupSection` contracts; TodaySection and its former `missionControl.today` errors are absent from the reported failures.
+
+## Mission-control ReputationSection Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `0a63461` replaces the unsupported ReputationSection with a typed unavailable-state page. It removes unverified overall and category reputation scores, leaderboard rankings, and recomputation claims. Local `pnpm run check` reduced the reproducible backlog from 534 to 526 errors. Remote Actions run `32590901481` failed on remaining `OpportunitiesSection` and `StartupSection` contracts; ReputationSection and its former reputation procedure errors are absent from the reported failures.
