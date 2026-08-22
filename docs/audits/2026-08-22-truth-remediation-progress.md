@@ -36,3 +36,7 @@ Verified diagnostics include `server/streaming-engine.ts` errors at lines 475, 4
 ## skycoin44-backend foundation checkpoint (2026-08-22)
 
 The documentation-only `skycoin44-backend` repository was converted into a bounded typed Express service. It now implements `/health`, `/ready`, structured 404 responses, a 32 KiB JSON body limit, port validation, a structured startup event, strict TypeScript compilation, three executable HTTP tests, a pnpm lockfile, and pull-request CI. Its README explicitly states that database, wallet custody, blockchain, AI-provider, financial-data, authentication, authorization, persistence, and deployment capabilities are not implemented. Local build and tests passed; the published and SHA-verified commit is `19c6464`.
+
+## skycoin44-backend measured metrics checkpoint (2026-08-22)
+
+The backend now exposes `GET /metrics` with measured process uptime and Node memory usage, and its test command explicitly sets `NODE_ENV=test` to prevent a test server from starting. The concurrent checkpoint was authored by `skylerblue333`, passed the remote GitHub Actions run, and is verified at `skycoin44-backend` commit `0fdd655`. The metrics are runtime measurements only; they are not uptime, traffic, latency, deployment, or business metrics.
