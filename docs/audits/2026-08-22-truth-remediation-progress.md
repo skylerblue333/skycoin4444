@@ -128,3 +128,7 @@ ShadowChat-Core checkpoint `249866b` persists a bounded trading-bot lifecycle in
 ## ShadowChat-Core persisted bot-performance checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `4d2a54b` aggregates bot performance from persisted lifecycle records. GitHub Actions run `32578034096` completed successfully with install, typecheck, tests, and production build. These are application-level aggregates over stored records only; they are not evidence of live exchange execution, profitable trading, market-data completeness, or financial performance.
+
+## ShadowChat-Core bot-trade safety checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `f8d0190` disables unverifiable bot trades rather than simulating execution. GitHub Actions run `32578144051` completed successfully with install, typecheck, tests, and production build. Persisted lifecycle records remain available for bounded inspection; no live exchange execution, order settlement, profitability, or financial performance claim is made.
