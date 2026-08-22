@@ -284,3 +284,7 @@ Canonical checkpoint `6bc6e8c` replaces the mock TipJar with a typed unavailable
 ## StripeCheckout Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `db1fe93` replaces the mock Stripe checkout with a typed unavailable-state page. It removes unverified subscription plans, prices, promo codes, security/compliance badges, guarantees, fallback checkout success, and activation claims. Local `pnpm run check` reduced the reproducible backlog from 445 to 443 errors. Remote Actions run `32592800218` failed on remaining `StreamGifting`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; StripeCheckout and its former payments.createStripeCheckout error are absent from the reported failures.
+
+## StreamGifting Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `ecb3492` replaces the simulated StreamGifting surface with a typed unavailable-state page. It removes fabricated streams, viewer counts, balances, gifts, gift animations, leaderboards, recent activity, local balance deductions, top-ups, and success messages. Local `pnpm run check` reduced the reproducible backlog from 443 to 441 errors. Remote Actions run `32592887767` failed on remaining `Stories`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; StreamGifting and its former missing identity/gifting errors are absent from the reported failures.
