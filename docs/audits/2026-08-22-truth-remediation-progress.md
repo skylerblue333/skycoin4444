@@ -112,3 +112,7 @@ Checkpoint `3735e0a` removes fabricated creator dashboard metrics and nonexisten
 ## Current canonical audit gate status (2026-08-22)
 
 For audit checkpoint `aba4b98`, Pages deployment run `32576030548` completed successfully, while CI run `32576031268` completed with failure from the remaining repository-wide legacy TypeScript contract backlog. ShadowChat-Core remains remote-green at product checkpoint `2026757` with Actions run `32575769807` successful. Deployment availability and application validation are intentionally reported as separate metrics.
+
+## Current audit workflow verification (2026-08-22)
+
+For canonical audit checkpoint `4bc9e42`, Pages deployment run `32576085248` completed successfully, while CI run `32576085911` completed with failure from the known repository-wide legacy TypeScript contract backlog. ShadowChat-Core checkpoint `2026757` remains remote-green under Actions run `32575769807`. These statuses are reported separately and no release claim is made for the CI-red audit repository.
