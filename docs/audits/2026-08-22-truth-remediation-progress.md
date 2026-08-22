@@ -160,3 +160,7 @@ Audit commit `defd480` is synchronized to origin. Actions run `32578736667` fail
 ## ShadowChat-Core anomaly-detection Truth-Mode checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `5c51954` removes fabricated anomaly detections and returns an explicit unavailable state until privacy-reviewed telemetry and a validated detection model exist. Local typecheck passed; focused router tests passed with 31 tests. GitHub Actions run `32580712425` completed successfully. No behavioral risk score, anomaly event, or security conclusion is claimed.
+
+## Agent Economy Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `9d379fa` replaces the unbacked Agent Economy dashboard with a typed unavailable-state page. It removes missing `enterprise.freeWill` client calls and fabricated agent counts, earnings, rewards, and efficiency metrics. Local `pnpm run check` reduced the reproducible backlog from 711 to 709 errors. Remote Actions run `32589822719` failed on remaining unrelated client tRPC contract debt; `AIAgentEconomy.tsx` and its former `freeWill` errors are absent from the reported failures.
