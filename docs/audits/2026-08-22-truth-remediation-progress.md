@@ -56,3 +56,7 @@ The Direct Messages screen no longer uses generated local data, random failures,
 ## ShadowChat-Core bidirectional conversation checkpoint (2026-08-22)
 
 The persisted conversation query now returns messages in both directions between the authenticated user and the selected participant, and a dedicated test covers that contract. Checkpoint `971f22b` passed GitHub Actions run `32574464844`; local validation measured 14 test files and 70 tests, with typecheck and production build passing. This does not yet establish real-time push delivery, human two-browser acceptance, or live deployment.
+
+## ShadowChat-Core authenticated realtime stream checkpoint (2026-08-22)
+
+ShadowChat-Core now exposes an authenticated SSE endpoint for a selected conversation, backed by a typed in-process subscriber hub. Persisted direct-message sends publish to both participants, and hub tests cover participant fan-out and unsubscribe cleanup. Checkpoint `bd35e2b` passed GitHub Actions run `32574773129` with locked install, typecheck, full tests, and production build. The transport is explicitly in-process only; cross-instance delivery, live deployment, and human two-browser acceptance remain unverified.
