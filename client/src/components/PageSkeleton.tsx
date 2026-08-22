@@ -1,34 +1,21 @@
-export interface PageSkeletonProps {
-  readonly rows?: number;
-}
-
-function SkeletonBar({ className = "" }: { readonly className?: string }) {
-  return <div className={`animate-pulse rounded bg-muted/50 ${className}`} aria-hidden="true" />;
-}
-
-export function PageSkeleton({ rows = 4 }: PageSkeletonProps) {
+export function PageSkeleton() {
   return (
-    <div className="space-y-4" role="status" aria-label="Loading page">
-      <SkeletonBar className="h-8 w-1/3" />
-      <SkeletonBar className="h-4 w-2/3" />
-      {Array.from({ length: rows }, (_, index) => <SkeletonBar key={index} className="h-16 w-full" />)}
-      <span className="sr-only">Loading</span>
+    <div className="space-y-4" aria-busy="true" aria-label="Loading">
+      <div className="h-8 w-1/3 animate-pulse rounded bg-muted" />
+      <div className="h-24 animate-pulse rounded bg-muted" />
+      <div className="h-48 animate-pulse rounded bg-muted" />
     </div>
   );
 }
 
-export function TableSkeleton({ rows = 5 }: PageSkeletonProps) {
+export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="space-y-2" role="status" aria-label="Loading table">
+    <div className="space-y-2" aria-busy="true" aria-label="Loading table">
       {Array.from({ length: rows }, (_, index) => (
-        <div key={index} className="flex gap-3 rounded-lg border border-border/50 p-3">
-          <SkeletonBar className="h-8 w-8 shrink-0" />
-          <SkeletonBar className="h-8 flex-1" />
-          <SkeletonBar className="h-8 w-24" />
-        </div>
+        <div key={index} className="h-10 animate-pulse rounded bg-muted" />
       ))}
-      <span className="sr-only">Loading</span>
     </div>
   );
 }
 
+export default PageSkeleton;

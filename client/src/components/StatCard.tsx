@@ -1,39 +1,30 @@
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+import { cn } from "@/lib/utils";
 
-export interface StatCardProps {
-  readonly icon: LucideIcon;
-  readonly label: string;
-  readonly value: string;
-  readonly change?: number;
-  readonly changeLabel?: string;
-  readonly color?: "primary" | "success" | "accent" | "warning" | string;
+const colorClasses = {
+  primary: "text-primary bg-primary/10",
+  success: "text-emerald-500 bg-emerald-500/10",
+  accent: "text-cyan-500 bg-cyan-500/10",
+  warning: "text-amber-500 bg-amber-500/10",
+} as const;
+
+type StatColor = keyof typeof colorClasses;
+
+interface StatCardProps {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  color?: StatColor;
 }
 
-const colorClasses: Record<string, string> = {
-  primary: "text-primary",
-  success: "text-success",
-  accent: "text-accent",
-  warning: "text-warning",
-};
-
-export function StatCard({ icon: Icon, label, value, change, changeLabel = "from prior period", color = "primary" }: StatCardProps) {
-  const colorClass = colorClasses[color] ?? color;
+export function StatCard({ icon: Icon, label, value, color = "primary" }: StatCardProps) {
   return (
-    <article className="card p-4" aria-label={label}>
-      <div className="flex items-center justify-between gap-3">
-        <span className={`flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/60 ${colorClass}`}>
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </span>
-        {typeof change === "number" && (
-          <span className={change >= 0 ? "text-xs text-success" : "text-xs text-destructive"}>
-            {change >= 0 ? "+" : ""}{change}%
-          </span>
-        )}
+    <div className="rounded-xl border border-border/60 bg-card p-4">
+      <div className={cn("mb-3 flex h-9 w-9 items-center justify-center rounded-lg", colorClasses[color])}>
+        <Icon className="h-4 w-4" />
       </div>
-      <p className="mt-4 text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-xl font-semibold">{value}</p>
-      {typeof change === "number" && <p className="mt-1 text-xs text-muted-foreground">{changeLabel}</p>}
-    </article>
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xl font-semibold tracking-tight">{value}</p>
+    </div>
   );
 }
-
