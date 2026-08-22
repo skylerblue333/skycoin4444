@@ -236,3 +236,7 @@ Canonical checkpoint `abf9ce0` replaces the unsupported Wallet page with a typed
 ## ProfileWallet Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `3f3b14c` replaces the unsupported ProfileWallet surface with a typed account-only page. It removes mock activity, fabricated balances and addresses, hard-coded profile statistics, earnings, rewards, transaction history, and wallet-security claims. Local `pnpm run check` reduced the reproducible backlog from 472 to 469 errors. Remote Actions run `32591745001` failed on remaining `VestingSchedule`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; ProfileWallet and its former wallet procedure errors are absent from the reported failures.
+
+## VestingSchedule Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `4150cac` replaces the unsupported VestingSchedule with a typed unavailable-state page. It removes hard-coded token supply, allocation percentages, unlock dates, circulating amounts, account vesting positions, and claim-success claims. Local `pnpm run check` reduced the reproducible backlog from 469 to 467 errors. Remote Actions run `32591814511` failed on remaining `UnhiddenInterface`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; VestingSchedule and its former token procedure errors are absent from the reported failures.
