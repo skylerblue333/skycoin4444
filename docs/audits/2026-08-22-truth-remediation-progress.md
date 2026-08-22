@@ -308,3 +308,7 @@ Canonical checkpoints `b8d6811` (Messages), `7f83bc2` (AIPersonaSystem), and `98
 ## Crypto wallet Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `a9de4cb` replaces the stale Crypto wallet surface with an explicit unavailable state. It removes hard-coded token prices, portfolio calculations, transaction assumptions, DeFi APY/TVL and coverage claims, and fake future-action feedback. Local `pnpm run check` reduced the reproducible backlog from 345 to 337 errors. The checkpoint was fetched, rebased, pushed, and reconciled to the exact remote SHA. Actions run `32593512140` completed with failure because unrelated legacy TypeScript debt remains; no Crypto page/token procedure failures were reported for the replacement.
+
+## AI development surfaces Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `92d1c33` replaces AICodeStudio’s unsupported autonomous coding surface with an explicit unavailable state. It removes fabricated bots, generation and analysis output, line counts, sessions, logs, push history, SSE fallback behavior, and production-readiness implications. Local `pnpm run check` reduced the reproducible backlog from 337 to 326 errors. The checkpoint was fetched, rebased, pushed, and reconciled to the exact remote SHA. Actions run `32593572740` completed with failure because unrelated legacy TypeScript debt remains; no AICodeStudio or aiEngineer procedure failures were reported for the replacement.
