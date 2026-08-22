@@ -44,3 +44,7 @@ The backend now exposes `GET /metrics` with measured process uptime and Node mem
 ## ShadowChat-Core remote validation checkpoint (2026-08-22)
 
 ShadowChat-Core now has a repository-owned CI workflow that runs locked pnpm installation, TypeScript typecheck, the full test suite, and the production build. The authoritative branch checkpoint `1c5c8ca` completed GitHub Actions run `32573451469` successfully in 1m27s; the run reported 10 test files and 65 tests through the local validation path. The checkpoint also contains the validated messaging domain contract and its four focused tests. No claim is made yet that persisted real-time messaging or deployment is complete.
+
+## ShadowChat-Core persisted direct messaging checkpoint (2026-08-22)
+
+ShadowChat-Core now has one canonical `directMessages` MySQL table and an authenticated tRPC `messages` router with bounded input validation, recipient existence checks, self-message rejection, persisted sends, and participant-scoped conversation reads. A concurrent duplicate-table conflict was resolved before release. The final checkpoint `17aeece` passed GitHub Actions run `32574211849` with locked install, typecheck, 13 test files, 69 tests, and production build. Real-time delivery, read receipts, live deployment, and human two-browser acceptance remain unverified.
