@@ -184,3 +184,7 @@ Canonical checkpoint `a6e4c43` replaces the unsupported Compliance Center with a
 ## Economic Layer Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `d250f60` replaces the unsupported Economic Layer with a typed unavailable-state page. It removes unverified balances, market values, fee charges, treasury totals, rewards, rich-list rankings, and economic mutation claims. Local `pnpm run check` reduced the reproducible backlog from 647 to 627 errors. Remote Actions run `32590441377` failed on unrelated remaining client tRPC contracts; EconomicLayer and its former economy procedure errors are absent from the reported failures.
+
+## Staking Portal Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `381d45d` replaces the unsupported Staking Portal with a typed unavailable-state page. It removes hard-coded APY history, reward projections, pool totals, participant counts, audited-security claims, unlock schedules, and staking or reward-claim mutation claims. Local `pnpm run check` reduced the reproducible backlog from 627 to 610 errors. Remote Actions run `32590523043` failed on unrelated remaining client tRPC contracts; StakingPortal and its former staking procedure errors are absent from the reported failures.
