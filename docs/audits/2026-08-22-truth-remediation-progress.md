@@ -176,3 +176,7 @@ ShadowChat-Core checkpoint `0029b9e` prevents notification subscriptions from be
 ## ProfileEdit Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `6483096` replaces the broken ProfileEdit surface with a typed account-identity view backed only by the existing authentication contract. Unsupported profile-update and image-upload mutations, local-only “saved” states, wallet persistence claims, and unverified profile fields were removed. Local `pnpm run check` reduced the reproducible backlog from 708 to 673 errors. Remote Actions run `32590202014` failed on unrelated remaining client tRPC contracts; `ProfileEdit.tsx` is absent from the reported failures.
+
+## Compliance Center Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `a6e4c43` replaces the unsupported Compliance Center with a typed unavailable-state page. It removes unverified KYC approval, risk-score, consent-persistence, audit-event, processing-deadline, and data-rights execution claims. Local `pnpm run check` reduced the reproducible backlog from 673 to 647 errors. Remote Actions run `32590293289` failed on unrelated remaining client tRPC contracts; ComplianceCenter and its former compliance procedure errors are absent from the reported failures.
