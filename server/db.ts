@@ -199,9 +199,13 @@ export async function createWallet(data: any) {
 }
 
 // ============ GENERIC HELPERS ============
-export async function getAllRecords(table: any) {
+type QueryTableName = keyof typeof db.query;
+type QueryBuilder = { findMany: () => Promise<unknown[]> };
+
+export async function getAllRecords(table: QueryTableName) {
   try {
-    return await db.query[table].findMany();
+    const query = db.query[table] as QueryBuilder;
+    return await query.findMany();
   } catch (error) {
     return [];
   }
