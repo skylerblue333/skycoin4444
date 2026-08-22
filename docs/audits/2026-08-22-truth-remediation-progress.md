@@ -84,3 +84,7 @@ ShadowChat-Core checkpoint `e6510a0` labels unimplemented alert sources explicit
 ## ShadowChat-Core wallet safety remediation (2026-08-22)
 
 ShadowChat-Core checkpoint `0176609` disables unverifiable wallet operations instead of simulating transaction success. GitHub Actions run `32575307019` completed successfully with install, typecheck, tests, and production build. This is a safety and credibility correction; it is not evidence of wallet custody, blockchain execution, transaction settlement, or production financial infrastructure.
+
+## Creator monetization truth boundary checkpoint (2026-08-22)
+
+Checkpoint `1e31d67` replaces fabricated creator monetization charts, payout history, revenue totals, subscriptions, milestones, and AI advice with an explicit unavailable state. GitHub Pages deployment run `32575487738` succeeded. CI run `32575488250` remains failed because the repository-wide legacy TypeScript contract backlog persists; this targeted screen no longer calls the nonexistent creator procedures. The checkpoint is published, but the canonical repository is not fully green.
