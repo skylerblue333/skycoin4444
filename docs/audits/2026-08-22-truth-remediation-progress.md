@@ -164,3 +164,7 @@ ShadowChat-Core checkpoint `5c51954` removes fabricated anomaly detections and r
 ## Agent Economy Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `9d379fa` replaces the unbacked Agent Economy dashboard with a typed unavailable-state page. It removes missing `enterprise.freeWill` client calls and fabricated agent counts, earnings, rewards, and efficiency metrics. Local `pnpm run check` reduced the reproducible backlog from 711 to 709 errors. Remote Actions run `32589822719` failed on remaining unrelated client tRPC contract debt; `AIAgentEconomy.tsx` and its former `freeWill` errors are absent from the reported failures.
+
+## Situation Room Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `1ca82da` removes the missing `enterprise.freeWill.systemSnapshot` client call and replaces unsupported active-citizen and agent-activity values with explicit `Unavailable` states. Local typecheck reduced the reproducible backlog from 709 to 708 errors. Remote Actions run `32589903845` remains failed on unrelated mission-control and other client tRPC contracts; `SituationRoom.tsx` and its former `freeWill` errors are absent from the reported failures.
