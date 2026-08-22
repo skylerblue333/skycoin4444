@@ -228,3 +228,7 @@ Canonical checkpoint `cc17495` replaces the unsupported WorldBrain surface with 
 ## WorldSimulationControl Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `8d7d0d4` replaces the unsupported WorldSimulationControl surface with a typed unavailable-state page. It removes hard-coded AI personas, synthetic-user counts, economy and wallet metrics, snapshots, trend injection, scenario risk, and simulation-tick claims. Local `pnpm run check` reduced the reproducible backlog from 480 to 479 errors. Remote Actions run `32591581602` failed on newly exposed `Wallet`, `WhaleMonitor`, and existing `StartupSection` contracts; WorldSimulationControl and its former simulation tick error are absent from the reported failures.
+
+## Wallet Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `abf9ce0` replaces the unsupported Wallet page with a typed unavailable-state page. It removes unverified balances, USD valuation, external-wallet connection, transaction history, fee estimates, send mutations, and crypto action claims. Local `pnpm run check` reduced the reproducible backlog from 479 to 472 errors. Remote Actions run `32591664713` failed on remaining `ProfileWallet`, `VestingSchedule`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; Wallet and its former wallet procedure errors are absent from the reported failures.
