@@ -276,3 +276,7 @@ Canonical checkpoint `b167f3d` replaces the simulated WhaleMonitor with a typed 
 ## TokenDashboard Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `fbb726a` replaces the unsupported TokenDashboard with a typed unavailable-state page. It removes hard-coded token allocation, supply, burn history, holder counts, staking ratio, governance activity, and unsupported token metrics claims. Local `pnpm run check` reduced the reproducible backlog from 450 to 446 errors. Remote Actions run `32592644021` failed on remaining `TipJar`, `TournamentBracket`, `UniversalSearch`, `StartupSection`, and other unrelated contracts; TokenDashboard and its former token metrics/burnHistory errors are absent from the reported failures.
+
+## TipJar Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `6bc6e8c` replaces the mock TipJar with a typed unavailable-state page. It removes fabricated creators, tip leaderboards, recent tips, balances, payment amounts, and fallback success behavior when the payment procedure is absent. Local `pnpm run check` reduced the reproducible backlog from 446 to 445 errors. Remote Actions run `32592726555` failed on remaining `StripeCheckout`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; TipJar and its former creator.tip error are absent from the reported failures.
