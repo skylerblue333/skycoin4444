@@ -268,3 +268,7 @@ Canonical checkpoint `11183b8` replaces the mock VOD archive with a typed unavai
 ## VideoArea Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `c31584c` replaces the mock VideoArea with a typed unavailable-state page. It removes fabricated reels, videos, live streams, view counts, likes, trending rankings, thumbnails, uploads, playback, and engagement claims. Local `pnpm run check` reduced the reproducible backlog from 452 to 451 errors. Remote Actions run `32592478826` failed on remaining `TournamentBracket`, `UniversalSearch`, `WhaleMonitor`, and `StartupSection` contracts; VideoArea and its former video.listVideos procedure error are absent from the reported failures.
+
+## WhaleMonitor Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `b167f3d` replaces the simulated WhaleMonitor with a typed unavailable-state page. It removes fabricated transactions, wallet addresses, token amounts, USD valuations, impact labels, live-feed status, volume totals, and largest-transaction claims. Local `pnpm run check` reduced the reproducible backlog from 451 to 450 errors. Remote Actions run `32592581636` failed on remaining `TokenDashboard`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts; WhaleMonitor and its former token.whaleAlerts procedure error are absent from the reported failures.
