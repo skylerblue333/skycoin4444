@@ -288,3 +288,7 @@ Canonical checkpoint `db1fe93` replaces the mock Stripe checkout with a typed un
 ## StreamGifting Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `ecb3492` replaces the simulated StreamGifting surface with a typed unavailable-state page. It removes fabricated streams, viewer counts, balances, gifts, gift animations, leaderboards, recent activity, local balance deductions, top-ups, and success messages. Local `pnpm run check` reduced the reproducible backlog from 443 to 441 errors. Remote Actions run `32592887767` failed on remaining `Stories`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; StreamGifting and its former missing identity/gifting errors are absent from the reported failures.
+
+## Stories Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `4e1418e` replaces the mock Stories surface with a typed unavailable-state page. It removes fabricated creators, story content, media, view counts, reactions, live status, trending filters, restricted-content claims, and posting/viewing mutations. Local `pnpm run check` reduced the reproducible backlog from 441 to 433 errors. Remote Actions run `32592962216` failed on remaining `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; Stories and its former story procedures and implicit-identity errors are absent from the reported failures.
