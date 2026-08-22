@@ -200,3 +200,7 @@ Canonical checkpoint `82b8079` replaces the unsupported AI Persona Feed with a t
 ## AIBrain Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `ae183ba` replaces the unsupported AIBrain surface with a typed unavailable-state page. It removes unverified model superiority, module accuracy, live-AI status, generated code, lesson output, provider-model counts, and benchmark claims. Local `pnpm run check` remained at 539 errors because AIBrain was not among the compiler-reported backlog. Remote Actions run `32590758817` failed on the unchanged mission-control contract backlog; AIBrain and its former ai procedure errors are absent from the reported failures.
+
+## Mission-control TodaySection Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `d83e818` replaces the unsupported mission-control TodaySection with a typed unavailable-state page. It removes unverified revenue, reputation, opportunity-ranking, activity-count, community-count, and AI recommendation claims. Local `pnpm run check` reduced the reproducible backlog from 539 to 534 errors. Remote Actions run `32590829834` failed on remaining `ReputationSection` and `StartupSection` contracts; TodaySection and its former `missionControl.today` errors are absent from the reported failures.
