@@ -32,3 +32,7 @@ Verified diagnostics include `server/streaming-engine.ts` errors at lines 475, 4
 ## CI reproducibility checkpoints (2026-08-22)
 
 `TS-Auth-Service` was upgraded to pull-request CI with a frozen pnpm install, TypeScript build, and deterministic Jest execution; local validation passed 1 suite and 3 tests, published at commit `eeb4d8f`. `TS-React-Dashboard` received the same locked-install/build/test gates; local validation passed 1 suite and 2 tests, published at `07fce57`. `TS-Express-API` received the same gates and was safely rebased over three newer remote commits before publication at `1038380`; local build and Jest validation passed. GitHub reported an aggregate 5-alert Dependabot notice for TS-Express-API, but its detailed alert endpoint returned 403 and the local full `pnpm audit` reported zero advisories; this discrepancy remains explicitly unresolved.
+
+## skycoin44-backend foundation checkpoint (2026-08-22)
+
+The documentation-only `skycoin44-backend` repository was converted into a bounded typed Express service. It now implements `/health`, `/ready`, structured 404 responses, a 32 KiB JSON body limit, port validation, a structured startup event, strict TypeScript compilation, three executable HTTP tests, a pnpm lockfile, and pull-request CI. Its README explicitly states that database, wallet custody, blockchain, AI-provider, financial-data, authentication, authorization, persistence, and deployment capabilities are not implemented. Local build and tests passed; the published and SHA-verified commit is `19c6464`.
