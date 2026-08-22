@@ -76,3 +76,7 @@ ShadowChat-Core checkpoint `d6b0c50` removes fabricated trading-alert output and
 ## Canonical audit CI status clarification (2026-08-22)
 
 For audit commit `e71b6d9`, GitHub Pages deployment run `32575164422` completed successfully, while CI run `32575164992` failed during the full legacy frontend typecheck. The reported errors include creator analytics and monetization screens calling router procedures that do not exist (`earnings`, `milestones`, `fanScores`, `revenueForecasting`, `mySubscriptions`, and `myTips`). These are unresolved product-contract gaps; no fake procedures are being added solely to make CI green.
+
+## ShadowChat-Core alert-source truth labeling (2026-08-22)
+
+ShadowChat-Core checkpoint `e6510a0` labels unimplemented alert sources explicitly instead of presenting unsupported trading or notification signals as live data. GitHub Actions run `32575188529` completed successfully; local validation also passed typecheck, production build, and 15 test files with 73 tests. This checkpoint improves product honesty and safety but is not evidence of a live market-data provider.
