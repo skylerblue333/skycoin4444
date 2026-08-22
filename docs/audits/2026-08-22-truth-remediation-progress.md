@@ -260,3 +260,7 @@ Canonical checkpoint `2c2c2c6` replaces the mock Trading terminal with a typed u
 ## AI Trading Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `70fd02f` replaces the mock AI Trading page with a typed unavailable-state page. It removes fabricated performance metrics, active capability claims, automated execution promises, wallet-optimization claims, and the unsupported token metrics query. Local `pnpm run check` reduced the reproducible backlog from 454 to 453 errors. Remote Actions run `32592198990` failed on remaining `TournamentBracket`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; AITrading and its former token metrics error are absent from the reported failures.
+
+## VODArchive Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `11183b8` replaces the mock VOD archive with a typed unavailable-state page. It removes fabricated recordings, titles, creators, view counts, durations, playback, download, sharing, and catalog claims. Local `pnpm run check` reduced the reproducible backlog from 453 to 452 errors. Remote Actions run `32592351975` failed on remaining `TournamentBracket`, `UniversalSearch`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; VODArchive and its former stream.vods procedure error are absent from the reported failures.
