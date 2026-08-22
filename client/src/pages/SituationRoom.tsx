@@ -85,10 +85,6 @@ export default function SituationRoom() {
   const { data: secRisk } = trpc.enterprise.security.myRiskScore.useQuery(undefined, {
     refetchInterval: 30_000,
   });
-  const { data: freeWillSnap } = trpc.enterprise.freeWill.systemSnapshot.useQuery(undefined, {
-    refetchInterval: 30_000,
-  });
-
   const platformScore = orchestratorState?.platformScore ?? 0;
   const economyHealth = econHealth?.overallHealth ?? "UNKNOWN";
   const nationHealth =
@@ -99,8 +95,8 @@ export default function SituationRoom() {
       : "Loading";
   const riskScore = secRisk?.riskScore ?? 0;
   const threatLevel = riskScore > 70 ? "critical" : riskScore > 40 ? "high" : riskScore > 20 ? "medium" : "low";
-  const dau = (freeWillSnap as unknown as Record<string, unknown>)?.activeGoals ?? 0;
-  const agentActivity = orchestratorState?.recommendations?.length ?? 0;
+  const dau: string | number = "Unavailable";
+  const agentActivity: string | number = "Unavailable";
 
   const now = new Date();
 
@@ -153,7 +149,7 @@ export default function SituationRoom() {
             </div>
             <div className="hidden md:grid grid-cols-2 gap-4 text-right">
               <div>
-                <div className="text-3xl font-bold text-emerald-400">{dau as number}</div>
+                <div className="text-3xl font-bold text-emerald-400">{dau}</div>
                 <div className="text-xs text-white/40">Active Citizens</div>
               </div>
               <div>
