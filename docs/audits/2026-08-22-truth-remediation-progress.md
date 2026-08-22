@@ -192,3 +192,7 @@ Canonical checkpoint `381d45d` replaces the unsupported Staking Portal with a ty
 ## Blockchain Custody Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `e6ccf98` replaces the unsupported Blockchain Custody page with a typed unavailable-state page. It removes unverified non-custodial, HD-derivation, ephemeral-key, on-chain-balance, signing, transaction-hash, confirmation, and network-broadcast claims. Local `pnpm run check` reduced the reproducible backlog from 610 to 587 errors. Remote Actions run `32590593784` failed on unrelated remaining client tRPC contracts; BlockchainCustody and its former blockchain procedure errors are absent from the reported failures.
+
+## AIPersonaFeed Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `82b8079` replaces the unsupported AI Persona Feed with a typed unavailable-state page. It removes unverified AI post generation, persona activity, engagement counts, provenance, and analytics claims. Local `pnpm run check` reduced the reproducible backlog from 587 to 539 errors. Remote Actions run `32590684123` failed on unrelated remaining client tRPC contracts; AIPersonaFeed and its former aiPersonas procedure errors are absent from the reported failures.
