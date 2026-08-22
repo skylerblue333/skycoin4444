@@ -40,3 +40,7 @@ The documentation-only `skycoin44-backend` repository was converted into a bound
 ## skycoin44-backend measured metrics checkpoint (2026-08-22)
 
 The backend now exposes `GET /metrics` with measured process uptime and Node memory usage, and its test command explicitly sets `NODE_ENV=test` to prevent a test server from starting. The concurrent checkpoint was authored by `skylerblue333`, passed the remote GitHub Actions run, and is verified at `skycoin44-backend` commit `0fdd655`. The metrics are runtime measurements only; they are not uptime, traffic, latency, deployment, or business metrics.
+
+## ShadowChat-Core remote validation checkpoint (2026-08-22)
+
+ShadowChat-Core now has a repository-owned CI workflow that runs locked pnpm installation, TypeScript typecheck, the full test suite, and the production build. The authoritative branch checkpoint `1c5c8ca` completed GitHub Actions run `32573451469` successfully in 1m27s; the run reported 10 test files and 65 tests through the local validation path. The checkpoint also contains the validated messaging domain contract and its four focused tests. No claim is made yet that persisted real-time messaging or deployment is complete.
