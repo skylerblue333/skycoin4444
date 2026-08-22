@@ -148,3 +148,7 @@ Checkpoint `7a2d088` normalizes Express wildcard parameters through an `unknown`
 ## Canonical cron-user schema checkpoint (2026-08-22)
 
 Checkpoint `6afb284` replaces the unsafe cron-user cast with a complete value conforming to the canonical Drizzle `User` schema, preserving explicit cron identity fields and null/false defaults. Local `pnpm run check` reproduced 712 remaining errors, down from 713; the prior `sdk.ts` assertion error no longer appears. Remote Actions run `32578609655` remains failed on other legacy TypeScript contract debt, so canonical CI is still red.
+
+## Canonical database query-helper checkpoint (2026-08-22)
+
+Checkpoint `f7ebca2` constrains `getAllRecords` to actual Drizzle relation keys and uses a narrow `findMany` structural contract, removing the unsafe dynamic-index TypeScript error without `any`. Local `pnpm run check` reproduced 711 remaining errors, down from 712. Remote Actions run `32578682606` failed on the remaining client tRPC contract backlog; `server/db.ts` no longer appears among the reported failures.
