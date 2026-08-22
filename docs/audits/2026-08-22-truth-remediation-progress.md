@@ -168,3 +168,7 @@ Canonical checkpoint `9d379fa` replaces the unbacked Agent Economy dashboard wit
 ## Situation Room Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `1ca82da` removes the missing `enterprise.freeWill.systemSnapshot` client call and replaces unsupported active-citizen and agent-activity values with explicit `Unavailable` states. Local typecheck reduced the reproducible backlog from 709 to 708 errors. Remote Actions run `32589903845` remains failed on unrelated mission-control and other client tRPC contracts; `SituationRoom.tsx` and its former `freeWill` errors are absent from the reported failures.
+
+## ShadowChat-Core notification persistence checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `0029b9e` prevents notification subscriptions from being reported as active when they are not persisted. GitHub Actions run `32586958802` completed successfully. This validates a truthful unavailable/error path, not production notification delivery or subscription durability beyond the implemented persistence boundary.
