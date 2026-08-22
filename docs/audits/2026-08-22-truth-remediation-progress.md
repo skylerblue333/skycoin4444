@@ -68,3 +68,7 @@ The latest concurrent ShadowChat-Core checkpoint clears persisted user notificat
 ## Latest remote verification state (2026-08-22)
 
 ShadowChat-Core advanced concurrently to `59a42e8`, and GitHub Actions run `32574980359` completed successfully. The canonical `skycoin4444` Pages deployment for audit commit `10af39f` completed successfully in run `32574996035`; its CI run `32574996541` remains failed because the full legacy frontend typecheck still has unresolved contract errors. The deployment result is therefore recorded independently from CI health, and the audit repository is not represented as fully green.
+
+## ShadowChat-Core Truth-Mode alert remediation (2026-08-22)
+
+ShadowChat-Core checkpoint `d6b0c50` removes fabricated trading-alert output and keeps activity data grounded in persisted events. GitHub Actions run `32575071932` completed successfully for the product branch. This is an honesty and safety correction, not evidence of live market-data integration or financial functionality.
