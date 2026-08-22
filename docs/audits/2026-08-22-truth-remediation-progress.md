@@ -64,3 +64,7 @@ ShadowChat-Core now exposes an authenticated SSE endpoint for a selected convers
 ## ShadowChat-Core notification consistency checkpoint (2026-08-22)
 
 The latest concurrent ShadowChat-Core checkpoint clears persisted user notifications through the real notification path rather than leaving stale records. Checkpoint `bca7c64` passed GitHub Actions run `32574865680`; local validation measured 15 test files and 73 tests, with typecheck and production build passing. The product branch is SHA-verified; the canonical audit repository itself still has a separate legacy typecheck failure unrelated to this checkpoint.
+
+## Latest remote verification state (2026-08-22)
+
+ShadowChat-Core advanced concurrently to `59a42e8`, and GitHub Actions run `32574980359` completed successfully. The canonical `skycoin4444` Pages deployment for audit commit `10af39f` completed successfully in run `32574996035`; its CI run `32574996541` remains failed because the full legacy frontend typecheck still has unresolved contract errors. The deployment result is therefore recorded independently from CI health, and the audit repository is not represented as fully green.
