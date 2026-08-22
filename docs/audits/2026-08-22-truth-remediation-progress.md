@@ -52,3 +52,7 @@ ShadowChat-Core now has one canonical `directMessages` MySQL table and an authen
 ## ShadowChat-Core real messaging UI checkpoint (2026-08-22)
 
 The Direct Messages screen no longer uses generated local data, random failures, or local-only sends. It now uses the authenticated tRPC `messages` router and displays real persisted conversation records, with invalid-participant, loading, empty, error, send-pending, and send-failure states. Checkpoint `306510f` passed GitHub Actions run `32574388471` with install, typecheck, tests, and production build. Human two-browser real-time acceptance and live deployment remain unverified.
+
+## ShadowChat-Core bidirectional conversation checkpoint (2026-08-22)
+
+The persisted conversation query now returns messages in both directions between the authenticated user and the selected participant, and a dedicated test covers that contract. Checkpoint `971f22b` passed GitHub Actions run `32574464844`; local validation measured 14 test files and 70 tests, with typecheck and production build passing. This does not yet establish real-time push delivery, human two-browser acceptance, or live deployment.
