@@ -140,3 +140,7 @@ ShadowChat-Core checkpoint `8696df7` reports missing trading-bot state explicitl
 ## Canonical CI contract finding (2026-08-22)
 
 Actions run `32578238382` for audit commit `6a3cddb` failed during TypeScript validation. The current failure includes stale mission-control callers (`hopeIntelligence.missionControl.today` and `hopeIntelligence.startup.*`) against a generic feature router that does not expose those procedures, plus missing `server/storage` resolution, an `AuthenticatedUser` shape mismatch, an unsafe dynamic database index, and additional legacy implicit-any errors. These findings are recorded as unresolved technical debt; no claim of canonical-repository CI readiness is made.
+
+## Canonical storage proxy typing checkpoint (2026-08-22)
+
+Checkpoint `7a2d088` normalizes Express wildcard parameters through an `unknown` boundary and removes the remaining `storageProxy` TypeScript error without changing proxy behavior. Local `pnpm run check` reproduced 713 remaining errors, down from 714. Remote Actions run `32578541827` failed only on the pre-existing legacy TypeScript backlog; the storage proxy error did not recur. The canonical repository remains CI-red and is not represented as production-ready.
