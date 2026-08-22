@@ -48,3 +48,7 @@ ShadowChat-Core now has a repository-owned CI workflow that runs locked pnpm ins
 ## ShadowChat-Core persisted direct messaging checkpoint (2026-08-22)
 
 ShadowChat-Core now has one canonical `directMessages` MySQL table and an authenticated tRPC `messages` router with bounded input validation, recipient existence checks, self-message rejection, persisted sends, and participant-scoped conversation reads. A concurrent duplicate-table conflict was resolved before release. The final checkpoint `17aeece` passed GitHub Actions run `32574211849` with locked install, typecheck, 13 test files, 69 tests, and production build. Real-time delivery, read receipts, live deployment, and human two-browser acceptance remain unverified.
+
+## ShadowChat-Core real messaging UI checkpoint (2026-08-22)
+
+The Direct Messages screen no longer uses generated local data, random failures, or local-only sends. It now uses the authenticated tRPC `messages` router and displays real persisted conversation records, with invalid-participant, loading, empty, error, send-pending, and send-failure states. Checkpoint `306510f` passed GitHub Actions run `32574388471` with install, typecheck, tests, and production build. Human two-browser real-time acceptance and live deployment remain unverified.
