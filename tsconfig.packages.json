@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@skycoin/contracts": ["packages/contracts/src/index.ts"], "@skycoin/area-registry": ["packages/area-registry/src/index.ts"] }
+  },
+  "include": ["packages/**/*.ts"]
+}
