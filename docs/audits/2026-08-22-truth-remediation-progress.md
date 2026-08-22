@@ -120,3 +120,7 @@ For canonical audit checkpoint `4bc9e42`, Pages deployment run `32576085248` com
 ## ShadowChat-Core generated gallery truth labeling (2026-08-22)
 
 ShadowChat-Core checkpoint `bf5db62` labels the preserved generated gallery as an experimental inventory rather than a production feature. The gallery contains 969 generated page files and remains reachable under `/g/:slug` for inventory review, but its sample/stub data and draft UI are explicitly excluded from product-readiness claims. GitHub Actions run `32577847162` completed successfully; the local production build also passed.
+
+## ShadowChat-Core trading-bot lifecycle checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `249866b` persists a bounded trading-bot lifecycle instead of claiming live exchange execution or trading performance. GitHub Actions run `32577937173` completed successfully with install, typecheck, tests, and production build. The checkpoint is evidence of lifecycle persistence only; it is not evidence of profitable trading, market-data coverage, order settlement, or production financial infrastructure.
