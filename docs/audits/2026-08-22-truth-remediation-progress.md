@@ -196,3 +196,7 @@ Canonical checkpoint `e6ccf98` replaces the unsupported Blockchain Custody page 
 ## AIPersonaFeed Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `82b8079` replaces the unsupported AI Persona Feed with a typed unavailable-state page. It removes unverified AI post generation, persona activity, engagement counts, provenance, and analytics claims. Local `pnpm run check` reduced the reproducible backlog from 587 to 539 errors. Remote Actions run `32590684123` failed on unrelated remaining client tRPC contracts; AIPersonaFeed and its former aiPersonas procedure errors are absent from the reported failures.
+
+## AIBrain Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `ae183ba` replaces the unsupported AIBrain surface with a typed unavailable-state page. It removes unverified model superiority, module accuracy, live-AI status, generated code, lesson output, provider-model counts, and benchmark claims. Local `pnpm run check` remained at 539 errors because AIBrain was not among the compiler-reported backlog. Remote Actions run `32590758817` failed on the unchanged mission-control contract backlog; AIBrain and its former ai procedure errors are absent from the reported failures.
