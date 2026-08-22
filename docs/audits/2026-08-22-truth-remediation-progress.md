@@ -224,3 +224,7 @@ Canonical checkpoint `5be3ac5` replaces the unsupported MarketplaceSection with 
 ## WorldBrain Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `cc17495` replaces the unsupported WorldBrain surface with a typed unavailable-state page. It removes unverified simulation ticks, entity states, event streams, market prices, sentiment, forecasts, behavior predictions, action confidence, expected impact, and execution claims. Local `pnpm run check` reduced the reproducible backlog from 487 to 480 errors. Authoritative CI run `32591493667` failed on remaining contracts, including `WorldSimulationControl`; Pages deployment run `32591493145` succeeded. WorldBrain and its former simulation procedure errors are absent from the reported CI failure set.
+
+## WorldSimulationControl Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `8d7d0d4` replaces the unsupported WorldSimulationControl surface with a typed unavailable-state page. It removes hard-coded AI personas, synthetic-user counts, economy and wallet metrics, snapshots, trend injection, scenario risk, and simulation-tick claims. Local `pnpm run check` reduced the reproducible backlog from 480 to 479 errors. Remote Actions run `32591581602` failed on newly exposed `Wallet`, `WhaleMonitor`, and existing `StartupSection` contracts; WorldSimulationControl and its former simulation tick error are absent from the reported failures.
