@@ -328,3 +328,7 @@ Canonical checkpoints `0b3d7bf` (Marketplace) and `b8e0233` (InvestorPortal) rep
 ## Notification intelligence Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `6c961bc` replaces NotificationIntelligence with an explicit unavailable state. It removes unsupported notification feed, AI summary, analytics, priority scoring, unread-count, and mark-read procedures, avoiding synthetic notifications and metrics. Local `pnpm run check` reduced the reproducible backlog from 279 to 258 errors, with zero page-specific failures. The checkpoint was fetched, rebased, pushed, and reconciled to the exact remote SHA. Actions run `32593978330` completed with failure because unrelated legacy TypeScript debt remains.
+
+## Notification and HopeAI Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoints `6c961bc` (NotificationIntelligence) and `802bb3f` (HopeAI) replace unsupported notification and AI companion surfaces with explicit unavailable states. NotificationIntelligence no longer calls missing intelligent-feed, AI-summary, analytics, or mark-read procedures; HopeAI no longer calls missing chat, history, persistence, or gray-area analysis procedures or claims emotional inference. Local `pnpm run check` measurements progressed from 279 to 258 after NotificationIntelligence and then to 250 after HopeAI, with zero page-specific failures. Each checkpoint was fetched, rebased, pushed, and reconciled to the exact remote SHA. Actions runs `32593978330` and `32594056329` completed with failure because unrelated legacy TypeScript debt remains.
