@@ -15,6 +15,7 @@ This checkpoint records real changes that were implemented, tested, and verified
 | `skycoin-security` | Typed AES-256-GCM primitive, strict validation, real package scripts, executable tamper tests, explicit exclusion of broken AI drafts | Build, lint, and encryption tests pass | [`9f7639a`](https://github.com/skylerblue333/skycoin-security/commit/9f7639a0b0bbebdf2294e65c53c437fb6e43febc) |
 | `Go-Rate-Limiter` | Fractional token refill, stoppable cleanup, positive configuration validation, client-IP parsing, race-safe tests | `go test -race ./...` and `go vet ./...` pass | [`402b05e`](https://github.com/skylerblue333/Go-Rate-Limiter/commit/402b05ef17028d4827d2772880da36e150ddad63) |
 | `Python-Feature-Flag-Service` | Validated flag schemas, deterministic SHA-256 rollout, duplicate protection, safe defaults | 5 pytest tests pass; legacy FastAPI deprecation warnings remain in a separate app | [`ff4f489`](https://github.com/skylerblue333/Python-Feature-Flag-Service/commit/ff4f489531e81cc9e7714f35e9f155498f215c3b) |
+| `C-Secret-Manager` | Shared C11 bounded store, safe key copying, explicit status codes, duplicate protection, strict warnings, truthful security boundary | CMake build and strict test executable pass | [`fc3a0c0`](https://github.com/skylerblue333/C-Secret-Manager/commit/fc3a0c0b2bef1e721f1dfb1859e539ca589226ef) |
 
 ## Remaining truth gaps
 
