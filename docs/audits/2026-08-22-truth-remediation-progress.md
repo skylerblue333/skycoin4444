@@ -132,3 +132,7 @@ ShadowChat-Core checkpoint `4d2a54b` aggregates bot performance from persisted l
 ## ShadowChat-Core bot-trade safety checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `f8d0190` disables unverifiable bot trades rather than simulating execution. GitHub Actions run `32578144051` completed successfully with install, typecheck, tests, and production build. Persisted lifecycle records remain available for bounded inspection; no live exchange execution, order settlement, profitability, or financial performance claim is made.
+
+## ShadowChat-Core missing trading-bot reporting checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `8696df7` reports missing trading-bot state explicitly instead of manufacturing rows. GitHub Actions run `32578264149` completed successfully with install, typecheck, tests, and production build. This is a truthful unavailable-state improvement and does not establish live bot execution, exchange connectivity, or trading performance.
