@@ -172,3 +172,7 @@ Canonical checkpoint `1ca82da` removes the missing `enterprise.freeWill.systemSn
 ## ShadowChat-Core notification persistence checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `0029b9e` prevents notification subscriptions from being reported as active when they are not persisted. GitHub Actions run `32586958802` completed successfully. This validates a truthful unavailable/error path, not production notification delivery or subscription durability beyond the implemented persistence boundary.
+
+## ProfileEdit Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `6483096` replaces the broken ProfileEdit surface with a typed account-identity view backed only by the existing authentication contract. Unsupported profile-update and image-upload mutations, local-only “saved” states, wallet persistence claims, and unverified profile fields were removed. Local `pnpm run check` reduced the reproducible backlog from 708 to 673 errors. Remote Actions run `32590202014` failed on unrelated remaining client tRPC contracts; `ProfileEdit.tsx` is absent from the reported failures.
