@@ -80,3 +80,7 @@ For audit commit `e71b6d9`, GitHub Pages deployment run `32575164422` completed 
 ## ShadowChat-Core alert-source truth labeling (2026-08-22)
 
 ShadowChat-Core checkpoint `e6510a0` labels unimplemented alert sources explicitly instead of presenting unsupported trading or notification signals as live data. GitHub Actions run `32575188529` completed successfully; local validation also passed typecheck, production build, and 15 test files with 73 tests. This checkpoint improves product honesty and safety but is not evidence of a live market-data provider.
+
+## ShadowChat-Core wallet safety remediation (2026-08-22)
+
+ShadowChat-Core checkpoint `0176609` disables unverifiable wallet operations instead of simulating transaction success. GitHub Actions run `32575307019` completed successfully with install, typecheck, tests, and production build. This is a safety and credibility correction; it is not evidence of wallet custody, blockchain execution, transaction settlement, or production financial infrastructure.
