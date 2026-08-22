@@ -1,7 +1,19 @@
 {
-  "extends": "./tsconfig.json",
+  "include": ["packages/**/*.ts"],
   "compilerOptions": {
-    "paths": { "@skycoin/contracts": ["./packages/contracts/src/index.ts"], "@skycoin/area-registry": ["./packages/area-registry/src/index.ts"] }
-  },
-  "include": ["packages/**/*.ts"]
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo.packages",
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "paths": {
+      "@skycoin/contracts": ["./packages/contracts/src/index.ts"],
+      "@skycoin/area-registry": ["./packages/area-registry/src/index.ts"]
+    }
+  }
 }
+
