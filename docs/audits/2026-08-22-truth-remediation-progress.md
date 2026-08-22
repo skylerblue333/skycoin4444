@@ -116,3 +116,7 @@ For audit checkpoint `aba4b98`, Pages deployment run `32576030548` completed suc
 ## Current audit workflow verification (2026-08-22)
 
 For canonical audit checkpoint `4bc9e42`, Pages deployment run `32576085248` completed successfully, while CI run `32576085911` completed with failure from the known repository-wide legacy TypeScript contract backlog. ShadowChat-Core checkpoint `2026757` remains remote-green under Actions run `32575769807`. These statuses are reported separately and no release claim is made for the CI-red audit repository.
+
+## ShadowChat-Core generated gallery truth labeling (2026-08-22)
+
+ShadowChat-Core checkpoint `bf5db62` labels the preserved generated gallery as an experimental inventory rather than a production feature. The gallery contains 969 generated page files and remains reachable under `/g/:slug` for inventory review, but its sample/stub data and draft UI are explicitly excluded from product-readiness claims. GitHub Actions run `32577847162` completed successfully; the local production build also passed.
