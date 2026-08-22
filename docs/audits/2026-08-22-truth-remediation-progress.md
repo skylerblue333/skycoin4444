@@ -280,3 +280,7 @@ Canonical checkpoint `fbb726a` replaces the unsupported TokenDashboard with a ty
 ## TipJar Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `6bc6e8c` replaces the mock TipJar with a typed unavailable-state page. It removes fabricated creators, tip leaderboards, recent tips, balances, payment amounts, and fallback success behavior when the payment procedure is absent. Local `pnpm run check` reduced the reproducible backlog from 446 to 445 errors. Remote Actions run `32592726555` failed on remaining `StripeCheckout`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; TipJar and its former creator.tip error are absent from the reported failures.
+
+## StripeCheckout Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `db1fe93` replaces the mock Stripe checkout with a typed unavailable-state page. It removes unverified subscription plans, prices, promo codes, security/compliance badges, guarantees, fallback checkout success, and activation claims. Local `pnpm run check` reduced the reproducible backlog from 445 to 443 errors. Remote Actions run `32592800218` failed on remaining `StreamGifting`, `TeamWorkspace`, `TournamentBracket`, `UniversalSearch`, and `StartupSection` contracts plus other unrelated debt; StripeCheckout and its former payments.createStripeCheckout error are absent from the reported failures.
