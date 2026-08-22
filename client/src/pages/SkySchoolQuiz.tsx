@@ -174,7 +174,7 @@ interface QuizResult {
   timestamp: Date;
 }
 
-export default function SkySchoolQuiz({ lessonId, onComplete }: { lessonId: string; onComplete?: (result: QuizResult) => void }) {
+export default function SkySchoolQuiz({ lessonId = "blockchain-101-lesson-0", onComplete }: { lessonId?: string; onComplete?: (result: QuizResult) => void }) {
   const { isAuthenticated, user } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
