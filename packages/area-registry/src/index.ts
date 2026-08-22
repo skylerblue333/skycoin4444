@@ -5,7 +5,7 @@ import type { AreaManifest } from "@skycoin/contracts";
  * descriptive: an area is not considered implemented until its source and
  * validation evidence are linked here.
  */
-export const skycoinAreas: readonly AreaManifest[] = [
+const areaDefinitions: readonly [string, string, AreaManifest["domain"], AreaManifest["status"]][] = [
   ["core-platform", "Core Platform", "platform", "implemented"],
   ["identity-auth", "Identity and Authentication", "identity", "integrating"],
   ["profiles", "Profiles", "identity", "implemented"],
@@ -36,7 +36,9 @@ export const skycoinAreas: readonly AreaManifest[] = [
   ["analytics", "Analytics", "data", "planned"],
   ["security", "Security and Compliance", "security", "integrating"],
   ["observability", "Observability", "operations", "planned"],
-].map(([id, name, domain, status]) => ({
+];
+
+export const skycoinAreas: readonly AreaManifest[] = areaDefinitions.map(([id, name, domain, status]): AreaManifest => ({
   id,
   name,
   domain,
