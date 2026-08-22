@@ -72,3 +72,7 @@ ShadowChat-Core advanced concurrently to `59a42e8`, and GitHub Actions run `3257
 ## ShadowChat-Core Truth-Mode alert remediation (2026-08-22)
 
 ShadowChat-Core checkpoint `d6b0c50` removes fabricated trading-alert output and keeps activity data grounded in persisted events. GitHub Actions run `32575071932` completed successfully for the product branch. This is an honesty and safety correction, not evidence of live market-data integration or financial functionality.
+
+## Canonical audit CI status clarification (2026-08-22)
+
+For audit commit `e71b6d9`, GitHub Pages deployment run `32575164422` completed successfully, while CI run `32575164992` failed during the full legacy frontend typecheck. The reported errors include creator analytics and monetization screens calling router procedures that do not exist (`earnings`, `milestones`, `fanScores`, `revenueForecasting`, `mySubscriptions`, and `myTips`). These are unresolved product-contract gaps; no fake procedures are being added solely to make CI green.
