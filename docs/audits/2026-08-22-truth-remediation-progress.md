@@ -104,3 +104,7 @@ ShadowChat-Core checkpoint `76a4ff2` disables unverifiable market feeds in the p
 ## ShadowChat-Core integrated product baseline (2026-08-22)
 
 ShadowChat-Core checkpoint `2026757` integrates the validated messaging foundation with concurrent safety corrections: duplicate stub-router removal, disabled unverifiable wallet operations, disabled unsupported portfolio and market feeds, explicit alert-source labeling, and query-aware social search. Local validation passed typecheck, production build, and 15 test files with 73 tests. GitHub Actions run `32575769807` completed successfully. This baseline still does not claim live custody, exchange settlement, market-data coverage, cross-instance realtime scale, or production deployment.
+
+## Creator dashboard remote status (2026-08-22)
+
+Checkpoint `3735e0a` removes fabricated creator dashboard metrics and nonexistent creator API calls; targeted CreatorDashboard errors are zero and the production build passes locally. GitHub Pages deployment run `32575976385` succeeded. Canonical CI run `32575976861` failed because 715 unrelated legacy TypeScript errors remain elsewhere in the repository. The change is published and SHA-verified, but the repository-wide gate is not green.
