@@ -252,3 +252,7 @@ Canonical checkpoint `3b81020` replaces the unsupported TrustSafetyDashboard wit
 ## TranslationEnabledSocialFeed Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `074d99d` replaces the mock translated social feed with a typed unavailable-state page. It removes fabricated posts, translations, authors, timestamps, engagement counts, and social mutations until verified feed and translation procedures exist. Local `pnpm run check` reduced the reproducible backlog from 456 to 455 errors. Remote Actions run `32592056765` failed on remaining `TournamentBracket`, `Trading`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; TranslationEnabledSocialFeed and its former missing TranslationLayer error are absent from the reported failures.
+
+## Trading Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `2c2c2c6` replaces the mock Trading terminal with a typed unavailable-state page. It removes hard-coded market prices, volumes, portfolio value, P&L, open orders, bot counts, signals, and trading-entry claims. Local `pnpm run check` reduced the reproducible backlog from 455 to 454 errors. Remote Actions run `32592126174` failed on remaining `AITrading`, `CodeQuality`, `Growth`, `TournamentBracket`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; Trading and its former StatCard mismatch are absent from the reported failures.
