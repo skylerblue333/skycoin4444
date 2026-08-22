@@ -220,3 +220,7 @@ Canonical checkpoint `9270f99` replaces the unsupported MissionsSection with a t
 ## Mission-control MarketplaceSection Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `5be3ac5` replaces the unsupported MarketplaceSection with a typed unavailable-state page. It removes unverified token balances, listings, prices, sales, ratings, purchases, unlocked content, creator earnings, and payment-settlement claims. Local `pnpm run check` reduced the reproducible backlog from 502 to 487 errors. Remote Actions run `32591414764` failed on remaining `WorldBrain`, `WorldSimulationControl`, and `StartupSection` contracts; MarketplaceSection and its former aiMarketplace procedure errors are absent from the reported failures.
+
+## WorldBrain Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `cc17495` replaces the unsupported WorldBrain surface with a typed unavailable-state page. It removes unverified simulation ticks, entity states, event streams, market prices, sentiment, forecasts, behavior predictions, action confidence, expected impact, and execution claims. Local `pnpm run check` reduced the reproducible backlog from 487 to 480 errors. Authoritative CI run `32591493667` failed on remaining contracts, including `WorldSimulationControl`; Pages deployment run `32591493145` succeeded. WorldBrain and its former simulation procedure errors are absent from the reported CI failure set.
