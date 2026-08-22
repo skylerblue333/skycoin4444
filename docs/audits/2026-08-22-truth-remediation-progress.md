@@ -180,3 +180,7 @@ Canonical checkpoint `6483096` replaces the broken ProfileEdit surface with a ty
 ## Compliance Center Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `a6e4c43` replaces the unsupported Compliance Center with a typed unavailable-state page. It removes unverified KYC approval, risk-score, consent-persistence, audit-event, processing-deadline, and data-rights execution claims. Local `pnpm run check` reduced the reproducible backlog from 673 to 647 errors. Remote Actions run `32590293289` failed on unrelated remaining client tRPC contracts; ComplianceCenter and its former compliance procedure errors are absent from the reported failures.
+
+## Economic Layer Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `d250f60` replaces the unsupported Economic Layer with a typed unavailable-state page. It removes unverified balances, market values, fee charges, treasury totals, rewards, rich-list rankings, and economic mutation claims. Local `pnpm run check` reduced the reproducible backlog from 647 to 627 errors. Remote Actions run `32590441377` failed on unrelated remaining client tRPC contracts; EconomicLayer and its former economy procedure errors are absent from the reported failures.
