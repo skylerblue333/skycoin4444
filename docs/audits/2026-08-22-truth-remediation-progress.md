@@ -264,3 +264,7 @@ Canonical checkpoint `70fd02f` replaces the mock AI Trading page with a typed un
 ## VODArchive Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `11183b8` replaces the mock VOD archive with a typed unavailable-state page. It removes fabricated recordings, titles, creators, view counts, durations, playback, download, sharing, and catalog claims. Local `pnpm run check` reduced the reproducible backlog from 453 to 452 errors. Remote Actions run `32592351975` failed on remaining `TournamentBracket`, `UniversalSearch`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; VODArchive and its former stream.vods procedure error are absent from the reported failures.
+
+## VideoArea Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `c31584c` replaces the mock VideoArea with a typed unavailable-state page. It removes fabricated reels, videos, live streams, view counts, likes, trending rankings, thumbnails, uploads, playback, and engagement claims. Local `pnpm run check` reduced the reproducible backlog from 452 to 451 errors. Remote Actions run `32592478826` failed on remaining `TournamentBracket`, `UniversalSearch`, `WhaleMonitor`, and `StartupSection` contracts; VideoArea and its former video.listVideos procedure error are absent from the reported failures.
