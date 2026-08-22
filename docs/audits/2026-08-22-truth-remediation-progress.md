@@ -144,3 +144,7 @@ Actions run `32578238382` for audit commit `6a3cddb` failed during TypeScript va
 ## Canonical storage proxy typing checkpoint (2026-08-22)
 
 Checkpoint `7a2d088` normalizes Express wildcard parameters through an `unknown` boundary and removes the remaining `storageProxy` TypeScript error without changing proxy behavior. Local `pnpm run check` reproduced 713 remaining errors, down from 714. Remote Actions run `32578541827` failed only on the pre-existing legacy TypeScript backlog; the storage proxy error did not recur. The canonical repository remains CI-red and is not represented as production-ready.
+
+## Canonical cron-user schema checkpoint (2026-08-22)
+
+Checkpoint `6afb284` replaces the unsafe cron-user cast with a complete value conforming to the canonical Drizzle `User` schema, preserving explicit cron identity fields and null/false defaults. Local `pnpm run check` reproduced 712 remaining errors, down from 713; the prior `sdk.ts` assertion error no longer appears. Remote Actions run `32578609655` remains failed on other legacy TypeScript contract debt, so canonical CI is still red.
