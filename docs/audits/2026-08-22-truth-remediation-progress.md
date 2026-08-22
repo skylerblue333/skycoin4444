@@ -124,3 +124,7 @@ ShadowChat-Core checkpoint `bf5db62` labels the preserved generated gallery as a
 ## ShadowChat-Core trading-bot lifecycle checkpoint (2026-08-22)
 
 ShadowChat-Core checkpoint `249866b` persists a bounded trading-bot lifecycle instead of claiming live exchange execution or trading performance. GitHub Actions run `32577937173` completed successfully with install, typecheck, tests, and production build. The checkpoint is evidence of lifecycle persistence only; it is not evidence of profitable trading, market-data coverage, order settlement, or production financial infrastructure.
+
+## ShadowChat-Core persisted bot-performance checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `4d2a54b` aggregates bot performance from persisted lifecycle records. GitHub Actions run `32578034096` completed successfully with install, typecheck, tests, and production build. These are application-level aggregates over stored records only; they are not evidence of live exchange execution, profitable trading, market-data completeness, or financial performance.
