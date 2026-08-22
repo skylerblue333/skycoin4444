@@ -156,3 +156,7 @@ Checkpoint `f7ebca2` constrains `getAllRecords` to actual Drizzle relation keys 
 ## Canonical post-repair CI verification (2026-08-22)
 
 Audit commit `defd480` is synchronized to origin. Actions run `32578736667` failed during TypeScript validation on client-side tRPC contract mismatches and implicit-any fallout, before tests and production build. The repaired `server/_core/sdk.ts`, `server/_core/storageProxy.ts`, and `server/db.ts` errors are absent from this run's reported failures. Canonical CI therefore remains red, with the next work focused on shared client-router contracts rather than claiming completion.
+
+## ShadowChat-Core anomaly-detection Truth-Mode checkpoint (2026-08-22)
+
+ShadowChat-Core checkpoint `5c51954` removes fabricated anomaly detections and returns an explicit unavailable state until privacy-reviewed telemetry and a validated detection model exist. Local typecheck passed; focused router tests passed with 31 tests. GitHub Actions run `32580712425` completed successfully. No behavioral risk score, anomaly event, or security conclusion is claimed.
