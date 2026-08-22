@@ -244,3 +244,7 @@ Canonical checkpoint `4150cac` replaces the unsupported VestingSchedule with a t
 ## UnhiddenInterface Truth-Mode checkpoint (2026-08-22)
 
 Canonical checkpoint `cce5a78` replaces the unrestricted UnhiddenInterface with a typed diagnostic-unavailable page. It removes arbitrary procedure execution, simulated event logs, fabricated system health and version metrics, hard-coded database row counts, token supply, and simulation status. Local `pnpm run check` reduced the reproducible backlog from 467 to 465 errors. Remote Actions run `32591893654` failed on remaining `TrustSafetyDashboard`, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; UnhiddenInterface and its former token/simulation/auth-console errors are absent from the reported failures.
+
+## TrustSafetyDashboard Truth-Mode checkpoint (2026-08-22)
+
+Canonical checkpoint `3b81020` replaces the unsupported TrustSafetyDashboard with a typed availability page. It removes unverified trust scores, risk levels, moderation rules and actions, audit events, rate-limit telemetry, and security-coverage claims. Local `pnpm run check` reduced the reproducible backlog from 465 to 456 errors. Remote Actions run `32591973411` failed on remaining `StatCard` typing, `TranslationLayer` import, `UniversalSearch`, `VODArchive`, `VideoArea`, `WhaleMonitor`, and `StartupSection` contracts; TrustSafetyDashboard and its former trustSafety procedure errors are absent from the reported failures.
