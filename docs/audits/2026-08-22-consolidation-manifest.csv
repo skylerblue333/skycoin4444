@@ -1,0 +1,195 @@
+repository,size_kb,default_branch,url,disposition,rationale
+Skycoin-Stable-Release,3375,main,https://github.com/skylerblue333/Skycoin-Stable-Release,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+ShadowChat-Integration-Hub,3364,main,https://github.com/skylerblue333/ShadowChat-Integration-Hub,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+contribution-history-vault,2298,master,https://github.com/skylerblue333/contribution-history-vault,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+skycoin4444-platform,1986,main,https://github.com/skylerblue333/skycoin4444-platform,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+Skycoin-Reference-Implementation,878,main,https://github.com/skylerblue333/Skycoin-Reference-Implementation,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+Skycoin-Next-Gen,845,main,https://github.com/skylerblue333/Skycoin-Next-Gen,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+Skycoin-Legacy-Core,751,main,https://github.com/skylerblue333/Skycoin-Legacy-Core,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+my-skills,673,main,https://github.com/skylerblue333/my-skills,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+Skycoin-Protocol-Upgrade,597,main,https://github.com/skylerblue333/Skycoin-Protocol-Upgrade,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+ShadowChat-Final-Build,588,main,https://github.com/skylerblue333/ShadowChat-Final-Build,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+ShadowChat-Legacy,523,main,https://github.com/skylerblue333/ShadowChat-Legacy,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+contribution-booster,210,master,https://github.com/skylerblue333/contribution-booster,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+skycoin4444-production-optimized,144,master,https://github.com/skylerblue333/skycoin4444-production-optimized,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+skylerblue333,113,main,https://github.com/skylerblue333/skylerblue333,ARCHIVE-CANDIDATE,Potential reference or component; preserve history until reviewed.
+frontendpages,1076632,master,https://github.com/skylerblue333/frontendpages,CANONICAL-FRONTEND,Named consolidation target; requires source-level validation before migration.
+skycoin4444,22063,main,https://github.com/skylerblue333/skycoin4444,CANONICAL-PLATFORM,Named consolidation target; requires source-level validation before migration.
+ShadowChat-Pro-Edition,118422,main,https://github.com/skylerblue333/ShadowChat-Pro-Edition,PRODUCT-CANDIDATE,Named consolidation target; requires source-level validation before migration.
+ShadowChat-Core,3682,main,https://github.com/skylerblue333/ShadowChat-Core,PRODUCT-CANDIDATE,Named consolidation target; requires source-level validation before migration.
+Skycoin-Protocol-v44,814,main,https://github.com/skylerblue333/Skycoin-Protocol-v44,PRODUCT-CANDIDATE,Named consolidation target; requires source-level validation before migration.
+frontenedpages,363162,main,https://github.com/skylerblue333/frontenedpages,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+the-digital-ghost,48857,main,https://github.com/skylerblue333/the-digital-ghost,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+Loathing-in-the-woes-of-ruthless-the-chosen-one-,48566,main,https://github.com/skylerblue333/Loathing-in-the-woes-of-ruthless-the-chosen-one-,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+skycoin-production,39287,main,https://github.com/skylerblue333/skycoin-production,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+SKYCOIN4444-Ecosystem,15420,main,https://github.com/skylerblue333/SKYCOIN4444-Ecosystem,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+TS-Express-API,12222,main,https://github.com/skylerblue333/TS-Express-API,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+skycoin4444-personal-backup,10824,main,https://github.com/skylerblue333/skycoin4444-personal-backup,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+skycoin4444hopeAIShadowchat,10510,main,https://github.com/skylerblue333/skycoin4444hopeAIShadowchat,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+ShadowChat,10202,master,https://github.com/skylerblue333/ShadowChat,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+skycoin444-shadow-chat-hope-Ai-production-,9108,main,https://github.com/skylerblue333/skycoin444-shadow-chat-hope-Ai-production-,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+finishedforgoogle,6877,main,https://github.com/skylerblue333/finishedforgoogle,REQUIRES-REVIEW,"Large repository; inspect dependencies, tests, history, and runtime claims."
+main-about-me-and-IITR,44,main,https://github.com/skylerblue333/main-about-me-and-IITR,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin4444-legal-compliance-demo,38,master,https://github.com/skylerblue333/skycoin4444-legal-compliance-demo,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CPP-HTTP-Client,28,main,https://github.com/skylerblue333/CPP-HTTP-Client,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-admin,25,main,https://github.com/skylerblue333/skycoin-admin,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-ai,25,main,https://github.com/skylerblue333/skycoin-ai,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-analytics,25,main,https://github.com/skylerblue333/skycoin-analytics,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-api,25,main,https://github.com/skylerblue333/skycoin-api,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-content,25,main,https://github.com/skylerblue333/skycoin-content,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-core,25,main,https://github.com/skylerblue333/skycoin-core,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-creator,25,main,https://github.com/skylerblue333/skycoin-creator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-design,25,main,https://github.com/skylerblue333/skycoin-design,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-docs,25,main,https://github.com/skylerblue333/skycoin-docs,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-education,25,main,https://github.com/skylerblue333/skycoin-education,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-finance,25,main,https://github.com/skylerblue333/skycoin-finance,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-gaming,25,main,https://github.com/skylerblue333/skycoin-gaming,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-home,25,main,https://github.com/skylerblue333/skycoin-home,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-infrastructure,25,main,https://github.com/skylerblue333/skycoin-infrastructure,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-learning,25,main,https://github.com/skylerblue333/skycoin-learning,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-marketplace,25,main,https://github.com/skylerblue333/skycoin-marketplace,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-mining,25,main,https://github.com/skylerblue333/skycoin-mining,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-mobile,25,main,https://github.com/skylerblue333/skycoin-mobile,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-security,25,main,https://github.com/skylerblue333/skycoin-security,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-social,25,main,https://github.com/skylerblue333/skycoin-social,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-tests,25,main,https://github.com/skylerblue333/skycoin-tests,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-tools,25,main,https://github.com/skylerblue333/skycoin-tools,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-trading,25,main,https://github.com/skylerblue333/skycoin-trading,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-wallet,25,main,https://github.com/skylerblue333/skycoin-wallet,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin-web3,25,main,https://github.com/skylerblue333/skycoin-web3,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-WebSocket-Chat,24,main,https://github.com/skylerblue333/TS-WebSocket-Chat,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+AI-Agent-Orchestrator,23,main,https://github.com/skylerblue333/AI-Agent-Orchestrator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-Cron-Manager,23,main,https://github.com/skylerblue333/CSharp-Cron-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-ML-Inference-Server,23,main,https://github.com/skylerblue333/Py-ML-Inference-Server,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sol-NFT-Marketplace,23,main,https://github.com/skylerblue333/Sol-NFT-Marketplace,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-Payment-Gateway,23,main,https://github.com/skylerblue333/TS-Payment-Gateway,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-Tax-Calculator,22,main,https://github.com/skylerblue333/CSharp-Tax-Calculator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-GraphQL-Server,22,main,https://github.com/skylerblue333/TS-GraphQL-Server,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-React-Dashboard,22,main,https://github.com/skylerblue333/TS-React-Dashboard,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CPP-Math-Library,21,main,https://github.com/skylerblue333/CPP-Math-Library,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CPP-Thread-Pool,21,main,https://github.com/skylerblue333/CPP-Thread-Pool,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Database-Migration-Tool,21,main,https://github.com/skylerblue333/Database-Migration-Tool,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Distributed-Tracing-Setup,21,main,https://github.com/skylerblue333/Distributed-Tracing-Setup,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Concurrent-Crawler,21,main,https://github.com/skylerblue333/Go-Concurrent-Crawler,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Graph-Database,21,main,https://github.com/skylerblue333/Go-Graph-Database,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Snapshot-Creator,21,main,https://github.com/skylerblue333/Go-Snapshot-Creator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Stream-Processor,21,main,https://github.com/skylerblue333/Go-Stream-Processor,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Video-Transcoder,21,main,https://github.com/skylerblue333/Java-Video-Transcoder,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Async-Worker,21,main,https://github.com/skylerblue333/Py-Async-Worker,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Log-Analyzer,21,main,https://github.com/skylerblue333/Py-Log-Analyzer,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Web-Scraper,21,main,https://github.com/skylerblue333/Py-Web-Scraper,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Certificate-Authority,21,main,https://github.com/skylerblue333/Ruby-Certificate-Authority,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-marketing,21,master,https://github.com/skylerblue333/skycoin44-marketing,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+System-Architecture-Docs,21,main,https://github.com/skylerblue333/System-Architecture-Docs,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-E2E-Testing,21,main,https://github.com/skylerblue333/TS-E2E-Testing,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-NextJS-Blog,21,main,https://github.com/skylerblue333/TS-NextJS-Blog,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-Serverless-Funcs,21,main,https://github.com/skylerblue333/TS-Serverless-Funcs,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-State-Manager,21,main,https://github.com/skylerblue333/TS-State-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Load-Shedder,20,main,https://github.com/skylerblue333/C-Load-Shedder,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Map-Reduce-Job,20,main,https://github.com/skylerblue333/C-Map-Reduce-Job,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Order-Processor,20,main,https://github.com/skylerblue333/C-Order-Processor,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Search-Engine,20,main,https://github.com/skylerblue333/C-Search-Engine,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Secret-Manager,20,main,https://github.com/skylerblue333/C-Secret-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+C-Webhook-Dispatcher,20,main,https://github.com/skylerblue333/C-Webhook-Dispatcher,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CI-CD-Pipeline-Templates,20,main,https://github.com/skylerblue333/CI-CD-Pipeline-Templates,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Cross-Platform-Mobile,20,main,https://github.com/skylerblue333/Cross-Platform-Mobile,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-Alerting-System,20,main,https://github.com/skylerblue333/CSharp-Alerting-System,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-Document-Converter,20,main,https://github.com/skylerblue333/CSharp-Document-Converter,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-Identity-Provider,20,main,https://github.com/skylerblue333/CSharp-Identity-Provider,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+CSharp-PKI-Infrastructure,20,main,https://github.com/skylerblue333/CSharp-PKI-Infrastructure,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-Data-Lake-Ingester,20,main,https://github.com/skylerblue333/Elixir-Data-Lake-Ingester,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Load-Balancer,20,main,https://github.com/skylerblue333/Go-Load-Balancer,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Price-Estimator,20,main,https://github.com/skylerblue333/Go-Price-Estimator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-SMS-Gateway,20,main,https://github.com/skylerblue333/Go-SMS-Gateway,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Event-Bus,20,main,https://github.com/skylerblue333/Java-Event-Bus,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Key-Vault,20,main,https://github.com/skylerblue333/Java-Key-Vault,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Rule-Engine,20,main,https://github.com/skylerblue333/Java-Rule-Engine,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+PHP-Laravel-API,20,main,https://github.com/skylerblue333/PHP-Laravel-API,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Blockchain-Indexer,20,main,https://github.com/skylerblue333/Py-Blockchain-Indexer,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-Recommendation-Engine,20,main,https://github.com/skylerblue333/Python-Recommendation-Engine,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Log-Shipper,20,main,https://github.com/skylerblue333/Ruby-Log-Shipper,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Workflow-Engine,20,main,https://github.com/skylerblue333/Ruby-Workflow-Engine,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Batch-Processor,20,main,https://github.com/skylerblue333/Rust-Batch-Processor,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Circuit-Breaker,20,main,https://github.com/skylerblue333/Rust-Circuit-Breaker,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Disaster-Recovery,20,main,https://github.com/skylerblue333/Rust-Disaster-Recovery,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Inventory-Manager,20,main,https://github.com/skylerblue333/Rust-Inventory-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Time-Series-DB,20,main,https://github.com/skylerblue333/Rust-Time-Series-DB,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-Anomaly-Detector,20,main,https://github.com/skylerblue333/Scala-Anomaly-Detector,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-OAuth-Server,20,main,https://github.com/skylerblue333/Scala-OAuth-Server,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-Shipping-Estimator,20,main,https://github.com/skylerblue333/Scala-Shipping-Estimator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Server-Side-Rendering,20,main,https://github.com/skylerblue333/Server-Side-Rendering,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Swift-iOS-App,20,main,https://github.com/skylerblue333/Swift-iOS-App,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-Backup-Manager,20,main,https://github.com/skylerblue333/TypeScript-Backup-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-Data-Warehouse-Sync,20,main,https://github.com/skylerblue333/TypeScript-Data-Warehouse-Sync,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-Email-Sender,20,main,https://github.com/skylerblue333/TypeScript-Email-Sender,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-Search-Ranker,20,main,https://github.com/skylerblue333/TypeScript-Search-Ranker,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+viral-rap-songs,20,main,https://github.com/skylerblue333/viral-rap-songs,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-Fraud-Detector,19,main,https://github.com/skylerblue333/Elixir-Fraud-Detector,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-Service-Mesh,19,main,https://github.com/skylerblue333/Elixir-Service-Mesh,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Event-Sourcing-System,19,main,https://github.com/skylerblue333/Event-Sourcing-System,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-gRPC-Service,19,main,https://github.com/skylerblue333/Go-gRPC-Service,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+HCL-AWS-VPC,19,main,https://github.com/skylerblue333/HCL-AWS-VPC,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Metrics-Aggregator,19,main,https://github.com/skylerblue333/Java-Metrics-Aggregator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Java-Payment-Reconciler,19,main,https://github.com/skylerblue333/Java-Payment-Reconciler,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-CLI-Tool,19,main,https://github.com/skylerblue333/Py-CLI-Tool,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Security-Scanner,19,main,https://github.com/skylerblue333/Py-Security-Scanner,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Trading-Bot,19,main,https://github.com/skylerblue333/Py-Trading-Bot,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Image-Optimizer,19,main,https://github.com/skylerblue333/Ruby-Image-Optimizer,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Job-Scheduler,19,main,https://github.com/skylerblue333/Ruby-Job-Scheduler,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Ruby-Ledger-System,19,main,https://github.com/skylerblue333/Ruby-Ledger-System,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-Push-Notifier,19,main,https://github.com/skylerblue333/Rust-Push-Notifier,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-API-Gateway,19,main,https://github.com/skylerblue333/Scala-API-Gateway,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-PDF-Generator,19,main,https://github.com/skylerblue333/Scala-PDF-Generator,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Scala-Task-Queue,19,main,https://github.com/skylerblue333/Scala-Task-Queue,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sol-ERC20-Token,19,main,https://github.com/skylerblue333/Sol-ERC20-Token,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-A-B-Testing,19,main,https://github.com/skylerblue333/TypeScript-A-B-Testing,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Auto-Scaling-Manager,18,main,https://github.com/skylerblue333/Auto-Scaling-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-Loyalty-Program,18,main,https://github.com/skylerblue333/Elixir-Loyalty-Program,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-Report-Builder,18,main,https://github.com/skylerblue333/Elixir-Report-Builder,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Elixir-SAML-Provider,18,main,https://github.com/skylerblue333/Elixir-SAML-Provider,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Key-Value-Store,18,main,https://github.com/skylerblue333/Go-Key-Value-Store,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Kotlin-Ktor-Backend,18,main,https://github.com/skylerblue333/Kotlin-Ktor-Backend,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Data-Pipeline,18,main,https://github.com/skylerblue333/Py-Data-Pipeline,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Py-Microservice-Gateway,18,main,https://github.com/skylerblue333/Py-Microservice-Gateway,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-Data-Exporter,18,main,https://github.com/skylerblue333/Python-Data-Exporter,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-Notification-Router,18,main,https://github.com/skylerblue333/Python-Notification-Router,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-CLI-Task-Manager,18,main,https://github.com/skylerblue333/Rust-CLI-Task-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TS-Auth-Service,18,main,https://github.com/skylerblue333/TS-Auth-Service,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Go-Rate-Limiter,17,main,https://github.com/skylerblue333/Go-Rate-Limiter,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-Distributed-Cache,17,main,https://github.com/skylerblue333/Python-Distributed-Cache,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-Feature-Flag-Service,17,main,https://github.com/skylerblue333/Python-Feature-Flag-Service,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Rust-File-Encryptor,17,main,https://github.com/skylerblue333/Rust-File-Encryptor,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Python-ETL-Pipeline,16,main,https://github.com/skylerblue333/Python-ETL-Pipeline,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Zero-Trust-Network,16,main,https://github.com/skylerblue333/Zero-Trust-Network,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skylerblue-chess,11,master,https://github.com/skylerblue333/skylerblue-chess,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+TypeScript-Message-Queue,11,main,https://github.com/skylerblue333/TypeScript-Message-Queue,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+ai-object-detection,10,main,https://github.com/skylerblue333/ai-object-detection,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+cybersecurity-threat-detection,10,main,https://github.com/skylerblue333/cybersecurity-threat-detection,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+enterprise-devops-infrastructure,10,main,https://github.com/skylerblue333/enterprise-devops-infrastructure,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+fedramp-security-hardening,10,main,https://github.com/skylerblue333/fedramp-security-hardening,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+geolocation-intelligence,10,main,https://github.com/skylerblue333/geolocation-intelligence,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+nist-compliance-framework,10,main,https://github.com/skylerblue333/nist-compliance-framework,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+realtime-analytics,10,main,https://github.com/skylerblue333/realtime-analytics,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+ShadowChat-production-,10,main,https://github.com/skylerblue333/ShadowChat-production-,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-Portfolio-Manager,10,main,https://github.com/skylerblue333/Sky-Portfolio-Manager,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyAnalytics,10,main,https://github.com/skylerblue333/Sky-SkyAnalytics,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyCloud,10,main,https://github.com/skylerblue333/Sky-SkyCloud,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyCommunity,10,main,https://github.com/skylerblue333/Sky-SkyCommunity,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyDating,10,main,https://github.com/skylerblue333/Sky-SkyDating,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyDeveloper,10,main,https://github.com/skylerblue333/Sky-SkyDeveloper,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyEnterprise,10,main,https://github.com/skylerblue333/Sky-SkyEnterprise,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyGaming,10,main,https://github.com/skylerblue333/Sky-SkyGaming,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyHope,10,main,https://github.com/skylerblue333/Sky-SkyHope,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyInvestor,10,main,https://github.com/skylerblue333/Sky-SkyInvestor,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkyLive,10,main,https://github.com/skylerblue333/Sky-SkyLive,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkySchool,10,main,https://github.com/skylerblue333/Sky-SkySchool,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-marketing-website,10,master,https://github.com/skylerblue333/skycoin44-marketing-website,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin_production,10,main,https://github.com/skylerblue333/skycoin_production,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+system-orchestration-poc,10,main,https://github.com/skylerblue333/system-orchestration-poc,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+ultimate-blueprint,10,master,https://github.com/skylerblue333/ultimate-blueprint,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+Sky-SkySecurity,9,main,https://github.com/skylerblue333/Sky-SkySecurity,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-backend,6,main,https://github.com/skylerblue333/skycoin44-backend,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-documentation,6,main,https://github.com/skylerblue333/skycoin44-documentation,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-frontend,6,main,https://github.com/skylerblue333/skycoin44-frontend,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-infrastructure,6,main,https://github.com/skylerblue333/skycoin44-infrastructure,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
+skycoin44-token,6,main,https://github.com/skylerblue333/skycoin44-token,REQUIRES-VALIDATION,Small repository; do not treat size as evidence of production readiness.
