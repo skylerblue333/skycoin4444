@@ -22,3 +22,9 @@ This checkpoint records real changes that were implemented, tested, and verified
 The broader portfolio still contains generated scaffolds, duplicated repositories, unverified integrations, and unsupported README claims. The current GitHub inventory returned 194 visible repositories, while the supplied audit refers to 212; that discrepancy remains open. `frontendpages` currently measures 1,086 page-directory files, 1,062 lazy imports, and 1,067 route elements—not 1,155 verified distinct screens.
 
 Financial, wallet, blockchain, AI-provider, and deployment claims remain unavailable unless supported by real providers, secure configuration, tests, and operational evidence. The consolidation target remains 10–15 product repositories, with archive and reference dispositions for the remaining repositories rather than mass copying.
+
+## SKYCOIN4444-Ecosystem — streaming contract audit (2026-08-22)
+
+The repository-wide typecheck was reproduced and remains broadly failing. The streaming subsystem is not limited to a numeric/string identifier mismatch: `server/streaming-engine.ts` passes numeric stream/user identifiers into string-backed `streams` and `notifications` columns, while also writing fields such as `actorId`, `targetType`, and `targetId` that are absent from the current `drizzle/schema.ts` notification table. The `tips` table assumed by the service is also absent from the primary schema export. This is recorded as a schema-contract repair candidate rather than patched with casts or `any`, because a superficial change would conceal missing persistence functionality and violate Truth Mode.
+
+Verified diagnostics include `server/streaming-engine.ts` errors at lines 475, 479, 509, 515, 520, 807, and 810, plus a stale `createStream` reference from `server/dating-integration-hub.ts`. No changes were published for this repository during this checkpoint.
