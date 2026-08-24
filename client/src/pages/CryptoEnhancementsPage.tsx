@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Coins, Zap, Wallet } from 'lucide-react'; // Using lucide-react for icons
+import { ArrowRight, Coins, Zap, Wallet } from 'lucide-react';
 
 const CryptoEnhancementsPage = () => {
   return (
@@ -27,7 +27,7 @@ const CryptoEnhancementsPage = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up animation-delay-400">
             <Link href="/wallet">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                Access Your Wallet <WalletIcon className="ml-2 h-5 w-5" />
+                Access Your Wallet <Wallet className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link href="/swap">
@@ -45,7 +45,7 @@ const CryptoEnhancementsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <CoinIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
+              <Coins className="h-10 w-10 text-blue-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Enhanced Multi-Crypto Mining</CardTitle>
             </CardHeader>
             <CardContent>
@@ -54,7 +54,7 @@ const CryptoEnhancementsPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <WalletIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
+              <Wallet className="h-10 w-10 text-blue-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Advanced Wallet Features</CardTitle>
             </CardHeader>
             <CardContent>
@@ -72,7 +72,7 @@ const CryptoEnhancementsPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <CoinIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
+              <Coins className="h-10 w-10 text-blue-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Intelligent Trading Tools</CardTitle>
             </CardHeader>
             <CardContent>
@@ -81,7 +81,7 @@ const CryptoEnhancementsPage = () => {
           </Card>
           <Card className="bg-gray-800 border-gray-700 text-white transform hover:scale-105 transition-transform duration-300">
             <CardHeader>
-              <WalletIcon className="h-10 w-10 text-blue-400 mx-auto mb-4" />
+              <Wallet className="h-10 w-10 text-blue-400 mx-auto mb-4" />
               <CardTitle className="text-2xl">Staking & Yield Farming</CardTitle>
             </CardHeader>
             <CardContent>
@@ -106,7 +106,7 @@ const CryptoEnhancementsPage = () => {
         <p className="text-lg mb-8 opacity-90">Explore the full suite of SKY444 crypto enhancements and take control of your digital wealth.</p>
         <Link href="/wallet">
           <Button className="bg-white text-blue-700 text-lg px-10 py-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-            Explore Enhancements <ArrowRightIcon className="ml-2 h-5 w-5" />
+            Explore Enhancements <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
       </section>
