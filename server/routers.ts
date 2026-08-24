@@ -6,30 +6,125 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
 
-const unavailable = (feature: string, operation: string): never => {
+// Deliberately typed as `any`: these procedures must remain compatible with the
+// existing client surface while still failing truthfully at runtime. Returning
+// `never` makes tRPC infer unusable client data types and causes unrelated UI
+// type failures even though the endpoint is intentionally unavailable.
+const unavailable = (feature: string, operation: string): any => {
   throw new TRPCError({
     code: "NOT_IMPLEMENTED",
     message: `${feature} ${operation} API is not implemented yet`,
   });
 };
 
-// Truthful compatibility contract for feature areas that are registered in the
-// client but do not yet have a real backend implementation. Never return fake
-// data or fake mutation success from these endpoints.
-const createUnavailableFeatureRouter = (feature: string) =>
-  router({
-    list: publicProcedure.query(() => unavailable(feature, "list")),
-    get: publicProcedure.input(z.string()).query(() => unavailable(feature, "get")),
-    create: protectedProcedure
-      .input(z.object({}).passthrough())
-      .mutation(() => unavailable(feature, "create")),
-    update: protectedProcedure
-      .input(z.object({ id: z.string() }).passthrough())
-      .mutation(() => unavailable(feature, "update")),
-    delete: protectedProcedure
-      .input(z.string())
-      .mutation(() => unavailable(feature, "delete")),
+const createUnavailableFeatureRouter = (feature: string) => {
+  const query = (operation: string) =>
+    publicProcedure.input(z.any().optional()).query(() => unavailable(feature, operation));
+  const mutation = (operation: string) =>
+    protectedProcedure.input(z.any().optional()).mutation(() => unavailable(feature, operation));
+
+  return router({
+    // Generic CRUD compatibility
+    list: query("list"),
+    get: query("get"),
+    create: mutation("create"),
+    update: mutation("update"),
+    delete: mutation("delete"),
+
+    // Read/query compatibility used across the existing client.
+    stats: query("stats"),
+    health: query("health"),
+    logs: query("logs"),
+    users: query("users"),
+    queue: query("queue"),
+    moderationQueue: query("moderationQueue"),
+    history: query("history"),
+    metrics: query("metrics"),
+    getAll: query("getAll"),
+    getFeed: query("getFeed"),
+    tournaments: query("tournaments"),
+    quests: query("quests"),
+    getBattlePass: query("getBattlePass"),
+    bookmarks: query("bookmarks"),
+    getBounties: query("getBounties"),
+    campaigns: query("campaigns"),
+    leaderboard: query("leaderboard"),
+    conversations: query("conversations"),
+    reputation: query("reputation"),
+    behavior: query("behavior"),
+    governanceV2: query("governanceV2"),
+    economy: query("economy"),
+    emergent: query("emergent"),
+    analytics: query("analytics"),
+    earnings: query("earnings"),
+    milestones: query("milestones"),
+    fanScores: query("fanScores"),
+    revenueForecasting: query("revenueForecasting"),
+    mySubscriptions: query("mySubscriptions"),
+    memoryGraph: query("memoryGraph"),
+    twin: query("twin"),
+    github: query("github"),
+    trending: query("trending"),
+    live: query("live"),
+    pools: query("pools"),
+    freeWill: query("freeWill"),
+    tokenRegistry: query("tokenRegistry"),
+    regions: query("regions"),
+    ambassadors: query("ambassadors"),
+    heatmap: query("heatmap"),
+    growthAnalysis: query("growthAnalysis"),
+    getWorldState: query("getWorldState"),
+    kpis: query("kpis"),
+    revenue: query("revenue"),
+    treasury: query("treasury"),
+    getPartners: query("getPartners"),
+    getFavorites: query("getFavorites"),
+    founderProfile: query("founderProfile"),
+    platformMetrics: query("platformMetrics"),
+    missionControl: query("missionControl"),
+    myOrders: query("myOrders"),
+    getProficiency: query("getProficiency"),
+    getStats: query("getStats"),
+    getDashboard: query("getDashboard"),
+    reelsFeed: query("reelsFeed"),
+    getStreak: query("getStreak"),
+    getLoyaltyProfile: query("getLoyaltyProfile"),
+    getUserBadges: query("getUserBadges"),
+    getActiveQuests: query("getActiveQuests"),
+    getFanLevel: query("getFanLevel"),
+    myActivity: query("myActivity"),
+    getSpinPrizes: query("getSpinPrizes"),
+    getState: query("getState"),
+    seasonPass: query("seasonPass"),
+    security: query("security"),
+    orderHistory: query("orderHistory"),
+
+    // Mutation compatibility. These always throw NOT_IMPLEMENTED until a real
+    // backend exists; none of them fabricate a successful transaction.
+    resolve: mutation("resolve"),
+    tip: mutation("tip"),
+    banUser: mutation("banUser"),
+    updateUserRole: mutation("updateUserRole"),
+    triggerSprint: mutation("triggerSprint"),
+    claimTier: mutation("claimTier"),
+    removeBookmark: mutation("removeBookmark"),
+    completeBounty: mutation("completeBounty"),
+    donate: mutation("donate"),
+    send: mutation("send"),
+    join: mutation("join"),
+    createReel: mutation("createReel"),
+    subscribeWithStripe: mutation("subscribeWithStripe"),
+    requestSession: mutation("requestSession"),
+    saveFavorite: mutation("saveFavorite"),
+    removeFavorite: mutation("removeFavorite"),
+    logSession: mutation("logSession"),
+    createCheckout: mutation("createCheckout"),
+    recordEngagement: mutation("recordEngagement"),
+    recordActivity: mutation("recordActivity"),
+    generateFiles: mutation("generateFiles"),
+    spin: mutation("spin"),
   });
+};
 
 export const appRouter = router({
   system: systemRouter,
@@ -59,6 +154,7 @@ export const appRouter = router({
   community: createUnavailableFeatureRouter("Community"),
   dm: createUnavailableFeatureRouter("Direct Messaging"),
   story: createUnavailableFeatureRouter("Story"),
+  user: createUnavailableFeatureRouter("User"),
 
   // Marketplace & Commerce Routers
   marketplace: createUnavailableFeatureRouter("Marketplace"),
@@ -73,6 +169,8 @@ export const appRouter = router({
   economy: createUnavailableFeatureRouter("Economy"),
   gamefi: createUnavailableFeatureRouter("GameFi"),
   ico: createUnavailableFeatureRouter("ICO"),
+  wallet: createUnavailableFeatureRouter("Wallet"),
+  token: createUnavailableFeatureRouter("Token"),
 
   // Admin & Moderation Routers
   admin: createUnavailableFeatureRouter("Admin"),
