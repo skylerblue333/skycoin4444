@@ -12,9 +12,9 @@ A product is marked complete only after its exact PR head passes the repository'
 3. Sky Secret Vault — `C-Secret-Manager`
 4. Sky RPC Core — `Go-gRPC-Service`
 5. Sky Event Ledger — `Event-Sourcing-System`
+6. Sky Gateway — `Py-Microservice-Gateway` (adapts concepts from `Scala-API-Gateway`)
 
 ## Product queue
-6. Sky Gateway — `Py-Microservice-Gateway` (adapts concepts from `Scala-API-Gateway`)
 7. Sky Identity — `CSharp-Identity-Provider` (federation adapters from `Scala-OAuth-Server`, `Elixir-SAML-Provider`)
 8. Sky Queue — `Scala-Task-Queue` (worker adapter from `Py-Async-Worker`)
 9. Sky Workflow — `Ruby-Workflow-Engine` (scheduler adapter from `CSharp-Cron-Manager`)
