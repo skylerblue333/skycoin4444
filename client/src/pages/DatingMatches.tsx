@@ -38,6 +38,8 @@ interface Message {
 
 export default function DatingMatches() {
   const { user } = useAuth();
+  const parsedUserId = Number(user?.id);
+  const currentUserId = Number.isFinite(parsedUserId) ? parsedUserId : null;
   const [matches, setMatches] = useState<Match[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -81,13 +83,13 @@ export default function DatingMatches() {
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedMatch) return;
+    if (!newMessage.trim() || !selectedMatch || currentUserId === null) return;
 
     const tempMessage: Message = {
       id: Date.now(),
       matchId: selectedMatch.id,
-      senderId: user?.id || 0,
-      recipientId: selectedMatch.user1Id === user?.id ? selectedMatch.user2Id : selectedMatch.user1Id,
+      senderId: currentUserId,
+      recipientId: selectedMatch.user1Id === currentUserId ? selectedMatch.user2Id : selectedMatch.user1Id,
       content: newMessage,
       mediaUrl: null,
       mediaType: null,
@@ -125,7 +127,6 @@ export default function DatingMatches() {
       <DatingNotificationToast />
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
-          {/* Matches List */}
           <div className="md:col-span-1">
             <Card className="p-4">
               <h2 className="text-2xl font-bold mb-4">Matches ({matches.length})</h2>
@@ -180,11 +181,9 @@ export default function DatingMatches() {
             </Card>
           </div>
 
-          {/* Chat Area */}
           <div className="md:col-span-2">
             {selectedMatch ? (
               <Card className="p-4 h-96 flex flex-col">
-                {/* Chat Header */}
                 <div className="flex items-center gap-3 pb-4 border-b">
                   {selectedMatch.matchedUser?.profileImageUrl && (
                     <img
@@ -203,7 +202,6 @@ export default function DatingMatches() {
                   </div>
                 </div>
 
-                {/* Messages */}
                 <div className="flex-1 overflow-y-auto py-4 space-y-4">
                   {messageLoading ? (
                     <div className="flex items-center justify-center h-full">
@@ -217,11 +215,11 @@ export default function DatingMatches() {
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`flex ${msg.senderId === user?.id ? 'justify-end' : 'justify-start'}`}
+                        className={`flex ${msg.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
                           className={`max-w-xs px-4 py-2 rounded-lg ${
-                            msg.senderId === user?.id
+                            msg.senderId === currentUserId
                               ? 'bg-pink-500 text-white'
                               : 'bg-gray-200 text-gray-900'
                           }`}
@@ -236,7 +234,6 @@ export default function DatingMatches() {
                   )}
                 </div>
 
-                {/* Message Input */}
                 <div className="flex gap-2 pt-4 border-t">
                   <Input
                     value={newMessage}
@@ -251,7 +248,7 @@ export default function DatingMatches() {
                   />
                   <Button
                     onClick={handleSendMessage}
-                    disabled={!newMessage.trim()}
+                    disabled={!newMessage.trim() || currentUserId === null}
                     className="bg-pink-500 hover:bg-pink-600"
                   >
                     <MessageCircle className="w-4 h-4" />

@@ -25,6 +25,7 @@ const AUDIO_TRACKS = [
 
 export default function CreateReel() {
   const [, navigate] = useLocation();
+  const { isAuthenticated } = useAuth();
   
   const fileRef = useRef<HTMLInputElement>(null);
   const [caption, setCaption] = useState("");
@@ -90,7 +91,6 @@ export default function CreateReel() {
       let thumbnailUrl = "";
 
       if (videoFile) {
-        // Upload video file
         const formData = new FormData();
         formData.append("file", videoFile);
         const res = await fetch("/api/upload", { method: "POST", body: formData, credentials: "include" });
@@ -124,7 +124,6 @@ export default function CreateReel() {
       />
 
       <div className="space-y-6">
-        {/* Video Upload */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-3 block">Video</Label>
           {videoPreview ? (
@@ -152,7 +151,6 @@ export default function CreateReel() {
           <input ref={fileRef} type="file" accept="video/*" className="hidden" onChange={handleFileChange} />
         </Card>
 
-        {/* Caption */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-2 block">Caption</Label>
           <Textarea
@@ -165,7 +163,6 @@ export default function CreateReel() {
           <div className="text-xs text-muted-foreground text-right mt-1">{caption.length}/500</div>
         </Card>
 
-        {/* Hashtags */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
             <Hash className="w-4 h-4" /> Hashtags
@@ -191,7 +188,6 @@ export default function CreateReel() {
           )}
         </Card>
 
-        {/* Duration */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
             <Clock className="w-4 h-4" /> Duration (seconds)
@@ -209,7 +205,6 @@ export default function CreateReel() {
           </div>
         </Card>
 
-        {/* Audio */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-3 block">Audio Track</Label>
           <div className="space-y-2">
@@ -225,7 +220,6 @@ export default function CreateReel() {
           </div>
         </Card>
 
-        {/* Effects */}
         <Card className="p-6">
           <Label className="text-sm font-medium mb-3 block flex items-center gap-2">
             <Sparkles className="w-4 h-4" /> Effects
@@ -243,7 +237,6 @@ export default function CreateReel() {
           </div>
         </Card>
 
-        {/* Premium toggle */}
         <Card className="p-4 flex items-center justify-between">
           <div>
             <div className="font-medium text-sm">Premium Content</div>
@@ -257,7 +250,6 @@ export default function CreateReel() {
           </button>
         </Card>
 
-        {/* Submit */}
         <Button
           onClick={handleSubmit}
           disabled={isUploading || !caption.trim()}

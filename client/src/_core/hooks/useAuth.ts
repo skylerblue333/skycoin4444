@@ -27,7 +27,9 @@ export function useAuth(options?: UseAuthOptions) {
     },
   });
 
-  const logout = useCallback(async () => {
+  // The optional argument preserves compatibility with older callers that pass
+  // an event/options object. Logout behavior intentionally ignores that value.
+  const logout = useCallback(async (_legacyOptions?: unknown) => {
     try {
       await logoutMutation.mutateAsync();
     } catch (error: unknown) {
@@ -39,9 +41,6 @@ export function useAuth(options?: UseAuthOptions) {
       }
       throw error;
     } finally {
-      // Clear the Preview auto-login token mirrored into sessionStorage, so
-      // header-based sessions (Safari ITP / WebView) are logged out too. The
-      // backend cookie is cleared by the logout mutation.
       try {
         sessionStorage.removeItem("manus-cookie");
       } catch {}
@@ -76,7 +75,6 @@ export function useAuth(options?: UseAuthOptions) {
     if (typeof window === "undefined") return;
     if (redirectPath && window.location.pathname === redirectPath) return;
 
-    // Navigate at this moment only. startLogin() mints the nonce + cookie itself.
     if (redirectPath) {
       window.location.href = redirectPath;
     } else {

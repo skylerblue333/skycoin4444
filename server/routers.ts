@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -5,18 +6,189 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
 
-// Create a base router template for all feature modules
-const createFeatureRouter = () => router({
-  list: publicProcedure.query(() => []),
-  get: publicProcedure.input(z.string()).query(({ input }) => ({})),
-  create: protectedProcedure.input(z.object({})).mutation(({ input }) => ({ success: true })),
-  update: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ input }) => ({ success: true })),
-  delete: protectedProcedure.input(z.string()).mutation(({ input }) => ({ success: true })),
+// Compatibility procedures preserve the client contract while refusing to
+// fabricate backend behavior. Every unavailable operation throws at runtime.
+const unavailable = (feature: string, operation: string): any => {
+  throw new TRPCError({
+    code: "NOT_IMPLEMENTED",
+    message: `${feature} ${operation} API is not implemented yet`,
+  });
+};
+
+const compatibilityInput = z.union([
+  z.void(),
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.unknown()),
+  z.record(z.string(), z.unknown()),
+]);
+
+const unavailableQuery = (feature: string, operation: string) =>
+  publicProcedure
+    .input(compatibilityInput)
+    .query(() => unavailable(feature, operation));
+
+const unavailableMutation = (feature: string, operation: string) =>
+  protectedProcedure
+    .input(compatibilityInput)
+    .mutation(() => unavailable(feature, operation));
+
+// A few existing mutation callbacks inspect the variables passed to mutate().
+// Preserve those input shapes without claiming any successful backend action.
+const unavailableResolveMutation = (feature: string) =>
+  protectedProcedure
+    .input(z.object({ action: z.string() }).passthrough())
+    .mutation(() => unavailable(feature, "resolve"));
+
+const unavailableFollowMutation = (feature: string) =>
+  protectedProcedure
+    .input(z.object({ userId: z.number() }).passthrough())
+    .mutation(() => unavailable(feature, "follow"));
+
+const createUnavailableFeatureRecord = (feature: string) => ({
+  list: unavailableQuery(feature, "list"),
+  get: unavailableQuery(feature, "get"),
+  create: unavailableMutation(feature, "create"),
+  update: unavailableMutation(feature, "update"),
+  delete: unavailableMutation(feature, "delete"),
+
+  stats: unavailableQuery(feature, "stats"),
+  health: unavailableQuery(feature, "health"),
+  logs: unavailableQuery(feature, "logs"),
+  users: unavailableQuery(feature, "users"),
+  queue: unavailableQuery(feature, "queue"),
+  moderationQueue: unavailableQuery(feature, "moderationQueue"),
+  history: unavailableQuery(feature, "history"),
+  metrics: unavailableQuery(feature, "metrics"),
+  getAll: unavailableQuery(feature, "getAll"),
+  getFeed: unavailableQuery(feature, "getFeed"),
+  getBalance: unavailableQuery(feature, "getBalance"),
+  tokenomics: unavailableQuery(feature, "tokenomics"),
+  tournaments: unavailableQuery(feature, "tournaments"),
+  quests: unavailableQuery(feature, "quests"),
+  getBattlePass: unavailableQuery(feature, "getBattlePass"),
+  bookmarks: unavailableQuery(feature, "bookmarks"),
+  getBounties: unavailableQuery(feature, "getBounties"),
+  campaigns: unavailableQuery(feature, "campaigns"),
+  leaderboard: unavailableQuery(feature, "leaderboard"),
+  conversations: unavailableQuery(feature, "conversations"),
+  analytics: unavailableQuery(feature, "analytics"),
+  earnings: unavailableQuery(feature, "earnings"),
+  milestones: unavailableQuery(feature, "milestones"),
+  fanScores: unavailableQuery(feature, "fanScores"),
+  revenueForecasting: unavailableQuery(feature, "revenueForecasting"),
+  mySubscriptions: unavailableQuery(feature, "mySubscriptions"),
+  github: unavailableQuery(feature, "github"),
+  trending: unavailableQuery(feature, "trending"),
+  live: unavailableQuery(feature, "live"),
+  pools: unavailableQuery(feature, "pools"),
+  tokenRegistry: unavailableQuery(feature, "tokenRegistry"),
+  regions: unavailableQuery(feature, "regions"),
+  ambassadors: unavailableQuery(feature, "ambassadors"),
+  heatmap: unavailableQuery(feature, "heatmap"),
+  growthAnalysis: unavailableQuery(feature, "growthAnalysis"),
+  getWorldState: unavailableQuery(feature, "getWorldState"),
+  kpis: unavailableQuery(feature, "kpis"),
+  revenue: unavailableQuery(feature, "revenue"),
+  treasury: unavailableQuery(feature, "treasury"),
+  getPartners: unavailableQuery(feature, "getPartners"),
+  getFavorites: unavailableQuery(feature, "getFavorites"),
+  founderProfile: unavailableQuery(feature, "founderProfile"),
+  platformMetrics: unavailableQuery(feature, "platformMetrics"),
+  myOrders: unavailableQuery(feature, "myOrders"),
+  getProficiency: unavailableQuery(feature, "getProficiency"),
+  getStats: unavailableQuery(feature, "getStats"),
+  getDashboard: unavailableQuery(feature, "getDashboard"),
+  reelsFeed: unavailableQuery(feature, "reelsFeed"),
+  getStreak: unavailableQuery(feature, "getStreak"),
+  getLoyaltyProfile: unavailableQuery(feature, "getLoyaltyProfile"),
+  getUserBadges: unavailableQuery(feature, "getUserBadges"),
+  getActiveQuests: unavailableQuery(feature, "getActiveQuests"),
+  getFanLevel: unavailableQuery(feature, "getFanLevel"),
+  myActivity: unavailableQuery(feature, "myActivity"),
+  getSpinPrizes: unavailableQuery(feature, "getSpinPrizes"),
+  getState: unavailableQuery(feature, "getState"),
+  seasonPass: unavailableQuery(feature, "seasonPass"),
+  security: unavailableQuery(feature, "security"),
+  orderHistory: unavailableQuery(feature, "orderHistory"),
+  status: unavailableQuery(feature, "status"),
+  profile: unavailableQuery(feature, "profile"),
+  followers: unavailableQuery(feature, "followers"),
+  following: unavailableQuery(feature, "following"),
+  suggestedFollows: unavailableQuery(feature, "suggestedFollows"),
+
+  resolve: unavailableResolveMutation(feature),
+  tip: unavailableMutation(feature, "tip"),
+  banUser: unavailableMutation(feature, "banUser"),
+  updateUserRole: unavailableMutation(feature, "updateUserRole"),
+  triggerSprint: unavailableMutation(feature, "triggerSprint"),
+  claimTier: unavailableMutation(feature, "claimTier"),
+  removeBookmark: unavailableMutation(feature, "removeBookmark"),
+  completeBounty: unavailableMutation(feature, "completeBounty"),
+  donate: unavailableMutation(feature, "donate"),
+  send: unavailableMutation(feature, "send"),
+  join: unavailableMutation(feature, "join"),
+  createReel: unavailableMutation(feature, "createReel"),
+  subscribeWithStripe: unavailableMutation(feature, "subscribeWithStripe"),
+  requestSession: unavailableMutation(feature, "requestSession"),
+  saveFavorite: unavailableMutation(feature, "saveFavorite"),
+  removeFavorite: unavailableMutation(feature, "removeFavorite"),
+  logSession: unavailableMutation(feature, "logSession"),
+  createCheckout: unavailableMutation(feature, "createCheckout"),
+  recordEngagement: unavailableMutation(feature, "recordEngagement"),
+  recordActivity: unavailableMutation(feature, "recordActivity"),
+  generateFiles: unavailableMutation(feature, "generateFiles"),
+  spin: unavailableMutation(feature, "spin"),
+  updateProfile: unavailableMutation(feature, "updateProfile"),
+  follow: unavailableFollowMutation(feature),
+});
+
+const createUnavailableFeatureRouter = (feature: string) =>
+  router(createUnavailableFeatureRecord(feature));
+
+const createUnavailableNamespace = (feature: string, namespace: string) =>
+  router({
+    get: unavailableQuery(feature, `${namespace}.get`),
+    me: unavailableQuery(feature, `${namespace}.me`),
+    myProfile: unavailableQuery(feature, `${namespace}.myProfile`),
+    health: unavailableQuery(feature, `${namespace}.health`),
+    healthReport: unavailableQuery(feature, `${namespace}.healthReport`),
+    systemSnapshot: unavailableQuery(feature, `${namespace}.systemSnapshot`),
+    goals: unavailableQuery(feature, `${namespace}.goals`),
+    predictions: unavailableQuery(feature, `${namespace}.predictions`),
+    snapshot: unavailableQuery(feature, `${namespace}.snapshot`),
+    digitalNationStatus: unavailableQuery(feature, `${namespace}.digitalNationStatus`),
+    marketStates: unavailableQuery(feature, `${namespace}.marketStates`),
+    emissionCaps: unavailableQuery(feature, `${namespace}.emissionCaps`),
+    today: unavailableQuery(feature, `${namespace}.today`),
+    myRiskScore: unavailableQuery(feature, `${namespace}.myRiskScore`),
+  });
+
+const enterpriseRouter = router({
+  ...createUnavailableFeatureRecord("Enterprise"),
+  freeWill: createUnavailableNamespace("Enterprise", "freeWill"),
+  behavior: createUnavailableNamespace("Enterprise", "behavior"),
+  governanceV2: createUnavailableNamespace("Enterprise", "governanceV2"),
+  economy: createUnavailableNamespace("Enterprise", "economy"),
+  emergent: createUnavailableNamespace("Enterprise", "emergent"),
+  twin: createUnavailableNamespace("Enterprise", "twin"),
+  missionControl: createUnavailableNamespace("Enterprise", "missionControl"),
+  memoryGraph: createUnavailableNamespace("Enterprise", "memoryGraph"),
+  security: createUnavailableNamespace("Enterprise", "security"),
+});
+
+const hopeIntelligenceRouter = router({
+  ...createUnavailableFeatureRecord("Hope Intelligence"),
+  reputation: createUnavailableNamespace("Hope Intelligence", "reputation"),
+  memoryGraph: createUnavailableNamespace("Hope Intelligence", "memoryGraph"),
+  twin: createUnavailableNamespace("Hope Intelligence", "twin"),
+  missionControl: createUnavailableNamespace("Hope Intelligence", "missionControl"),
 });
 
 export const appRouter = router({
   system: systemRouter,
-  
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -26,68 +198,63 @@ export const appRouter = router({
     }),
   }),
 
-  // AI & Agents Routers
   ai: aiRouter,
-  aiEngineer: createFeatureRouter(),
-  aiMarket: createFeatureRouter(),
-  aiPersonas: createFeatureRouter(),
-  hopeAI: createFeatureRouter(),
-  hopeIntelligence: createFeatureRouter(),
-  agents44: createFeatureRouter(),
+  aiEngineer: createUnavailableFeatureRouter("AI Engineer"),
+  aiMarket: createUnavailableFeatureRouter("AI Market"),
+  aiPersonas: createUnavailableFeatureRouter("AI Personas"),
+  hopeAI: createUnavailableFeatureRouter("HopeAI"),
+  hopeIntelligence: hopeIntelligenceRouter,
+  agents44: createUnavailableFeatureRouter("Agents44"),
 
-  // Social & Community Routers
-  social: createFeatureRouter(),
-  socialCore: createFeatureRouter(),
-  feed: createFeatureRouter(),
-  community: createFeatureRouter(),
-  dm: createFeatureRouter(),
-  story: createFeatureRouter(),
+  social: createUnavailableFeatureRouter("Social"),
+  socialCore: createUnavailableFeatureRouter("Social Core"),
+  feed: createUnavailableFeatureRouter("Feed"),
+  community: createUnavailableFeatureRouter("Community"),
+  dm: createUnavailableFeatureRouter("Direct Messaging"),
+  story: createUnavailableFeatureRouter("Story"),
+  user: createUnavailableFeatureRouter("User"),
 
-  // Marketplace & Commerce Routers
-  marketplace: createFeatureRouter(),
-  creator: createFeatureRouter(),
-  creatorGrowth: createFeatureRouter(),
-  digitalArt: createFeatureRouter(),
-  payments: createFeatureRouter(),
+  marketplace: createUnavailableFeatureRouter("Marketplace"),
+  creator: createUnavailableFeatureRouter("Creator"),
+  creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
+  digitalArt: createUnavailableFeatureRouter("Digital Art"),
+  payments: createUnavailableFeatureRouter("Payments"),
 
-  // Blockchain & Crypto Routers
-  blockchain: createFeatureRouter(),
-  staking: createFeatureRouter(),
-  economy: createFeatureRouter(),
-  gamefi: createFeatureRouter(),
-  ico: createFeatureRouter(),
+  blockchain: createUnavailableFeatureRouter("Blockchain"),
+  staking: createUnavailableFeatureRouter("Staking"),
+  economy: createUnavailableFeatureRouter("Economy"),
+  gamefi: createUnavailableFeatureRouter("GameFi"),
+  ico: createUnavailableFeatureRouter("ICO"),
+  wallet: createUnavailableFeatureRouter("Wallet"),
+  token: createUnavailableFeatureRouter("Token"),
 
-  // Admin & Moderation Routers
-  admin: createFeatureRouter(),
-  moderation: createFeatureRouter(),
-  auditLogs: createFeatureRouter(),
-  security: createFeatureRouter(),
-  complianceIntelligence: createFeatureRouter(),
+  admin: createUnavailableFeatureRouter("Admin"),
+  moderation: createUnavailableFeatureRouter("Moderation"),
+  auditLogs: createUnavailableFeatureRouter("Audit Logs"),
+  security: createUnavailableFeatureRouter("Security"),
+  complianceIntelligence: createUnavailableFeatureRouter("Compliance Intelligence"),
 
-  // Platform & Enterprise Routers
-  platform: createFeatureRouter(),
-  enterprise: createFeatureRouter(),
-  governance: createFeatureRouter(),
-  orchestrator: createFeatureRouter(),
-  search: createFeatureRouter(),
+  platform: createUnavailableFeatureRouter("Platform"),
+  enterprise: enterpriseRouter,
+  governance: createUnavailableFeatureRouter("Governance"),
+  orchestrator: createUnavailableFeatureRouter("Orchestrator"),
+  search: createUnavailableFeatureRouter("Search"),
 
-  // Gaming & Gamification Routers
-  gamification: createFeatureRouter(),
-  simulation: createFeatureRouter(),
-  legendary: createFeatureRouter(),
+  gamification: createUnavailableFeatureRouter("Gamification"),
+  simulation: createUnavailableFeatureRouter("Simulation"),
+  legendary: createUnavailableFeatureRouter("Legendary"),
 
-  // Additional Feature Routers
-  charity: createFeatureRouter(),
-  stream: createFeatureRouter(),
-  languageExchange: createFeatureRouter(),
-  audienceLockIn: createFeatureRouter(),
-  shadowIdentity: createFeatureRouter(),
-  proofVault: createFeatureRouter(),
-  goc: createFeatureRouter(),
-  notifIntelligence: createFeatureRouter(),
-  investor: createFeatureRouter(),
-  installer: createFeatureRouter(),
-  sprint: createFeatureRouter(),
+  charity: createUnavailableFeatureRouter("Charity"),
+  stream: createUnavailableFeatureRouter("Stream"),
+  languageExchange: createUnavailableFeatureRouter("Language Exchange"),
+  audienceLockIn: createUnavailableFeatureRouter("Audience Lock-In"),
+  shadowIdentity: createUnavailableFeatureRouter("Shadow Identity"),
+  proofVault: createUnavailableFeatureRouter("Proof Vault"),
+  goc: createUnavailableFeatureRouter("GOC"),
+  notifIntelligence: createUnavailableFeatureRouter("Notification Intelligence"),
+  investor: createUnavailableFeatureRouter("Investor"),
+  installer: createUnavailableFeatureRouter("Installer"),
+  sprint: createUnavailableFeatureRouter("Sprint"),
 });
 
 export type AppRouter = typeof appRouter;
