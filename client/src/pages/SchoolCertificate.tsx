@@ -73,8 +73,8 @@ export default function SchoolCertificate() {
             <h3 className="font-semibold mb-3 flex items-center gap-2"><Share2 className="h-4 w-4 text-blue-400" />Share Achievement</h3>
             <p className="text-sm text-muted-foreground mb-3">Share your certificate on social media and with employers.</p>
             <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/10"><Share2 as TwitterIcon className="h-3.5 w-3.5" />Share on Share2 as TwitterIcon</Button>
-              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-600/30 text-blue-500 hover:bg-blue-600/10"><Link2 as LinkedinIcon className="h-3.5 w-3.5" />Add to LinkedIn</Button>
+              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-500/30 text-blue-400 hover:bg-blue-500/10"><TwitterIcon className="h-3.5 w-3.5" />Share on X</Button>
+              <Button variant="outline" size="sm" className="w-full gap-2 border-blue-600/30 text-blue-500 hover:bg-blue-600/10"><LinkedinIcon className="h-3.5 w-3.5" />Add to LinkedIn</Button>
               <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleCopy}><Copy className="h-3.5 w-3.5" />{copied ? "Copied!" : "Copy Link"}</Button>
             </div>
           </div>
