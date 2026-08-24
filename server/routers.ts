@@ -6,10 +6,8 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
 
-// Deliberately typed as `any`: these procedures must remain compatible with the
-// existing client surface while still failing truthfully at runtime. Returning
-// `never` makes tRPC infer unusable client data types and causes unrelated UI
-// type failures even though the endpoint is intentionally unavailable.
+// Compatibility procedures preserve the client contract while refusing to
+// fabricate backend behavior. Every unavailable operation throws at runtime.
 const unavailable = (feature: string, operation: string): any => {
   throw new TRPCError({
     code: "NOT_IMPLEMENTED",
@@ -17,114 +15,163 @@ const unavailable = (feature: string, operation: string): any => {
   });
 };
 
-const createUnavailableFeatureRouter = (feature: string) => {
-  const query = (operation: string) =>
-    publicProcedure.input(z.any().optional()).query(() => unavailable(feature, operation));
-  const mutation = (operation: string) =>
-    protectedProcedure.input(z.any().optional()).mutation(() => unavailable(feature, operation));
+// Including void in the input union allows existing callers to use either
+// useQuery() or useQuery({...}) without pretending that a specific schema is
+// implemented. Real feature routers replace this compatibility input later.
+const compatibilityInput = z.union([
+  z.void(),
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.unknown()),
+  z.record(z.string(), z.unknown()),
+]);
 
-  return router({
-    // Generic CRUD compatibility
-    list: query("list"),
-    get: query("get"),
-    create: mutation("create"),
-    update: mutation("update"),
-    delete: mutation("delete"),
+const unavailableQuery = (feature: string, operation: string) =>
+  publicProcedure
+    .input(compatibilityInput)
+    .query(() => unavailable(feature, operation));
 
-    // Read/query compatibility used across the existing client.
-    stats: query("stats"),
-    health: query("health"),
-    logs: query("logs"),
-    users: query("users"),
-    queue: query("queue"),
-    moderationQueue: query("moderationQueue"),
-    history: query("history"),
-    metrics: query("metrics"),
-    getAll: query("getAll"),
-    getFeed: query("getFeed"),
-    tournaments: query("tournaments"),
-    quests: query("quests"),
-    getBattlePass: query("getBattlePass"),
-    bookmarks: query("bookmarks"),
-    getBounties: query("getBounties"),
-    campaigns: query("campaigns"),
-    leaderboard: query("leaderboard"),
-    conversations: query("conversations"),
-    reputation: query("reputation"),
-    behavior: query("behavior"),
-    governanceV2: query("governanceV2"),
-    economy: query("economy"),
-    emergent: query("emergent"),
-    analytics: query("analytics"),
-    earnings: query("earnings"),
-    milestones: query("milestones"),
-    fanScores: query("fanScores"),
-    revenueForecasting: query("revenueForecasting"),
-    mySubscriptions: query("mySubscriptions"),
-    memoryGraph: query("memoryGraph"),
-    twin: query("twin"),
-    github: query("github"),
-    trending: query("trending"),
-    live: query("live"),
-    pools: query("pools"),
-    freeWill: query("freeWill"),
-    tokenRegistry: query("tokenRegistry"),
-    regions: query("regions"),
-    ambassadors: query("ambassadors"),
-    heatmap: query("heatmap"),
-    growthAnalysis: query("growthAnalysis"),
-    getWorldState: query("getWorldState"),
-    kpis: query("kpis"),
-    revenue: query("revenue"),
-    treasury: query("treasury"),
-    getPartners: query("getPartners"),
-    getFavorites: query("getFavorites"),
-    founderProfile: query("founderProfile"),
-    platformMetrics: query("platformMetrics"),
-    missionControl: query("missionControl"),
-    myOrders: query("myOrders"),
-    getProficiency: query("getProficiency"),
-    getStats: query("getStats"),
-    getDashboard: query("getDashboard"),
-    reelsFeed: query("reelsFeed"),
-    getStreak: query("getStreak"),
-    getLoyaltyProfile: query("getLoyaltyProfile"),
-    getUserBadges: query("getUserBadges"),
-    getActiveQuests: query("getActiveQuests"),
-    getFanLevel: query("getFanLevel"),
-    myActivity: query("myActivity"),
-    getSpinPrizes: query("getSpinPrizes"),
-    getState: query("getState"),
-    seasonPass: query("seasonPass"),
-    security: query("security"),
-    orderHistory: query("orderHistory"),
+const unavailableMutation = (feature: string, operation: string) =>
+  protectedProcedure
+    .input(compatibilityInput)
+    .mutation(() => unavailable(feature, operation));
 
-    // Mutation compatibility. These always throw NOT_IMPLEMENTED until a real
-    // backend exists; none of them fabricate a successful transaction.
-    resolve: mutation("resolve"),
-    tip: mutation("tip"),
-    banUser: mutation("banUser"),
-    updateUserRole: mutation("updateUserRole"),
-    triggerSprint: mutation("triggerSprint"),
-    claimTier: mutation("claimTier"),
-    removeBookmark: mutation("removeBookmark"),
-    completeBounty: mutation("completeBounty"),
-    donate: mutation("donate"),
-    send: mutation("send"),
-    join: mutation("join"),
-    createReel: mutation("createReel"),
-    subscribeWithStripe: mutation("subscribeWithStripe"),
-    requestSession: mutation("requestSession"),
-    saveFavorite: mutation("saveFavorite"),
-    removeFavorite: mutation("removeFavorite"),
-    logSession: mutation("logSession"),
-    createCheckout: mutation("createCheckout"),
-    recordEngagement: mutation("recordEngagement"),
-    recordActivity: mutation("recordActivity"),
-    generateFiles: mutation("generateFiles"),
-    spin: mutation("spin"),
+const createUnavailableFeatureRecord = (feature: string) => ({
+  list: unavailableQuery(feature, "list"),
+  get: unavailableQuery(feature, "get"),
+  create: unavailableMutation(feature, "create"),
+  update: unavailableMutation(feature, "update"),
+  delete: unavailableMutation(feature, "delete"),
+
+  stats: unavailableQuery(feature, "stats"),
+  health: unavailableQuery(feature, "health"),
+  logs: unavailableQuery(feature, "logs"),
+  users: unavailableQuery(feature, "users"),
+  queue: unavailableQuery(feature, "queue"),
+  moderationQueue: unavailableQuery(feature, "moderationQueue"),
+  history: unavailableQuery(feature, "history"),
+  metrics: unavailableQuery(feature, "metrics"),
+  getAll: unavailableQuery(feature, "getAll"),
+  getFeed: unavailableQuery(feature, "getFeed"),
+  getBalance: unavailableQuery(feature, "getBalance"),
+  tokenomics: unavailableQuery(feature, "tokenomics"),
+  tournaments: unavailableQuery(feature, "tournaments"),
+  quests: unavailableQuery(feature, "quests"),
+  getBattlePass: unavailableQuery(feature, "getBattlePass"),
+  bookmarks: unavailableQuery(feature, "bookmarks"),
+  getBounties: unavailableQuery(feature, "getBounties"),
+  campaigns: unavailableQuery(feature, "campaigns"),
+  leaderboard: unavailableQuery(feature, "leaderboard"),
+  conversations: unavailableQuery(feature, "conversations"),
+  analytics: unavailableQuery(feature, "analytics"),
+  earnings: unavailableQuery(feature, "earnings"),
+  milestones: unavailableQuery(feature, "milestones"),
+  fanScores: unavailableQuery(feature, "fanScores"),
+  revenueForecasting: unavailableQuery(feature, "revenueForecasting"),
+  mySubscriptions: unavailableQuery(feature, "mySubscriptions"),
+  github: unavailableQuery(feature, "github"),
+  trending: unavailableQuery(feature, "trending"),
+  live: unavailableQuery(feature, "live"),
+  pools: unavailableQuery(feature, "pools"),
+  tokenRegistry: unavailableQuery(feature, "tokenRegistry"),
+  regions: unavailableQuery(feature, "regions"),
+  ambassadors: unavailableQuery(feature, "ambassadors"),
+  heatmap: unavailableQuery(feature, "heatmap"),
+  growthAnalysis: unavailableQuery(feature, "growthAnalysis"),
+  getWorldState: unavailableQuery(feature, "getWorldState"),
+  kpis: unavailableQuery(feature, "kpis"),
+  revenue: unavailableQuery(feature, "revenue"),
+  treasury: unavailableQuery(feature, "treasury"),
+  getPartners: unavailableQuery(feature, "getPartners"),
+  getFavorites: unavailableQuery(feature, "getFavorites"),
+  founderProfile: unavailableQuery(feature, "founderProfile"),
+  platformMetrics: unavailableQuery(feature, "platformMetrics"),
+  myOrders: unavailableQuery(feature, "myOrders"),
+  getProficiency: unavailableQuery(feature, "getProficiency"),
+  getStats: unavailableQuery(feature, "getStats"),
+  getDashboard: unavailableQuery(feature, "getDashboard"),
+  reelsFeed: unavailableQuery(feature, "reelsFeed"),
+  getStreak: unavailableQuery(feature, "getStreak"),
+  getLoyaltyProfile: unavailableQuery(feature, "getLoyaltyProfile"),
+  getUserBadges: unavailableQuery(feature, "getUserBadges"),
+  getActiveQuests: unavailableQuery(feature, "getActiveQuests"),
+  getFanLevel: unavailableQuery(feature, "getFanLevel"),
+  myActivity: unavailableQuery(feature, "myActivity"),
+  getSpinPrizes: unavailableQuery(feature, "getSpinPrizes"),
+  getState: unavailableQuery(feature, "getState"),
+  seasonPass: unavailableQuery(feature, "seasonPass"),
+  security: unavailableQuery(feature, "security"),
+  orderHistory: unavailableQuery(feature, "orderHistory"),
+  status: unavailableQuery(feature, "status"),
+  profile: unavailableQuery(feature, "profile"),
+  followers: unavailableQuery(feature, "followers"),
+  following: unavailableQuery(feature, "following"),
+  suggestedFollows: unavailableQuery(feature, "suggestedFollows"),
+
+  resolve: unavailableMutation(feature, "resolve"),
+  tip: unavailableMutation(feature, "tip"),
+  banUser: unavailableMutation(feature, "banUser"),
+  updateUserRole: unavailableMutation(feature, "updateUserRole"),
+  triggerSprint: unavailableMutation(feature, "triggerSprint"),
+  claimTier: unavailableMutation(feature, "claimTier"),
+  removeBookmark: unavailableMutation(feature, "removeBookmark"),
+  completeBounty: unavailableMutation(feature, "completeBounty"),
+  donate: unavailableMutation(feature, "donate"),
+  send: unavailableMutation(feature, "send"),
+  join: unavailableMutation(feature, "join"),
+  createReel: unavailableMutation(feature, "createReel"),
+  subscribeWithStripe: unavailableMutation(feature, "subscribeWithStripe"),
+  requestSession: unavailableMutation(feature, "requestSession"),
+  saveFavorite: unavailableMutation(feature, "saveFavorite"),
+  removeFavorite: unavailableMutation(feature, "removeFavorite"),
+  logSession: unavailableMutation(feature, "logSession"),
+  createCheckout: unavailableMutation(feature, "createCheckout"),
+  recordEngagement: unavailableMutation(feature, "recordEngagement"),
+  recordActivity: unavailableMutation(feature, "recordActivity"),
+  generateFiles: unavailableMutation(feature, "generateFiles"),
+  spin: unavailableMutation(feature, "spin"),
+  updateProfile: unavailableMutation(feature, "updateProfile"),
+  follow: unavailableMutation(feature, "follow"),
+});
+
+const createUnavailableFeatureRouter = (feature: string) =>
+  router(createUnavailableFeatureRecord(feature));
+
+const createUnavailableNamespace = (feature: string, namespace: string) =>
+  router({
+    get: unavailableQuery(feature, `${namespace}.get`),
+    me: unavailableQuery(feature, `${namespace}.me`),
+    myProfile: unavailableQuery(feature, `${namespace}.myProfile`),
+    health: unavailableQuery(feature, `${namespace}.health`),
+    healthReport: unavailableQuery(feature, `${namespace}.healthReport`),
+    systemSnapshot: unavailableQuery(feature, `${namespace}.systemSnapshot`),
+    goals: unavailableQuery(feature, `${namespace}.goals`),
+    predictions: unavailableQuery(feature, `${namespace}.predictions`),
+    snapshot: unavailableQuery(feature, `${namespace}.snapshot`),
+    digitalNationStatus: unavailableQuery(feature, `${namespace}.digitalNationStatus`),
+    marketStates: unavailableQuery(feature, `${namespace}.marketStates`),
+    emissionCaps: unavailableQuery(feature, `${namespace}.emissionCaps`),
+    today: unavailableQuery(feature, `${namespace}.today`),
+    myRiskScore: unavailableQuery(feature, `${namespace}.myRiskScore`),
   });
-};
+
+const enterpriseRouter = router({
+  ...createUnavailableFeatureRecord("Enterprise"),
+  freeWill: createUnavailableNamespace("Enterprise", "freeWill"),
+  behavior: createUnavailableNamespace("Enterprise", "behavior"),
+  governanceV2: createUnavailableNamespace("Enterprise", "governanceV2"),
+  economy: createUnavailableNamespace("Enterprise", "economy"),
+  emergent: createUnavailableNamespace("Enterprise", "emergent"),
+  twin: createUnavailableNamespace("Enterprise", "twin"),
+  missionControl: createUnavailableNamespace("Enterprise", "missionControl"),
+});
+
+const hopeIntelligenceRouter = router({
+  ...createUnavailableFeatureRecord("Hope Intelligence"),
+  reputation: createUnavailableNamespace("Hope Intelligence", "reputation"),
+  memoryGraph: createUnavailableNamespace("Hope Intelligence", "memoryGraph"),
+});
 
 export const appRouter = router({
   system: systemRouter,
@@ -138,16 +185,14 @@ export const appRouter = router({
     }),
   }),
 
-  // AI & Agents Routers
   ai: aiRouter,
   aiEngineer: createUnavailableFeatureRouter("AI Engineer"),
   aiMarket: createUnavailableFeatureRouter("AI Market"),
   aiPersonas: createUnavailableFeatureRouter("AI Personas"),
   hopeAI: createUnavailableFeatureRouter("HopeAI"),
-  hopeIntelligence: createUnavailableFeatureRouter("Hope Intelligence"),
+  hopeIntelligence: hopeIntelligenceRouter,
   agents44: createUnavailableFeatureRouter("Agents44"),
 
-  // Social & Community Routers
   social: createUnavailableFeatureRouter("Social"),
   socialCore: createUnavailableFeatureRouter("Social Core"),
   feed: createUnavailableFeatureRouter("Feed"),
@@ -156,14 +201,12 @@ export const appRouter = router({
   story: createUnavailableFeatureRouter("Story"),
   user: createUnavailableFeatureRouter("User"),
 
-  // Marketplace & Commerce Routers
   marketplace: createUnavailableFeatureRouter("Marketplace"),
   creator: createUnavailableFeatureRouter("Creator"),
   creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
   digitalArt: createUnavailableFeatureRouter("Digital Art"),
   payments: createUnavailableFeatureRouter("Payments"),
 
-  // Blockchain & Crypto Routers
   blockchain: createUnavailableFeatureRouter("Blockchain"),
   staking: createUnavailableFeatureRouter("Staking"),
   economy: createUnavailableFeatureRouter("Economy"),
@@ -172,26 +215,22 @@ export const appRouter = router({
   wallet: createUnavailableFeatureRouter("Wallet"),
   token: createUnavailableFeatureRouter("Token"),
 
-  // Admin & Moderation Routers
   admin: createUnavailableFeatureRouter("Admin"),
   moderation: createUnavailableFeatureRouter("Moderation"),
   auditLogs: createUnavailableFeatureRouter("Audit Logs"),
   security: createUnavailableFeatureRouter("Security"),
   complianceIntelligence: createUnavailableFeatureRouter("Compliance Intelligence"),
 
-  // Platform & Enterprise Routers
   platform: createUnavailableFeatureRouter("Platform"),
-  enterprise: createUnavailableFeatureRouter("Enterprise"),
+  enterprise: enterpriseRouter,
   governance: createUnavailableFeatureRouter("Governance"),
   orchestrator: createUnavailableFeatureRouter("Orchestrator"),
   search: createUnavailableFeatureRouter("Search"),
 
-  // Gaming & Gamification Routers
   gamification: createUnavailableFeatureRouter("Gamification"),
   simulation: createUnavailableFeatureRouter("Simulation"),
   legendary: createUnavailableFeatureRouter("Legendary"),
 
-  // Additional Feature Routers
   charity: createUnavailableFeatureRouter("Charity"),
   stream: createUnavailableFeatureRouter("Stream"),
   languageExchange: createUnavailableFeatureRouter("Language Exchange"),
