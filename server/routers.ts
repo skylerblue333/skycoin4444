@@ -5,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
+import { getSkyFeedProcedure } from "./routers/feed";
 import { notificationsRouter } from "./routers/notifications";
 import { searchRouter } from "./routers/search";
 import {
@@ -100,6 +101,8 @@ const userRouter = router({
   follow: userFollowProcedure,
   unfollow: userUnfollowProcedure,
 });
+const socialRouter = router({ ...createUnavailableFeatureRecord("Social"), getFeed: getSkyFeedProcedure });
+const feedRouter = router({ ...createUnavailableFeatureRecord("Feed"), getFeed: getSkyFeedProcedure });
 
 export const appRouter = router({
   system: systemRouter,
@@ -115,7 +118,7 @@ export const appRouter = router({
   ai: aiRouter,
   aiEngineer: createUnavailableFeatureRouter("AI Engineer"), aiMarket: createUnavailableFeatureRouter("AI Market"), aiPersonas: createUnavailableFeatureRouter("AI Personas"),
   hopeAI: createUnavailableFeatureRouter("HopeAI"), hopeIntelligence: hopeIntelligenceRouter, agents44: createUnavailableFeatureRouter("Agents44"),
-  social: createUnavailableFeatureRouter("Social"), socialCore: createUnavailableFeatureRouter("Social Core"), feed: createUnavailableFeatureRouter("Feed"),
+  social: socialRouter, socialCore: createUnavailableFeatureRouter("Social Core"), feed: feedRouter,
   community: createUnavailableFeatureRouter("Community"), dm: createUnavailableFeatureRouter("Direct Messaging"), story: createUnavailableFeatureRouter("Story"), user: userRouter,
   marketplace: createUnavailableFeatureRouter("Marketplace"), creator: createUnavailableFeatureRouter("Creator"), creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
   digitalArt: createUnavailableFeatureRouter("Digital Art"), payments: createUnavailableFeatureRouter("Payments"), blockchain: createUnavailableFeatureRouter("Blockchain"),
