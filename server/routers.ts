@@ -9,6 +9,14 @@ import { getSkyFeedProcedure } from "./routers/feed";
 import { notificationsRouter } from "./routers/notifications";
 import { searchRouter } from "./routers/search";
 import {
+  addCommentProcedure,
+  createPostProcedure,
+  deletePostProcedure,
+  likePostProcedure,
+  listCommentsProcedure,
+  unlikePostProcedure,
+} from "./routers/social";
+import {
   userFollowProcedure,
   userFollowersProcedure,
   userFollowingProcedure,
@@ -93,15 +101,21 @@ const hopeIntelligenceRouter = router({
 });
 const userRouter = router({
   ...createUnavailableFeatureRecord("User"),
-  profile: userProfileProcedure,
-  updateProfile: userUpdateProfileProcedure,
-  followers: userFollowersProcedure,
-  following: userFollowingProcedure,
-  suggestedFollows: userSuggestedFollowsProcedure,
-  follow: userFollowProcedure,
-  unfollow: userUnfollowProcedure,
+  profile: userProfileProcedure, updateProfile: userUpdateProfileProcedure,
+  followers: userFollowersProcedure, following: userFollowingProcedure, suggestedFollows: userSuggestedFollowsProcedure,
+  follow: userFollowProcedure, unfollow: userUnfollowProcedure,
 });
-const socialRouter = router({ ...createUnavailableFeatureRecord("Social"), getFeed: getSkyFeedProcedure });
+const socialInteractions = {
+  getFeed: getSkyFeedProcedure,
+  createPost: createPostProcedure,
+  deletePost: deletePostProcedure,
+  comments: listCommentsProcedure,
+  addComment: addCommentProcedure,
+  likePost: likePostProcedure,
+  unlikePost: unlikePostProcedure,
+};
+const socialRouter = router({ ...createUnavailableFeatureRecord("Social"), ...socialInteractions });
+const socialCoreRouter = router({ ...createUnavailableFeatureRecord("Social Core"), ...socialInteractions });
 const feedRouter = router({ ...createUnavailableFeatureRecord("Feed"), getFeed: getSkyFeedProcedure });
 
 export const appRouter = router({
@@ -118,7 +132,7 @@ export const appRouter = router({
   ai: aiRouter,
   aiEngineer: createUnavailableFeatureRouter("AI Engineer"), aiMarket: createUnavailableFeatureRouter("AI Market"), aiPersonas: createUnavailableFeatureRouter("AI Personas"),
   hopeAI: createUnavailableFeatureRouter("HopeAI"), hopeIntelligence: hopeIntelligenceRouter, agents44: createUnavailableFeatureRouter("Agents44"),
-  social: socialRouter, socialCore: createUnavailableFeatureRouter("Social Core"), feed: feedRouter,
+  social: socialRouter, socialCore: socialCoreRouter, feed: feedRouter,
   community: createUnavailableFeatureRouter("Community"), dm: createUnavailableFeatureRouter("Direct Messaging"), story: createUnavailableFeatureRouter("Story"), user: userRouter,
   marketplace: createUnavailableFeatureRouter("Marketplace"), creator: createUnavailableFeatureRouter("Creator"), creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
   digitalArt: createUnavailableFeatureRouter("Digital Art"), payments: createUnavailableFeatureRouter("Payments"), blockchain: createUnavailableFeatureRouter("Blockchain"),
