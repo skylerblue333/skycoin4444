@@ -1,15 +1,29 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { follows, users } from "../../drizzle/schema";
+import { follows, notifications, users } from "../../drizzle/schema";
 import { db } from "../db";
 import { protectedProcedure, publicProcedure } from "../_core/trpc";
 
-const profileInput = z
+const userIdSchema = z.union([z.string().min(1), z.number().int()]);
+const profileInput = z.object({ userId: userIdSchema.optional() }).optional();
+const listInput = z
   .object({
-    userId: z.union([z.string().min(1), z.number().int()]).optional(),
+    userId: userIdSchema.optional(),
+    limit: z.number().int().min(1).max(100).default(30),
   })
   .optional();
+
+const publicUserFields = {
+  id: users.id,
+  username: users.username,
+  name: users.name,
+  bio: users.bio,
+  avatar: users.avatar,
+  verified: users.verified,
+  createdAt: users.createdAt,
+};
 
 function publicProfile(user: typeof users.$inferSelect, followerCount: number, email: string | null) {
   return {
@@ -22,26 +36,26 @@ function publicProfile(user: typeof users.$inferSelect, followerCount: number, e
     createdAt: user.createdAt,
     email,
     followerCount,
-    // These concepts are not represented by the current schema. Returning
-    // null keeps clients honest instead of manufacturing progression metrics.
     level: null,
     xp: null,
     reputation: null,
   };
 }
 
+function resolveTargetId(input: { userId?: string | number } | undefined, sessionUserId?: string) {
+  const requestedId = input?.userId !== undefined ? String(input.userId) : sessionUserId;
+  if (!requestedId) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Sign in or provide a userId" });
+  }
+  return requestedId;
+}
+
 export const userProfileProcedure = publicProcedure
   .input(profileInput)
   .query(async ({ ctx, input }) => {
-    const requestedId = input?.userId !== undefined ? String(input.userId) : ctx.user?.id;
-    if (!requestedId) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: "Sign in or provide a userId" });
-    }
-
+    const requestedId = resolveTargetId(input, ctx.user?.id);
     const user = await db.query.users.findFirst({ where: eq(users.id, requestedId) });
-    if (!user) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
-    }
+    if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
 
     const followerRows = await db
       .select({ id: follows.id })
@@ -58,13 +72,7 @@ const updateProfileInput = z
     name: z.string().trim().min(1).max(255).optional(),
     bio: z.string().trim().max(255).nullable().optional(),
     avatar: z.string().trim().max(255).nullable().optional(),
-    username: z
-      .string()
-      .trim()
-      .min(2)
-      .max(64)
-      .regex(/^[A-Za-z0-9_.-]+$/, "Username contains unsupported characters")
-      .optional(),
+    username: z.string().trim().min(2).max(64).regex(/^[A-Za-z0-9_.-]+$/, "Username contains unsupported characters").optional(),
   })
   .refine(value => Object.values(value).some(field => field !== undefined), {
     message: "At least one profile field is required",
@@ -74,10 +82,7 @@ export const userUpdateProfileProcedure = protectedProcedure
   .input(updateProfileInput)
   .mutation(async ({ ctx, input }) => {
     const name = input.displayName ?? input.name;
-    const updates: Partial<typeof users.$inferInsert> = {
-      updatedAt: new Date(),
-    };
-
+    const updates: Partial<typeof users.$inferInsert> = { updatedAt: new Date() };
     if (name !== undefined) updates.name = name;
     if (input.bio !== undefined) updates.bio = input.bio;
     if (input.avatar !== undefined) updates.avatar = input.avatar;
@@ -94,14 +99,95 @@ export const userUpdateProfileProcedure = protectedProcedure
     }
 
     const updated = await db.query.users.findFirst({ where: eq(users.id, ctx.user.id) });
-    if (!updated) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found after update" });
+    if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found after update" });
+
+    const followerRows = await db.select({ id: follows.id }).from(follows).where(eq(follows.followingId, ctx.user.id));
+    return publicProfile(updated, followerRows.length, updated.email);
+  });
+
+export const userFollowersProcedure = publicProcedure
+  .input(listInput)
+  .query(async ({ ctx, input }) => {
+    const targetId = resolveTargetId(input, ctx.user?.id);
+    const limit = input?.limit ?? 30;
+    const rows = await db
+      .select({ userId: follows.followerId })
+      .from(follows)
+      .where(eq(follows.followingId, targetId))
+      .limit(limit);
+    const ids = rows.map(row => row.userId).filter((id): id is string => Boolean(id));
+    if (!ids.length) return [];
+    return db.select(publicUserFields).from(users).where(inArray(users.id, ids)).limit(limit);
+  });
+
+export const userFollowingProcedure = publicProcedure
+  .input(listInput)
+  .query(async ({ ctx, input }) => {
+    const targetId = resolveTargetId(input, ctx.user?.id);
+    const limit = input?.limit ?? 30;
+    const rows = await db
+      .select({ userId: follows.followingId })
+      .from(follows)
+      .where(eq(follows.followerId, targetId))
+      .limit(limit);
+    const ids = rows.map(row => row.userId).filter((id): id is string => Boolean(id));
+    if (!ids.length) return [];
+    return db.select(publicUserFields).from(users).where(inArray(users.id, ids)).limit(limit);
+  });
+
+export const userSuggestedFollowsProcedure = protectedProcedure
+  .input(z.object({ limit: z.number().int().min(1).max(50).default(12) }).optional())
+  .query(async ({ ctx, input }) => {
+    const existing = await db
+      .select({ userId: follows.followingId })
+      .from(follows)
+      .where(eq(follows.followerId, ctx.user.id));
+    const excluded = new Set(existing.map(row => row.userId).filter(Boolean));
+    excluded.add(ctx.user.id);
+
+    const candidates = await db.select(publicUserFields).from(users).limit(100);
+    return candidates.filter(candidate => !excluded.has(candidate.id)).slice(0, input?.limit ?? 12);
+  });
+
+export const userFollowProcedure = protectedProcedure
+  .input(z.object({ userId: userIdSchema }))
+  .mutation(async ({ ctx, input }) => {
+    const targetId = String(input.userId);
+    if (targetId === ctx.user.id) {
+      throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot follow yourself" });
     }
 
-    const followerRows = await db
-      .select({ id: follows.id })
-      .from(follows)
-      .where(eq(follows.followingId, ctx.user.id));
+    const target = await db.query.users.findFirst({ where: eq(users.id, targetId) });
+    if (!target) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 
-    return publicProfile(updated, followerRows.length, updated.email);
+    const existing = await db.query.follows.findFirst({
+      where: and(eq(follows.followerId, ctx.user.id), eq(follows.followingId, targetId)),
+    });
+    if (existing) return { following: true, created: false } as const;
+
+    await db.insert(follows).values({
+      id: randomUUID(),
+      followerId: ctx.user.id,
+      followingId: targetId,
+    });
+
+    await db.insert(notifications).values({
+      id: randomUUID(),
+      userId: targetId,
+      type: "follow",
+      content: `${ctx.user.name || ctx.user.username || "Someone"} followed you`,
+      read: false,
+    });
+
+    return { following: true, created: true } as const;
+  });
+
+export const userUnfollowProcedure = protectedProcedure
+  .input(z.object({ userId: userIdSchema }))
+  .mutation(async ({ ctx, input }) => {
+    const targetId = String(input.userId);
+    await db
+      .delete(follows)
+      .where(and(eq(follows.followerId, ctx.user.id), eq(follows.followingId, targetId)));
+    return { following: false } as const;
   });
