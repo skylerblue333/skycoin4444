@@ -27,6 +27,7 @@ export type SessionPayload = {
 const EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
 const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
+const MIN_SESSION_SECRET_BYTES = 32;
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
@@ -145,17 +146,34 @@ class SDKServer {
 
   private getSessionSecret() {
     const secret = ENV.cookieSecret;
-    return new TextEncoder().encode(secret);
+    const encoded = new TextEncoder().encode(secret);
+    if (encoded.byteLength < MIN_SESSION_SECRET_BYTES) {
+      throw new Error(
+        `JWT_SECRET must be configured with at least ${MIN_SESSION_SECRET_BYTES} bytes`
+      );
+    }
+    return encoded;
+  }
+
+  private requireAppId() {
+    if (!isNonEmptyString(ENV.appId)) {
+      throw new Error("VITE_APP_ID must be configured before issuing sessions");
+    }
+    return ENV.appId;
   }
 
   async createSessionToken(
     openId: string,
     options: { expiresInMs?: number; name?: string } = {}
   ): Promise<string> {
+    if (!isNonEmptyString(openId)) {
+      throw new Error("Cannot issue a session without an openId");
+    }
+
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
+        appId: this.requireAppId(),
         name: options.name || "",
       },
       options
@@ -166,6 +184,11 @@ class SDKServer {
     payload: SessionPayload,
     options: { expiresInMs?: number } = {}
   ): Promise<string> {
+    const configuredAppId = this.requireAppId();
+    if (!isNonEmptyString(payload.openId) || payload.appId !== configuredAppId) {
+      throw new Error("Session identity does not match this application");
+    }
+
     const issuedAt = Date.now();
     const expiresInMs = options.expiresInMs ?? ONE_YEAR_MS;
     const expirationSeconds = Math.floor((issuedAt + expiresInMs) / 1000);
@@ -195,17 +218,12 @@ class SDKServer {
       });
       const { openId, appId, name } = payload as Record<string, unknown>;
 
-      // openId and appId are identity/security claims. A display name is not:
-      // OAuth accounts are allowed to have no name, and createSessionToken
-      // intentionally emits an empty string in that case.
       if (!isNonEmptyString(openId) || !isNonEmptyString(appId)) {
         console.warn("[Auth] Session payload missing required identity fields");
         return null;
       }
 
-      // Bind sessions to this application even if another deployment happens
-      // to share the same signing secret.
-      if (appId !== ENV.appId) {
+      if (!isNonEmptyString(ENV.appId) || appId !== ENV.appId) {
         console.warn("[Auth] Session appId does not match this application");
         return null;
       }
