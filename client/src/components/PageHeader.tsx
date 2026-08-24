@@ -3,11 +3,23 @@ import { Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const badgeVariantClasses = {
+  default: "bg-primary/10 text-primary",
+  secondary: "bg-secondary text-secondary-foreground",
+  success: "bg-emerald-500/10 text-emerald-500",
+  warning: "bg-amber-500/10 text-amber-500",
+  destructive: "bg-destructive/10 text-destructive",
+  outline: "border border-border text-foreground",
+} as const;
+
+type BadgeVariant = keyof typeof badgeVariantClasses;
+
 interface PageHeaderProps {
   title: string;
   description?: string;
   subtitle?: string;
   badge?: ReactNode;
+  badgeVariant?: BadgeVariant | string;
   icon?: ComponentType<{ className?: string }>;
   backHref?: string;
   actions?: ReactNode;
@@ -19,11 +31,14 @@ export function PageHeader({
   description,
   subtitle,
   badge,
+  badgeVariant = "default",
   icon: Icon,
   backHref,
   actions,
   children,
 }: PageHeaderProps) {
+  const badgeClass = badgeVariantClasses[badgeVariant as BadgeVariant] ?? badgeVariantClasses.default;
+
   return (
     <div className="mb-8 flex items-start justify-between gap-4">
       <div className="min-w-0">
@@ -35,7 +50,11 @@ export function PageHeader({
         <div className="flex items-center gap-3">
           {Icon ? <Icon className="h-7 w-7 shrink-0 text-primary" /> : null}
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
-          {badge ? <span className="shrink-0">{badge}</span> : null}
+          {badge ? (
+            <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-medium", badgeClass)}>
+              {badge}
+            </span>
+          ) : null}
         </div>
         {(description || subtitle) ? (
           <p className={cn("mt-2 text-muted-foreground", subtitle && "text-sm")}>{description ?? subtitle}</p>
