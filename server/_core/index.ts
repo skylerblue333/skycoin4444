@@ -9,6 +9,8 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 
+const DEFAULT_BODY_LIMIT = "2mb";
+
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
     const server = net.createServer();
@@ -31,12 +33,31 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // Do not disclose framework implementation details in every response.
+  app.disable("x-powered-by");
+
+  // Baseline headers that are safe for both the production app and embedded
+  // development/preview environments. Frame policy is intentionally not set
+  // here because the application is used in preview iframes.
+  app.use((_req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(), payment=()"
+    );
+    next();
+  });
+
+  // Large files use the storage proxy/presigned-object flow. Generic API
+  // requests should not be allowed to allocate tens of megabytes per request.
+  app.use(express.json({ limit: DEFAULT_BODY_LIMIT }));
+  app.use(express.urlencoded({ limit: DEFAULT_BODY_LIMIT, extended: true }));
+
   registerStorageProxy(app);
   registerOAuthRoutes(app);
-  // tRPC API
+
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -44,7 +65,7 @@ async function startServer() {
       createContext,
     })
   );
-  // development mode uses Vite, production mode uses static files
+
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
