@@ -16,10 +16,11 @@ interface StatCardProps {
   label: string;
   value: string;
   change?: number;
+  changeLabel?: string;
   color?: StatColor;
 }
 
-export function StatCard({ icon: Icon, label, value, change, color = "primary" }: StatCardProps) {
+export function StatCard({ icon: Icon, label, value, change, changeLabel, color = "primary" }: StatCardProps) {
   return (
     <div className="rounded-xl border border-border/60 bg-card p-4">
       <div className={cn("mb-3 flex h-9 w-9 items-center justify-center rounded-lg", colorClasses[color])}>
@@ -30,8 +31,10 @@ export function StatCard({ icon: Icon, label, value, change, color = "primary" }
         <p className="text-xl font-semibold tracking-tight">{value}</p>
         {typeof change === "number" ? (
           <span className={cn("text-xs font-medium", change > 0 ? "text-emerald-500" : change < 0 ? "text-destructive" : "text-muted-foreground")}>
-            {change > 0 ? "+" : ""}{change}%
+            {changeLabel ?? `${change > 0 ? "+" : ""}${change}%`}
           </span>
+        ) : changeLabel ? (
+          <span className="text-xs font-medium text-muted-foreground">{changeLabel}</span>
         ) : null}
       </div>
     </div>
