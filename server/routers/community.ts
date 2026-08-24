@@ -30,9 +30,7 @@ export const communityRouter = router({
         .orderBy(desc(communities.createdAt))
         .limit(input?.limit ?? 30);
 
-      if (!ctx.user || !rows.length) {
-        return rows.map(row => ({ ...row, joined: false }));
-      }
+      if (!ctx.user || !rows.length) return rows.map(row => ({ ...row, joined: false }));
 
       const memberships = await db
         .select({ communityId: communityMembers.communityId })
@@ -51,7 +49,6 @@ export const communityRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       const communityId = randomUUID();
-      const memberId = randomUUID();
       await db.insert(communities).values({
         id: communityId,
         ownerId: ctx.user.id,
@@ -63,7 +60,7 @@ export const communityRouter = router({
       });
       try {
         await db.insert(communityMembers).values({
-          id: memberId,
+          id: randomUUID(),
           communityId,
           userId: ctx.user.id,
           role: "owner",
@@ -78,8 +75,7 @@ export const communityRouter = router({
   join: protectedProcedure
     .input(z.object({ communityId: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      const community = await db.query.communities?.findFirst?.({ where: eq(communities.id, input.communityId) })
-        ?? (await db.select().from(communities).where(eq(communities.id, input.communityId)).limit(1))[0];
+      const community = (await db.select({ id: communities.id }).from(communities).where(eq(communities.id, input.communityId)).limit(1))[0];
       if (!community) throw new TRPCError({ code: "NOT_FOUND", message: "Community not found" });
 
       const existing = (await db
@@ -89,12 +85,7 @@ export const communityRouter = router({
         .limit(1))[0];
       if (existing) return { joined: true, created: false } as const;
 
-      await db.insert(communityMembers).values({
-        id: randomUUID(),
-        communityId: input.communityId,
-        userId: ctx.user.id,
-        role: "member",
-      });
+      await db.insert(communityMembers).values({ id: randomUUID(), communityId: input.communityId, userId: ctx.user.id, role: "member" });
       await db.update(communities)
         .set({ memberCount: sql`COALESCE(${communities.memberCount}, 0) + 1` })
         .where(eq(communities.id, input.communityId));
