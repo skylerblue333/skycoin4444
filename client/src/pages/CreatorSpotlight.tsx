@@ -13,7 +13,7 @@ const PREVIEW_CREATORS = [
   { id: "c2", name: "CryptoQueen", handle: "@cryptoqueen", avatar: "C", tier: "Elite", bio: "DeFi and digital-assets preview profile.", categories: ["DeFi", "NFTs", "Trading"], verified: true, gradient: "from-blue-600 to-cyan-600" },
   { id: "c3", name: "NeonStreamer", handle: "@neonstreamer", avatar: "N", tier: "Pro", bio: "Gaming and livestreaming preview profile.", categories: ["Gaming", "Streaming"], verified: true, gradient: "from-green-600 to-teal-600" },
   { id: "c4", name: "AIArtist", handle: "@aiartist", avatar: "A", tier: "Rising", bio: "Generative-art preview profile.", categories: ["Art", "AI"], verified: false, gradient: "from-orange-600 to-red-600" },
-];
+] as const;
 
 const TIER_CONFIG = {
   Legendary: { color: "text-yellow-400 border-yellow-500/30", icon: Crown },
