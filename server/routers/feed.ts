@@ -1,6 +1,6 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { posts, users } from "../../drizzle/schema";
+import { likes, posts, users } from "../../drizzle/schema";
 import { db } from "../db";
 import { publicProcedure } from "../_core/trpc";
 
@@ -13,7 +13,7 @@ const feedInput = z
 
 export const getSkyFeedProcedure = publicProcedure
   .input(feedInput)
-  .query(async ({ input }) => {
+  .query(async ({ ctx, input }) => {
     const limit = input?.limit ?? 20;
     const offset = input?.offset ?? 0;
 
@@ -39,6 +39,15 @@ export const getSkyFeedProcedure = publicProcedure
       .limit(limit)
       .offset(offset);
 
+    const postIds = rows.map(row => row.id);
+    const likedRows = ctx.user && postIds.length
+      ? await db
+          .select({ postId: likes.postId })
+          .from(likes)
+          .where(and(eq(likes.userId, ctx.user.id), inArray(likes.postId, postIds)))
+      : [];
+    const likedPostIds = new Set(likedRows.map(row => row.postId).filter(Boolean));
+
     return rows.map(row => ({
       id: row.id,
       userId: row.userId,
@@ -46,6 +55,7 @@ export const getSkyFeedProcedure = publicProcedure
       media: row.media,
       likeCount: row.likeCount ?? 0,
       commentCount: row.commentCount ?? 0,
+      likedByMe: likedPostIds.has(row.id),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       author: row.authorId
