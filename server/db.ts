@@ -3,11 +3,29 @@ import mysql from 'mysql2/promise';
 import * as schema from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
-const poolConnection = mysql.createPool(process.env.DATABASE_URL as string);
+const databaseUrl = process.env.DATABASE_URL?.trim();
+const poolConnection = databaseUrl ? mysql.createPool(databaseUrl) : null;
 
-export const db = drizzle(poolConnection, { schema, mode: 'default' });
+if (!databaseUrl) {
+  console.warn('[Database] DATABASE_URL is not configured; database-backed features are unavailable.');
+}
+
+type Database = ReturnType<typeof drizzle<typeof schema>>;
+
+function unavailableDatabaseError(): never {
+  throw new Error('DATABASE_URL is not configured; database-backed feature unavailable');
+}
+
+export const db = poolConnection
+  ? drizzle(poolConnection, { schema, mode: 'default' })
+  : (new Proxy({}, {
+      get() {
+        return unavailableDatabaseError();
+      },
+    }) as Database);
 
 export async function getDb() {
+  if (!databaseUrl) unavailableDatabaseError();
   return db;
 }
 
@@ -49,7 +67,6 @@ export async function upsertUser(data: any) {
 
 export async function getUserByOpenId(openId: string) {
   try {
-    // Compatibility lookup until the schema has a dedicated openId column.
     return await db.query.users.findFirst({ where: eq(schema.users.email, openId) });
   } catch (error) {
     return databaseFailure('getUserByOpenId', error);
