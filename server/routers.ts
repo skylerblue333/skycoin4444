@@ -5,9 +5,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
+import { notificationsRouter } from "./routers/notifications";
+import { searchRouter } from "./routers/search";
 
-// Compatibility procedures preserve the client contract while refusing to
-// fabricate backend behavior. Every unavailable operation throws at runtime.
 const unavailable = (feature: string, operation: string): any => {
   throw new TRPCError({
     code: "NOT_IMPLEMENTED",
@@ -16,35 +16,20 @@ const unavailable = (feature: string, operation: string): any => {
 };
 
 const compatibilityInput = z.union([
-  z.void(),
-  z.string(),
-  z.number(),
-  z.boolean(),
-  z.array(z.unknown()),
-  z.record(z.string(), z.unknown()),
+  z.void(), z.string(), z.number(), z.boolean(), z.array(z.unknown()), z.record(z.string(), z.unknown()),
 ]);
 
 const unavailableQuery = (feature: string, operation: string) =>
-  publicProcedure
-    .input(compatibilityInput)
-    .query(() => unavailable(feature, operation));
+  publicProcedure.input(compatibilityInput).query(() => unavailable(feature, operation));
 
 const unavailableMutation = (feature: string, operation: string) =>
-  protectedProcedure
-    .input(compatibilityInput)
-    .mutation(() => unavailable(feature, operation));
+  protectedProcedure.input(compatibilityInput).mutation(() => unavailable(feature, operation));
 
-// A few existing mutation callbacks inspect the variables passed to mutate().
-// Preserve those input shapes without claiming any successful backend action.
 const unavailableResolveMutation = (feature: string) =>
-  protectedProcedure
-    .input(z.object({ action: z.string() }).passthrough())
-    .mutation(() => unavailable(feature, "resolve"));
+  protectedProcedure.input(z.object({ action: z.string() }).passthrough()).mutation(() => unavailable(feature, "resolve"));
 
 const unavailableFollowMutation = (feature: string) =>
-  protectedProcedure
-    .input(z.object({ userId: z.number() }).passthrough())
-    .mutation(() => unavailable(feature, "follow"));
+  protectedProcedure.input(z.object({ userId: z.number() }).passthrough()).mutation(() => unavailable(feature, "follow"));
 
 const createUnavailableFeatureRecord = (feature: string) => ({
   list: unavailableQuery(feature, "list"),
@@ -52,7 +37,6 @@ const createUnavailableFeatureRecord = (feature: string) => ({
   create: unavailableMutation(feature, "create"),
   update: unavailableMutation(feature, "update"),
   delete: unavailableMutation(feature, "delete"),
-
   stats: unavailableQuery(feature, "stats"),
   health: unavailableQuery(feature, "health"),
   logs: unavailableQuery(feature, "logs"),
@@ -117,7 +101,6 @@ const createUnavailableFeatureRecord = (feature: string) => ({
   followers: unavailableQuery(feature, "followers"),
   following: unavailableQuery(feature, "following"),
   suggestedFollows: unavailableQuery(feature, "suggestedFollows"),
-
   resolve: unavailableResolveMutation(feature),
   tip: unavailableMutation(feature, "tip"),
   banUser: unavailableMutation(feature, "banUser"),
@@ -144,26 +127,24 @@ const createUnavailableFeatureRecord = (feature: string) => ({
   follow: unavailableFollowMutation(feature),
 });
 
-const createUnavailableFeatureRouter = (feature: string) =>
-  router(createUnavailableFeatureRecord(feature));
+const createUnavailableFeatureRouter = (feature: string) => router(createUnavailableFeatureRecord(feature));
 
-const createUnavailableNamespace = (feature: string, namespace: string) =>
-  router({
-    get: unavailableQuery(feature, `${namespace}.get`),
-    me: unavailableQuery(feature, `${namespace}.me`),
-    myProfile: unavailableQuery(feature, `${namespace}.myProfile`),
-    health: unavailableQuery(feature, `${namespace}.health`),
-    healthReport: unavailableQuery(feature, `${namespace}.healthReport`),
-    systemSnapshot: unavailableQuery(feature, `${namespace}.systemSnapshot`),
-    goals: unavailableQuery(feature, `${namespace}.goals`),
-    predictions: unavailableQuery(feature, `${namespace}.predictions`),
-    snapshot: unavailableQuery(feature, `${namespace}.snapshot`),
-    digitalNationStatus: unavailableQuery(feature, `${namespace}.digitalNationStatus`),
-    marketStates: unavailableQuery(feature, `${namespace}.marketStates`),
-    emissionCaps: unavailableQuery(feature, `${namespace}.emissionCaps`),
-    today: unavailableQuery(feature, `${namespace}.today`),
-    myRiskScore: unavailableQuery(feature, `${namespace}.myRiskScore`),
-  });
+const createUnavailableNamespace = (feature: string, namespace: string) => router({
+  get: unavailableQuery(feature, `${namespace}.get`),
+  me: unavailableQuery(feature, `${namespace}.me`),
+  myProfile: unavailableQuery(feature, `${namespace}.myProfile`),
+  health: unavailableQuery(feature, `${namespace}.health`),
+  healthReport: unavailableQuery(feature, `${namespace}.healthReport`),
+  systemSnapshot: unavailableQuery(feature, `${namespace}.systemSnapshot`),
+  goals: unavailableQuery(feature, `${namespace}.goals`),
+  predictions: unavailableQuery(feature, `${namespace}.predictions`),
+  snapshot: unavailableQuery(feature, `${namespace}.snapshot`),
+  digitalNationStatus: unavailableQuery(feature, `${namespace}.digitalNationStatus`),
+  marketStates: unavailableQuery(feature, `${namespace}.marketStates`),
+  emissionCaps: unavailableQuery(feature, `${namespace}.emissionCaps`),
+  today: unavailableQuery(feature, `${namespace}.today`),
+  myRiskScore: unavailableQuery(feature, `${namespace}.myRiskScore`),
+});
 
 const enterpriseRouter = router({
   ...createUnavailableFeatureRecord("Enterprise"),
@@ -188,7 +169,6 @@ const hopeIntelligenceRouter = router({
 
 export const appRouter = router({
   system: systemRouter,
-
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -197,7 +177,7 @@ export const appRouter = router({
       return { success: true } as const;
     }),
   }),
-
+  notifications: notificationsRouter,
   ai: aiRouter,
   aiEngineer: createUnavailableFeatureRouter("AI Engineer"),
   aiMarket: createUnavailableFeatureRouter("AI Market"),
@@ -205,7 +185,6 @@ export const appRouter = router({
   hopeAI: createUnavailableFeatureRouter("HopeAI"),
   hopeIntelligence: hopeIntelligenceRouter,
   agents44: createUnavailableFeatureRouter("Agents44"),
-
   social: createUnavailableFeatureRouter("Social"),
   socialCore: createUnavailableFeatureRouter("Social Core"),
   feed: createUnavailableFeatureRouter("Feed"),
@@ -213,13 +192,11 @@ export const appRouter = router({
   dm: createUnavailableFeatureRouter("Direct Messaging"),
   story: createUnavailableFeatureRouter("Story"),
   user: createUnavailableFeatureRouter("User"),
-
   marketplace: createUnavailableFeatureRouter("Marketplace"),
   creator: createUnavailableFeatureRouter("Creator"),
   creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
   digitalArt: createUnavailableFeatureRouter("Digital Art"),
   payments: createUnavailableFeatureRouter("Payments"),
-
   blockchain: createUnavailableFeatureRouter("Blockchain"),
   staking: createUnavailableFeatureRouter("Staking"),
   economy: createUnavailableFeatureRouter("Economy"),
@@ -227,23 +204,19 @@ export const appRouter = router({
   ico: createUnavailableFeatureRouter("ICO"),
   wallet: createUnavailableFeatureRouter("Wallet"),
   token: createUnavailableFeatureRouter("Token"),
-
   admin: createUnavailableFeatureRouter("Admin"),
   moderation: createUnavailableFeatureRouter("Moderation"),
   auditLogs: createUnavailableFeatureRouter("Audit Logs"),
   security: createUnavailableFeatureRouter("Security"),
   complianceIntelligence: createUnavailableFeatureRouter("Compliance Intelligence"),
-
   platform: createUnavailableFeatureRouter("Platform"),
   enterprise: enterpriseRouter,
   governance: createUnavailableFeatureRouter("Governance"),
   orchestrator: createUnavailableFeatureRouter("Orchestrator"),
-  search: createUnavailableFeatureRouter("Search"),
-
+  search: searchRouter,
   gamification: createUnavailableFeatureRouter("Gamification"),
   simulation: createUnavailableFeatureRouter("Simulation"),
   legendary: createUnavailableFeatureRouter("Legendary"),
-
   charity: createUnavailableFeatureRouter("Charity"),
   stream: createUnavailableFeatureRouter("Stream"),
   languageExchange: createUnavailableFeatureRouter("Language Exchange"),
