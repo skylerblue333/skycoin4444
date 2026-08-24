@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { aiRouter } from "./routers/ai";
+import { searchRouter } from "./routers/search";
 
 // Create a base router template for all feature modules
 const createFeatureRouter = () => router({
@@ -16,7 +17,7 @@ const createFeatureRouter = () => router({
 
 export const appRouter = router({
   system: systemRouter,
-  
+
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -69,7 +70,7 @@ export const appRouter = router({
   enterprise: createFeatureRouter(),
   governance: createFeatureRouter(),
   orchestrator: createFeatureRouter(),
-  search: createFeatureRouter(),
+  search: searchRouter,
 
   // Gaming & Gamification Routers
   gamification: createFeatureRouter(),
