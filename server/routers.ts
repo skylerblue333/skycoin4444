@@ -15,9 +15,6 @@ const unavailable = (feature: string, operation: string): any => {
   });
 };
 
-// Including void in the input union allows existing callers to use either
-// useQuery() or useQuery({...}) without pretending that a specific schema is
-// implemented. Real feature routers replace this compatibility input later.
 const compatibilityInput = z.union([
   z.void(),
   z.string(),
@@ -36,6 +33,18 @@ const unavailableMutation = (feature: string, operation: string) =>
   protectedProcedure
     .input(compatibilityInput)
     .mutation(() => unavailable(feature, operation));
+
+// A few existing mutation callbacks inspect the variables passed to mutate().
+// Preserve those input shapes without claiming any successful backend action.
+const unavailableResolveMutation = (feature: string) =>
+  protectedProcedure
+    .input(z.object({ action: z.string() }).passthrough())
+    .mutation(() => unavailable(feature, "resolve"));
+
+const unavailableFollowMutation = (feature: string) =>
+  protectedProcedure
+    .input(z.object({ userId: z.number() }).passthrough())
+    .mutation(() => unavailable(feature, "follow"));
 
 const createUnavailableFeatureRecord = (feature: string) => ({
   list: unavailableQuery(feature, "list"),
@@ -109,7 +118,7 @@ const createUnavailableFeatureRecord = (feature: string) => ({
   following: unavailableQuery(feature, "following"),
   suggestedFollows: unavailableQuery(feature, "suggestedFollows"),
 
-  resolve: unavailableMutation(feature, "resolve"),
+  resolve: unavailableResolveMutation(feature),
   tip: unavailableMutation(feature, "tip"),
   banUser: unavailableMutation(feature, "banUser"),
   updateUserRole: unavailableMutation(feature, "updateUserRole"),
@@ -132,7 +141,7 @@ const createUnavailableFeatureRecord = (feature: string) => ({
   generateFiles: unavailableMutation(feature, "generateFiles"),
   spin: unavailableMutation(feature, "spin"),
   updateProfile: unavailableMutation(feature, "updateProfile"),
-  follow: unavailableMutation(feature, "follow"),
+  follow: unavailableFollowMutation(feature),
 });
 
 const createUnavailableFeatureRouter = (feature: string) =>
@@ -165,12 +174,16 @@ const enterpriseRouter = router({
   emergent: createUnavailableNamespace("Enterprise", "emergent"),
   twin: createUnavailableNamespace("Enterprise", "twin"),
   missionControl: createUnavailableNamespace("Enterprise", "missionControl"),
+  memoryGraph: createUnavailableNamespace("Enterprise", "memoryGraph"),
+  security: createUnavailableNamespace("Enterprise", "security"),
 });
 
 const hopeIntelligenceRouter = router({
   ...createUnavailableFeatureRecord("Hope Intelligence"),
   reputation: createUnavailableNamespace("Hope Intelligence", "reputation"),
   memoryGraph: createUnavailableNamespace("Hope Intelligence", "memoryGraph"),
+  twin: createUnavailableNamespace("Hope Intelligence", "twin"),
+  missionControl: createUnavailableNamespace("Hope Intelligence", "missionControl"),
 });
 
 export const appRouter = router({
