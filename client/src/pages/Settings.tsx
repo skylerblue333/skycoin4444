@@ -2,8 +2,13 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { trpc } from "@/lib/trpc";
 import { AlertTriangle, Bell, Lock, Shield, UserRound, Wallet } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 function UnavailableSetting({ title, description }: { title: string; description: string }) {
   return (
@@ -16,6 +21,38 @@ function UnavailableSetting({ title, description }: { title: string; description
 
 export default function Settings() {
   const { user, isAuthenticated, logout } = useAuth();
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+
+  const profileQuery = trpc.user.profile.useQuery(
+    { userId: user?.id ?? "" },
+    { enabled: Boolean(user?.id) }
+  );
+  const utils = trpc.useUtils();
+  const updateProfile = trpc.user.updateProfile.useMutation({
+    onSuccess: async () => {
+      toast.success("Profile saved");
+      await profileQuery.refetch();
+      await utils.auth.me.invalidate();
+    },
+    onError: error => toast.error(error.message),
+  });
+
+  useEffect(() => {
+    if (!profileQuery.data) return;
+    setDisplayName(profileQuery.data.name ?? "");
+    setUsername(profileQuery.data.username ?? "");
+    setBio(profileQuery.data.bio ?? "");
+  }, [profileQuery.data]);
+
+  const saveProfile = () => {
+    updateProfile.mutate({
+      displayName: displayName.trim() || undefined,
+      username: username.trim() || undefined,
+      bio: bio.trim() || null,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -33,16 +70,23 @@ export default function Settings() {
 
             <TabsContent value="profile">
               <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><UserRound className="h-5 w-5" />Account profile</CardTitle><CardDescription>Values below come from the authenticated server session.</CardDescription></CardHeader>
-                <CardContent className="space-y-4">
+                <CardHeader><CardTitle className="flex items-center gap-2"><UserRound className="h-5 w-5" />SkyProfile</CardTitle><CardDescription>Profile fields are stored in the users table. Unsupported progression metrics are not simulated.</CardDescription></CardHeader>
+                <CardContent className="space-y-5">
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Name</p><p className="font-medium">{user?.name || "Not provided"}</p></div>
-                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Email</p><p className="font-medium">{user?.email || "Not provided"}</p></div>
-                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Role</p><p className="font-medium">{user?.role || "user"}</p></div>
-                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Account ID</p><p className="break-all font-mono text-sm">{user?.id || "Unavailable"}</p></div>
+                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Email</p><p className="font-medium">{profileQuery.data?.email || user?.email || "Not provided"}</p></div>
+                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Followers</p><p className="font-medium">{profileQuery.data?.followerCount ?? "—"}</p></div>
+                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Level / XP</p><p className="font-medium">Not represented in current schema</p></div>
+                    <div className="rounded-lg border p-3"><p className="text-xs text-muted-foreground">Reputation</p><p className="font-medium">Not represented in current schema</p></div>
                   </div>
-                  <UnavailableSetting title="Profile editing" description="Profile-write API is not verified yet, so this screen does not pretend local edits were saved." />
-                  <Button variant="outline" onClick={() => void logout()}>Sign Out</Button>
+
+                  <div className="grid gap-4">
+                    <div><label className="text-sm font-medium" htmlFor="profile-name">Display name</label><Input id="profile-name" className="mt-1" value={displayName} onChange={event => setDisplayName(event.target.value)} maxLength={255} /></div>
+                    <div><label className="text-sm font-medium" htmlFor="profile-username">Username</label><Input id="profile-username" className="mt-1" value={username} onChange={event => setUsername(event.target.value)} maxLength={64} placeholder="letters, numbers, _, ., -" /></div>
+                    <div><label className="text-sm font-medium" htmlFor="profile-bio">Bio</label><Textarea id="profile-bio" className="mt-1" value={bio} onChange={event => setBio(event.target.value)} maxLength={255} rows={4} /></div>
+                  </div>
+
+                  {profileQuery.error ? <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{profileQuery.error.message}</div> : null}
+                  <div className="flex flex-wrap gap-2"><Button onClick={saveProfile} disabled={updateProfile.isPending || profileQuery.isLoading}>{updateProfile.isPending ? "Saving…" : "Save Profile"}</Button><Button variant="outline" onClick={() => void logout()}>Sign Out</Button></div>
                 </CardContent>
               </Card>
             </TabsContent>

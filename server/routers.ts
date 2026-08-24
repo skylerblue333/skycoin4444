@@ -7,6 +7,7 @@ import { z } from "zod";
 import { aiRouter } from "./routers/ai";
 import { notificationsRouter } from "./routers/notifications";
 import { searchRouter } from "./routers/search";
+import { userProfileProcedure, userUpdateProfileProcedure } from "./routers/user";
 
 const unavailable = (feature: string, operation: string): any => {
   throw new TRPCError({
@@ -167,6 +168,12 @@ const hopeIntelligenceRouter = router({
   missionControl: createUnavailableNamespace("Hope Intelligence", "missionControl"),
 });
 
+const userRouter = router({
+  ...createUnavailableFeatureRecord("User"),
+  profile: userProfileProcedure,
+  updateProfile: userUpdateProfileProcedure,
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -191,7 +198,7 @@ export const appRouter = router({
   community: createUnavailableFeatureRouter("Community"),
   dm: createUnavailableFeatureRouter("Direct Messaging"),
   story: createUnavailableFeatureRouter("Story"),
-  user: createUnavailableFeatureRouter("User"),
+  user: userRouter,
   marketplace: createUnavailableFeatureRouter("Marketplace"),
   creator: createUnavailableFeatureRouter("Creator"),
   creatorGrowth: createUnavailableFeatureRouter("Creator Growth"),
