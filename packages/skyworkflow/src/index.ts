@@ -25,21 +25,33 @@ function token(value: string, field: string): string {
   return normalized;
 }
 
-export function validateWorkflow(definition: WorkflowDefinition): WorkflowDefinition {
+export function validateWorkflow(
+  definition: WorkflowDefinition
+): WorkflowDefinition {
   const name = token(definition.name, "name");
-  const states = [...new Set(definition.states.map((state) => token(state, "state")))];
-  if (states.length === 0) throw new Error("workflow must define at least one state");
+  const states = [
+    ...new Set(definition.states.map(state => token(state, "state"))),
+  ];
+  if (states.length === 0) {
+    throw new Error("workflow must define at least one state");
+  }
   const initial = token(definition.initial, "initial");
-  if (!states.includes(initial)) throw new Error("initial state must be declared");
+  if (!states.includes(initial)) {
+    throw new Error("initial state must be declared");
+  }
 
   const seen = new Set<string>();
-  const transitions = definition.transitions.map((transition) => {
+  const transitions = definition.transitions.map(transition => {
     const from = token(transition.from, "transition.from");
     const event = token(transition.event, "transition.event");
     const to = token(transition.to, "transition.to");
-    if (!states.includes(from) || !states.includes(to)) throw new Error("transition states must be declared");
+    if (!states.includes(from) || !states.includes(to)) {
+      throw new Error("transition states must be declared");
+    }
     const key = `${from}\u0000${event}`;
-    if (seen.has(key)) throw new Error(`ambiguous transition for ${from}/${event}`);
+    if (seen.has(key)) {
+      throw new Error(`ambiguous transition for ${from}/${event}`);
+    }
     seen.add(key);
     return { from, event, to };
   });
@@ -47,21 +59,39 @@ export function validateWorkflow(definition: WorkflowDefinition): WorkflowDefini
   return { name, initial, states, transitions };
 }
 
-export function startWorkflow(definition: WorkflowDefinition): WorkflowInstance {
+export function startWorkflow(
+  definition: WorkflowDefinition
+): WorkflowInstance {
   const validated = validateWorkflow(definition);
-  return { definition: validated.name, state: validated.initial, revision: 0 };
+  return {
+    definition: validated.name,
+    state: validated.initial,
+    revision: 0,
+  };
 }
 
 export function applyWorkflowEvent(
   definition: WorkflowDefinition,
   instance: WorkflowInstance,
-  eventInput: string,
+  eventInput: string
 ): WorkflowInstance {
   const validated = validateWorkflow(definition);
-  if (instance.definition !== validated.name) throw new Error("instance belongs to another workflow");
-  if (!validated.states.includes(instance.state)) throw new Error("instance state is not declared");
+  if (instance.definition !== validated.name) {
+    throw new Error("instance belongs to another workflow");
+  }
+  if (!validated.states.includes(instance.state)) {
+    throw new Error("instance state is not declared");
+  }
   const event = token(eventInput, "event");
-  const transition = validated.transitions.find((candidate) => candidate.from === instance.state && candidate.event === event);
-  if (!transition) throw new Error(`event ${event} is not allowed from ${instance.state}`);
-  return { ...instance, state: transition.to, revision: instance.revision + 1 };
+  const transition = validated.transitions.find(
+    candidate => candidate.from === instance.state && candidate.event === event
+  );
+  if (!transition) {
+    throw new Error(`event ${event} is not allowed from ${instance.state}`);
+  }
+  return {
+    ...instance,
+    state: transition.to,
+    revision: instance.revision + 1,
+  };
 }
