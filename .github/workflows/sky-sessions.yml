@@ -37,7 +37,7 @@ jobs:
       - name: Strict package typecheck
         run: pnpm run check:packages
       - name: Deterministic SkySessions tests
-        run: pnpm exec vitest run packages/sky-sessions/src/index.test.ts
+        run: pnpm exec vitest run --config packages/sky-sessions/vitest.config.ts
       - name: Formatting gate
         run: pnpm exec prettier --check packages/sky-sessions
       - name: Production dependency audit
