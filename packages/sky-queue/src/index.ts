@@ -29,7 +29,13 @@ export class InMemoryQueue<T> {
     if (!ID.test(input.id)) throw new Error("invalid job id");
     parseTime(input.availableAt, "availableAt");
     const maxAttempts = input.maxAttempts ?? 3;
-    if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 100) throw new Error("invalid maxAttempts");
+    if (
+      !Number.isSafeInteger(maxAttempts) ||
+      maxAttempts < 1 ||
+      maxAttempts > 100
+    ) {
+      throw new Error("invalid maxAttempts");
+    }
     if (this.jobs.has(input.id)) throw new Error("duplicate job id");
     const job: QueueJob<T> = { ...input, attempts: 0, maxAttempts };
     this.jobs.set(job.id, job);
@@ -47,8 +53,8 @@ export class InMemoryQueue<T> {
       )
       .sort(
         (a, b) =>
-          parseTime(a.availableAt, "availableAt") - parseTime(b.availableAt, "availableAt") ||
-          a.id.localeCompare(b.id),
+          parseTime(a.availableAt, "availableAt") -
+            parseTime(b.availableAt, "availableAt") || a.id.localeCompare(b.id),
       );
     const job = eligible[0];
     if (!job) return undefined;
@@ -69,7 +75,9 @@ export class InMemoryQueue<T> {
     const job = this.jobs.get(id);
     if (!job) throw new Error("job not found");
     if (!this.claimed.has(id)) throw new Error("job is not claimed");
-    if (job.attempts >= job.maxAttempts) throw new Error("max attempts reached");
+    if (job.attempts >= job.maxAttempts) {
+      throw new Error("max attempts reached");
+    }
     job.availableAt = availableAt;
     this.claimed.delete(id);
     return { ...job };
