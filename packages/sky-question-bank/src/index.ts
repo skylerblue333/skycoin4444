@@ -16,7 +16,7 @@ const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const TAG = /^[a-z0-9][a-z0-9-]{0,31}$/;
 
 export function validateQuestion(
-  question: MultipleChoiceQuestion,
+  question: MultipleChoiceQuestion
 ): MultipleChoiceQuestion {
   if (!ID.test(question.id)) throw new Error("invalid question id");
   if (question.prompt.trim().length < 3 || question.prompt.length > 1000) {
@@ -27,7 +27,7 @@ export function validateQuestion(
   }
   if (
     question.choices.some(
-      (choice) => choice.trim().length === 0 || choice.length > 500,
+      choice => choice.trim().length === 0 || choice.length > 500
     )
   ) {
     throw new Error("invalid choice");
@@ -39,10 +39,7 @@ export function validateQuestion(
   ) {
     throw new Error("invalid correctIndex");
   }
-  if (
-    question.tags.length > 16 ||
-    question.tags.some((tag) => !TAG.test(tag))
-  ) {
+  if (question.tags.length > 16 || question.tags.some(tag => !TAG.test(tag))) {
     throw new Error("invalid tags");
   }
   return {
@@ -54,7 +51,7 @@ export function validateQuestion(
 
 export function gradeAnswer(
   question: MultipleChoiceQuestion,
-  selectedIndex: number,
+  selectedIndex: number
 ): AnswerResult {
   const checked = validateQuestion(question);
   if (
@@ -73,10 +70,10 @@ export function gradeAnswer(
 
 export function filterQuestionsByTag(
   questions: readonly MultipleChoiceQuestion[],
-  tag: string,
+  tag: string
 ): MultipleChoiceQuestion[] {
   if (!TAG.test(tag)) throw new Error("invalid tag");
   return questions
     .map(validateQuestion)
-    .filter((question) => question.tags.includes(tag));
+    .filter(question => question.tags.includes(tag));
 }
