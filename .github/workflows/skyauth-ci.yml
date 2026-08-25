@@ -30,7 +30,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
       - name: Format check
-        run: pnpm exec prettier --check server/features/auth/skyAuth.ts server/features/auth/skyAuth.test.ts docs/products/62-skyauth.md .github/workflows/skyauth-ci.yml
+        run: |
+          pnpm exec prettier --write server/features/auth/skyAuth.ts server/features/auth/skyAuth.test.ts docs/products/62-skyauth.md .github/workflows/skyauth-ci.yml
+          git diff --exit-code -- server/features/auth/skyAuth.ts server/features/auth/skyAuth.test.ts docs/products/62-skyauth.md .github/workflows/skyauth-ci.yml
       - name: Targeted tests
         run: pnpm exec vitest run server/features/auth/skyAuth.test.ts
       - name: Typecheck
