@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  MessagingService,
-  type MessagingNotificationContract,
-} from "./index";
+import { MessagingService, type MessagingNotificationContract } from "./index";
 
 describe("SkyMessaging domain core", () => {
   it("creates a thread, sends idempotently, and emits notification metadata", () => {
