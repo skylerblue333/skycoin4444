@@ -26,9 +26,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @skycoin/sky-queue test
       - run: pnpm run check:packages
-      - name: Diagnose Prettier diff
-        run: |
-          pnpm exec prettier --write packages/sky-queue
-          git diff -- packages/sky-queue
-          git diff --quiet -- packages/sky-queue
+      - run: pnpm exec prettier --check packages/sky-queue
       - run: pnpm audit --audit-level high
