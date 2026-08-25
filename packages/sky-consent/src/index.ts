@@ -25,9 +25,15 @@ const SUBJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const POLICY_VERSION = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
 
 export function validateConsentRecord(record: ConsentRecord): ConsentRecord {
-  if (!SUBJECT_ID.test(record.subjectId)) throw new Error("invalid subjectId");
-  if (!POLICY_VERSION.test(record.policyVersion)) throw new Error("invalid policyVersion");
-  if (!Number.isFinite(Date.parse(record.recordedAt))) throw new Error("invalid recordedAt");
+  if (!SUBJECT_ID.test(record.subjectId)) {
+    throw new Error("invalid subjectId");
+  }
+  if (!POLICY_VERSION.test(record.policyVersion)) {
+    throw new Error("invalid policyVersion");
+  }
+  if (!Number.isFinite(Date.parse(record.recordedAt))) {
+    throw new Error("invalid recordedAt");
+  }
   return { ...record };
 }
 
@@ -36,8 +42,12 @@ export function decideConsent(
   currentPolicyVersion: string,
   records: readonly ConsentRecord[],
 ): ConsentDecision {
-  if (!POLICY_VERSION.test(currentPolicyVersion)) throw new Error("invalid policyVersion");
-  if (purpose === "essential") return { allowed: true, reason: "essential" };
+  if (!POLICY_VERSION.test(currentPolicyVersion)) {
+    throw new Error("invalid policyVersion");
+  }
+  if (purpose === "essential") {
+    return { allowed: true, reason: "essential" };
+  }
 
   const relevant = records
     .filter((record) => record.purpose === purpose)
@@ -61,7 +71,10 @@ export function latestConsentByPurpose(
   for (const raw of records) {
     const record = validateConsentRecord(raw);
     const prior = result[record.purpose];
-    if (!prior || Date.parse(record.recordedAt) > Date.parse(prior.recordedAt)) {
+    if (
+      !prior ||
+      Date.parse(record.recordedAt) > Date.parse(prior.recordedAt)
+    ) {
       result[record.purpose] = record;
     }
   }
