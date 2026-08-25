@@ -17,19 +17,45 @@ describe("SkyWorkflow domain core", () => {
     const started = startWorkflow(approval);
     const review = applyWorkflowEvent(approval, started, "submit");
     expect(review).toMatchObject({ state: "review", revision: 1 });
-    expect(applyWorkflowEvent(approval, review, "approve")).toMatchObject({ state: "approved", revision: 2 });
+    expect(applyWorkflowEvent(approval, review, "approve")).toMatchObject({
+      state: "approved",
+      revision: 2,
+    });
   });
 
   it("rejects undeclared transitions", () => {
-    expect(() => applyWorkflowEvent(approval, startWorkflow(approval), "approve")).toThrow();
+    expect(() =>
+      applyWorkflowEvent(approval, startWorkflow(approval), "approve")
+    ).toThrow();
   });
 
   it("rejects ambiguous same-state event definitions", () => {
-    expect(() => validateWorkflow({ ...approval, transitions: [...approval.transitions, { from: "review", event: "approve", to: "rejected" }] })).toThrow();
+    expect(() =>
+      validateWorkflow({
+        ...approval,
+        transitions: [
+          ...approval.transitions,
+          { from: "review", event: "approve", to: "rejected" },
+        ],
+      })
+    ).toThrow();
   });
 
   it("rejects invalid states and cross-definition instances", () => {
-    expect(() => validateWorkflow({ name: "bad", initial: "missing", states: ["ok"], transitions: [] })).toThrow();
-    expect(() => applyWorkflowEvent(approval, { definition: "other", state: "draft", revision: 0 }, "submit")).toThrow();
+    expect(() =>
+      validateWorkflow({
+        name: "bad",
+        initial: "missing",
+        states: ["ok"],
+        transitions: [],
+      })
+    ).toThrow();
+    expect(() =>
+      applyWorkflowEvent(
+        approval,
+        { definition: "other", state: "draft", revision: 0 },
+        "submit"
+      )
+    ).toThrow();
   });
 });
