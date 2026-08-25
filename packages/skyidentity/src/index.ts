@@ -20,7 +20,9 @@ export interface IdentityRecord extends IdentitySubject {
 export function normalizeNamespace(value: string): string {
   const namespace = value.trim().toLowerCase();
   if (!NAMESPACE_RE.test(namespace)) {
-    throw new Error("namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter");
+    throw new Error(
+      "namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter"
+    );
   }
   return namespace;
 }
@@ -48,7 +50,7 @@ export function isSkyIdentityId(value: unknown): value is SkyIdentityId {
 }
 
 export function createIdentityRecord(
-  input: IdentitySubject & { createdAt: string; displayName?: string },
+  input: IdentitySubject & { createdAt: string; displayName?: string }
 ): IdentityRecord {
   const createdAt = new Date(input.createdAt);
   if (Number.isNaN(createdAt.getTime())) {
@@ -71,6 +73,9 @@ export function createIdentityRecord(
   };
 }
 
-export function matchesSubject(record: IdentityRecord, input: IdentitySubject): boolean {
+export function matchesSubject(
+  record: IdentityRecord,
+  input: IdentitySubject
+): boolean {
   return record.id === deriveIdentityId(input);
 }
