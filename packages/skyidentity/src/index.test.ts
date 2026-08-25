@@ -10,16 +10,22 @@ import {
 
 describe("SkyIdentity domain core", () => {
   it("derives stable IDs for the same canonical subject", () => {
-    const first = deriveIdentityId({ namespace: "SkySchool", subject: "student:42" });
-    const second = deriveIdentityId({ namespace: "skyschool", subject: "student:42" });
+    const first = deriveIdentityId({
+      namespace: "SkySchool",
+      subject: "student:42",
+    });
+    const second = deriveIdentityId({
+      namespace: "skyschool",
+      subject: "student:42",
+    });
     expect(first).toBe(second);
     expect(isSkyIdentityId(first)).toBe(true);
   });
 
   it("separates namespaces", () => {
-    expect(deriveIdentityId({ namespace: "skyschool", subject: "42" })).not.toBe(
-      deriveIdentityId({ namespace: "skyhope", subject: "42" }),
-    );
+    expect(
+      deriveIdentityId({ namespace: "skyschool", subject: "42" })
+    ).not.toBe(deriveIdentityId({ namespace: "skyhope", subject: "42" }));
   });
 
   it("normalizes safe input and rejects malformed input", () => {
@@ -39,18 +45,29 @@ describe("SkyIdentity domain core", () => {
     });
     expect(record.displayName).toBe("Example Member");
     expect(record.createdAt).toBe("2026-08-25T14:00:00.000Z");
-    expect(matchesSubject(record, { namespace: "skycommunity", subject: "member/123" })).toBe(true);
+    expect(
+      matchesSubject(record, {
+        namespace: "skycommunity",
+        subject: "member/123",
+      })
+    ).toBe(true);
   });
 
   it("rejects invalid timestamps and excessive display names", () => {
-    expect(() => createIdentityRecord({ namespace: "skychat", subject: "1", createdAt: "not-a-date" })).toThrow();
+    expect(() =>
+      createIdentityRecord({
+        namespace: "skychat",
+        subject: "1",
+        createdAt: "not-a-date",
+      })
+    ).toThrow();
     expect(() =>
       createIdentityRecord({
         namespace: "skychat",
         subject: "1",
         createdAt: "2026-08-25T00:00:00Z",
         displayName: "x".repeat(121),
-      }),
+      })
     ).toThrow();
   });
 });
