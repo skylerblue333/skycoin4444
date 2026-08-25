@@ -56,7 +56,7 @@ describe("SkyConsent", () => {
 
   it("rejects malformed untrusted identifiers", () => {
     expect(() =>
-      validateConsentRecord({ ...granted, subjectId: "../bad id" }),
+      validateConsentRecord({ ...granted, subjectId: "../bad id" })
     ).toThrow("invalid subjectId");
   });
 });
