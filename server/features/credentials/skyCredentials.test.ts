@@ -28,9 +28,9 @@ describe("SkyCredentials", () => {
   });
 
   it("treats revoked credentials as inactive", () => {
-    expect(
-      isCredentialActive({ ...credential, status: "revoked" }, 150)
-    ).toBe(false);
+    expect(isCredentialActive({ ...credential, status: "revoked" }, 150)).toBe(
+      false
+    );
   });
 
   it("rejects malformed evidence hashes", () => {
