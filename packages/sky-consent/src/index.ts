@@ -1,9 +1,5 @@
 export type ConsentPurpose =
-  | "essential"
-  | "analytics"
-  | "personalization"
-  | "marketing"
-  | "ai_training";
+  "essential" | "analytics" | "personalization" | "marketing" | "ai_training";
 
 export type ConsentState = "granted" | "denied";
 
@@ -40,7 +36,7 @@ export function validateConsentRecord(record: ConsentRecord): ConsentRecord {
 export function decideConsent(
   purpose: ConsentPurpose,
   currentPolicyVersion: string,
-  records: readonly ConsentRecord[],
+  records: readonly ConsentRecord[]
 ): ConsentDecision {
   if (!POLICY_VERSION.test(currentPolicyVersion)) {
     throw new Error("invalid policyVersion");
@@ -50,7 +46,7 @@ export function decideConsent(
   }
 
   const relevant = records
-    .filter((record) => record.purpose === purpose)
+    .filter(record => record.purpose === purpose)
     .map(validateConsentRecord)
     .sort((a, b) => Date.parse(b.recordedAt) - Date.parse(a.recordedAt));
 
@@ -65,7 +61,7 @@ export function decideConsent(
 }
 
 export function latestConsentByPurpose(
-  records: readonly ConsentRecord[],
+  records: readonly ConsentRecord[]
 ): Partial<Record<ConsentPurpose, ConsentRecord>> {
   const result: Partial<Record<ConsentPurpose, ConsentRecord>> = {};
   for (const raw of records) {
