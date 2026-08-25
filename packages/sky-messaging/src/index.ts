@@ -47,26 +47,42 @@ export class MessagingService {
   constructor(options: MessagingServiceOptions = {}) {
     this.now = options.now ?? Date.now;
     this.threadIdFactory =
-      options.threadIdFactory ?? (() => `thread_${Math.random().toString(36).slice(2, 18)}`);
+      options.threadIdFactory ??
+      (() => `thread_${Math.random().toString(36).slice(2, 18)}`);
     this.messageIdFactory =
-      options.messageIdFactory ?? (() => `msg_${Math.random().toString(36).slice(2, 18)}`);
+      options.messageIdFactory ??
+      (() => `msg_${Math.random().toString(36).slice(2, 18)}`);
     this.onNotification = options.onNotification;
   }
 
   createThread(participantIds: string[]): ThreadRecord {
-    if (!Array.isArray(participantIds)) throw new Error("invalid_participants");
-    const unique = [...new Set(participantIds.map(id => validateIdentifier("participantId", id)))].sort();
-    if (unique.length < 2 || unique.length > MAX_PARTICIPANTS) throw new Error("invalid_participants");
+    if (!Array.isArray(participantIds)) {
+      throw new Error("invalid_participants");
+    }
+    const unique = [
+      ...new Set(
+        participantIds.map(id => validateIdentifier("participantId", id))
+      ),
+    ].sort();
+    if (unique.length < 2 || unique.length > MAX_PARTICIPANTS) {
+      throw new Error("invalid_participants");
+    }
 
     const id = validateIdentifier("threadId", this.threadIdFactory());
     if (this.threads.has(id)) throw new Error("thread_id_collision");
-    const record: ThreadRecord = { id, participantIds: unique, createdAt: this.now() };
+    const record: ThreadRecord = {
+      id,
+      participantIds: unique,
+      createdAt: this.now(),
+    };
     this.threads.set(id, cloneThread(record));
     return cloneThread(record);
   }
 
   getThread(threadId: string): ThreadRecord | undefined {
-    const record = this.threads.get(validateIdentifier("threadId", threadId));
+    const record = this.threads.get(
+      validateIdentifier("threadId", threadId)
+    );
     return record ? cloneThread(record) : undefined;
   }
 
@@ -78,9 +94,14 @@ export class MessagingService {
   }): MessageRecord {
     const thread = this.requireThread(input.threadId);
     const senderId = validateIdentifier("senderId", input.senderId);
-    if (!thread.participantIds.includes(senderId)) throw new Error("sender_not_participant");
+    if (!thread.participantIds.includes(senderId)) {
+      throw new Error("sender_not_participant");
+    }
     const body = validateBody(input.body);
-    const clientRequestId = validateIdentifier("clientRequestId", input.clientRequestId);
+    const clientRequestId = validateIdentifier(
+      "clientRequestId",
+      input.clientRequestId
+    );
     const requestKey = `${thread.id}:${senderId}:${clientRequestId}`;
     const existingId = this.requestIndex.get(requestKey);
     if (existingId) return cloneMessage(this.messages.get(existingId)!);
@@ -105,18 +126,30 @@ export class MessagingService {
       threadId: thread.id,
       messageId: id,
       senderId,
-      recipientIds: thread.participantIds.filter(idValue => idValue !== senderId),
+      recipientIds: thread.participantIds.filter(
+        idValue => idValue !== senderId
+      ),
       occurredAt: createdAt,
     });
     return cloneMessage(record);
   }
 
-  edit(input: { messageId: string; actorId: string; body: string }): MessageRecord {
+  edit(input: {
+    messageId: string;
+    actorId: string;
+    body: string;
+  }): MessageRecord {
     const record = this.requireMessage(input.messageId);
     const actorId = validateIdentifier("actorId", input.actorId);
-    if (record.senderId !== actorId) throw new Error("message_edit_forbidden");
+    if (record.senderId !== actorId) {
+      throw new Error("message_edit_forbidden");
+    }
     if (record.deletedAt !== null) throw new Error("message_deleted");
-    const next = { ...record, body: validateBody(input.body), editedAt: this.now() };
+    const next = {
+      ...record,
+      body: validateBody(input.body),
+      editedAt: this.now(),
+    };
     this.messages.set(next.id, cloneMessage(next));
     return cloneMessage(next);
   }
@@ -124,7 +157,9 @@ export class MessagingService {
   delete(input: { messageId: string; actorId: string }): MessageRecord {
     const record = this.requireMessage(input.messageId);
     const actorId = validateIdentifier("actorId", input.actorId);
-    if (record.senderId !== actorId) throw new Error("message_delete_forbidden");
+    if (record.senderId !== actorId) {
+      throw new Error("message_delete_forbidden");
+    }
     if (record.deletedAt !== null) return record;
     const next = { ...record, body: "", deletedAt: this.now() };
     this.messages.set(next.id, cloneMessage(next));
@@ -134,7 +169,9 @@ export class MessagingService {
   list(threadId: string, actorId: string): MessageRecord[] {
     const thread = this.requireThread(threadId);
     const actor = validateIdentifier("actorId", actorId);
-    if (!thread.participantIds.includes(actor)) throw new Error("thread_access_forbidden");
+    if (!thread.participantIds.includes(actor)) {
+      throw new Error("thread_access_forbidden");
+    }
     return [...this.messages.values()]
       .filter(message => message.threadId === thread.id)
       .sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))
@@ -148,21 +185,27 @@ export class MessagingService {
   }
 
   private requireMessage(messageId: string): MessageRecord {
-    const record = this.messages.get(validateIdentifier("messageId", messageId));
+    const record = this.messages.get(
+      validateIdentifier("messageId", messageId)
+    );
     if (!record) throw new Error("message_not_found");
     return cloneMessage(record);
   }
 }
 
 function validateIdentifier(name: string, value: string): string {
-  if (typeof value !== "string" || !IDENTIFIER.test(value)) throw new Error(`invalid_${name}`);
+  if (typeof value !== "string" || !IDENTIFIER.test(value)) {
+    throw new Error(`invalid_${name}`);
+  }
   return value;
 }
 
 function validateBody(value: string): string {
   if (typeof value !== "string") throw new Error("invalid_message_body");
   const body = value.trim();
-  if (!body || body.length > MAX_BODY_LENGTH || /\u0000/.test(body)) throw new Error("invalid_message_body");
+  if (!body || body.length > MAX_BODY_LENGTH || /\u0000/.test(body)) {
+    throw new Error("invalid_message_body");
+  }
   return body;
 }
 
