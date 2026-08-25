@@ -16,7 +16,9 @@ function validateId(value: string, field: string): string {
   return normalized;
 }
 
-export function inviteMember(input: Omit<ClassroomMembership, "state">): ClassroomMembership {
+export function inviteMember(
+  input: Omit<ClassroomMembership, "state">
+): ClassroomMembership {
   return {
     classroomId: validateId(input.classroomId, "classroomId"),
     userId: validateId(input.userId, "userId"),
@@ -25,17 +27,28 @@ export function inviteMember(input: Omit<ClassroomMembership, "state">): Classro
   };
 }
 
-export function activateMembership(membership: ClassroomMembership): ClassroomMembership {
-  if (membership.state !== "invited") throw new Error("only invited memberships can be activated");
+export function activateMembership(
+  membership: ClassroomMembership
+): ClassroomMembership {
+  if (membership.state !== "invited") {
+    throw new Error("only invited memberships can be activated");
+  }
   return { ...membership, state: "active" };
 }
 
-export function removeMembership(membership: ClassroomMembership): ClassroomMembership {
-  if (membership.state === "removed") throw new Error("membership is already removed");
+export function removeMembership(
+  membership: ClassroomMembership
+): ClassroomMembership {
+  if (membership.state === "removed") {
+    throw new Error("membership is already removed");
+  }
   return { ...membership, state: "removed" };
 }
 
-export function canManageMembership(actor: ClassroomMembership, target: ClassroomMembership): boolean {
+export function canManageMembership(
+  actor: ClassroomMembership,
+  target: ClassroomMembership
+): boolean {
   return (
     actor.classroomId === target.classroomId &&
     actor.state === "active" &&
