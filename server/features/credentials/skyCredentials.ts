@@ -24,11 +24,7 @@ function validId(value: unknown): value is string {
 }
 
 function validTimestamp(value: unknown): value is number {
-  return (
-    typeof value === "number" &&
-    Number.isSafeInteger(value) &&
-    value >= 0
-  );
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
 export function createEducationCredential(input: unknown): EducationCredential {
