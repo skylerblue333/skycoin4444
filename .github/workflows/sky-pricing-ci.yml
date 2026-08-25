@@ -24,7 +24,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec vitest run packages/sky-pricing/src/index.test.ts
+      - run: pnpm --filter @skycoin/sky-pricing test
       - run: pnpm run check:packages
       - run: pnpm exec prettier --check packages/sky-pricing
       - run: pnpm audit --audit-level high
