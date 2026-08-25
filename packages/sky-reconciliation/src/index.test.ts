@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  reconcile,
-  reconciliationSummary,
-  validateRecord,
-} from "./index";
+import { reconcile, reconciliationSummary, validateRecord } from "./index";
 
 const internal = {
   id: "ledger:1",
@@ -32,20 +28,21 @@ describe("SkyReconciliation", () => {
   it("detects missing, mismatched, and duplicate references", () => {
     expect(reconcile([internal], [])[0]?.status).toBe("missing_external");
     expect(
-      reconcile([internal], [{ ...external, amountMinor: 1300 }])[0]?.status,
+      reconcile([internal], [{ ...external, amountMinor: 1300 }])[0]?.status
     ).toBe("amount_mismatch");
     expect(
-      reconcile(
-        [internal],
-        [external, { ...external, id: "provider:10" }],
-      )[0]?.status,
+      reconcile([internal], [external, { ...external, id: "provider:10" }])[0]
+        ?.status
     ).toBe("duplicate_external_ref");
   });
 
   it("summarizes reconciliation outcomes", () => {
     const results = reconcile(
-      [{ ...internal }, { ...internal, id: "ledger:2", externalRef: "tx:none" }],
-      [external],
+      [
+        { ...internal },
+        { ...internal, id: "ledger:2", externalRef: "tx:none" },
+      ],
+      [external]
     );
     expect(reconciliationSummary(results)).toEqual({
       matched: 1,
@@ -57,10 +54,10 @@ describe("SkyReconciliation", () => {
 
   it("requires integer minor units and ISO-like currencies", () => {
     expect(() => validateRecord({ ...internal, amountMinor: 1.2 })).toThrow(
-      "safe integer",
+      "safe integer"
     );
     expect(() => validateRecord({ ...internal, currency: "usd" })).toThrow(
-      "invalid currency",
+      "invalid currency"
     );
   });
 });
