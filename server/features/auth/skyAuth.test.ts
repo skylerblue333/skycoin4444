@@ -29,16 +29,29 @@ describe("authenticateVerifiedSession", () => {
   });
 
   it("rejects expired sessions", () => {
-    const result = authenticateVerifiedSession({ ...validClaims(), expiresAtMs: now }, now);
+    const result = authenticateVerifiedSession(
+      { ...validClaims(), expiresAtMs: now },
+      now
+    );
     expect(result).toMatchObject({ ok: false, code: "expired" });
   });
 
   it("rejects unsupported auth methods and unsafe identifiers", () => {
-    expect(authenticateVerifiedSession({ ...validClaims(), authMethod: "magic" }, now)).toMatchObject({
+    expect(
+      authenticateVerifiedSession(
+        { ...validClaims(), authMethod: "magic" },
+        now
+      )
+    ).toMatchObject({
       ok: false,
       code: "invalid_claims",
     });
-    expect(authenticateVerifiedSession({ ...validClaims(), subject: "<script>" }, now)).toMatchObject({
+    expect(
+      authenticateVerifiedSession(
+        { ...validClaims(), subject: "<script>" },
+        now
+      )
+    ).toMatchObject({
       ok: false,
       code: "invalid_claims",
     });
@@ -46,16 +59,24 @@ describe("authenticateVerifiedSession", () => {
 
   it("rejects sessions issued beyond clock-skew tolerance", () => {
     const result = authenticateVerifiedSession(
-      { ...validClaims(), issuedAtMs: now + skyAuthPolicy.maxClockSkewMs + 1, expiresAtMs: now + skyAuthPolicy.maxClockSkewMs + 60_000 },
-      now,
+      {
+        ...validClaims(),
+        issuedAtMs: now + skyAuthPolicy.maxClockSkewMs + 1,
+        expiresAtMs: now + skyAuthPolicy.maxClockSkewMs + 60_000,
+      },
+      now
     );
     expect(result).toMatchObject({ ok: false, code: "not_yet_valid" });
   });
 
   it("rejects excessive lifetimes", () => {
     const result = authenticateVerifiedSession(
-      { ...validClaims(), issuedAtMs: now, expiresAtMs: now + skyAuthPolicy.maxSessionLifetimeMs + 1 },
-      now,
+      {
+        ...validClaims(),
+        issuedAtMs: now,
+        expiresAtMs: now + skyAuthPolicy.maxSessionLifetimeMs + 1,
+      },
+      now
     );
     expect(result).toMatchObject({ ok: false, code: "invalid_claims" });
   });
