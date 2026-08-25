@@ -96,9 +96,7 @@ export class InvoiceService {
   }
 
   get(invoiceId: string): InvoiceRecord | undefined {
-    const record = this.records.get(
-      validateIdentifier("invoiceId", invoiceId)
-    );
+    const record = this.records.get(validateIdentifier("invoiceId", invoiceId));
     return record ? clone(record) : undefined;
   }
 
@@ -179,10 +177,7 @@ function validateLine(input: InvoiceLineInput): InvoiceLine {
   ) {
     throw new Error("invalid_line_quantity");
   }
-  if (
-    !Number.isSafeInteger(input.unitPriceMinor) ||
-    input.unitPriceMinor < 0
-  ) {
+  if (!Number.isSafeInteger(input.unitPriceMinor) || input.unitPriceMinor < 0) {
     throw new Error("invalid_unit_price");
   }
   const lineTotalMinor = safeMultiply(input.quantity, input.unitPriceMinor);
