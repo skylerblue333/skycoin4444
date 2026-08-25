@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { MessagingService, type MessagingNotificationContract } from "./index";
+import {
+  MessagingService,
+  type MessagingNotificationContract,
+} from "./index";
 
 describe("SkyMessaging domain core", () => {
   it("creates a thread, sends idempotently, and emits notification metadata", () => {
@@ -45,17 +48,23 @@ describe("SkyMessaging domain core", () => {
       clientRequestId: "request_2",
     });
 
-    expect(() => service.list("thread_2", "user_c")).toThrow("thread_access_forbidden");
-    expect(() => service.edit({ messageId: message.id, actorId: "user_b", body: "nope" })).toThrow(
-      "message_edit_forbidden",
+    expect(() => service.list("thread_2", "user_c")).toThrow(
+      "thread_access_forbidden"
     );
+    expect(() =>
+      service.edit({
+        messageId: message.id,
+        actorId: "user_b",
+        body: "nope",
+      })
+    ).toThrow("message_edit_forbidden");
     expect(() =>
       service.send({
         threadId: "thread_2",
         senderId: "user_c",
         body: "nope",
         clientRequestId: "request_3",
-      }),
+      })
     ).toThrow("sender_not_participant");
   });
 
@@ -74,16 +83,29 @@ describe("SkyMessaging domain core", () => {
       clientRequestId: "request_4",
     });
     now = 20;
-    expect(service.edit({ messageId: message.id, actorId: "user_a", body: "second" }).editedAt).toBe(20);
+    expect(
+      service.edit({
+        messageId: message.id,
+        actorId: "user_a",
+        body: "second",
+      }).editedAt
+    ).toBe(20);
     now = 30;
-    const deleted = service.delete({ messageId: message.id, actorId: "user_a" });
+    const deleted = service.delete({
+      messageId: message.id,
+      actorId: "user_a",
+    });
     expect(deleted.deletedAt).toBe(30);
     expect(deleted.body).toBe("");
   });
 
   it("validates participant and message inputs", () => {
-    const service = new MessagingService({ threadIdFactory: () => "thread_4" });
-    expect(() => service.createThread(["user_a"])).toThrow("invalid_participants");
+    const service = new MessagingService({
+      threadIdFactory: () => "thread_4",
+    });
+    expect(() => service.createThread(["user_a"])).toThrow(
+      "invalid_participants"
+    );
     service.createThread(["user_a", "user_b"]);
     expect(() =>
       service.send({
@@ -91,7 +113,7 @@ describe("SkyMessaging domain core", () => {
         senderId: "user_a",
         body: "   ",
         clientRequestId: "request_5",
-      }),
+      })
     ).toThrow("invalid_message_body");
   });
 });
