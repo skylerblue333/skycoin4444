@@ -6,10 +6,7 @@ export interface ReconciliationRecord {
 }
 
 export type ReconciliationStatus =
-  | "matched"
-  | "amount_mismatch"
-  | "missing_external"
-  | "duplicate_external_ref";
+  "matched" | "amount_mismatch" | "missing_external" | "duplicate_external_ref";
 
 export interface ReconciliationResult {
   recordId: string;
@@ -21,7 +18,7 @@ const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const CURRENCY = /^[A-Z]{3}$/;
 
 export function validateRecord(
-  record: ReconciliationRecord,
+  record: ReconciliationRecord
 ): ReconciliationRecord {
   if (!ID.test(record.id) || !ID.test(record.externalRef)) {
     throw new Error("invalid identifier");
@@ -35,7 +32,7 @@ export function validateRecord(
 
 export function reconcile(
   internal: readonly ReconciliationRecord[],
-  external: readonly ReconciliationRecord[],
+  external: readonly ReconciliationRecord[]
 ): ReconciliationResult[] {
   const extByRef = new Map<string, ReconciliationRecord[]>();
   for (const raw of external) {
@@ -45,7 +42,7 @@ export function reconcile(
     extByRef.set(item.externalRef, bucket);
   }
 
-  return internal.map((raw) => {
+  return internal.map(raw => {
     const item = validateRecord(raw);
     const matches = extByRef.get(item.externalRef) ?? [];
     if (matches.length === 0) {
@@ -70,7 +67,7 @@ export function reconcile(
 }
 
 export function reconciliationSummary(
-  results: readonly ReconciliationResult[],
+  results: readonly ReconciliationResult[]
 ): Record<ReconciliationStatus, number> {
   const summary: Record<ReconciliationStatus, number> = {
     matched: 0,
