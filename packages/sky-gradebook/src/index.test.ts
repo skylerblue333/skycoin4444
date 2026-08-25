@@ -19,7 +19,11 @@ describe("SkyGradebook domain core", () => {
       title: "Project",
       maxPoints: 60,
     });
-    service.recordScore({ itemId: "quiz_1", studentId: "student_1", points: 30 });
+    service.recordScore({
+      itemId: "quiz_1",
+      studentId: "student_1",
+      points: 30,
+    });
     service.recordScore({
       itemId: "project_1",
       studentId: "student_1",
@@ -48,7 +52,11 @@ describe("SkyGradebook domain core", () => {
       title: "Exam",
       maxPoints: 100,
     });
-    service.recordScore({ itemId: "exam_1", studentId: "student_2", points: 88 });
+    service.recordScore({
+      itemId: "exam_1",
+      studentId: "student_2",
+      points: 88,
+    });
     now = 600;
     service.publishSummary("course_2", "student_2");
 
@@ -80,7 +88,11 @@ describe("SkyGradebook domain core", () => {
       maxPoints: 10,
     });
     expect(() =>
-      service.recordScore({ itemId: "quiz_2", studentId: "student_1", points: 11 })
+      service.recordScore({
+        itemId: "quiz_2",
+        studentId: "student_1",
+        points: 11,
+      })
     ).toThrow("invalid_grade_points");
   });
 
