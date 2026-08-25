@@ -1,0 +1,14 @@
+{
+  "name": "@skycoin/skyclassroom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p ../../tsconfig.packages.json",
+    "format:check": "prettier --write src README.md package.json vitest.config.ts && git diff --exit-code -- ."
+  }
+}
