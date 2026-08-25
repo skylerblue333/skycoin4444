@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createTelemetryEvent, metricKey, sanitizeAttributes } from "./index";
+import {
+  createTelemetryEvent,
+  metricKey,
+  sanitizeAttributes,
+} from "./index";
 
 describe("SkyObservability contracts", () => {
   it("creates canonical telemetry events", () => {
@@ -16,16 +20,41 @@ describe("SkyObservability contracts", () => {
   });
 
   it("drops obviously sensitive attribute names and unsupported values", () => {
-    expect(sanitizeAttributes({ accessToken: "secret", password: "x", ok: "yes", nested: { x: 1 }, nan: Number.NaN })).toEqual({ ok: "yes" });
+    expect(
+      sanitizeAttributes({
+        accessToken: "secret",
+        password: "x",
+        ok: "yes",
+        nested: { x: 1 },
+        nan: Number.NaN,
+      })
+    ).toEqual({ ok: "yes" });
   });
 
   it("bounds string attributes", () => {
-    expect(sanitizeAttributes({ message: "x".repeat(600) }).message).toHaveLength(512);
+    expect(
+      sanitizeAttributes({ message: "x".repeat(600) }).message
+    ).toHaveLength(512);
   });
 
   it("rejects invalid identifiers and trace IDs", () => {
-    expect(() => createTelemetryEvent({ timestamp: "bad", service: "svc", level: "info", name: "event" })).toThrow();
-    expect(() => createTelemetryEvent({ timestamp: "2026-08-25T00:00:00Z", service: "svc", level: "info", name: "event", traceId: "not-hex" })).toThrow();
+    expect(() =>
+      createTelemetryEvent({
+        timestamp: "bad",
+        service: "svc",
+        level: "info",
+        name: "event",
+      })
+    ).toThrow();
+    expect(() =>
+      createTelemetryEvent({
+        timestamp: "2026-08-25T00:00:00Z",
+        service: "svc",
+        level: "info",
+        name: "event",
+        traceId: "not-hex",
+      })
+    ).toThrow();
     expect(() => metricKey("bad service", "requests")).toThrow();
   });
 });
