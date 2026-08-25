@@ -23,9 +23,9 @@ describe("SkyContracts", () => {
   });
 
   it("treats terminated contracts as out of force", () => {
-    expect(
-      isContractInForce({ ...contract, status: "terminated" }, 150)
-    ).toBe(false);
+    expect(isContractInForce({ ...contract, status: "terminated" }, 150)).toBe(
+      false
+    );
   });
 
   it("rejects invalid document digests", () => {
