@@ -1,9 +1,7 @@
 import { createHash } from "node:crypto";
 
 export type SupportedDocumentType =
-  | "text/plain"
-  | "text/markdown"
-  | "application/json";
+  "text/plain" | "text/markdown" | "application/json";
 
 export interface DocumentInput {
   id: string;
@@ -55,9 +53,7 @@ export function extractDocument(input: DocumentInput): DocumentExtraction {
   return {
     id,
     mediaType: input.mediaType,
-    sha256: createHash("sha256")
-      .update(input.content, "utf8")
-      .digest("hex"),
+    sha256: createHash("sha256").update(input.content, "utf8").digest("hex"),
     bytes,
     text,
     lines,
