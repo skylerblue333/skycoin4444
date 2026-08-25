@@ -14,7 +14,7 @@ export interface PresencePolicy {
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 
 export function validateHeartbeat(
-  heartbeat: PresenceHeartbeat,
+  heartbeat: PresenceHeartbeat
 ): PresenceHeartbeat {
   if (!ID.test(heartbeat.subjectId)) throw new Error("invalid subjectId");
   if (heartbeat.deviceId !== undefined && !ID.test(heartbeat.deviceId)) {
@@ -26,9 +26,7 @@ export function validateHeartbeat(
   return { ...heartbeat };
 }
 
-export function validatePresencePolicy(
-  policy: PresencePolicy,
-): PresencePolicy {
+export function validatePresencePolicy(policy: PresencePolicy): PresencePolicy {
   if (
     !Number.isSafeInteger(policy.onlineWithinMs) ||
     policy.onlineWithinMs < 0
@@ -47,7 +45,7 @@ export function validatePresencePolicy(
 export function derivePresence(
   heartbeat: PresenceHeartbeat | undefined,
   now: string,
-  policy: PresencePolicy,
+  policy: PresencePolicy
 ): PresenceStatus {
   const nowMs = Date.parse(now);
   if (!Number.isFinite(nowMs)) throw new Error("invalid now");
@@ -62,7 +60,7 @@ export function derivePresence(
 }
 
 export function latestHeartbeat(
-  heartbeats: readonly PresenceHeartbeat[],
+  heartbeats: readonly PresenceHeartbeat[]
 ): PresenceHeartbeat | undefined {
   let latest: PresenceHeartbeat | undefined;
   for (const raw of heartbeats) {
