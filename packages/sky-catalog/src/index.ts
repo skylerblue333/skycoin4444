@@ -77,7 +77,9 @@ export class CatalogService {
     if (!Number.isSafeInteger(contract.available) || contract.available < 0) {
       throw new Error("invalid_inventory_availability");
     }
-    const item = [...this.items.values()].find(candidate => candidate.sku === sku);
+    const item = [...this.items.values()].find(
+      candidate => candidate.sku === sku
+    );
     if (!item) throw new Error("catalog_sku_not_found");
     return this.save({ ...item, available: contract.available });
   }
@@ -109,7 +111,8 @@ function validateIdentifier(name: string, value: string): string {
 }
 
 function validateSku(value: string): string {
-  if (typeof value !== "string" || !SKU.test(value)) throw new Error("invalid_sku");
+  if (typeof value !== "string" || !SKU.test(value))
+    throw new Error("invalid_sku");
   return value;
 }
 
