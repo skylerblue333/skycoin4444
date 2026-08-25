@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 
-export type SupportedDocumentType = "text/plain" | "text/markdown" | "application/json";
+export type SupportedDocumentType =
+  | "text/plain"
+  | "text/markdown"
+  | "application/json";
 
 export interface DocumentInput {
   id: string;
@@ -29,7 +32,9 @@ function validateId(id: string): string {
 
 function ensureSize(content: string): number {
   const bytes = Buffer.byteLength(content, "utf8");
-  if (bytes > MAX_BYTES) throw new Error(`document exceeds ${MAX_BYTES} byte limit`);
+  if (bytes > MAX_BYTES) {
+    throw new Error(`document exceeds ${MAX_BYTES} byte limit`);
+  }
   return bytes;
 }
 
@@ -50,7 +55,9 @@ export function extractDocument(input: DocumentInput): DocumentExtraction {
   return {
     id,
     mediaType: input.mediaType,
-    sha256: createHash("sha256").update(input.content, "utf8").digest("hex"),
+    sha256: createHash("sha256")
+      .update(input.content, "utf8")
+      .digest("hex"),
     bytes,
     text,
     lines,
@@ -58,6 +65,12 @@ export function extractDocument(input: DocumentInput): DocumentExtraction {
   };
 }
 
-export function isSupportedDocumentType(value: string): value is SupportedDocumentType {
-  return value === "text/plain" || value === "text/markdown" || value === "application/json";
+export function isSupportedDocumentType(
+  value: string
+): value is SupportedDocumentType {
+  return (
+    value === "text/plain" ||
+    value === "text/markdown" ||
+    value === "application/json"
+  );
 }
