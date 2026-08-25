@@ -42,7 +42,9 @@ export class MessagingService {
   private readonly now: () => number;
   private readonly threadIdFactory: () => string;
   private readonly messageIdFactory: () => string;
-  private readonly onNotification?: (event: MessagingNotificationContract) => void;
+  private readonly onNotification?: (
+    event: MessagingNotificationContract
+  ) => void;
 
   constructor(options: MessagingServiceOptions = {}) {
     this.now = options.now ?? Date.now;
@@ -80,9 +82,7 @@ export class MessagingService {
   }
 
   getThread(threadId: string): ThreadRecord | undefined {
-    const record = this.threads.get(
-      validateIdentifier("threadId", threadId)
-    );
+    const record = this.threads.get(validateIdentifier("threadId", threadId));
     return record ? cloneThread(record) : undefined;
   }
 
