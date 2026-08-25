@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  createTelemetryEvent,
-  metricKey,
-  sanitizeAttributes,
-} from "./index";
+import { createTelemetryEvent, metricKey, sanitizeAttributes } from "./index";
 
 describe("SkyObservability contracts", () => {
   it("creates canonical telemetry events", () => {
