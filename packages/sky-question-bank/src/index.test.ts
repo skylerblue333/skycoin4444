@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  filterQuestionsByTag,
-  gradeAnswer,
-  validateQuestion,
-} from "./index";
+import { filterQuestionsByTag, gradeAnswer, validateQuestion } from "./index";
 
 const question = {
   id: "q:1",
@@ -29,12 +25,12 @@ describe("SkyQuestionBank", () => {
   });
 
   it("rejects malformed question definitions", () => {
-    expect(() =>
-      validateQuestion({ ...question, correctIndex: 4 }),
-    ).toThrow("invalid correctIndex");
-    expect(() =>
-      validateQuestion({ ...question, choices: ["only"] }),
-    ).toThrow("invalid choices");
+    expect(() => validateQuestion({ ...question, correctIndex: 4 })).toThrow(
+      "invalid correctIndex"
+    );
+    expect(() => validateQuestion({ ...question, choices: ["only"] })).toThrow(
+      "invalid choices"
+    );
   });
 
   it("rejects out-of-range submitted answers", () => {
