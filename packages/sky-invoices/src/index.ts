@@ -49,20 +49,33 @@ export class InvoiceService {
 
   constructor(options: InvoiceServiceOptions = {}) {
     this.now = options.now ?? Date.now;
-    this.idFactory = options.idFactory ?? (() => `inv_${Math.random().toString(36).slice(2, 18)}`);
+    this.idFactory =
+      options.idFactory ??
+      (() => `inv_${Math.random().toString(36).slice(2, 18)}`);
     this.onLedgerEvent = options.onLedgerEvent;
   }
 
-  create(input: { customerId: string; currency: string; lines: InvoiceLineInput[] }): InvoiceRecord {
+  create(input: {
+    customerId: string;
+    currency: string;
+    lines: InvoiceLineInput[];
+  }): InvoiceRecord {
     const customerId = validateIdentifier("customerId", input.customerId);
     const currency = input.currency.trim().toUpperCase();
     if (!CURRENCY.test(currency)) throw new Error("invalid_currency");
-    if (!Array.isArray(input.lines) || input.lines.length === 0 || input.lines.length > 500) {
+    if (
+      !Array.isArray(input.lines) ||
+      input.lines.length === 0 ||
+      input.lines.length > 500
+    ) {
       throw new Error("invalid_lines");
     }
 
     const lines = input.lines.map(validateLine);
-    const subtotalMinor = lines.reduce((sum, line) => safeAdd(sum, line.lineTotalMinor), 0);
+    const subtotalMinor = lines.reduce(
+      (sum, line) => safeAdd(sum, line.lineTotalMinor),
+      0
+    );
     const id = validateIdentifier("invoiceId", this.idFactory());
     if (this.records.has(id)) throw new Error("invoice_id_collision");
 
@@ -83,7 +96,9 @@ export class InvoiceService {
   }
 
   get(invoiceId: string): InvoiceRecord | undefined {
-    const record = this.records.get(validateIdentifier("invoiceId", invoiceId));
+    const record = this.records.get(
+      validateIdentifier("invoiceId", invoiceId)
+    );
     return record ? clone(record) : undefined;
   }
 
@@ -91,7 +106,11 @@ export class InvoiceService {
     const record = this.require(invoiceId);
     if (record.status !== "draft") throw new Error("invoice_not_draft");
     const occurredAt = this.now();
-    const next = { ...record, status: "issued" as const, issuedAt: occurredAt };
+    const next = {
+      ...record,
+      status: "issued" as const,
+      issuedAt: occurredAt,
+    };
     return this.persistWithEvent(next, "invoice.issued", occurredAt);
   }
 
@@ -105,7 +124,9 @@ export class InvoiceService {
 
   void(invoiceId: string): InvoiceRecord {
     const record = this.require(invoiceId);
-    if (record.status !== "draft" && record.status !== "issued") throw new Error("invoice_not_voidable");
+    if (record.status !== "draft" && record.status !== "issued") {
+      throw new Error("invoice_not_voidable");
+    }
     const occurredAt = this.now();
     const next = { ...record, status: "void" as const, voidedAt: occurredAt };
     return this.persistWithEvent(next, "invoice.voided", occurredAt);
@@ -120,7 +141,7 @@ export class InvoiceService {
   private persistWithEvent(
     record: InvoiceRecord,
     event: InvoiceLedgerContract["event"],
-    occurredAt: number,
+    occurredAt: number
   ): InvoiceRecord {
     this.records.set(record.id, clone(record));
     this.onLedgerEvent?.({
@@ -136,23 +157,41 @@ export class InvoiceService {
 }
 
 function validateIdentifier(name: string, value: string): string {
-  if (typeof value !== "string" || !IDENTIFIER.test(value)) throw new Error(`invalid_${name}`);
+  if (typeof value !== "string" || !IDENTIFIER.test(value)) {
+    throw new Error(`invalid_${name}`);
+  }
   return value;
 }
 
 function validateLine(input: InvoiceLineInput): InvoiceLine {
   const description = input.description.trim();
-  if (!description || description.length > 500 || /[\u0000-\u001F\u007F]/.test(description)) {
+  if (
+    !description ||
+    description.length > 500 ||
+    /[\u0000-\u001F\u007F]/.test(description)
+  ) {
     throw new Error("invalid_line_description");
   }
-  if (!Number.isSafeInteger(input.quantity) || input.quantity <= 0 || input.quantity > 1_000_000) {
+  if (
+    !Number.isSafeInteger(input.quantity) ||
+    input.quantity <= 0 ||
+    input.quantity > 1_000_000
+  ) {
     throw new Error("invalid_line_quantity");
   }
-  if (!Number.isSafeInteger(input.unitPriceMinor) || input.unitPriceMinor < 0) {
+  if (
+    !Number.isSafeInteger(input.unitPriceMinor) ||
+    input.unitPriceMinor < 0
+  ) {
     throw new Error("invalid_unit_price");
   }
   const lineTotalMinor = safeMultiply(input.quantity, input.unitPriceMinor);
-  return { description, quantity: input.quantity, unitPriceMinor: input.unitPriceMinor, lineTotalMinor };
+  return {
+    description,
+    quantity: input.quantity,
+    unitPriceMinor: input.unitPriceMinor,
+    lineTotalMinor,
+  };
 }
 
 function safeMultiply(a: number, b: number): number {
