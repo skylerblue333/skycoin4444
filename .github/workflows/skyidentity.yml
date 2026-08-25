@@ -1,0 +1,39 @@
+name: skyidentity-ci
+
+on:
+  pull_request:
+    paths:
+      - "packages/skyidentity/**"
+      - "tsconfig.packages.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/skyidentity.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/skyidentity/**"
+      - "tsconfig.packages.json"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/skyidentity.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @skycoin/skyidentity test
+      - run: pnpm run check:packages
+      - run: pnpm --filter @skycoin/skyidentity format:check
+      - run: pnpm audit --audit-level=high
