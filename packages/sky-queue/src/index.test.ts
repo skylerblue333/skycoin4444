@@ -57,14 +57,14 @@ describe("SkyQueue", () => {
         id: "job:1",
         payload: "y",
         availableAt: "2026-08-25T09:00:00.000Z",
-      }),
+      })
     ).toThrow("duplicate");
     expect(() =>
       queue.enqueue({
         id: "../bad",
         payload: "y",
         availableAt: "2026-08-25T09:00:00.000Z",
-      }),
+      })
     ).toThrow("invalid job id");
   });
 });
