@@ -30,7 +30,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
       - name: Format check
-        run: pnpm exec prettier --check server/features/service-registry/skyServiceRegistry.ts server/features/service-registry/skyServiceRegistry.test.ts docs/products/152-skyserviceregistry.md .github/workflows/skyserviceregistry-ci.yml
+        run: |
+          pnpm exec prettier --write server/features/service-registry/skyServiceRegistry.ts server/features/service-registry/skyServiceRegistry.test.ts docs/products/152-skyserviceregistry.md .github/workflows/skyserviceregistry-ci.yml
+          git diff --exit-code -- server/features/service-registry/skyServiceRegistry.ts server/features/service-registry/skyServiceRegistry.test.ts docs/products/152-skyserviceregistry.md .github/workflows/skyserviceregistry-ci.yml
       - name: Targeted tests
         run: pnpm exec vitest run server/features/service-registry/skyServiceRegistry.test.ts
       - name: Typecheck
