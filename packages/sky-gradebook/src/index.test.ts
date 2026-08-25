@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  GradebookService,
-  type GradebookProgressContract,
-} from "./index";
+import { GradebookService, type GradebookProgressContract } from "./index";
 
 describe("SkyGradebook domain core", () => {
   it("records bounded scores and summarizes basis-point progress", () => {
