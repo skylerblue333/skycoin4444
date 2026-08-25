@@ -20,15 +20,16 @@ function token(value: string, field: string): string {
 }
 
 export function sanitizeAttributes(
-  attributes: Record<string, unknown>,
+  attributes: Record<string, unknown>
 ): Record<string, string | number | boolean> {
   const result: Record<string, string | number | boolean> = {};
   for (const [rawKey, value] of Object.entries(attributes)) {
     const key = token(rawKey, "attribute key");
     if (BLOCKED_ATTRIBUTE.test(key)) continue;
     if (typeof value === "string") result[key] = value.slice(0, 512);
-    else if (typeof value === "number" && Number.isFinite(value)) result[key] = value;
-    else if (typeof value === "boolean") result[key] = value;
+    else if (typeof value === "number" && Number.isFinite(value)) {
+      result[key] = value;
+    } else if (typeof value === "boolean") result[key] = value;
   }
   return result;
 }
@@ -42,9 +43,13 @@ export function createTelemetryEvent(input: {
   attributes?: Record<string, unknown>;
 }): TelemetryEvent {
   const timestamp = new Date(input.timestamp);
-  if (Number.isNaN(timestamp.getTime())) throw new Error("timestamp is invalid");
+  if (Number.isNaN(timestamp.getTime())) {
+    throw new Error("timestamp is invalid");
+  }
   const traceId = input.traceId?.trim().toLowerCase();
-  if (traceId && !TRACE_RE.test(traceId)) throw new Error("traceId must be 16-32 lowercase hex characters");
+  if (traceId && !TRACE_RE.test(traceId)) {
+    throw new Error("traceId must be 16-32 lowercase hex characters");
+  }
   return {
     timestamp: timestamp.toISOString(),
     service: token(input.service, "service"),
