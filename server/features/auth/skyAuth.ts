@@ -44,9 +44,7 @@ function isSafeIdentifier(value: unknown): value is string {
 }
 
 function isFiniteInteger(value: unknown): value is number {
-  return (
-    typeof value === "number" && Number.isSafeInteger(value) && value >= 0
-  );
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
 /**
