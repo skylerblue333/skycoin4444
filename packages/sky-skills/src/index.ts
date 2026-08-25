@@ -1,0 +1,8 @@
+export interface Skill { id:string; name:string; aliases:string[]; category:string; }
+export interface SkillProfile { subjectId:string; skillIds:string[]; }
+const ID=/^[A-Za-z0-9][A-Za-z0-9:_-]{2,127}$/;
+const TEXT=/^[A-Za-z0-9][A-Za-z0-9 .+#/_-]{1,79}$/;
+export function normalizeSkill(skill:Skill):Skill{if(!ID.test(skill.id))throw new Error("invalid skill id");if(!TEXT.test(skill.name.trim())||!TEXT.test(skill.category.trim()))throw new Error("invalid skill text");const aliases=[...new Set(skill.aliases.map(a=>a.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));if(aliases.length>20||aliases.some(a=>!TEXT.test(a)))throw new Error("invalid aliases");return {...skill,name:skill.name.trim(),category:skill.category.trim(),aliases};}
+export function buildSkillIndex(skills:Skill[]):Map<string,string>{const index=new Map<string,string>();for(const raw of skills){const s=normalizeSkill(raw);for(const key of [s.name,...s.aliases]){const k=key.toLowerCase();const existing=index.get(k);if(existing&&existing!==s.id)throw new Error(`ambiguous skill alias: ${key}`);index.set(k,s.id)}}return index;}
+export function resolveSkills(query:string,index:Map<string,string>):string[]{if(query.length>500)throw new Error("query too long");const tokens=[...new Set(query.split(/[,;\n]/).map(v=>v.trim().toLowerCase()).filter(Boolean))];return tokens.map(t=>index.get(t)).filter((v):v is string=>Boolean(v)).sort();}
+export function toSkillsIntegrationEvent(profile:SkillProfile){if(!ID.test(profile.subjectId)||profile.skillIds.some(id=>!ID.test(id)))throw new Error("invalid profile");return {type:"skills.profile_updated" as const,subjectId:profile.subjectId,skillIds:[...new Set(profile.skillIds)].sort()};}
