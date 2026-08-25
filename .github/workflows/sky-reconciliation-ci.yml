@@ -26,5 +26,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @skycoin/sky-reconciliation test
       - run: pnpm run check:packages
-      - run: pnpm exec prettier --check packages/sky-reconciliation
+      - name: Diagnose Prettier diff
+        run: |
+          pnpm exec prettier --write packages/sky-reconciliation
+          git diff -- packages/sky-reconciliation
+          git diff --quiet -- packages/sky-reconciliation
       - run: pnpm audit --audit-level high
