@@ -3,7 +3,11 @@ import { extractDocument, isSupportedDocumentType } from "./index";
 
 describe("SkyDocumentAI extraction core", () => {
   it("extracts deterministic text metrics", () => {
-    const result = extractDocument({ id: "doc:1", mediaType: "text/plain", content: "hello world\nsecond line" });
+    const result = extractDocument({
+      id: "doc:1",
+      mediaType: "text/plain",
+      content: "hello world\nsecond line",
+    });
     expect(result.bytes).toBe(23);
     expect(result.lines).toBe(2);
     expect(result.words).toBe(4);
@@ -11,14 +15,30 @@ describe("SkyDocumentAI extraction core", () => {
   });
 
   it("normalizes JSON deterministically", () => {
-    const result = extractDocument({ id: "doc-json", mediaType: "application/json", content: '{"b":2,"a":1}' });
+    const result = extractDocument({
+      id: "doc-json",
+      mediaType: "application/json",
+      content: '{"b":2,"a":1}',
+    });
     expect(result.text).toContain('"b": 2');
     expect(result.lines).toBeGreaterThan(1);
   });
 
   it("rejects malformed JSON and invalid ids", () => {
-    expect(() => extractDocument({ id: "bad id", mediaType: "text/plain", content: "x" })).toThrow();
-    expect(() => extractDocument({ id: "ok", mediaType: "application/json", content: "{" })).toThrow();
+    expect(() =>
+      extractDocument({
+        id: "bad id",
+        mediaType: "text/plain",
+        content: "x",
+      })
+    ).toThrow();
+    expect(() =>
+      extractDocument({
+        id: "ok",
+        mediaType: "application/json",
+        content: "{",
+      })
+    ).toThrow();
   });
 
   it("reports only explicitly supported local media types", () => {
