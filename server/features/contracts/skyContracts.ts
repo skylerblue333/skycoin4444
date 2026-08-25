@@ -24,11 +24,7 @@ function validId(value: unknown): value is string {
 }
 
 function validTimestamp(value: unknown): value is number {
-  return (
-    typeof value === "number" &&
-    Number.isSafeInteger(value) &&
-    value >= 0
-  );
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
 export function createContractRecord(input: unknown): ContractRecord {
@@ -52,7 +48,11 @@ export function createContractRecord(input: unknown): ContractRecord {
     throw new TypeError("contract identifiers must be safe identifiers");
   }
 
-  if (typeof title !== "string" || title.trim().length < 1 || title.length > 240) {
+  if (
+    typeof title !== "string" ||
+    title.trim().length < 1 ||
+    title.length > 240
+  ) {
     throw new TypeError("title must contain 1 to 240 characters");
   }
 
