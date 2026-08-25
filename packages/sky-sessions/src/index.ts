@@ -80,7 +80,9 @@ export class SessionService {
     this.policy = { ...options.policy };
     this.store = options.store ?? new InMemorySessionStore();
     this.now = options.now ?? Date.now;
-    this.idFactory = options.idFactory ?? (() => `sess_${Math.random().toString(36).slice(2, 18)}`);
+    this.idFactory =
+      options.idFactory ??
+      (() => `sess_${Math.random().toString(36).slice(2, 18)}`);
     this.onAuditEvent = options.onAuditEvent;
   }
 
@@ -113,7 +115,12 @@ export class SessionService {
       revokeReason: null,
     };
     this.store.save(record);
-    this.emit({ type: "session.created", sessionId: id, userId, occurredAt: now });
+    this.emit({
+      type: "session.created",
+      sessionId: id,
+      userId,
+      occurredAt: now,
+    });
     return { ...record };
   }
 
@@ -133,7 +140,12 @@ export class SessionService {
     }
     const next = { ...record, lastSeenAt: now };
     this.store.save(next);
-    this.emit({ type: "session.touched", sessionId: next.id, userId: next.userId, occurredAt: now });
+    this.emit({
+      type: "session.touched",
+      sessionId: next.id,
+      userId: next.userId,
+      occurredAt: now,
+    });
     return { ...next };
   }
 
@@ -157,7 +169,9 @@ export class SessionService {
 
   revokeAllExcept(userId: string, keepSessionId?: string): number {
     const validUserId = validateIdentifier("userId", userId);
-    const keep = keepSessionId ? validateIdentifier("sessionId", keepSessionId) : undefined;
+    const keep = keepSessionId
+      ? validateIdentifier("sessionId", keepSessionId)
+      : undefined;
     let revoked = 0;
     for (const record of this.store.listByUser(validUserId)) {
       if (record.id === keep || this.evaluate(record) !== "active") continue;
@@ -183,7 +197,12 @@ export class SessionService {
 
   private evaluate(record: SessionRecord, at = this.now()): SessionStatus {
     if (record.revokedAt !== null) return "revoked";
-    if (at >= record.expiresAt || at - record.lastSeenAt >= this.policy.idleTtlMs) return "expired";
+    if (
+      at >= record.expiresAt ||
+      at - record.lastSeenAt >= this.policy.idleTtlMs
+    ) {
+      return "expired";
+    }
     return "active";
   }
 
@@ -208,18 +227,32 @@ function validateIdentifier(name: string, value: string): string {
 
 function validateReason(value: string): string {
   const reason = value.trim();
-  if (!reason || reason.length > REASON_MAX_LENGTH || /[\u0000-\u001F\u007F]/.test(reason)) {
+  if (
+    !reason ||
+    reason.length > REASON_MAX_LENGTH ||
+    /[\u0000-\u001F\u007F]/.test(reason)
+  ) {
     throw new Error("invalid_revoke_reason");
   }
   return reason;
 }
 
 function validatePolicy(policy: SessionPolicy): void {
-  const positiveInteger = (value: number) => Number.isSafeInteger(value) && value > 0;
-  if (!positiveInteger(policy.absoluteTtlMs)) throw new Error("invalid_absolute_ttl");
-  if (!positiveInteger(policy.idleTtlMs)) throw new Error("invalid_idle_ttl");
-  if (!positiveInteger(policy.maxSessionsPerUser) || policy.maxSessionsPerUser > 1000) {
+  const positiveInteger = (value: number) =>
+    Number.isSafeInteger(value) && value > 0;
+  if (!positiveInteger(policy.absoluteTtlMs)) {
+    throw new Error("invalid_absolute_ttl");
+  }
+  if (!positiveInteger(policy.idleTtlMs)) {
+    throw new Error("invalid_idle_ttl");
+  }
+  if (
+    !positiveInteger(policy.maxSessionsPerUser) ||
+    policy.maxSessionsPerUser > 1000
+  ) {
     throw new Error("invalid_max_sessions");
   }
-  if (policy.idleTtlMs > policy.absoluteTtlMs) throw new Error("idle_ttl_exceeds_absolute_ttl");
+  if (policy.idleTtlMs > policy.absoluteTtlMs) {
+    throw new Error("idle_ttl_exceeds_absolute_ttl");
+  }
 }
