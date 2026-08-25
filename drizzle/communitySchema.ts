@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, int, timestamp, text } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 import { users } from "./schema";
 
@@ -22,5 +22,26 @@ export const communityMembers = mysqlTable("community_members", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const communityThreads = mysqlTable("community_threads", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  communityId: varchar("community_id", { length: 255 }).references(() => communities.id).notNull(),
+  authorId: varchar("author_id", { length: 255 }).references(() => users.id).notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  body: text("body").notNull(),
+  replyCount: int("reply_count").default(0).notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const communityReplies = mysqlTable("community_replies", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  threadId: varchar("thread_id", { length: 255 }).references(() => communityThreads.id).notNull(),
+  authorId: varchar("author_id", { length: 255 }).references(() => users.id).notNull(),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
 export type Community = typeof communities.$inferSelect;
 export type CommunityMember = typeof communityMembers.$inferSelect;
+export type CommunityThread = typeof communityThreads.$inferSelect;
+export type CommunityReply = typeof communityReplies.$inferSelect;
