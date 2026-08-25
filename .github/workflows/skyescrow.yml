@@ -1,0 +1,24 @@
+name: skyescrow-ci
+on:
+  pull_request:
+    paths:
+      - "packages/skyescrow/**"
+      - ".github/workflows/skyescrow.yml"
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @skycoin/skyescrow test
+      - run: pnpm run check:packages
+      - run: pnpm --filter @skycoin/skyescrow format:check
