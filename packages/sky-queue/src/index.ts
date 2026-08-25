@@ -46,15 +46,15 @@ export class InMemoryQueue<T> {
     const nowMs = parseTime(now, "now");
     const eligible = [...this.jobs.values()]
       .filter(
-        (job) =>
+        job =>
           !this.claimed.has(job.id) &&
           job.attempts < job.maxAttempts &&
-          parseTime(job.availableAt, "availableAt") <= nowMs,
+          parseTime(job.availableAt, "availableAt") <= nowMs
       )
       .sort(
         (a, b) =>
           parseTime(a.availableAt, "availableAt") -
-            parseTime(b.availableAt, "availableAt") || a.id.localeCompare(b.id),
+            parseTime(b.availableAt, "availableAt") || a.id.localeCompare(b.id)
       );
     const job = eligible[0];
     if (!job) return undefined;
