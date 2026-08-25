@@ -25,3 +25,30 @@ CREATE TABLE IF NOT EXISTS `community_members` (
   CONSTRAINT `community_members_community_fk` FOREIGN KEY (`community_id`) REFERENCES `communities` (`id`) ON DELETE CASCADE,
   CONSTRAINT `community_members_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
+
+CREATE TABLE IF NOT EXISTS `community_threads` (
+  `id` varchar(255) NOT NULL,
+  `community_id` varchar(255) NOT NULL,
+  `author_id` varchar(255) NOT NULL,
+  `title` varchar(160) NOT NULL,
+  `body` text NOT NULL,
+  `reply_count` int NOT NULL DEFAULT 0,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `community_threads_community_idx` (`community_id`, `created_at`),
+  CONSTRAINT `community_threads_community_fk` FOREIGN KEY (`community_id`) REFERENCES `communities` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `community_threads_author_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+);
+
+CREATE TABLE IF NOT EXISTS `community_replies` (
+  `id` varchar(255) NOT NULL,
+  `thread_id` varchar(255) NOT NULL,
+  `author_id` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `community_replies_thread_idx` (`thread_id`, `created_at`),
+  CONSTRAINT `community_replies_thread_fk` FOREIGN KEY (`thread_id`) REFERENCES `community_threads` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `community_replies_author_fk` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+);
