@@ -1,9 +1,5 @@
 export type EscrowState =
-  | "draft"
-  | "funded"
-  | "released"
-  | "cancelled"
-  | "disputed";
+  "draft" | "funded" | "released" | "cancelled" | "disputed";
 
 export interface EscrowRecord {
   id: string;
@@ -25,9 +21,7 @@ function validId(value: string, field: string): string {
   return normalized;
 }
 
-export function createEscrow(
-  input: Omit<EscrowRecord, "state">
-): EscrowRecord {
+export function createEscrow(input: Omit<EscrowRecord, "state">): EscrowRecord {
   const id = validId(input.id, "id");
   const buyerId = validId(input.buyerId, "buyerId");
   const sellerId = validId(input.sellerId, "sellerId");
