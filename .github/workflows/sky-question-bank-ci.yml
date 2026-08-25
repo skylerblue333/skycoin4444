@@ -26,9 +26,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @skycoin/sky-question-bank test
       - run: pnpm run check:packages
-      - name: Diagnose Prettier diff
-        run: |
-          pnpm exec prettier --write packages/sky-question-bank
-          git diff -- packages/sky-question-bank
-          git diff --quiet -- packages/sky-question-bank
+      - run: pnpm exec prettier --check packages/sky-question-bank
       - run: pnpm audit --audit-level high
