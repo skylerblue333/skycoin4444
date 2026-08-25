@@ -1,0 +1,33 @@
+name: SkyFeatureFlags
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/sky-feature-flags/**'
+      - 'tsconfig.packages.json'
+      - 'pnpm-lock.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11.20.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check:packages
+      - run: pnpm vitest run --config packages/sky-feature-flags/vitest.config.ts
+  dependency-review:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
