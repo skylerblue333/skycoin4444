@@ -33,7 +33,7 @@ jobs:
       - name: Package typecheck
         run: pnpm run check:packages
       - name: SkyMFA tests
-        run: pnpm vitest run packages/sky-mfa/src/index.test.ts
+        run: pnpm vitest run --config packages/sky-mfa/vitest.config.ts
 
   dependency-review:
     if: github.event_name == 'pull_request'
