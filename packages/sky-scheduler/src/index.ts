@@ -73,10 +73,14 @@ export class SchedulerService {
   nextDueAt(id: string): number | null {
     const record = this.require(id);
     if (record.status !== "active") return null;
-    if (record.maxRuns !== null && record.runCount >= record.maxRuns) return null;
+    if (record.maxRuns !== null && record.runCount >= record.maxRuns)
+      return null;
     if (record.runCount === 0) return record.startAt;
     if (record.intervalMs === null) return null;
-    return safeAdd(record.startAt, safeMultiply(record.intervalMs, record.runCount));
+    return safeAdd(
+      record.startAt,
+      safeMultiply(record.intervalMs, record.runCount)
+    );
   }
 
   due(at: number, limit = 100): SchedulerDispatchContract[] {
@@ -91,8 +95,7 @@ export class SchedulerService {
           candidate.dueAt !== null && candidate.dueAt <= timestamp
       )
       .sort(
-        (a, b) =>
-          a.dueAt - b.dueAt || a.record.id.localeCompare(b.record.id)
+        (a, b) => a.dueAt - b.dueAt || a.record.id.localeCompare(b.record.id)
       )
       .slice(0, limit)
       .map(({ record, dueAt }) => ({
@@ -103,14 +106,14 @@ export class SchedulerService {
       }));
   }
 
-  acknowledge(input: {
-    scheduleId: string;
-    dueAt: number;
-  }): ScheduleRecord {
+  acknowledge(input: { scheduleId: string; dueAt: number }): ScheduleRecord {
     const record = this.require(input.scheduleId);
     if (record.status !== "active") throw new Error("schedule_not_active");
     const expectedDueAt = this.nextDueAt(record.id);
-    if (expectedDueAt === null || expectedDueAt !== validateTimestamp(input.dueAt)) {
+    if (
+      expectedDueAt === null ||
+      expectedDueAt !== validateTimestamp(input.dueAt)
+    ) {
       throw new Error("stale_or_unknown_dispatch");
     }
     const runCount = record.runCount + 1;
