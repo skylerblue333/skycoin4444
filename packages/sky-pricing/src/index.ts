@@ -63,7 +63,7 @@ export function validatePricingRule(rule: PricingRule): PricingRule {
 
 export function quotePrice(
   input: PriceInput,
-  rules: readonly PricingRule[],
+  rules: readonly PricingRule[]
 ): PriceQuote {
   const checked = validatePriceInput(input);
   const subtotalMinor = checked.baseAmountMinor * checked.quantity;
@@ -74,15 +74,15 @@ export function quotePrice(
   const applicable = rules
     .map(validatePricingRule)
     .filter(
-      (rule) =>
+      rule =>
         rule.minimumQuantity === undefined ||
-        checked.quantity >= rule.minimumQuantity,
+        checked.quantity >= rule.minimumQuantity
     )
     .sort((a, b) => a.id.localeCompare(b.id));
 
   const totalBps = Math.min(
     10_000,
-    applicable.reduce((sum, rule) => sum + rule.discountBps, 0),
+    applicable.reduce((sum, rule) => sum + rule.discountBps, 0)
   );
   const discountMinor = Math.floor((subtotalMinor * totalBps) / 10_000);
   return {
@@ -92,6 +92,6 @@ export function quotePrice(
     subtotalMinor,
     discountMinor,
     totalMinor: subtotalMinor - discountMinor,
-    appliedRuleIds: applicable.map((rule) => rule.id),
+    appliedRuleIds: applicable.map(rule => rule.id),
   };
 }
