@@ -26,9 +26,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @skycoin/sky-pricing test
       - run: pnpm run check:packages
-      - name: Diagnose Prettier diff
-        run: |
-          pnpm exec prettier --write packages/sky-pricing
-          git diff -- packages/sky-pricing
-          git diff --quiet -- packages/sky-pricing
+      - run: pnpm exec prettier --check packages/sky-pricing
       - run: pnpm audit --audit-level high
