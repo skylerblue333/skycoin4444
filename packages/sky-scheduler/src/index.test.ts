@@ -15,9 +15,9 @@ describe("SkyScheduler domain core", () => {
         dueAt: 1000,
       },
     ]);
-    expect(service.acknowledge({ scheduleId: "job_1", dueAt: 1000 }).status).toBe(
-      "completed"
-    );
+    expect(
+      service.acknowledge({ scheduleId: "job_1", dueAt: 1000 }).status
+    ).toBe("completed");
     expect(service.due(2000)).toEqual([]);
   });
 
@@ -36,9 +36,9 @@ describe("SkyScheduler domain core", () => {
     ).toThrow("stale_or_unknown_dispatch");
     service.acknowledge({ scheduleId: "job_2", dueAt: 100 });
     expect(service.nextDueAt("job_2")).toBe(150);
-    expect(service.acknowledge({ scheduleId: "job_2", dueAt: 150 }).status).toBe(
-      "completed"
-    );
+    expect(
+      service.acknowledge({ scheduleId: "job_2", dueAt: 150 }).status
+    ).toBe("completed");
   });
 
   it("pauses dispatch planning without discarding schedule state", () => {
