@@ -26,5 +26,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @skycoin/sky-consent test
       - run: pnpm run check:packages
-      - run: pnpm exec prettier --check packages/sky-consent
+      - name: Diagnose Prettier diff
+        run: |
+          pnpm exec prettier --write packages/sky-consent
+          git diff -- packages/sky-consent
+          git diff --quiet -- packages/sky-consent
       - run: pnpm audit --audit-level high
