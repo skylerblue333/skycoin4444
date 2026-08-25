@@ -14,21 +14,21 @@ const heartbeat = {
 
 describe("SkyPresence", () => {
   it("derives online, away, and offline deterministically", () => {
-    expect(
-      derivePresence(heartbeat, "2026-08-25T09:00:30.000Z", policy),
-    ).toBe("online");
-    expect(
-      derivePresence(heartbeat, "2026-08-25T09:03:00.000Z", policy),
-    ).toBe("away");
-    expect(
-      derivePresence(heartbeat, "2026-08-25T09:06:00.000Z", policy),
-    ).toBe("offline");
+    expect(derivePresence(heartbeat, "2026-08-25T09:00:30.000Z", policy)).toBe(
+      "online"
+    );
+    expect(derivePresence(heartbeat, "2026-08-25T09:03:00.000Z", policy)).toBe(
+      "away"
+    );
+    expect(derivePresence(heartbeat, "2026-08-25T09:06:00.000Z", policy)).toBe(
+      "offline"
+    );
   });
 
   it("returns offline with no heartbeat", () => {
-    expect(
-      derivePresence(undefined, "2026-08-25T09:00:00.000Z", policy),
-    ).toBe("offline");
+    expect(derivePresence(undefined, "2026-08-25T09:00:00.000Z", policy)).toBe(
+      "offline"
+    );
   });
 
   it("selects the latest heartbeat", () => {
@@ -41,10 +41,10 @@ describe("SkyPresence", () => {
 
   it("rejects invalid thresholds and future observations", () => {
     expect(() =>
-      validatePresencePolicy({ onlineWithinMs: 100, awayWithinMs: 99 }),
+      validatePresencePolicy({ onlineWithinMs: 100, awayWithinMs: 99 })
     ).toThrow("invalid awayWithinMs");
     expect(() =>
-      derivePresence(heartbeat, "2026-08-25T08:59:59.000Z", policy),
+      derivePresence(heartbeat, "2026-08-25T08:59:59.000Z", policy)
     ).toThrow("future");
   });
 });
