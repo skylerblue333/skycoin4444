@@ -34,7 +34,9 @@ describe("SkyCatalog domain core", () => {
     });
     const inventory = createInventoryItem("SKU-2", 7);
 
-    expect(service.applyAvailability(toCatalogAvailability(inventory)).available).toBe(7);
+    expect(
+      service.applyAvailability(toCatalogAvailability(inventory)).available
+    ).toBe(7);
   });
 
   it("rejects invalid catalog inputs and unsupported inventory data", () => {
