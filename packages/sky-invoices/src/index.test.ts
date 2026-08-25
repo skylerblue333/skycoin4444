@@ -51,21 +51,31 @@ describe("SkyInvoices domain core", () => {
   it("validates untrusted invoice inputs and safe integer arithmetic", () => {
     const service = new InvoiceService({ idFactory: () => "inv_3" });
     expect(() =>
-      service.create({ customerId: "bad customer", currency: "USD", lines: [] }),
+      service.create({
+        customerId: "bad customer",
+        currency: "USD",
+        lines: [],
+      })
     ).toThrow("invalid_customerId");
     expect(() =>
       service.create({
         customerId: "customer_1",
         currency: "US",
         lines: [{ description: "Service", quantity: 1, unitPriceMinor: 1 }],
-      }),
+      })
     ).toThrow("invalid_currency");
     expect(() =>
       service.create({
         customerId: "customer_1",
         currency: "USD",
-        lines: [{ description: "Service", quantity: Number.MAX_SAFE_INTEGER, unitPriceMinor: 2 }],
-      }),
+        lines: [
+          {
+            description: "Service",
+            quantity: Number.MAX_SAFE_INTEGER,
+            unitPriceMinor: 2,
+          },
+        ],
+      })
     ).toThrow();
   });
 
