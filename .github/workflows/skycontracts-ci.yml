@@ -30,7 +30,9 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
       - name: Format check
-        run: pnpm exec prettier --check server/features/contracts/skyContracts.ts server/features/contracts/skyContracts.test.ts docs/products/134-skycontracts.md .github/workflows/skycontracts-ci.yml
+        run: |
+          pnpm exec prettier --write server/features/contracts/skyContracts.ts server/features/contracts/skyContracts.test.ts docs/products/134-skycontracts.md .github/workflows/skycontracts-ci.yml
+          git diff --exit-code -- server/features/contracts/skyContracts.ts server/features/contracts/skyContracts.test.ts docs/products/134-skycontracts.md .github/workflows/skycontracts-ci.yml
       - name: Targeted tests
         run: pnpm exec vitest run server/features/contracts/skyContracts.test.ts
       - name: Typecheck
