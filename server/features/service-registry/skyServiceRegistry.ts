@@ -60,7 +60,9 @@ export function createServiceDescriptor(input: unknown): ServiceDescriptor {
   }
 
   if (!Array.isArray(capabilities) || capabilities.length > 64) {
-    throw new TypeError("capabilities must be an array with at most 64 entries");
+    throw new TypeError(
+      "capabilities must be an array with at most 64 entries"
+    );
   }
 
   const normalizedCapabilities = [...new Set(capabilities.map(String))];
