@@ -1,0 +1,9 @@
+export interface ObjectRef { bucket:string; key:string; version?:string; }
+export interface PutPlan { op:"put"; ref:ObjectRef; contentType:string; sizeBytes:number; checksumSha256:string; metadata:Record<string,string>; }
+export interface GetPlan { op:"get"; ref:ObjectRef; }
+const NAME=/^[a-z0-9][a-z0-9.-]{2,62}$/;const KEY=/^[A-Za-z0-9][A-Za-z0-9!_.*'()\-/]{0,1023}$/;const SHA=/^[a-f0-9]{64}$/;const META=/^[A-Za-z0-9._-]{1,64}$/;
+export function validateRef(ref:ObjectRef):ObjectRef{if(!NAME.test(ref.bucket)||!KEY.test(ref.key)||ref.key.includes("../")||ref.key.startsWith("/"))throw new Error("invalid object reference");if(ref.version!==undefined&&(ref.version.length<1||ref.version.length>256))throw new Error("invalid version");return {...ref};}
+export function createPutPlan(input:Omit<PutPlan,"op">):PutPlan{const ref=validateRef(input.ref);if(!Number.isSafeInteger(input.sizeBytes)||input.sizeBytes<0||input.sizeBytes>5_000_000_000)throw new Error("invalid sizeBytes");if(input.contentType.length<3||input.contentType.length>128||!SHA.test(input.checksumSha256))throw new Error("invalid content metadata");const entries=Object.entries(input.metadata);if(entries.length>32||entries.some(([k,v])=>!META.test(k)||v.length>512))throw new Error("invalid metadata");return {op:"put",ref,contentType:input.contentType,sizeBytes:input.sizeBytes,checksumSha256:input.checksumSha256,metadata:Object.fromEntries(entries.sort(([a],[b])=>a.localeCompare(b)))};}
+export function createGetPlan(ref:ObjectRef):GetPlan{return {op:"get",ref:validateRef(ref)};}
+export interface StorageAdapter { put(plan:PutPlan):Promise<{etag:string;version?:string}>; get(plan:GetPlan):Promise<{sizeBytes:number;contentType:string}>; delete(ref:ObjectRef):Promise<void>; }
+export function toStorageIntegrationEvent(ref:ObjectRef,action:"put"|"delete"){const r=validateRef(ref);return {type:`storage.object_${action}` as const,bucket:r.bucket,key:r.key,version:r.version};}
