@@ -1,0 +1,30 @@
+name: sky-queue-ci
+
+on:
+  pull_request:
+    paths:
+      - "packages/sky-queue/**"
+      - ".github/workflows/sky-queue-ci.yml"
+      - "pnpm-lock.yaml"
+      - "tsconfig.packages.json"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @skycoin/sky-queue test
+      - run: pnpm run check:packages
+      - run: pnpm exec prettier --check packages/sky-queue
+      - run: pnpm audit --prod --audit-level high
