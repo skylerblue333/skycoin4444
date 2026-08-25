@@ -11,9 +11,17 @@ describe("SkyPrivacy", () => {
     });
   });
 
-  it("validates identifiers and categories", () => {
+  it("validates identifiers, categories, and runtime actions", () => {
     expect(() => createExportManifest("x", ["profile"], "2026-08-25T09:00:00Z")).toThrow();
     expect(() => createExportManifest("user:123", ["../secret"], "2026-08-25T09:00:00Z")).toThrow();
+    expect(() =>
+      createPrivacyRequest({
+        id: "privacy_003",
+        subjectId: "user:789",
+        action: "archive" as never,
+        requestedAt: "2026-08-25T11:00:00Z",
+      }),
+    ).toThrow("action must be export or delete");
   });
 
   it("enforces delete/export workflow transitions", () => {
@@ -24,8 +32,16 @@ describe("SkyPrivacy", () => {
     expect(() => transitionPrivacyRequest(request, "completed")).toThrow();
   });
 
-  it("produces a bounded integration event", () => {
+  it("derives integration event type from lifecycle status", () => {
     const request = createPrivacyRequest({ id: "privacy_002", subjectId: "user:456", action: "export", requestedAt: "2026-08-25T10:00:00Z" });
     expect(toPrivacyIntegrationEvent(request)).toEqual({ type: "privacy.requested", subjectId: "user:456", requestId: "privacy_002", status: "requested" });
+
+    const approved = transitionPrivacyRequest(request, "approved");
+    expect(toPrivacyIntegrationEvent(approved)).toEqual({
+      type: "privacy.status_changed",
+      subjectId: "user:456",
+      requestId: "privacy_002",
+      status: "approved",
+    });
   });
 });

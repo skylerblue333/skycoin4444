@@ -19,9 +19,16 @@ export interface ExportManifest {
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9:_-]{2,127}$/;
 const CATEGORY_PATTERN = /^[a-z][a-z0-9_-]{1,63}$/;
+const PRIVACY_ACTIONS: ReadonlySet<string> = new Set(["export", "delete"]);
 
 function assertId(value: string, field: string): void {
   if (!ID_PATTERN.test(value)) throw new Error(`${field} is invalid`);
+}
+
+function assertPrivacyAction(value: unknown): asserts value is PrivacyAction {
+  if (typeof value !== "string" || !PRIVACY_ACTIONS.has(value)) {
+    throw new Error("action must be export or delete");
+  }
 }
 
 export function createExportManifest(subjectId: string, categories: string[], requestedAt: string): ExportManifest {
@@ -37,6 +44,7 @@ export function createExportManifest(subjectId: string, categories: string[], re
 export function createPrivacyRequest(input: Omit<PrivacyRequest, "status">): PrivacyRequest {
   assertId(input.id, "id");
   assertId(input.subjectId, "subjectId");
+  assertPrivacyAction(input.action);
   if (!Number.isFinite(Date.parse(input.requestedAt))) throw new Error("requestedAt must be ISO-compatible");
   if (input.reason && input.reason.trim().length > 500) throw new Error("reason is too long");
   return { ...input, reason: input.reason?.trim() || undefined, requestedAt: new Date(input.requestedAt).toISOString(), status: "requested" };
@@ -60,9 +68,9 @@ export interface PrivacyIntegrationEvent {
   status: PrivacyStatus;
 }
 
-export function toPrivacyIntegrationEvent(request: PrivacyRequest, changed = false): PrivacyIntegrationEvent {
+export function toPrivacyIntegrationEvent(request: PrivacyRequest): PrivacyIntegrationEvent {
   return {
-    type: changed ? "privacy.status_changed" : "privacy.requested",
+    type: request.status === "requested" ? "privacy.requested" : "privacy.status_changed",
     subjectId: request.subjectId,
     requestId: request.id,
     status: request.status,
