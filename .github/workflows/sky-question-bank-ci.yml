@@ -24,7 +24,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec vitest run packages/sky-question-bank/src/index.test.ts
+      - run: pnpm --filter @skycoin/sky-question-bank test
       - run: pnpm run check:packages
       - run: pnpm exec prettier --check packages/sky-question-bank
       - run: pnpm audit --audit-level high
