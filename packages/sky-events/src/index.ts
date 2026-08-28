@@ -17,6 +17,7 @@ export type EventFilter = {
 
 const MAX_ID = 200;
 const MAX_TYPE = 160;
+const EXPLICIT_ZONE = /(Z|[+-]\d{2}:\d{2})$/i;
 
 function clean(value: string, field: string, max: number): string {
   const result = value.trim();
@@ -26,9 +27,18 @@ function clean(value: string, field: string, max: number): string {
 }
 
 function parseInstant(value: string, field: string): string {
-  const ms = Date.parse(value);
+  const normalized = value.trim();
+  if (!EXPLICIT_ZONE.test(normalized)) {
+    throw new Error(`${field} must include Z or an explicit UTC offset`);
+  }
+  const ms = Date.parse(normalized);
   if (!Number.isFinite(ms)) throw new Error(`${field} must be an ISO-8601 instant`);
   return new Date(ms).toISOString();
+}
+
+function compareCodePoints(left: string, right: string): number {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
 }
 
 export function normalizeEvent(input: SkyEvent): SkyEvent {
@@ -64,7 +74,7 @@ export function selectEvents(events: SkyEvent[], filter: EventFilter = {}): SkyE
   return events
     .filter((event) => eventMatches(event, filter))
     .map(normalizeEvent)
-    .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt) || a.id.localeCompare(b.id));
+    .sort((a, b) => compareCodePoints(a.occurredAt, b.occurredAt) || compareCodePoints(a.id, b.id));
 }
 
 export function createEventPublishedContract(event: SkyEvent) {

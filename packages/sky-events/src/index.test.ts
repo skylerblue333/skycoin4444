@@ -10,6 +10,12 @@ describe("SkyEvents", () => {
     });
   });
 
+  it("rejects timezone-less instants", () => {
+    expect(() => normalizeEvent({ id: "e-1", type: "user.created", occurredAt: "2026-08-28T02:00:00" })).toThrow(
+      /explicit UTC offset/,
+    );
+  });
+
   it("filters and sorts deterministically", () => {
     const events = [
       { id: "b", type: "task.updated", actorId: "u1", occurredAt: "2026-08-28T02:02:00Z" },
@@ -18,6 +24,15 @@ describe("SkyEvents", () => {
     ];
 
     expect(selectEvents(events, { actorId: "u1" }).map((event) => event.id)).toEqual(["a", "b"]);
+  });
+
+  it("uses locale-independent ID ordering for equal instants", () => {
+    const occurredAt = "2026-08-28T02:00:00Z";
+    const events = [
+      { id: "ä", type: "task.updated", occurredAt },
+      { id: "z", type: "task.updated", occurredAt },
+    ];
+    expect(selectEvents(events).map((event) => event.id)).toEqual(["z", "ä"]);
   });
 
   it("emits a versioned provider-neutral integration contract", () => {
