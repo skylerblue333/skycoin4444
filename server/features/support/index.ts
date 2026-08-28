@@ -25,13 +25,23 @@ function bounded(value: string, field: string, max: number): string {
   return v;
 }
 
+const priorities = new Set<SupportPriority>(['low', 'normal', 'high', 'urgent']);
+
+function normalizePriority(value: unknown): SupportPriority {
+  const priority = value ?? 'normal';
+  if (typeof priority !== 'string' || !priorities.has(priority as SupportPriority)) {
+    throw new Error('invalid_priority');
+  }
+  return priority as SupportPriority;
+}
+
 export function createSupportTicket(input: SupportTicketInput): SupportTicket {
   return {
     ticketId: bounded(input.ticketId, 'ticket_id', 120),
     requesterId: bounded(input.requesterId, 'requester_id', 120),
     subject: bounded(input.subject, 'subject', 180),
     body: bounded(input.body, 'body', 10_000),
-    priority: input.priority ?? 'normal',
+    priority: normalizePriority(input.priority),
     status: 'open',
     revision: 1,
   };
