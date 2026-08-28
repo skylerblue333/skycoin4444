@@ -28,7 +28,7 @@ function bounded(value: string, field: string, max: number): string {
 const priorities = new Set<SupportPriority>(['low', 'normal', 'high', 'urgent']);
 
 function normalizePriority(value: unknown): SupportPriority {
-  const priority = value ?? 'normal';
+  const priority = value === undefined ? 'normal' : value;
   if (typeof priority !== 'string' || !priorities.has(priority as SupportPriority)) {
     throw new Error('invalid_priority');
   }
