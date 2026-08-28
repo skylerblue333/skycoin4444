@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 const SKY_ID_RE = /^skyid_[a-f0-9]{32}$/;
 const SUBJECT_RE = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,127}$/;
 const NAMESPACE_RE = /^[a-z][a-z0-9-]{1,31}$/;
-const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+const ISO_TIMESTAMP_RE =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 export type SkyIdentityId = `skyid_${string}`;
 
@@ -21,7 +22,9 @@ export interface IdentityRecord extends IdentitySubject {
 export function normalizeNamespace(value: string): string {
   const namespace = value.trim().toLowerCase();
   if (!NAMESPACE_RE.test(namespace)) {
-    throw new Error("namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter");
+    throw new Error(
+      "namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter",
+    );
   }
   return namespace;
 }
@@ -37,7 +40,10 @@ export function normalizeSubject(value: string): string {
 export function deriveIdentityId(input: IdentitySubject): SkyIdentityId {
   const namespace = normalizeNamespace(input.namespace);
   const subject = normalizeSubject(input.subject);
-  const digest = createHash("sha256").update(`${namespace}\u0000${subject}`, "utf8").digest("hex").slice(0, 32);
+  const digest = createHash("sha256")
+    .update(`${namespace}\u0000${subject}`, "utf8")
+    .digest("hex")
+    .slice(0, 32);
   return `skyid_${digest}` as SkyIdentityId;
 }
 
@@ -54,7 +60,9 @@ function parseStrictTimestamp(value: string): Date {
     throw new Error("createdAt must be a valid ISO-8601 timestamp");
   }
 
-  const wallClockMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+  const wallClockMatch = value.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/,
+  );
   if (!wallClockMatch) {
     throw new Error("createdAt must be a valid ISO-8601 timestamp");
   }
@@ -65,7 +73,10 @@ function parseStrictTimestamp(value: string): Date {
   }
   const normalized = offsetMatch[1] === "Z" ? "+00:00" : offsetMatch[1];
   const sign = normalized[0] === "+" ? 1 : -1;
-  const [offsetHours, offsetMinutes] = normalized.slice(1).split(":").map(Number);
+  const [offsetHours, offsetMinutes] = normalized
+    .slice(1)
+    .split(":")
+    .map(Number);
   if (offsetHours > 23 || offsetMinutes > 59) {
     throw new Error("createdAt has an invalid timezone offset");
   }
@@ -105,6 +116,9 @@ export function createIdentityRecord(
   };
 }
 
-export function matchesSubject(record: IdentityRecord, input: IdentitySubject): boolean {
+export function matchesSubject(
+  record: IdentityRecord,
+  input: IdentitySubject,
+): boolean {
   return record.id === deriveIdentityId(input);
 }
