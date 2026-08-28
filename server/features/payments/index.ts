@@ -49,6 +49,12 @@ export function validatePaymentIntent(intent: PaymentIntent): string[] {
   }
   if (!CURRENCY.test(intent.currency)) errors.push("currency must be a 3-letter uppercase code");
   if (!SAFE_ID.test(intent.idempotencyKey.trim())) errors.push("idempotencyKey is invalid");
+  if (
+    (intent.status === "authorized" || intent.status === "captured") &&
+    !intent.providerReference
+  ) {
+    errors.push("providerReference is required for authorized or captured intents");
+  }
   if (intent.providerReference !== undefined && !SAFE_ID.test(intent.providerReference.trim())) {
     errors.push("providerReference is invalid");
   }
@@ -61,6 +67,9 @@ export function createPaymentIntent(
 ): PaymentIntent[] {
   const errors = validatePaymentIntent(candidate);
   if (errors.length > 0) throw new Error(errors.join("; "));
+  if (candidate.status !== "created") {
+    throw new Error("new payment intents must start in created status");
+  }
   if (existing.some(intent => intent.id === candidate.id)) {
     throw new Error(`payment intent already exists: ${candidate.id}`);
   }
@@ -100,6 +109,8 @@ export function transitionPaymentIntent(
   next: PaymentIntentStatus,
   providerReference?: string,
 ): PaymentIntent {
+  const currentErrors = validatePaymentIntent(intent);
+  if (currentErrors.length > 0) throw new Error(currentErrors.join("; "));
   const allowed: Record<PaymentIntentStatus, readonly PaymentIntentStatus[]> = {
     created: ["authorized", "declined", "cancelled"],
     authorized: ["captured", "cancelled"],
