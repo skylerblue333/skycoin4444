@@ -60,9 +60,7 @@ function parseStrictTimestamp(value: string): Date {
     throw new Error("createdAt must be a valid ISO-8601 timestamp");
   }
 
-  const wallClockMatch = value.match(
-    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/,
-  );
+  const wallClockMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
   if (!wallClockMatch) {
     throw new Error("createdAt must be a valid ISO-8601 timestamp");
   }
@@ -73,10 +71,7 @@ function parseStrictTimestamp(value: string): Date {
   }
   const normalized = offsetMatch[1] === "Z" ? "+00:00" : offsetMatch[1];
   const sign = normalized[0] === "+" ? 1 : -1;
-  const [offsetHours, offsetMinutes] = normalized
-    .slice(1)
-    .split(":")
-    .map(Number);
+  const [offsetHours, offsetMinutes] = normalized.slice(1).split(":").map(Number);
   if (offsetHours > 23 || offsetMinutes > 59) {
     throw new Error("createdAt has an invalid timezone offset");
   }
@@ -116,9 +111,6 @@ export function createIdentityRecord(
   };
 }
 
-export function matchesSubject(
-  record: IdentityRecord,
-  input: IdentitySubject,
-): boolean {
+export function matchesSubject(record: IdentityRecord, input: IdentitySubject): boolean {
   return record.id === deriveIdentityId(input);
 }
