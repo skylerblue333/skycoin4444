@@ -1,0 +1,32 @@
+name: SkyEvents
+
+on:
+  pull_request:
+    paths:
+      - "packages/sky-events/**"
+      - ".github/workflows/sky-events.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/sky-events/**"
+      - ".github/workflows/sky-events.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run --config packages/sky-events/vitest.config.ts
+      - run: pnpm exec tsc --ignoreConfig --noEmit --module nodenext --moduleResolution nodenext --target es2022 packages/sky-events/src/index.ts
+      - run: pnpm audit --prod --audit-level=critical
