@@ -1,0 +1,14 @@
+{
+  "name": "@skycoin/skyidentity",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p ../../tsconfig.packages.json",
+    "format:check": "prettier --check README.md package.json vitest.config.ts"
+  }
+}
