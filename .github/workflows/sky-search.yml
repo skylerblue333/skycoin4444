@@ -5,11 +5,13 @@ on:
     paths:
       - "packages/sky-search/**"
       - ".github/workflows/sky-search.yml"
+      - "tsconfig.packages.json"
   push:
     branches: [main]
     paths:
       - "packages/sky-search/**"
       - ".github/workflows/sky-search.yml"
+      - "tsconfig.packages.json"
 
 jobs:
   test:
@@ -25,4 +27,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec vitest run --config packages/sky-search/vitest.config.ts
-      - run: pnpm exec tsc --ignoreConfig --noEmit --module nodenext --moduleResolution nodenext --target es2022 packages/sky-search/src/index.ts
+      - run: pnpm run check:packages
