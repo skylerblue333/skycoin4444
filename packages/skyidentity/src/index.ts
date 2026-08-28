@@ -23,7 +23,7 @@ export function normalizeNamespace(value: string): string {
   const namespace = value.trim().toLowerCase();
   if (!NAMESPACE_RE.test(namespace)) {
     throw new Error(
-      "namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter"
+      "namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter",
     );
   }
   return namespace;
@@ -61,7 +61,7 @@ function parseStrictTimestamp(value: string): Date {
   }
 
   const wallClockMatch = value.match(
-    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/,
   );
   if (!wallClockMatch) {
     throw new Error("createdAt must be a valid ISO-8601 timestamp");
@@ -96,7 +96,7 @@ function parseStrictTimestamp(value: string): Date {
 }
 
 export function createIdentityRecord(
-  input: IdentitySubject & { createdAt: string; displayName?: string }
+  input: IdentitySubject & { createdAt: string; displayName?: string },
 ): IdentityRecord {
   const createdAt = parseStrictTimestamp(input.createdAt);
 
@@ -118,7 +118,7 @@ export function createIdentityRecord(
 
 export function matchesSubject(
   record: IdentityRecord,
-  input: IdentitySubject
+  input: IdentitySubject,
 ): boolean {
   return record.id === deriveIdentityId(input);
 }
