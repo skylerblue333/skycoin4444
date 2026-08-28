@@ -16,11 +16,21 @@ export type ReturnDecision = {
   reason?: string;
 };
 
+const RETURN_STATUSES = new Set<ReturnStatus>(["requested", "approved", "rejected", "received", "refunded"]);
+
 const clean = (value: string, field: string, max: number): string => {
   const result = value.trim();
   if (!result) throw new Error(`${field} is required`);
   if (result.length > max) throw new Error(`${field} exceeds ${max} characters`);
   return result;
+};
+
+const normalizeStatus = (value: unknown): ReturnStatus => {
+  const status = value ?? "requested";
+  if (typeof status !== "string" || !RETURN_STATUSES.has(status as ReturnStatus)) {
+    throw new Error("status must be one of requested, approved, rejected, received, refunded");
+  }
+  return status as ReturnStatus;
 };
 
 export function normalizeReturnRequest(input: ReturnRequest): Required<ReturnRequest> {
@@ -34,7 +44,7 @@ export function normalizeReturnRequest(input: ReturnRequest): Required<ReturnReq
     itemId: clean(input.itemId, "itemId", 160),
     quantity,
     reason: clean(input.reason, "reason", 1000),
-    status: input.status ?? "requested",
+    status: normalizeStatus(input.status),
   };
 }
 
@@ -56,6 +66,9 @@ export function transitionReturn(request: ReturnRequest, next: ReturnStatus): Re
 
 export function createReturnDecision(request: ReturnRequest, approved: boolean, reason?: string): ReturnDecision {
   const normalized = normalizeReturnRequest(request);
+  if (normalized.status !== "requested") {
+    throw new Error("return decisions can only be created from requested status");
+  }
   const decisionReason = reason?.trim();
   if (!approved && !decisionReason) throw new Error("rejection reason is required");
   return {
