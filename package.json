@@ -111,5 +111,10 @@
     "vite-plugin-manus-runtime": "0.0.59",
     "vitest": "^4.1.10"
   },
-  "packageManager": "pnpm@11.20.0"
+  "packageManager": "pnpm@11.20.0",
+  "pnpm": {
+    "overrides": {
+      "postcss>nanoid": "3.3.18"
+    }
+  }
 }
