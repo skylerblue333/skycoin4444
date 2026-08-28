@@ -53,12 +53,15 @@ export function normalizeCdnPolicy(input: CdnPolicy): CdnPolicy {
   return normalized;
 }
 
+const matchesPathPrefix = (requestedPath: string, pathPrefix: string): boolean =>
+  pathPrefix === "/" || requestedPath === pathPrefix || requestedPath.startsWith(`${pathPrefix}/`);
+
 export function resolveCdnPolicy(policies: CdnPolicy[], path: string): CdnPolicyResolvedV1 | null {
   const requestedPath = clean(path, "path", 2000);
   if (!requestedPath.startsWith("/")) throw new Error("path must start with /");
   const matches = policies
     .map(normalizeCdnPolicy)
-    .filter((policy) => requestedPath === policy.pathPrefix || requestedPath.startsWith(`${policy.pathPrefix}/`))
+    .filter((policy) => matchesPathPrefix(requestedPath, policy.pathPrefix))
     .sort((a, b) => b.pathPrefix.length - a.pathPrefix.length || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   const selected = matches[0];
   if (!selected) return null;
