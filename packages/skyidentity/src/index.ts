@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 const SKY_ID_RE = /^skyid_[a-f0-9]{32}$/;
 const SUBJECT_RE = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,127}$/;
 const NAMESPACE_RE = /^[a-z][a-z0-9-]{1,31}$/;
-const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+const ISO_TIMESTAMP_RE =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 export type SkyIdentityId = `skyid_${string}`;
 
@@ -72,7 +73,10 @@ function parseStrictTimestamp(value: string): Date {
   }
   const normalized = offsetMatch[1] === "Z" ? "+00:00" : offsetMatch[1];
   const sign = normalized[0] === "+" ? 1 : -1;
-  const [offsetHours, offsetMinutes] = normalized.slice(1).split(":").map(Number);
+  const [offsetHours, offsetMinutes] = normalized
+    .slice(1)
+    .split(":")
+    .map(Number);
   if (offsetHours > 23 || offsetMinutes > 59) {
     throw new Error("createdAt has an invalid timezone offset");
   }
