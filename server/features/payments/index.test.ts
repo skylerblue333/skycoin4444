@@ -36,6 +36,37 @@ describe("SkyPayments", () => {
     ).toThrow("idempotency key already exists");
   });
 
+  it("canonicalizes identifiers before uniqueness checks and storage", () => {
+    expect(() =>
+      createPaymentIntent([intent], {
+        ...intent,
+        id: " pay-1 ",
+        idempotencyKey: " checkout-2 ",
+      }),
+    ).toThrow("payment intent already exists");
+
+    expect(() =>
+      createPaymentIntent([intent], {
+        ...intent,
+        id: "pay-2",
+        idempotencyKey: " checkout-1 ",
+      }),
+    ).toThrow("idempotency key already exists");
+
+    expect(
+      createPaymentIntent([], {
+        ...intent,
+        id: " pay-2 ",
+        accountId: " acct-1 ",
+        idempotencyKey: " checkout-2 ",
+      })[0],
+    ).toMatchObject({
+      id: "pay-2",
+      accountId: "acct-1",
+      idempotencyKey: "checkout-2",
+    });
+  });
+
   it("requires new intents to start as created", () => {
     expect(() =>
       createPaymentIntent([], {
