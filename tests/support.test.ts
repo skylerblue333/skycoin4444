@@ -11,6 +11,15 @@ describe('SkySupport', () => {
     });
   });
 
+  it('rejects unsupported runtime priority values', () => {
+    expect(() => createSupportTicket({
+      ticketId: 't', requesterId: 'u', subject: 's', body: 'b', priority: 'critical' as never,
+    })).toThrow('invalid_priority');
+    expect(() => createSupportTicket({
+      ticketId: 't', requesterId: 'u', subject: 's', body: 'b', priority: null as never,
+    })).toThrow('invalid_priority');
+  });
+
   it('enforces deterministic lifecycle transitions', () => {
     const open = createSupportTicket({ ticketId: 't', requesterId: 'u', subject: 's', body: 'b' });
     const active = transitionSupportTicket(open, 'in_progress');
