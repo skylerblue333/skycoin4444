@@ -23,9 +23,9 @@ describe("SkyIdentity domain core", () => {
   });
 
   it("separates namespaces", () => {
-    expect(
-      deriveIdentityId({ namespace: "skyschool", subject: "42" })
-    ).not.toBe(deriveIdentityId({ namespace: "skyhope", subject: "42" }));
+    expect(deriveIdentityId({ namespace: "skyschool", subject: "42" })).not.toBe(
+      deriveIdentityId({ namespace: "skyhope", subject: "42" }),
+    );
   });
 
   it("normalizes safe input and rejects malformed input", () => {
@@ -49,7 +49,7 @@ describe("SkyIdentity domain core", () => {
       matchesSubject(record, {
         namespace: "skycommunity",
         subject: "member/123",
-      })
+      }),
     ).toBe(true);
   });
 
@@ -66,7 +66,7 @@ describe("SkyIdentity domain core", () => {
           namespace: "skychat",
           subject: "1",
           createdAt,
-        })
+        }),
       ).toThrow();
     }
   });
@@ -78,7 +78,7 @@ describe("SkyIdentity domain core", () => {
         subject: "1",
         createdAt: "2026-08-25T00:00:00Z",
         displayName: "x".repeat(121),
-      })
+      }),
     ).toThrow();
   });
 });
