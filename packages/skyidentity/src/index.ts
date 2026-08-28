@@ -3,8 +3,7 @@ import { createHash } from "node:crypto";
 const SKY_ID_RE = /^skyid_[a-f0-9]{32}$/;
 const SUBJECT_RE = /^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,127}$/;
 const NAMESPACE_RE = /^[a-z][a-z0-9-]{1,31}$/;
-const ISO_TIMESTAMP_RE =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+const ISO_TIMESTAMP_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 export type SkyIdentityId = `skyid_${string}`;
 
@@ -22,9 +21,7 @@ export interface IdentityRecord extends IdentitySubject {
 export function normalizeNamespace(value: string): string {
   const namespace = value.trim().toLowerCase();
   if (!NAMESPACE_RE.test(namespace)) {
-    throw new Error(
-      "namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter",
-    );
+    throw new Error("namespace must be 2-32 lowercase alphanumeric/hyphen characters and start with a letter");
   }
   return namespace;
 }
@@ -40,10 +37,7 @@ export function normalizeSubject(value: string): string {
 export function deriveIdentityId(input: IdentitySubject): SkyIdentityId {
   const namespace = normalizeNamespace(input.namespace);
   const subject = normalizeSubject(input.subject);
-  const digest = createHash("sha256")
-    .update(`${namespace}\u0000${subject}`, "utf8")
-    .digest("hex")
-    .slice(0, 32);
+  const digest = createHash("sha256").update(`${namespace}\u0000${subject}`, "utf8").digest("hex").slice(0, 32);
   return `skyid_${digest}` as SkyIdentityId;
 }
 
