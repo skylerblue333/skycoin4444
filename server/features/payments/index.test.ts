@@ -36,6 +36,61 @@ describe("SkyPayments", () => {
     ).toThrow("idempotency key already exists");
   });
 
+  it("canonicalizes identifiers before uniqueness checks and storage", () => {
+    expect(() =>
+      createPaymentIntent([intent], {
+        ...intent,
+        id: " pay-1 ",
+        idempotencyKey: " checkout-2 ",
+      }),
+    ).toThrow("payment intent already exists");
+
+    expect(() =>
+      createPaymentIntent([intent], {
+        ...intent,
+        id: "pay-2",
+        idempotencyKey: " checkout-1 ",
+      }),
+    ).toThrow("idempotency key already exists");
+
+    expect(
+      createPaymentIntent([], {
+        ...intent,
+        id: " pay-2 ",
+        accountId: " acct-1 ",
+        idempotencyKey: " checkout-2 ",
+      })[0],
+    ).toMatchObject({
+      id: "pay-2",
+      accountId: "acct-1",
+      idempotencyKey: "checkout-2",
+    });
+  });
+
+  it("requires new intents to start as created", () => {
+    expect(() =>
+      createPaymentIntent([], {
+        ...intent,
+        status: "declined",
+      }),
+    ).toThrow("new payment intents must start in created status");
+  });
+
+  it("requires provider evidence for authorized and captured state", () => {
+    expect(
+      validatePaymentIntent({
+        ...intent,
+        status: "authorized",
+      }),
+    ).toContain("providerReference is required for authorized or captured intents");
+    expect(
+      validatePaymentIntent({
+        ...intent,
+        status: "captured",
+      }),
+    ).toContain("providerReference is required for authorized or captured intents");
+  });
+
   it("creates a deterministic external authorization plan", () => {
     expect(
       planPaymentAuthorization(intent, {
@@ -66,6 +121,19 @@ describe("SkyPayments", () => {
     expect(() => transitionPaymentIntent(intent, "captured", "capture-1")).toThrow(
       "invalid payment transition",
     );
+  });
+
+  it("rejects transitions from malformed post-creation state", () => {
+    expect(() =>
+      transitionPaymentIntent(
+        {
+          ...intent,
+          status: "authorized",
+        },
+        "captured",
+        "capture-1",
+      ),
+    ).toThrow("providerReference is required for authorized or captured intents");
   });
 
   it("states the non-execution integration boundary", () => {
