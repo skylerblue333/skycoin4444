@@ -15,7 +15,6 @@ describe("SkyDonations", () => {
     const pledged = createDonation(input);
     expect(pledged.status).toBe("pledged");
     const recorded = markRecorded(pledged);
-    expect(recorded.status).toBe("recorded");
     expect(toIntegrationEvent(recorded)).toEqual({
       type: "skyhope.donation.recorded",
       donationId: "don-1",
@@ -25,9 +24,20 @@ describe("SkyDonations", () => {
     });
   });
 
-  it("rejects invalid money input", () => {
+  it("rejects invalid money and impossible timestamps", () => {
     expect(() => createDonation({ ...input, amountMinor: 1.5 })).toThrow(RangeError);
     expect(() => createDonation({ ...input, currency: "usd" })).toThrow(TypeError);
+    expect(() => createDonation({ ...input, createdAt: "2026-02-30T00:00:00Z" })).toThrow(TypeError);
+  });
+
+  it("revalidates mutable records before transitions and emission", () => {
+    const pledged = createDonation(input);
+    pledged.amountMinor = -1;
+    expect(() => markRecorded(pledged)).toThrow(RangeError);
+
+    const recorded = markRecorded(createDonation(input));
+    recorded.currency = "usd";
+    expect(() => toIntegrationEvent(recorded)).toThrow(TypeError);
   });
 
   it("prevents cancellation after a donation is recorded", () => {

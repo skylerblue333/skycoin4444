@@ -12,8 +12,13 @@
     "moduleResolution": "bundler",
     "paths": {
       "@skycoin/contracts": ["./packages/contracts/src/index.ts"],
-      "@skycoin/area-registry": ["./packages/area-registry/src/index.ts"]
+      "@skycoin/area-registry": ["./packages/area-registry/src/index.ts"],
+      "@skycoin/sky-mfa": ["./packages/sky-mfa/src/index.ts"],
+      "@skycoin/sky-donations": ["./packages/sky-donations/src/index.ts"],
+      "@skycoin/sky-evaluation": ["./packages/sky-evaluation/src/index.ts"],
+      "@skycoin/sky-tutoring": ["./packages/sky-tutoring/src/index.ts"],
+      "@skycoin/sky-inventory": ["./packages/sky-inventory/src/index.ts"],
+      "@skycoin/sky-feature-flags": ["./packages/sky-feature-flags/src/index.ts"]
     }
   }
 }
-
