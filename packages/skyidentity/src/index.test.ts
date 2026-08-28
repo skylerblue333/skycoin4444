@@ -53,14 +53,25 @@ describe("SkyIdentity domain core", () => {
     ).toBe(true);
   });
 
-  it("rejects invalid timestamps and excessive display names", () => {
-    expect(() =>
-      createIdentityRecord({
-        namespace: "skychat",
-        subject: "1",
-        createdAt: "not-a-date",
-      })
-    ).toThrow();
+  it("rejects invalid and impossible timestamps", () => {
+    for (const createdAt of [
+      "not-a-date",
+      "0",
+      "2026-02-30T00:00:00Z",
+      "2026-08-25T00:00:00",
+      "2026-08-25T00:00:00+24:00",
+    ]) {
+      expect(() =>
+        createIdentityRecord({
+          namespace: "skychat",
+          subject: "1",
+          createdAt,
+        })
+      ).toThrow();
+    }
+  });
+
+  it("rejects excessive display names", () => {
     expect(() =>
       createIdentityRecord({
         namespace: "skychat",
