@@ -25,7 +25,21 @@ describe("SkyTalent", () => {
     ]);
   });
 
-  it("creates a versioned advisory request contract", () => {
+  it("creates a versioned advisory request contract and validates its limit", () => {
     expect(createTalentMatchRequested({ skills: ["React"] }).type).toBe("sky.talent.match.requested.v1");
+    expect(() => createTalentMatchRequested({ limit: 0 })).toThrow(/limit/);
+    expect(() => createTalentMatchRequested({ limit: 101 })).toThrow(/limit/);
+    expect(() => createTalentMatchRequested({ limit: 1.5 })).toThrow(/limit/);
+  });
+
+  it("uses locale-independent tie-breaking for equal scores", () => {
+    const matches = matchTalent(
+      [
+        { id: "ä", headline: "A", skills: ["typescript"] },
+        { id: "z", headline: "Z", skills: ["typescript"] },
+      ],
+      { skills: ["typescript"] },
+    );
+    expect(matches.map((match) => match.profile.id)).toEqual(["z", "ä"]);
   });
 });
