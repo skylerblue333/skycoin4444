@@ -24,11 +24,16 @@ describe("SkySecrets", () => {
     expect(event).not.toHaveProperty("value");
   });
 
-  it("rejects unsafe references and redacts obvious secret-bearing fields", () => {
+  it("rejects unsafe references and redacts common secret-bearing fields", () => {
     expect(() => secretReferenceKey({ namespace: "../escape", name: "key" })).toThrow();
-    expect(redactSecretValue({ value: "abc", token: "xyz", owner: "svc" })).toEqual({
+    expect(
+      redactSecretValue({ value: "abc", token: "xyz", clientSecret: "one", apiKey: "two", accessToken: 123, owner: "svc" }),
+    ).toEqual({
       value: "[REDACTED]",
       token: "[REDACTED]",
+      clientSecret: "[REDACTED]",
+      apiKey: "[REDACTED]",
+      accessToken: "[REDACTED]",
       owner: "svc",
     });
   });

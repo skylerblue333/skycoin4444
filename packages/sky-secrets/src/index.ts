@@ -10,6 +10,8 @@ export interface SecretAccessRequest {
   reference: SecretReference;
 }
 
+export type RedactedRecord = Record<string, unknown>;
+
 const SAFE_SEGMENT = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/;
 
 function requireSegment(value: string, field: string): string {
@@ -48,9 +50,25 @@ export function createSecretAccessEvent(request: SecretAccessRequest) {
   };
 }
 
-export function redactSecretValue<T extends Record<string, unknown>>(record: T): T {
-  const blocked = new Set(["secret", "value", "token", "password", "authorization", "privatekey", "private_key"]);
+function normalizedSecretKey(key: string): string {
+  return key.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+export function redactSecretValue(record: Record<string, unknown>): RedactedRecord {
+  const blocked = new Set([
+    "secret",
+    "value",
+    "token",
+    "password",
+    "authorization",
+    "privatekey",
+    "clientsecret",
+    "apikey",
+    "accesstoken",
+    "refreshtoken",
+    "bearertoken",
+  ]);
   return Object.fromEntries(
-    Object.entries(record).map(([key, value]) => [key, blocked.has(key.toLowerCase()) ? "[REDACTED]" : value]),
-  ) as T;
+    Object.entries(record).map(([key, value]) => [key, blocked.has(normalizedSecretKey(key)) ? "[REDACTED]" : value]),
+  );
 }
