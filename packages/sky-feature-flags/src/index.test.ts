@@ -26,4 +26,15 @@ describe("SkyFeatureFlags", () => {
       { key: "dup", defaultValue: false },
     ], { subjectId: "user-1" })).toThrow(/duplicate/);
   });
+
+  it("ignores inherited override properties and preserves __proto__ snapshot keys", () => {
+    expect(evaluateFlag({ key: "safe.flag", defaultValue: false, overrides: {} }, { subjectId: "constructor" })).toBe(false);
+    const snapshot = createFlagSnapshot([{ key: "__proto__", defaultValue: true }], { subjectId: "user-1" });
+    expect(Object.hasOwn(snapshot.values, "__proto__")).toBe(true);
+    expect(snapshot.values.__proto__).toBe(true);
+  });
+
+  it("rejects runtime values outside the declared flag value contract", () => {
+    expect(() => evaluateFlag({ key: "bad.value", defaultValue: {} as never }, { subjectId: "user-1" })).toThrow(TypeError);
+  });
 });
