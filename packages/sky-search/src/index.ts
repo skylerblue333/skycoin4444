@@ -30,8 +30,8 @@ export type SearchRequestedV1 = {
 
 const normalize = (value: string): string[] =>
   value
-    .toLocaleLowerCase("en-US")
     .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
     .split(/[^\p{L}\p{N}]+/u)
     .filter(Boolean);
 
@@ -43,6 +43,11 @@ const cleanString = (value: string, field: string, max: number): string => {
 };
 
 const unique = (values: string[]): string[] => [...new Set(values.map((v) => v.trim()).filter(Boolean))];
+
+const compareCodePoints = (left: string, right: string): number => {
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+};
 
 export function createSearchRequest(query: SearchQuery): SearchRequestedV1 {
   const text = cleanString(query.text, "query text", 512);
@@ -93,5 +98,5 @@ export function searchDocuments(documents: SearchDocument[], query: SearchQuery)
     hits.push(hit);
   }
 
-  return hits.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id)).slice(0, request.limit);
+  return hits.sort((a, b) => b.score - a.score || compareCodePoints(a.id, b.id)).slice(0, request.limit);
 }
