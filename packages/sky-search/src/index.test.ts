@@ -14,6 +14,22 @@ describe("SkySearch", () => {
     expect(hits[0]?.matchedTerms).toEqual(["wallet", "search"]);
   });
 
+  it("normalizes compatibility forms before case folding", () => {
+    const hits = searchDocuments([{ id: "compat", title: "Alpha" }], { text: "𝐀lpha" });
+    expect(hits.map((hit) => hit.id)).toEqual(["compat"]);
+  });
+
+  it("uses locale-independent ID ordering for equal scores", () => {
+    const hits = searchDocuments(
+      [
+        { id: "ä", title: "Alpha" },
+        { id: "z", title: "Alpha" },
+      ],
+      { text: "alpha" },
+    );
+    expect(hits.map((hit) => hit.id)).toEqual(["z", "ä"]);
+  });
+
   it("applies kind and tag filters", () => {
     const hits = searchDocuments(
       [
