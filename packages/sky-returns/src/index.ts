@@ -26,7 +26,7 @@ const clean = (value: string, field: string, max: number): string => {
 };
 
 const normalizeStatus = (value: unknown): ReturnStatus => {
-  const status = value ?? "requested";
+  const status = value === undefined ? "requested" : value;
   if (typeof status !== "string" || !RETURN_STATUSES.has(status as ReturnStatus)) {
     throw new Error("status must be one of requested, approved, rejected, received, refunded");
   }
