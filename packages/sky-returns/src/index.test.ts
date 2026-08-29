@@ -13,9 +13,12 @@ describe("SkyReturns", () => {
     });
   });
 
-  it("rejects unknown lifecycle states from untyped inputs", () => {
-    const unsafe = { id: "r1", orderId: "o1", itemId: "i1", quantity: 1, reason: "damaged", status: "cancelled" } as unknown as Parameters<typeof normalizeReturnRequest>[0];
-    expect(() => normalizeReturnRequest(unsafe)).toThrow(/status must be one of/);
+  it("rejects unknown and null lifecycle states from untyped inputs", () => {
+    const unknownStatus = { id: "r1", orderId: "o1", itemId: "i1", quantity: 1, reason: "damaged", status: "cancelled" } as unknown as Parameters<typeof normalizeReturnRequest>[0];
+    const nullStatus = { id: "r2", orderId: "o1", itemId: "i1", quantity: 1, reason: "damaged", status: null } as unknown as Parameters<typeof normalizeReturnRequest>[0];
+    expect(() => normalizeReturnRequest(unknownStatus)).toThrow(/status must be one of/);
+    expect(() => normalizeReturnRequest(nullStatus)).toThrow(/status must be one of/);
+    expect(() => createReturnDecision(nullStatus, true)).toThrow(/status must be one of/);
   });
 
   it("enforces deterministic lifecycle transitions", () => {
