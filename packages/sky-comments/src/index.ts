@@ -24,6 +24,7 @@ export interface CommentChangedEvent {
 }
 
 const ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
+const ISO_INSTANT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 const MAX_BODY_LENGTH = 4000;
 
 function assertId(value: string, field: string): void {
@@ -31,13 +32,10 @@ function assertId(value: string, field: string): void {
 }
 
 function assertIsoInstant(value: string, field: string): void {
+  if (!ISO_INSTANT_RE.test(value)) throw new Error(`${field} must be a canonical UTC ISO instant`);
   const parsed = new Date(value);
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) || Number.isNaN(parsed.getTime())) {
-    throw new Error(`${field} must be a UTC ISO instant`);
-  }
-  if (parsed.toISOString() !== value.replace(/\.000Z$/, "Z")) {
-    const canonical = parsed.toISOString();
-    if (canonical !== value) throw new Error(`${field} must represent a real UTC instant`);
+  if (Number.isNaN(parsed.getTime()) || parsed.toISOString() !== value) {
+    throw new Error(`${field} must represent a real UTC instant`);
   }
 }
 
