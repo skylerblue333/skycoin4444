@@ -23,6 +23,11 @@ function requireUnit(value: number, field: string): number {
   return value;
 }
 
+function compareIds(a: string, b: string): number {
+  if (a === b) return 0;
+  return a < b ? -1 : 1;
+}
+
 export function rankRecommendations(candidates: RecommendationCandidate[], limit = candidates.length): RankedRecommendation[] {
   if (!Array.isArray(candidates) || candidates.length === 0) throw new Error("candidates are required");
   if (!Number.isSafeInteger(limit) || limit <= 0) throw new Error("limit must be a positive safe integer");
@@ -38,6 +43,6 @@ export function rankRecommendations(candidates: RecommendationCandidate[], limit
     return { id, score };
   });
 
-  scored.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  scored.sort((a, b) => b.score - a.score || compareIds(a.id, b.id));
   return scored.slice(0, limit).map((item, index) => ({ ...item, rank: index + 1 }));
 }
