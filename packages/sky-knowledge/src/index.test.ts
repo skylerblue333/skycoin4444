@@ -13,6 +13,12 @@ describe('SkyKnowledge', () => {
     expect(searchKnowledge([a, b], 'wallet').map((article) => article.id)).toEqual(['a', 'b']);
   });
 
+  it('uses locale-independent code-unit ordering for ids', () => {
+    const accented = publishArticle(createArticle({ id: 'ä', title: 'Wallet Intl', body: 'International', tags: ['wallet'] }));
+    const ascii = publishArticle(createArticle({ id: 'z', title: 'Wallet ASCII', body: 'ASCII', tags: ['wallet'] }));
+    expect(searchKnowledge([accented, ascii], 'wallet').map((article) => article.id)).toEqual(['z', 'ä']);
+  });
+
   it('excludes drafts and archived articles from search', () => {
     const draft = createArticle({ id: 'd', title: 'Wallet Draft', body: 'hidden', tags: [] });
     const archived = archiveArticle(publishArticle(createArticle({ id: 'a', title: 'Wallet Old', body: 'old', tags: [] })));
