@@ -33,7 +33,20 @@ describe("SkySubscriptions", () => {
   });
 
   it("supports period-end cancellation without pretending to execute billing", () => {
-    expect(requestPeriodEndCancellation(subscription).cancelAtPeriodEnd).toBe(true);
+    const scheduled = requestPeriodEndCancellation(subscription);
+    expect(scheduled.cancelAtPeriodEnd).toBe(true);
+    expect(toSubscriptionIntent(scheduled, "cancel").cancelAtPeriodEnd).toBe(true);
+    expect(toSubscriptionIntent(subscription, "cancel").cancelAtPeriodEnd).toBe(false);
+  });
+
+  it("accepts valid ISO timestamps with UTC and explicit offsets", () => {
+    expect(
+      validateSubscription({
+        ...subscription,
+        currentPeriodStart: "2026-08-01T00:00:00Z",
+        currentPeriodEnd: "2026-09-01T01:00:00+01:00",
+      }),
+    ).toEqual([]);
   });
 
   it("validates periods, currency, and quantities", () => {
@@ -55,6 +68,7 @@ describe("SkySubscriptions", () => {
       planId: "pro",
       quantity: 2,
       action: "pause",
+      cancelAtPeriodEnd: false,
     });
   });
 });
