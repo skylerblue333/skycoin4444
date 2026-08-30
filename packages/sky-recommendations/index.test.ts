@@ -14,6 +14,16 @@ describe("SkyRecommendations", () => {
     expect(SKY_RECOMMENDATIONS_CONTRACT).toBe("sky.recommendations.ranked.v1");
   });
 
+  it("uses locale-independent code-unit ordering for tied ids", () => {
+    expect(rankRecommendations([
+      { id: "ä", relevance: 0.8, affinity: 0.4 },
+      { id: "z", relevance: 0.8, affinity: 0.4 },
+    ])).toEqual([
+      { id: "z", score: 0.7, rank: 1 },
+      { id: "ä", score: 0.7, rank: 2 },
+    ]);
+  });
+
   it("rejects malformed candidates", () => {
     expect(() => rankRecommendations([])).toThrow("candidates");
     expect(() => rankRecommendations([{ id: " ", relevance: 0.5 }])).toThrow("id");
