@@ -25,12 +25,13 @@ export interface SubscriptionIntentV1 {
   planId: string;
   quantity: number;
   action: "activate" | "pause" | "resume" | "cancel";
+  cancelAtPeriodEnd: boolean;
 }
 
 function isIsoTimestamp(value: string): boolean {
   if (!value.trim()) return false;
-  const parsed = Date.parse(value);
-  return Number.isFinite(parsed) && new Date(parsed).toISOString() === value;
+  const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+  return isoPattern.test(value) && Number.isFinite(Date.parse(value));
 }
 
 export function validatePlan(plan: SubscriptionPlan): string[] {
@@ -92,5 +93,6 @@ export function toSubscriptionIntent(subscription: Subscription, action: Subscri
     planId: subscription.planId,
     quantity: subscription.quantity,
     action,
+    cancelAtPeriodEnd: action === "cancel" ? subscription.cancelAtPeriodEnd : false,
   };
 }
