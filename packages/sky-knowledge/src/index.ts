@@ -19,6 +19,12 @@ function normalizeTags(tags: readonly string[]): readonly string[] {
   return Object.freeze([...normalized].sort());
 }
 
+function compareCodeUnits(a: string, b: string): number {
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 export function createArticle(input: Omit<KnowledgeArticle, 'status' | 'version'>): KnowledgeArticle {
   return Object.freeze({
     id: clean(input.id, 'id'),
@@ -59,7 +65,7 @@ export function searchKnowledge(articles: readonly KnowledgeArticle[], query: st
     articles
       .filter((article) => article.status === 'published')
       .filter((article) => `${article.title}\n${article.body}\n${article.tags.join(' ')}`.toLocaleLowerCase('en-US').includes(needle))
-      .sort((a, b) => a.id.localeCompare(b.id)),
+      .sort((a, b) => compareCodeUnits(a.id, b.id)),
   );
 }
 
