@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint ../../server ../../packages ../../scripts --config eslint.config.mjs --ext .ts,.tsx,.js,.mjs --max-warnings 0"
+    "lint": "cd ../.. && tools/eslint/node_modules/.bin/eslint server packages scripts --config eslint.config.mjs --max-warnings 0"
   },
   "devDependencies": {
     "eslint": "10.9.1",
