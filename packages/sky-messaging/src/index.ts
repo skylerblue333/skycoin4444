@@ -175,10 +175,7 @@ export class MessagingService {
     }
     return [...this.messages.values()]
       .filter(message => message.threadId === thread.id)
-      .sort(
-        (a, b) =>
-          a.createdAt - b.createdAt || compareCodeUnits(a.id, b.id)
-      )
+      .sort((a, b) => a.createdAt - b.createdAt || compareCodeUnits(a.id, b.id))
       .map(cloneMessage);
   }
 
