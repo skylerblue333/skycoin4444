@@ -31,8 +31,26 @@ jobs:
         run: pnpm run check
       - name: Package workspace typecheck
         run: pnpm run check:packages
-      - name: Canonical code lint
-        run: pnpm run lint
+      - name: Canonical code lint diagnostic
+        id: canonical_lint
+        shell: bash
+        run: |
+          set +e
+          pnpm run lint > eslint-output.txt 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          cat eslint-output.txt
+          exit 0
+      - name: Upload canonical lint diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-eslint-output
+          path: eslint-output.txt
+          if-no-files-found: error
+      - name: Enforce canonical code lint
+        if: steps.canonical_lint.outputs.status != '0'
+        run: exit 1
       - name: Current-tree credential pattern scan
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
