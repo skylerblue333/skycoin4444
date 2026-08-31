@@ -22,7 +22,9 @@ describe("SkySchemaRegistry", () => {
   });
 
   it("rejects removed or changed required fields", () => {
-    expect(isBackwardCompatible(v1, { name: "profile", version: 2, fields: [] })).toBe(false);
+    expect(
+      isBackwardCompatible(v1, { name: "profile", version: 2, fields: [] })
+    ).toBe(false);
   });
 
   it("rejects duplicate fields", () => {
@@ -36,5 +38,23 @@ describe("SkySchemaRegistry", () => {
         ],
       })
     ).toThrow("duplicate field name");
+  });
+
+  it("rejects invalid runtime field values from untyped callers", () => {
+    expect(() =>
+      validateSchema({
+        name: "profile",
+        version: 1,
+        fields: [{ name: "id", type: "object" as never, required: true }],
+      })
+    ).toThrow("invalid field type");
+
+    expect(() =>
+      validateSchema({
+        name: "profile",
+        version: 1,
+        fields: [{ name: "id", type: "string", required: "yes" as never }],
+      })
+    ).toThrow("invalid field required");
   });
 });
