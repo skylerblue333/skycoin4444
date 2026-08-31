@@ -1,44 +1,79 @@
-<!-- PORTFOLIO PROJECT PROFILE: maintained by the repository owner -->
+# SKYCOIN4444
 
-## Project profile and code-audit snapshot
+SKYCOIN4444 is a large TypeScript/React engineering project that combines a flagship application runtime with many independently testable domain packages and integration contracts. The current release target is an **engineering beta**, not a production certification.
 
-**What this is:** **skycoin4444** is a public repository described as: “software I've been working on #SkyCoin4444 #AI #Blockchain #DevOps #Innovation” Its dominant language signals are **TypeScript/React (1145 files), TypeScript (38 files), JavaScript (3 files), Python (1 files), HTML (1 files)**.
+## Current engineering-beta status
 
-**Why it has value:** Its value is best understood through the implementation evidence currently present in the repository: **1284 tracked files** were observed in the shallow audit, with the source structure and existing documentation providing the project’s specific context. This README does not treat a prototype, experiment, or archive as a production system without supporting evidence.
+The default branch has a reproducible pnpm workspace and a real CI pipeline. Current required CI covers:
 
-**Implementation evidence:** 8 test-related file(s) detected; 3 dependency or package manifest(s) detected; 1 build/CI/infrastructure signal(s) detected; and 4 documentation or governance file(s) detected. Test filenames observed include `vitest.config.ts`, `client/src/components/ui/aspect-ratio.tsx`, `client/src/pages/ABTesting.tsx`, `client/src/pages/ABTestingAdvanced.tsx`, `client/src/pages/APITesting.tsx`, `client/src/pages/MultivariateTesting.tsx`. Dependency or package files include `package.json`, `pnpm-lock.yaml`, `requirements.txt`. Build, CI, or infrastructure signals include `.github/workflows/ci.yml`.
+- frozen-lockfile dependency installation;
+- root TypeScript validation;
+- package-workspace TypeScript validation;
+- Vitest tests;
+- production client/server build;
+- high-severity production dependency audit.
 
-**Current status:** The repository is tracked on the `main` branch. The existing source tree, configuration, tests, workflows, and documentation remain authoritative for supported behavior and maturity. A code audit is not a production-readiness certification, and the presence of a test or workflow file does not establish that all checks pass.
+The repository also contains a verified cross-product integration vertical connecting identity, authentication, MFA, permissions, credentials, payment planning, audit, and narrow course/ledger/notification adapters. That integration is intentionally fail-closed at security and financial boundaries.
 
-**Relationship to the wider portfolio:** This repository is one focused component of the broader Skyler Blue Spillers portfolio across AI, software engineering, cloud and DevOps, cybersecurity, blockchain, finance, education, social systems, and creative work. It may provide a service boundary, implementation pattern, experiment, archive, or reusable idea for related repositories. Treat repositories as technical dependencies only where documented interfaces and verified project requirements support that relationship.
+This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
-**Quality and security note:** Potential secret-like or credential-like patterns were detected in repository text and require manual review; the static scan does not prove that a real secret is exposed. The audit also located TODO/FIXME markers in 3 file(s), indicating areas that may deserve follow-up.
+## Canonical execution surface
 
----
+The root `package.json` is the canonical engineering-beta workspace surface:
 
-# Skycoin4444
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+pnpm check
+pnpm run check:packages
+pnpm test
+pnpm run build
+pnpm db:push
+pnpm start
+```
 
-![GitHub stars](https://img.shields.io/github/stars/skylerblue333/skycoin4444?style=flat-square)
-![GitHub license](https://img.shields.io/github/license/skylerblue333/skycoin4444?style=flat-square)
+`pnpm db:push` is the schema/migration command. Do not run it against a database you have not intentionally configured and verified.
 
-## 🌟 Overview
-**skycoin4444** is a professional-grade project within the **SkyCoin4444** ecosystem. It focuses on delivering high-value solutions in the domain of **TypeScript, JavaScript, Python, Solidity**.
+The canonical application server entry point is `server/_core/index.ts`. The canonical frontend tree is `client/`. Independently testable product/domain libraries live under `packages/`.
 
-## 🚀 Key Features
-- **Scalable Architecture**: Designed for enterprise-level growth and performance.
-- **Modern Standards**: Implements best practices for clean code and maintainability.
-- **Robust Integration**: Built to work seamlessly within modern cloud-native environments.
+## Documentation
 
-## 🛠️ Technology Stack
-- **Primary Domain**: TypeScript, JavaScript, Python, Solidity
-- **Ecosystem**: SkyCoin4444 Digital Platform
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.
+- [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
+- [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
+- [`docs/INTEGRATION_CONTRACTS.md`](docs/INTEGRATION_CONTRACTS.md) — cross-product contracts and fail-closed behavior.
+- [`docs/ENGINEERING_BETA_LIMITATIONS.md`](docs/ENGINEERING_BETA_LIMITATIONS.md) — explicit non-production limitations.
+- [`docs/CANONICAL_ARCHITECTURE_INVENTORY.md`](docs/CANONICAL_ARCHITECTURE_INVENTORY.md) — evidence-based authoritative-vs-legacy inventory rules.
+- [`SECURITY.md`](SECURITY.md) — security reporting and current threat boundaries.
 
-## 📂 Structure
-The project is organized into a modular structure to ensure clarity and ease of development.
+Historical audit/readiness documents should be treated as dated evidence snapshots unless they explicitly identify a newer default-branch SHA.
 
-## 👨‍💻 Author
-**Skyler Blue Spillers**
-*Professional Chess Player & Software Engineer*
+## Development workflow
 
----
-*Powered by SkyCoin4444*
+1. Start from current `main`.
+2. Make focused changes on an isolated branch.
+3. Run the same verification commands used by CI.
+4. Open one focused pull request.
+5. Treat exact-head CI as the release evidence for that PR.
+6. Do not merge required red, stale, skipped, cancelled, or still-running checks.
+
+See [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) for details.
+
+## Product and integration boundaries
+
+A package, page, branch, or historical product slot is not automatically a production-integrated capability. Product status is described using explicit maturity terms such as:
+
+- **domain core** — deterministic library logic with tests;
+- **integration contract** — a defined interface between components;
+- **engineering-beta integration** — a tested local/CI path across canonical components;
+- **provider-backed capability** — only when an external provider is actually connected and verified.
+
+The current repository is primarily in the first three categories.
+
+## Security
+
+Do not commit secrets or credentials. Report suspected security issues privately as described in [`SECURITY.md`](SECURITY.md). Security-sensitive changes should preserve fail-closed behavior and include targeted tests.
+
+## License
+
+See the repository license metadata and source headers for applicable licensing terms.
