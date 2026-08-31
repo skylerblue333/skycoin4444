@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   validate:
@@ -41,13 +42,19 @@ jobs:
           echo "status=$status" >> "$GITHUB_OUTPUT"
           cat eslint-output.txt
           exit 0
-      - name: Upload canonical lint diagnostic
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-eslint-output
-          path: eslint-output.txt
-          if-no-files-found: error
+      - name: Post lint diagnostic to PR
+        if: github.event_name == 'pull_request' && steps.canonical_lint.outputs.status != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo 'Temporary engineering-beta lint diagnostic:'
+            echo
+            echo '```text'
+            sed -n '1,180p' eslint-output.txt
+            echo '```'
+          } > lint-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file lint-comment.md
       - name: Enforce canonical code lint
         if: steps.canonical_lint.outputs.status != '0'
         run: exit 1
