@@ -1,4 +1,7 @@
-import tseslint from 'typescript-eslint';
+import { createRequire } from 'node:module';
+
+const require = createRequire(new URL('./tools/eslint/package.json', import.meta.url));
+const tseslint = require('typescript-eslint');
 
 const safetyRules = {
   'no-debugger': 'error',
