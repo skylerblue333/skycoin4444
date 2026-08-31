@@ -20,13 +20,28 @@ describe('Sky4 block explorer index', () => {
     expect(listAccountTransfers(index, 'acct:alice').map((item) => item.id)).toEqual([b, a]);
   });
 
-  it('supports bounded pagination', () => {
+  it('paginates after deterministic ordering rather than insertion order', () => {
     const index = buildExplorerIndex(transfers);
-    expect(listAccountTransfers(index, 'acct:alice', { offset: 1, limit: 1 })).toHaveLength(1);
+    expect(listAccountTransfers(index, 'acct:alice', { offset: 0, limit: 1 }).map((item) => item.id))
+      .toEqual([b]);
+    expect(listAccountTransfers(index, 'acct:alice', { offset: 1, limit: 1 }).map((item) => item.id))
+      .toEqual([a]);
   });
 
   it('rejects duplicates and malformed identifiers', () => {
     expect(() => buildExplorerIndex([transfers[0], transfers[0]])).toThrow('duplicate transfer id');
     expect(() => getTransfer(buildExplorerIndex([]), 'bad')).toThrow('sha256');
+  });
+
+  it('rejects malformed runtime bigint and pagination values', () => {
+    expect(() => buildExplorerIndex([
+      { ...transfers[0], blockHeight: 2 as never },
+    ])).toThrow('non-negative bigint');
+    expect(() => buildExplorerIndex([
+      { ...transfers[0], amount: 10 as never },
+    ])).toThrow('positive bigint');
+    const index = buildExplorerIndex(transfers);
+    expect(() => listAccountTransfers(index, 'acct:alice', { offset: Number.MAX_SAFE_INTEGER + 1 }))
+      .toThrow('safe integer');
   });
 });
