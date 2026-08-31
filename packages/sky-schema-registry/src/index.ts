@@ -11,6 +11,11 @@ export interface SchemaDefinition {
 }
 
 const NAME = /^[A-Za-z][A-Za-z0-9._-]{0,127}$/;
+const FIELD_TYPES = new Set<FieldDefinition["type"]>([
+  "string",
+  "number",
+  "boolean",
+]);
 
 export function validateSchema(schema: SchemaDefinition): SchemaDefinition {
   if (!NAME.test(schema.name)) throw new Error("invalid schema name");
@@ -20,6 +25,10 @@ export function validateSchema(schema: SchemaDefinition): SchemaDefinition {
   const seen = new Set<string>();
   for (const field of schema.fields) {
     if (!NAME.test(field.name)) throw new Error("invalid field name");
+    if (!FIELD_TYPES.has(field.type)) throw new Error("invalid field type");
+    if (typeof field.required !== "boolean") {
+      throw new Error("invalid field required");
+    }
     if (seen.has(field.name)) throw new Error("duplicate field name");
     seen.add(field.name);
   }
