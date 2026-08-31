@@ -37,8 +37,10 @@ jobs:
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
         run: pnpm run audit:markers
-      - name: Test
+      - name: Unit and package tests
         run: pnpm test
+      - name: Engineering-beta integration tests
+        run: pnpm run test:integration
       - name: Production build
         run: pnpm run build
       - name: High-severity production dependency audit
