@@ -1,0 +1,73 @@
+import { createHash } from 'node:crypto';
+
+export type Validator = Readonly<{
+  id: string;
+  votingPower: bigint;
+}>;
+
+export type Vote = Readonly<{
+  validatorId: string;
+  height: bigint;
+  blockHash: string;
+}>;
+
+export type QuorumResult = Readonly<{
+  blockHash: string;
+  signedPower: bigint;
+  totalPower: bigint;
+  quorumReached: boolean;
+  digest: string;
+}>;
+
+const ID_RE = /^[a-zA-Z0-9:_-]{3,128}$/;
+const HASH_RE = /^[a-f0-9]{64}$/;
+
+export function validateValidator(validator: Validator): void {
+  if (!ID_RE.test(validator.id)) throw new Error('validator id must be 3-128 safe characters');
+  if (validator.votingPower <= 0n) throw new Error('voting power must be positive');
+}
+
+export function validateVote(vote: Vote): void {
+  if (!ID_RE.test(vote.validatorId)) throw new Error('validator id must be 3-128 safe characters');
+  if (vote.height < 0n) throw new Error('height must be non-negative');
+  if (!HASH_RE.test(vote.blockHash)) throw new Error('blockHash must be a lowercase sha256 digest');
+}
+
+export function evaluateQuorum(input: {
+  validators: readonly Validator[];
+  votes: readonly Vote[];
+  height: bigint;
+  blockHash: string;
+}): QuorumResult {
+  if (input.validators.length === 0) throw new Error('validator set must not be empty');
+  if (input.validators.length > 10_000) throw new Error('validator set limit exceeded');
+  if (input.height < 0n) throw new Error('height must be non-negative');
+  if (!HASH_RE.test(input.blockHash)) throw new Error('blockHash must be a lowercase sha256 digest');
+
+  const powers = new Map<string, bigint>();
+  let totalPower = 0n;
+  for (const validator of input.validators) {
+    validateValidator(validator);
+    if (powers.has(validator.id)) throw new Error('duplicate validator id');
+    powers.set(validator.id, validator.votingPower);
+    totalPower += validator.votingPower;
+  }
+
+  const seen = new Set<string>();
+  let signedPower = 0n;
+  for (const vote of input.votes) {
+    validateVote(vote);
+    if (vote.height !== input.height) throw new Error('vote height mismatch');
+    if (vote.blockHash !== input.blockHash) continue;
+    if (seen.has(vote.validatorId)) throw new Error('duplicate validator vote');
+    seen.add(vote.validatorId);
+    const power = powers.get(vote.validatorId);
+    if (power === undefined) throw new Error('vote from unknown validator');
+    signedPower += power;
+  }
+
+  const quorumReached = signedPower * 3n >= totalPower * 2n;
+  const canonical = [input.height, input.blockHash, totalPower, signedPower, quorumReached ? 1 : 0].join('\n');
+  const digest = createHash('sha256').update(canonical, 'utf8').digest('hex');
+  return Object.freeze({ blockHash: input.blockHash, signedPower, totalPower, quorumReached, digest });
+}
