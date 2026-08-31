@@ -31,8 +31,20 @@ jobs:
         run: pnpm run check
       - name: Package workspace typecheck
         run: pnpm run check:packages
-      - name: Canonical code lint
-        run: pnpm run lint
+      - name: Canonical code lint diagnostic
+        id: canonical_lint
+        continue-on-error: true
+        run: pnpm --dir tools/eslint exec eslint ../../server ../../packages ../../scripts --config eslint.config.mjs --max-warnings 0 --format json --output-file ../../eslint-report.json
+      - name: Upload canonical lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-eslint-report
+          path: eslint-report.json
+          if-no-files-found: warn
+      - name: Enforce canonical code lint
+        if: steps.canonical_lint.outcome == 'failure'
+        run: exit 1
       - name: Current-tree credential pattern scan
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
