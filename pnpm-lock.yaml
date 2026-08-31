@@ -303,6 +303,88 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  packages/sky-comments: {}
+
+  packages/sky-compliance: {}
+
+  packages/sky-consent: {}
+
+  packages/sky-creator-studio: {}
+
+  packages/sky-crm: {}
+
+  packages/sky-data-export: {}
+
+  packages/sky-data-import: {}
+
+  packages/sky-data-retention: {}
+
+  packages/sky-donations: {}
+
+  packages/sky-entitlements: {}
+
+  packages/sky-evaluation: {}
+
+  packages/sky-experimentation: {}
+
+  packages/sky-feature-flags: {}
+
+  packages/sky-governance: {}
+
+  packages/sky-incident: {}
+
+  packages/sky-inventory: {}
+
+  packages/sky-knowledge: {}
+
+  packages/sky-marketplace-core: {}
+
+  packages/sky-mentorship: {}
+
+  packages/sky-mfa: {}
+
+  packages/sky-moderation: {}
+
+  packages/sky-presence: {}
+
+  packages/sky-pricing: {}
+
+  packages/sky-prompt-registry: {}
+
+  packages/sky-question-bank: {}
+
+  packages/sky-queue: {}
+
+  packages/sky-rate-limit: {}
+
+  packages/sky-reactions: {}
+
+  packages/sky-reconciliation: {}
+
+  packages/sky-recovery-control: {}
+
+  packages/sky-runbooks: {}
+
+  packages/sky-schema-registry: {}
+
+  packages/sky-status: {}
+
+  packages/sky-tasks: {}
+
+  packages/sky-tutoring: {}
+
+  packages/skyclassroom: {}
+
+  packages/skydocumentai: {}
+
+  packages/skyescrow: {}
+
+  packages/skyidentity: {}
+
+  packages/skyobservability: {}
+
+  packages/skyworkflow: {}
+
 packages:
 
   '@antfu/install-pkg@1.1.0':

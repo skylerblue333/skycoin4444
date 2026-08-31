@@ -31,6 +31,8 @@ jobs:
         run: pnpm run check
       - name: Package workspace typecheck
         run: pnpm run check:packages
+      - name: Canonical code lint
+        run: pnpm run lint
       - name: Current-tree credential pattern scan
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
