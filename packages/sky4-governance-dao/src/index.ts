@@ -37,7 +37,9 @@ export function tallyProposal(input: {
   }
   if (!Number.isInteger(proposal.quorumBps) || proposal.quorumBps < 0 || proposal.quorumBps > 10_000) throw new Error('invalid quorumBps');
   if (!Number.isSafeInteger(input.now)) throw new Error('invalid now');
-  if (input.eligibleVotingPower <= 0n) throw new Error('eligibleVotingPower must be positive');
+  if (typeof input.eligibleVotingPower !== 'bigint' || input.eligibleVotingPower <= 0n) {
+    throw new Error('eligibleVotingPower must be a positive bigint');
+  }
   if (input.ballots.length > 100_000) throw new Error('ballot limit exceeded');
 
   const seen = new Set<string>();
@@ -46,7 +48,10 @@ export function tallyProposal(input: {
   for (const ballot of input.ballots) {
     if (ballot.proposalId !== proposal.id) throw new Error('ballot proposal mismatch');
     if (!ID_RE.test(ballot.voterId)) throw new Error('invalid voter id');
-    if (ballot.votingPower <= 0n) throw new Error('voting power must be positive');
+    if (typeof ballot.support !== 'boolean') throw new Error('ballot support must be boolean');
+    if (typeof ballot.votingPower !== 'bigint' || ballot.votingPower <= 0n) {
+      throw new Error('voting power must be a positive bigint');
+    }
     if (seen.has(ballot.voterId)) throw new Error('duplicate voter ballot');
     seen.add(ballot.voterId);
     if (ballot.support) yes += ballot.votingPower;
