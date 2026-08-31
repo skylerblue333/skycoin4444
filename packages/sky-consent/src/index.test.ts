@@ -59,4 +59,48 @@ describe("SkyConsent", () => {
       validateConsentRecord({ ...granted, subjectId: "../bad id" })
     ).toThrow("invalid subjectId");
   });
+
+  it("rejects impossible and non-canonical timestamps", () => {
+    expect(() =>
+      validateConsentRecord({
+        ...granted,
+        recordedAt: "2026-02-31T09:00:00.000Z",
+      })
+    ).toThrow("invalid recordedAt");
+
+    expect(() =>
+      validateConsentRecord({
+        ...granted,
+        recordedAt: "2026-08-25T09:00:00Z",
+      })
+    ).toThrow("invalid recordedAt");
+
+    expect(() =>
+      validateConsentRecord({
+        ...granted,
+        recordedAt: "2026-08-25T04:00:00.000-05:00",
+      })
+    ).toThrow("invalid recordedAt");
+  });
+
+  it("rejects invalid runtime enum values from untyped callers", () => {
+    expect(() =>
+      validateConsentRecord({
+        ...granted,
+        purpose: "tracking" as never,
+      })
+    ).toThrow("invalid purpose");
+
+    expect(() =>
+      validateConsentRecord({ ...granted, state: "yes" as never })
+    ).toThrow("invalid state");
+
+    expect(() =>
+      validateConsentRecord({ ...granted, source: "system" as never })
+    ).toThrow("invalid source");
+
+    expect(() => decideConsent("tracking" as never, "2026-08", [])).toThrow(
+      "invalid purpose"
+    );
+  });
 });
