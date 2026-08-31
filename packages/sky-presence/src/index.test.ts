@@ -51,13 +51,19 @@ describe("SkyPresence", () => {
 
   it("rejects non-canonical and impossible heartbeat instants", () => {
     expect(() =>
-      validateHeartbeat({ ...heartbeat, observedAt: "2026-02-30T09:00:00.000Z" })
+      validateHeartbeat({
+        ...heartbeat,
+        observedAt: "2026-02-30T09:00:00.000Z",
+      })
     ).toThrow("invalid observedAt");
     expect(() =>
       validateHeartbeat({ ...heartbeat, observedAt: "2026-08-25T09:00:00Z" })
     ).toThrow("invalid observedAt");
     expect(() =>
-      validateHeartbeat({ ...heartbeat, observedAt: "2026-08-25 09:00:00.000Z" })
+      validateHeartbeat({
+        ...heartbeat,
+        observedAt: "2026-08-25 09:00:00.000Z",
+      })
     ).toThrow("invalid observedAt");
   });
 
@@ -65,8 +71,8 @@ describe("SkyPresence", () => {
     expect(() =>
       derivePresence(heartbeat, "2026-02-30T09:00:00.000Z", policy)
     ).toThrow("invalid now");
-    expect(() => derivePresence(heartbeat, "2026-08-25T09:00:00Z", policy)).toThrow(
-      "invalid now"
-    );
+    expect(() =>
+      derivePresence(heartbeat, "2026-08-25T09:00:00Z", policy)
+    ).toThrow("invalid now");
   });
 });

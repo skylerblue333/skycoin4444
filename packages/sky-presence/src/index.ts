@@ -64,7 +64,10 @@ export function latestHeartbeat(
   let latestMs = -1;
   for (const raw of heartbeats) {
     const heartbeat = validateHeartbeat(raw);
-    const observedAtMs = parseCanonicalInstant(heartbeat.observedAt, "observedAt");
+    const observedAtMs = parseCanonicalInstant(
+      heartbeat.observedAt,
+      "observedAt"
+    );
     if (!latest || observedAtMs > latestMs) {
       latest = heartbeat;
       latestMs = observedAtMs;
@@ -78,7 +81,10 @@ function parseCanonicalInstant(value: string, field: string): number {
     throw new Error(`invalid ${field}`);
   }
   const milliseconds = Date.parse(value);
-  if (!Number.isFinite(milliseconds) || new Date(milliseconds).toISOString() !== value) {
+  if (
+    !Number.isFinite(milliseconds) ||
+    new Date(milliseconds).toISOString() !== value
+  ) {
     throw new Error(`invalid ${field}`);
   }
   return milliseconds;
