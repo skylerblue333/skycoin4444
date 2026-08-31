@@ -29,4 +29,19 @@ describe('Sky4 cross-chain bridge planner', () => {
     expect(() => planBridgeTransfer({ route, sender: 'acct:alice', recipient: '0xabc123', amount: 1n }))
       .toThrow('outside route bounds');
   });
+
+  it('rejects malformed runtime bigint values from untyped callers', () => {
+    expect(() => planBridgeTransfer({
+      route: { ...route, minAmount: 10 as never },
+      sender: 'acct:alice',
+      recipient: '0xabc123',
+      amount: 100n,
+    })).toThrow('route amounts must be bigint');
+    expect(() => planBridgeTransfer({
+      route,
+      sender: 'acct:alice',
+      recipient: '0xabc123',
+      amount: 100 as never,
+    })).toThrow('amount must be a bigint');
+  });
 });
