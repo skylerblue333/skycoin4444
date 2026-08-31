@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   validate:
@@ -33,17 +34,29 @@ jobs:
         run: pnpm run check:packages
       - name: Canonical code lint diagnostic
         id: canonical_lint
-        continue-on-error: true
-        run: pnpm --dir tools/eslint exec eslint ../../server ../../packages ../../scripts --config eslint.config.mjs --max-warnings 0 --format json --output-file ../../eslint-report.json
-      - name: Upload canonical lint report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-eslint-report
-          path: eslint-report.json
-          if-no-files-found: warn
+        shell: bash
+        run: |
+          set +e
+          pnpm run lint > eslint-output.txt 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          cat eslint-output.txt
+          exit 0
+      - name: Post lint diagnostic to PR
+        if: github.event_name == 'pull_request' && steps.canonical_lint.outputs.status != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo 'Temporary engineering-beta lint diagnostic:'
+            echo
+            echo '```text'
+            sed -n '1,180p' eslint-output.txt
+            echo '```'
+          } > lint-comment.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file lint-comment.md
       - name: Enforce canonical code lint
-        if: steps.canonical_lint.outcome == 'failure'
+        if: steps.canonical_lint.outputs.status != '0'
         run: exit 1
       - name: Current-tree credential pattern scan
         run: pnpm run check:secrets
