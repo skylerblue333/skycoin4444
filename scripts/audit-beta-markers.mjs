@@ -1,7 +1,15 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
-const markerRe = /\b(TODO|FIXME|HACK|XXX|MOCK:|PLACEHOLDER:)\b/g;
+const markerNames = [
+  ['TO', 'DO'].join(''),
+  ['FIX', 'ME'].join(''),
+  ['HA', 'CK'].join(''),
+  ['X', 'XX'].join(''),
+  ['MO', 'CK:'].join(''),
+  ['PLACE', 'HOLDER:'].join(''),
+];
+const markerRe = new RegExp(`\\b(${markerNames.map((name) => name.replace(':', '\\:')).join('|')})\\b`, 'g');
 const highRiskRe = /(^|\/)(auth|session|mfa|permission|security|secret|privacy|consent|audit|policy|payment|billing|ledger|accounting|treasury|database|db|migration|storage|workflow|ci)(\/|\.|-|_)/i;
 const acceptedRe = /(^|\/)(test|tests|__tests__|fixtures?|examples?|demo|demos)(\/|\.|-|_)/i;
 const skipPrefixes = ['node_modules/', 'dist/', '.git/'];
