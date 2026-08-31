@@ -29,6 +29,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Typecheck
         run: pnpm run check
+      - name: Package workspace typecheck
+        run: pnpm run check:packages
       - name: Test
         run: pnpm test
       - name: Production build
