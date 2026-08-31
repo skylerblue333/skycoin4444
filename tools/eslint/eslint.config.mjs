@@ -9,12 +9,24 @@ const safetyRules = {
   '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
 };
 
+const canonicalFiles = [
+  '../../server/**/*.{ts,tsx,js,mjs}',
+  '../../packages/**/*.{ts,tsx,js,mjs}',
+  '../../scripts/**/*.{ts,tsx,js,mjs}',
+];
+
 export default [
   {
-    ignores: ['client/**', 'dist/**', 'node_modules/**', 'coverage/**', 'docs/**'],
+    ignores: [
+      '../../client/**',
+      '../../dist/**',
+      '../../node_modules/**',
+      '../../coverage/**',
+      '../../docs/**',
+    ],
   },
   {
-    files: ['**/*.{ts,tsx,js,mjs}'],
+    files: canonicalFiles,
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
