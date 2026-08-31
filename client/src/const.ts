@@ -2,16 +2,32 @@ import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
-// Get the OAuth login URL without navigating
-export const getLoginUrl = () => {
+const LOCAL_AUTH_BOUNDARY = "/signin?reason=oauth-unconfigured";
+
+function getConfiguredOAuthUrl(): URL | null {
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
-  const redirectUri = `${window.location.origin}/api/oauth/callback`;
+  if (!oauthPortalUrl || !appId) return null;
 
+  try {
+    const url = new URL(`${oauthPortalUrl.replace(/\/+$/, "")}/app-auth`);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+// Get the OAuth login URL without navigating.
+export const getLoginUrl = () => {
+  const url = getConfiguredOAuthUrl();
+  if (!url) return LOCAL_AUTH_BOUNDARY;
+
+  const appId = import.meta.env.VITE_APP_ID as string;
+  const redirectUri = `${window.location.origin}/api/oauth/callback`;
   const nonce = crypto.randomUUID();
   const state = encodeOAuthState({ redirectUri, nonce });
 
-  const url = new URL(`${oauthPortalUrl}/app-auth`);
   url.searchParams.set("appId", appId);
   url.searchParams.set("redirectUri", redirectUri);
   url.searchParams.set("state", state);
@@ -31,15 +47,18 @@ export const getLoginUrl = () => {
 // with "invalid oauth state". It returns void by design, so there is no URL to
 // stash across renders.
 export const startLogin = () => {
-  const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
-  const appId = import.meta.env.VITE_APP_ID;
-  const redirectUri = `${window.location.origin}/api/oauth/callback`;
+  const url = getConfiguredOAuthUrl();
+  if (!url) {
+    window.location.href = LOCAL_AUTH_BOUNDARY;
+    return;
+  }
 
+  const appId = import.meta.env.VITE_APP_ID as string;
+  const redirectUri = `${window.location.origin}/api/oauth/callback`;
   const nonce = crypto.randomUUID();
   document.cookie = `${OAUTH_STATE_COOKIE}=${nonce}; Path=/; Max-Age=600; SameSite=None; Secure`;
   const state = encodeOAuthState({ redirectUri, nonce });
 
-  const url = new URL(`${oauthPortalUrl}/app-auth`);
   url.searchParams.set("appId", appId);
   url.searchParams.set("redirectUri", redirectUri);
   url.searchParams.set("state", state);
