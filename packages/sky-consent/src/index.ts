@@ -1,9 +1,5 @@
 export type ConsentPurpose =
-  | "essential"
-  | "analytics"
-  | "personalization"
-  | "marketing"
-  | "ai_training";
+  "essential" | "analytics" | "personalization" | "marketing" | "ai_training";
 
 export type ConsentState = "granted" | "denied";
 export type ConsentSource = "user" | "admin" | "migration";
@@ -24,8 +20,7 @@ export interface ConsentDecision {
 
 const SUBJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const POLICY_VERSION = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
-const CANONICAL_UTC_INSTANT =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const CANONICAL_UTC_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 const CONSENT_PURPOSES = new Set<ConsentPurpose>([
   "essential",
