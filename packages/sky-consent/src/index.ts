@@ -2,6 +2,7 @@ export type ConsentPurpose =
   "essential" | "analytics" | "personalization" | "marketing" | "ai_training";
 
 export type ConsentState = "granted" | "denied";
+export type ConsentSource = "user" | "admin" | "migration";
 
 export interface ConsentRecord {
   subjectId: string;
@@ -9,7 +10,7 @@ export interface ConsentRecord {
   state: ConsentState;
   policyVersion: string;
   recordedAt: string;
-  source: "user" | "admin" | "migration";
+  source: ConsentSource;
 }
 
 export interface ConsentDecision {
@@ -19,16 +20,50 @@ export interface ConsentDecision {
 
 const SUBJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const POLICY_VERSION = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
+const CANONICAL_UTC_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+
+const CONSENT_PURPOSES = new Set<ConsentPurpose>([
+  "essential",
+  "analytics",
+  "personalization",
+  "marketing",
+  "ai_training",
+]);
+const CONSENT_STATES = new Set<ConsentState>(["granted", "denied"]);
+const CONSENT_SOURCES = new Set<ConsentSource>(["user", "admin", "migration"]);
+
+function assertCanonicalUtcInstant(value: string): void {
+  if (!CANONICAL_UTC_INSTANT.test(value)) {
+    throw new Error("invalid recordedAt");
+  }
+
+  const parsed = new Date(value);
+  if (!Number.isFinite(parsed.getTime()) || parsed.toISOString() !== value) {
+    throw new Error("invalid recordedAt");
+  }
+}
+
+function compareNewestFirst(a: ConsentRecord, b: ConsentRecord): number {
+  if (a.recordedAt === b.recordedAt) return 0;
+  return a.recordedAt > b.recordedAt ? -1 : 1;
+}
 
 export function validateConsentRecord(record: ConsentRecord): ConsentRecord {
   if (!SUBJECT_ID.test(record.subjectId)) {
     throw new Error("invalid subjectId");
   }
+  if (!CONSENT_PURPOSES.has(record.purpose)) {
+    throw new Error("invalid purpose");
+  }
+  if (!CONSENT_STATES.has(record.state)) {
+    throw new Error("invalid state");
+  }
   if (!POLICY_VERSION.test(record.policyVersion)) {
     throw new Error("invalid policyVersion");
   }
-  if (!Number.isFinite(Date.parse(record.recordedAt))) {
-    throw new Error("invalid recordedAt");
+  assertCanonicalUtcInstant(record.recordedAt);
+  if (!CONSENT_SOURCES.has(record.source)) {
+    throw new Error("invalid source");
   }
   return { ...record };
 }
@@ -38,6 +73,9 @@ export function decideConsent(
   currentPolicyVersion: string,
   records: readonly ConsentRecord[]
 ): ConsentDecision {
+  if (!CONSENT_PURPOSES.has(purpose)) {
+    throw new Error("invalid purpose");
+  }
   if (!POLICY_VERSION.test(currentPolicyVersion)) {
     throw new Error("invalid policyVersion");
   }
@@ -48,7 +86,7 @@ export function decideConsent(
   const relevant = records
     .filter(record => record.purpose === purpose)
     .map(validateConsentRecord)
-    .sort((a, b) => Date.parse(b.recordedAt) - Date.parse(a.recordedAt));
+    .sort(compareNewestFirst);
 
   const latest = relevant[0];
   if (!latest) return { allowed: false, reason: "missing" };
@@ -67,10 +105,7 @@ export function latestConsentByPurpose(
   for (const raw of records) {
     const record = validateConsentRecord(raw);
     const prior = result[record.purpose];
-    if (
-      !prior ||
-      Date.parse(record.recordedAt) > Date.parse(prior.recordedAt)
-    ) {
+    if (!prior || record.recordedAt > prior.recordedAt) {
       result[record.purpose] = record;
     }
   }
