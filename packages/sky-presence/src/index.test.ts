@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   derivePresence,
   latestHeartbeat,
+  validateHeartbeat,
   validatePresencePolicy,
 } from "./index";
 
@@ -46,5 +47,26 @@ describe("SkyPresence", () => {
     expect(() =>
       derivePresence(heartbeat, "2026-08-25T08:59:59.000Z", policy)
     ).toThrow("future");
+  });
+
+  it("rejects non-canonical and impossible heartbeat instants", () => {
+    expect(() =>
+      validateHeartbeat({ ...heartbeat, observedAt: "2026-02-30T09:00:00.000Z" })
+    ).toThrow("invalid observedAt");
+    expect(() =>
+      validateHeartbeat({ ...heartbeat, observedAt: "2026-08-25T09:00:00Z" })
+    ).toThrow("invalid observedAt");
+    expect(() =>
+      validateHeartbeat({ ...heartbeat, observedAt: "2026-08-25 09:00:00.000Z" })
+    ).toThrow("invalid observedAt");
+  });
+
+  it("rejects non-canonical and impossible now instants", () => {
+    expect(() =>
+      derivePresence(heartbeat, "2026-02-30T09:00:00.000Z", policy)
+    ).toThrow("invalid now");
+    expect(() => derivePresence(heartbeat, "2026-08-25T09:00:00Z", policy)).toThrow(
+      "invalid now"
+    );
   });
 });
