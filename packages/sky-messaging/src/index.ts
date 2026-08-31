@@ -45,6 +45,7 @@ export class MessagingService {
   private readonly onNotification?: (
     event: MessagingNotificationContract
   ) => void;
+  private lastTimestamp = -1;
 
   constructor(options: MessagingServiceOptions = {}) {
     this.now = options.now ?? Date.now;
@@ -65,7 +66,7 @@ export class MessagingService {
       ...new Set(
         participantIds.map(id => validateIdentifier("participantId", id))
       ),
-    ].sort();
+    ].sort(compareCodeUnits);
     if (unique.length < 2 || unique.length > MAX_PARTICIPANTS) {
       throw new Error("invalid_participants");
     }
@@ -75,7 +76,7 @@ export class MessagingService {
     const record: ThreadRecord = {
       id,
       participantIds: unique,
-      createdAt: this.now(),
+      createdAt: this.nextTimestamp(),
     };
     this.threads.set(id, cloneThread(record));
     return cloneThread(record);
@@ -108,7 +109,7 @@ export class MessagingService {
 
     const id = validateIdentifier("messageId", this.messageIdFactory());
     if (this.messages.has(id)) throw new Error("message_id_collision");
-    const createdAt = this.now();
+    const createdAt = this.nextTimestamp();
     const record: MessageRecord = {
       id,
       threadId: thread.id,
@@ -148,7 +149,7 @@ export class MessagingService {
     const next = {
       ...record,
       body: validateBody(input.body),
-      editedAt: this.now(),
+      editedAt: this.nextTimestamp(),
     };
     this.messages.set(next.id, cloneMessage(next));
     return cloneMessage(next);
@@ -161,7 +162,7 @@ export class MessagingService {
       throw new Error("message_delete_forbidden");
     }
     if (record.deletedAt !== null) return record;
-    const next = { ...record, body: "", deletedAt: this.now() };
+    const next = { ...record, body: "", deletedAt: this.nextTimestamp() };
     this.messages.set(next.id, cloneMessage(next));
     return cloneMessage(next);
   }
@@ -174,8 +175,20 @@ export class MessagingService {
     }
     return [...this.messages.values()]
       .filter(message => message.threadId === thread.id)
-      .sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))
+      .sort((a, b) => a.createdAt - b.createdAt || compareCodeUnits(a.id, b.id))
       .map(cloneMessage);
+  }
+
+  private nextTimestamp(): number {
+    const value = this.now();
+    if (!Number.isSafeInteger(value) || value < 0) {
+      throw new Error("invalid_clock");
+    }
+    if (value < this.lastTimestamp) {
+      throw new Error("clock_moved_backwards");
+    }
+    this.lastTimestamp = value;
+    return value;
   }
 
   private requireThread(threadId: string): ThreadRecord {
@@ -207,6 +220,12 @@ function validateBody(value: string): string {
     throw new Error("invalid_message_body");
   }
   return body;
+}
+
+function compareCodeUnits(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
 }
 
 function cloneThread(record: ThreadRecord): ThreadRecord {
