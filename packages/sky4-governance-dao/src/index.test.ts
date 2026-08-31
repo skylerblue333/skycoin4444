@@ -48,4 +48,25 @@ describe('Sky4 governance DAO', () => {
       ballots: [{ voterId: 'voter:alice', proposalId: proposal.id, support: true, votingPower: 11n }],
     })).toThrow('participation exceeds');
   });
+
+  it('rejects malformed runtime ballot values from untyped callers', () => {
+    expect(() => tallyProposal({
+      proposal,
+      eligibleVotingPower: 10 as never,
+      now: 201,
+      ballots: [],
+    })).toThrow('positive bigint');
+    expect(() => tallyProposal({
+      proposal,
+      eligibleVotingPower: 10n,
+      now: 201,
+      ballots: [{ voterId: 'voter:alice', proposalId: proposal.id, support: 'yes' as never, votingPower: 1n }],
+    })).toThrow('support must be boolean');
+    expect(() => tallyProposal({
+      proposal,
+      eligibleVotingPower: 10n,
+      now: 201,
+      ballots: [{ voterId: 'voter:alice', proposalId: proposal.id, support: true, votingPower: 1 as never }],
+    })).toThrow('positive bigint');
+  });
 });
