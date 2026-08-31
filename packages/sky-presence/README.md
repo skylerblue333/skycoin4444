@@ -15,7 +15,9 @@ Chat, feed, classroom, and collaboration adapters may store normalized `Presence
 
 ## Security notes
 
-Identifiers are allow-list validated, timestamps must parse, future heartbeats are rejected, and policy thresholds are range-checked. Integrators must authenticate heartbeat writers, rate-limit updates, and avoid exposing presence to unauthorized viewers.
+Identifiers are allow-list validated, policy thresholds are range-checked, and future heartbeats are rejected. `observedAt` and caller-supplied `now` must be canonical UTC ISO-8601 instants in `YYYY-MM-DDTHH:mm:ss.sssZ` form. Accepted values are round-tripped through `Date.toISOString()`, which rejects impossible calendar values that permissive date parsing could otherwise normalize silently.
+
+This strict representation is a domain-input integrity rule, not a distributed clock-synchronization guarantee. Integrators must authenticate heartbeat writers, rate-limit updates, establish trusted time sources where required, and avoid exposing presence to unauthorized viewers.
 
 ## Validation
 
@@ -25,3 +27,5 @@ pnpm run check:packages
 pnpm exec prettier --check packages/sky-presence
 pnpm audit --audit-level high
 ```
+
+Regression coverage includes impossible calendar dates and non-canonical timestamp representations. Repository CI remains the merge authority.

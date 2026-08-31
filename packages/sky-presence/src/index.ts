@@ -12,6 +12,7 @@ export interface PresencePolicy {
 }
 
 const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
+const CANONICAL_INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 export function validateHeartbeat(
   heartbeat: PresenceHeartbeat
@@ -20,9 +21,7 @@ export function validateHeartbeat(
   if (heartbeat.deviceId !== undefined && !ID.test(heartbeat.deviceId)) {
     throw new Error("invalid deviceId");
   }
-  if (!Number.isFinite(Date.parse(heartbeat.observedAt))) {
-    throw new Error("invalid observedAt");
-  }
+  parseCanonicalInstant(heartbeat.observedAt, "observedAt");
   return { ...heartbeat };
 }
 
@@ -47,12 +46,11 @@ export function derivePresence(
   now: string,
   policy: PresencePolicy
 ): PresenceStatus {
-  const nowMs = Date.parse(now);
-  if (!Number.isFinite(nowMs)) throw new Error("invalid now");
+  const nowMs = parseCanonicalInstant(now, "now");
   const checkedPolicy = validatePresencePolicy(policy);
   if (!heartbeat) return "offline";
   const checked = validateHeartbeat(heartbeat);
-  const age = nowMs - Date.parse(checked.observedAt);
+  const age = nowMs - parseCanonicalInstant(checked.observedAt, "observedAt");
   if (age < 0) throw new Error("heartbeat is in the future");
   if (age <= checkedPolicy.onlineWithinMs) return "online";
   if (age <= checkedPolicy.awayWithinMs) return "away";
@@ -63,14 +61,31 @@ export function latestHeartbeat(
   heartbeats: readonly PresenceHeartbeat[]
 ): PresenceHeartbeat | undefined {
   let latest: PresenceHeartbeat | undefined;
+  let latestMs = -1;
   for (const raw of heartbeats) {
     const heartbeat = validateHeartbeat(raw);
-    if (
-      !latest ||
-      Date.parse(heartbeat.observedAt) > Date.parse(latest.observedAt)
-    ) {
+    const observedAtMs = parseCanonicalInstant(
+      heartbeat.observedAt,
+      "observedAt"
+    );
+    if (!latest || observedAtMs > latestMs) {
       latest = heartbeat;
+      latestMs = observedAtMs;
     }
   }
   return latest;
+}
+
+function parseCanonicalInstant(value: string, field: string): number {
+  if (typeof value !== "string" || !CANONICAL_INSTANT.test(value)) {
+    throw new Error(`invalid ${field}`);
+  }
+  const milliseconds = Date.parse(value);
+  if (
+    !Number.isFinite(milliseconds) ||
+    new Date(milliseconds).toISOString() !== value
+  ) {
+    throw new Error(`invalid ${field}`);
+  }
+  return milliseconds;
 }
