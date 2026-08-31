@@ -31,6 +31,10 @@ jobs:
         run: pnpm run check
       - name: Package workspace typecheck
         run: pnpm run check:packages
+      - name: Current-tree credential pattern scan
+        run: pnpm run check:secrets
+      - name: Engineering-beta marker audit
+        run: pnpm run audit:markers
       - name: Test
         run: pnpm test
       - name: Production build
