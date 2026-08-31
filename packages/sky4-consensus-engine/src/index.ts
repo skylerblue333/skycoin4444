@@ -21,15 +21,21 @@ export type QuorumResult = Readonly<{
 
 const ID_RE = /^[a-zA-Z0-9:_-]{3,128}$/;
 const HASH_RE = /^[a-f0-9]{64}$/;
+const MAX_VALIDATORS = 10_000;
+const MAX_VOTES = 10_000;
 
 export function validateValidator(validator: Validator): void {
   if (!ID_RE.test(validator.id)) throw new Error('validator id must be 3-128 safe characters');
-  if (validator.votingPower <= 0n) throw new Error('voting power must be positive');
+  if (typeof validator.votingPower !== 'bigint' || validator.votingPower <= 0n) {
+    throw new Error('voting power must be a positive bigint');
+  }
 }
 
 export function validateVote(vote: Vote): void {
   if (!ID_RE.test(vote.validatorId)) throw new Error('validator id must be 3-128 safe characters');
-  if (vote.height < 0n) throw new Error('height must be non-negative');
+  if (typeof vote.height !== 'bigint' || vote.height < 0n) {
+    throw new Error('height must be a non-negative bigint');
+  }
   if (!HASH_RE.test(vote.blockHash)) throw new Error('blockHash must be a lowercase sha256 digest');
 }
 
@@ -40,8 +46,11 @@ export function evaluateQuorum(input: {
   blockHash: string;
 }): QuorumResult {
   if (input.validators.length === 0) throw new Error('validator set must not be empty');
-  if (input.validators.length > 10_000) throw new Error('validator set limit exceeded');
-  if (input.height < 0n) throw new Error('height must be non-negative');
+  if (input.validators.length > MAX_VALIDATORS) throw new Error('validator set limit exceeded');
+  if (input.votes.length > MAX_VOTES) throw new Error('vote set limit exceeded');
+  if (typeof input.height !== 'bigint' || input.height < 0n) {
+    throw new Error('height must be a non-negative bigint');
+  }
   if (!HASH_RE.test(input.blockHash)) throw new Error('blockHash must be a lowercase sha256 digest');
 
   const powers = new Map<string, bigint>();
@@ -58,11 +67,11 @@ export function evaluateQuorum(input: {
   for (const vote of input.votes) {
     validateVote(vote);
     if (vote.height !== input.height) throw new Error('vote height mismatch');
-    if (vote.blockHash !== input.blockHash) continue;
     if (seen.has(vote.validatorId)) throw new Error('duplicate validator vote');
     seen.add(vote.validatorId);
     const power = powers.get(vote.validatorId);
     if (power === undefined) throw new Error('vote from unknown validator');
+    if (vote.blockHash !== input.blockHash) continue;
     signedPower += power;
   }
 
