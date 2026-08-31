@@ -48,6 +48,11 @@ function assertCanonicalUtcInstant(value: string): void {
   }
 }
 
+function compareNewestFirst(a: ConsentRecord, b: ConsentRecord): number {
+  if (a.recordedAt === b.recordedAt) return 0;
+  return a.recordedAt > b.recordedAt ? -1 : 1;
+}
+
 export function validateConsentRecord(record: ConsentRecord): ConsentRecord {
   if (!SUBJECT_ID.test(record.subjectId)) {
     throw new Error("invalid subjectId");
@@ -86,7 +91,7 @@ export function decideConsent(
   const relevant = records
     .filter(record => record.purpose === purpose)
     .map(validateConsentRecord)
-    .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt));
+    .sort(compareNewestFirst);
 
   const latest = relevant[0];
   if (!latest) return { allowed: false, reason: "missing" };
