@@ -166,9 +166,8 @@ describe("SkyMessaging domain core", () => {
       clientRequestId: "request_order_2",
     });
 
-    expect(service.list("thread_order", "user_a").map(message => message.id)).toEqual([
-      "msg_Z",
-      "msg_a",
-    ]);
+    expect(
+      service.list("thread_order", "user_a").map(message => message.id)
+    ).toEqual(["msg_Z", "msg_a"]);
   });
 });
