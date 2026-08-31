@@ -19,8 +19,9 @@ The root `package.json` defines a pnpm workspace over `packages/*` and the canon
 - `pnpm check` -> TypeScript no-emit validation
 - `pnpm test` -> Vitest
 - `pnpm check:packages` -> package-level TypeScript validation
+- `pnpm db:push` -> `drizzle-kit generate && drizzle-kit migrate`, the canonical schema/migration entry point
 
-These commands are the authoritative engineering-beta execution surface unless a later release PR intentionally changes them.
+These commands are the authoritative engineering-beta execution surface unless a later release PR intentionally changes them. Because database schema and migration paths are high-risk release surfaces, `db:push` must remain part of cleanup and release planning even when no live database is connected.
 
 ### 2. Server runtime
 
