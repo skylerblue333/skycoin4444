@@ -113,4 +113,62 @@ describe("SkyMessaging domain core", () => {
       })
     ).toThrow("invalid_message_body");
   });
+
+  it("rejects invalid and backwards clock values before persisting records", () => {
+    let now = Number.NaN;
+    const invalidClock = new MessagingService({
+      now: () => now,
+      threadIdFactory: () => "thread_bad_clock",
+    });
+    expect(() => invalidClock.createThread(["user_a", "user_b"])).toThrow(
+      "invalid_clock"
+    );
+    expect(invalidClock.getThread("thread_bad_clock")).toBeUndefined();
+
+    now = 20;
+    const service = new MessagingService({
+      now: () => now,
+      threadIdFactory: () => "thread_clock",
+      messageIdFactory: () => "msg_clock",
+    });
+    service.createThread(["user_a", "user_b"]);
+    now = 19;
+    expect(() =>
+      service.send({
+        threadId: "thread_clock",
+        senderId: "user_a",
+        body: "must not persist",
+        clientRequestId: "request_clock",
+      })
+    ).toThrow("clock_moved_backwards");
+    expect(service.list("thread_clock", "user_a")).toEqual([]);
+  });
+
+  it("uses code-unit ordering for equal-timestamp messages", () => {
+    const ids = ["msg_a", "msg_Z"];
+    let nextId = 0;
+    const service = new MessagingService({
+      now: () => 100,
+      threadIdFactory: () => "thread_order",
+      messageIdFactory: () => ids[nextId++],
+    });
+    service.createThread(["user_b", "user_a"]);
+    service.send({
+      threadId: "thread_order",
+      senderId: "user_a",
+      body: "first insertion",
+      clientRequestId: "request_order_1",
+    });
+    service.send({
+      threadId: "thread_order",
+      senderId: "user_a",
+      body: "second insertion",
+      clientRequestId: "request_order_2",
+    });
+
+    expect(service.list("thread_order", "user_a").map(message => message.id)).toEqual([
+      "msg_Z",
+      "msg_a",
+    ]);
+  });
 });
