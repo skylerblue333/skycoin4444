@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check README.md SECURITY.md docs scripts .github/workflows",
     "test": "vitest run",
-    "test:integration": "vitest run tests/release/integration-smoke.test.ts",
+    "test:integration": "vitest run tests/release",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "check:packages": "tsc --noEmit -p tsconfig.packages.json",
     "check:secrets": "node scripts/check-credential-patterns.mjs",
