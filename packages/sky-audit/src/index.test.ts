@@ -12,12 +12,23 @@ describe("SkyAudit", () => {
     expect(first.occurredAt).toBe("2026-08-25T12:00:00.000Z");
   });
 
-  it("canonicalizes metadata deterministically", () => {
+  it("canonicalizes metadata with locale-independent code-unit ordering", () => {
     expect(canonicalizeAudit(input)).toContain('[["a",1],["z",2]]');
+    expect(canonicalizeAudit({ ...input, metadata: { "ä": 2, z: 1 } })).toContain('[["z",1],["ä",2]]');
   });
 
-  it("rejects invalid dates and redacts sensitive keys", () => {
+  it("normalizes explicit offsets but rejects impossible calendar dates and missing zones", () => {
+    expect(createAuditRecord({ ...input, occurredAt: "2026-08-25T07:00:00-05:00" }).occurredAt).toBe("2026-08-25T12:00:00.000Z");
+    expect(() => createAuditRecord({ ...input, occurredAt: "2026-02-30T12:00:00Z" })).toThrow(/real ISO date-time/);
+    expect(() => createAuditRecord({ ...input, occurredAt: "2026-08-25T12:00:00" })).toThrow(/explicit UTC offset/);
     expect(() => createAuditRecord({ ...input, occurredAt: "invalid" })).toThrow();
-    expect(redactAuditMetadata({ token: "abc", ok: true })).toEqual({ token: "[REDACTED]", ok: true });
+  });
+
+  it("redacts sensitive keys case-insensitively", () => {
+    expect(redactAuditMetadata({ token: "abc", Authorization: "Bearer secret", ok: true })).toEqual({
+      token: "[REDACTED]",
+      Authorization: "[REDACTED]",
+      ok: true,
+    });
   });
 });
