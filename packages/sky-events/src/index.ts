@@ -17,7 +17,7 @@ export type EventFilter = {
 
 const MAX_ID = 200;
 const MAX_TYPE = 160;
-const EXPLICIT_ZONE = /(Z|[+-]\d{2}:\d{2})$/i;
+const ISO_INSTANT = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/i;
 
 function clean(value: string, field: string, max: number): string {
   const result = value.trim();
@@ -28,9 +28,30 @@ function clean(value: string, field: string, max: number): string {
 
 function parseInstant(value: string, field: string): string {
   const normalized = value.trim();
-  if (!EXPLICIT_ZONE.test(normalized)) {
-    throw new Error(`${field} must include Z or an explicit UTC offset`);
+  const match = ISO_INSTANT.exec(normalized);
+  if (!match) throw new Error(`${field} must include Z or an explicit UTC offset`);
+
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText, zone] = match;
+  const year = Number(yearText);
+  const month = Number(monthText);
+  const day = Number(dayText);
+  const hour = Number(hourText);
+  const minute = Number(minuteText);
+  const second = Number(secondText);
+
+  if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) {
+    throw new Error(`${field} must be a real ISO-8601 instant`);
   }
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day < 1 || day > daysInMonth) throw new Error(`${field} must be a real ISO-8601 instant`);
+
+  if (zone !== "Z" && zone !== "z") {
+    const [offsetHourText, offsetMinuteText] = zone.slice(1).split(":");
+    if (Number(offsetHourText) > 23 || Number(offsetMinuteText) > 59) {
+      throw new Error(`${field} must contain a valid UTC offset`);
+    }
+  }
+
   const ms = Date.parse(normalized);
   if (!Number.isFinite(ms)) throw new Error(`${field} must be an ISO-8601 instant`);
   return new Date(ms).toISOString();
