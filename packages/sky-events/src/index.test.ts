@@ -10,10 +10,28 @@ describe("SkyEvents", () => {
     });
   });
 
+  it("normalizes explicit offsets and rejects invalid calendar or offset values", () => {
+    expect(normalizeEvent({ id: "e-1", type: "user.created", occurredAt: "2026-08-27T21:00:00-05:00" }).occurredAt).toBe(
+      "2026-08-28T02:00:00.000Z",
+    );
+    expect(() => normalizeEvent({ id: "e-1", type: "user.created", occurredAt: "2026-02-30T02:00:00Z" })).toThrow(
+      /real ISO-8601 instant/,
+    );
+    expect(() => normalizeEvent({ id: "e-1", type: "user.created", occurredAt: "2026-08-28T02:00:00+25:00" })).toThrow(
+      /valid UTC offset/,
+    );
+  });
+
   it("rejects timezone-less instants", () => {
     expect(() => normalizeEvent({ id: "e-1", type: "user.created", occurredAt: "2026-08-28T02:00:00" })).toThrow(
       /explicit UTC offset/,
     );
+  });
+
+  it("applies the same strict instant validation to filters", () => {
+    const events = [{ id: "e-1", type: "user.created", occurredAt: "2026-08-28T02:00:00Z" }];
+    expect(() => selectEvents(events, { since: "2026-02-30T00:00:00Z" })).toThrow(/real ISO-8601 instant/);
+    expect(() => selectEvents(events, { until: "2026-08-28T02:00:00" })).toThrow(/explicit UTC offset/);
   });
 
   it("filters and sorts deterministically", () => {
