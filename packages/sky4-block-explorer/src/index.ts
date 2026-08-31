@@ -14,15 +14,27 @@ export type ExplorerIndex = Readonly<{
 const ID_RE = /^[a-f0-9]{64}$/;
 const ACCOUNT_RE = /^[a-zA-Z0-9:_-]{3,128}$/;
 
+function compareTransfers(a: IndexedTransfer, b: IndexedTransfer): number {
+  if (a.blockHeight < b.blockHeight) return -1;
+  if (a.blockHeight > b.blockHeight) return 1;
+  if (a.id < b.id) return -1;
+  if (a.id > b.id) return 1;
+  return 0;
+}
+
 export function buildExplorerIndex(transfers: readonly IndexedTransfer[]): ExplorerIndex {
   if (transfers.length > 100_000) throw new Error('transfer index limit exceeded');
   const byId = new Map<string, IndexedTransfer>();
   const byAccount = new Map<string, string[]>();
   for (const transfer of transfers) {
     if (!ID_RE.test(transfer.id)) throw new Error('transfer id must be a lowercase sha256 digest');
-    if (transfer.blockHeight < 0n) throw new Error('blockHeight must be non-negative');
+    if (typeof transfer.blockHeight !== 'bigint' || transfer.blockHeight < 0n) {
+      throw new Error('blockHeight must be a non-negative bigint');
+    }
     if (!ACCOUNT_RE.test(transfer.from) || !ACCOUNT_RE.test(transfer.to)) throw new Error('invalid account id');
-    if (transfer.amount <= 0n) throw new Error('amount must be positive');
+    if (typeof transfer.amount !== 'bigint' || transfer.amount <= 0n) {
+      throw new Error('amount must be a positive bigint');
+    }
     if (byId.has(transfer.id)) throw new Error('duplicate transfer id');
     byId.set(transfer.id, Object.freeze({ ...transfer }));
     for (const account of new Set([transfer.from, transfer.to])) {
@@ -49,10 +61,10 @@ export function listAccountTransfers(
   if (!ACCOUNT_RE.test(accountId)) throw new Error('invalid account id');
   const offset = options.offset ?? 0;
   const limit = options.limit ?? 50;
-  if (!Number.isInteger(offset) || offset < 0) throw new Error('offset must be non-negative');
-  if (!Number.isInteger(limit) || limit < 1 || limit > 200) throw new Error('limit must be 1-200');
-  return Object.freeze((index.byAccount.get(accountId) ?? [])
-    .slice(offset, offset + limit)
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new Error('offset must be a non-negative safe integer');
+  if (!Number.isSafeInteger(limit) || limit < 1 || limit > 200) throw new Error('limit must be a safe integer from 1-200');
+  const history = (index.byAccount.get(accountId) ?? [])
     .map((id) => index.byId.get(id)!)
-    .sort((a, b) => Number(a.blockHeight - b.blockHeight) || a.id.localeCompare(b.id)));
+    .sort(compareTransfers);
+  return Object.freeze(history.slice(offset, offset + limit));
 }
