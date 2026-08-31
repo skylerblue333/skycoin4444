@@ -1,0 +1,54 @@
+name: Engineering Beta RC Tag
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact green main commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Create engineering-beta RC tag exactly once
+        shell: bash
+        env:
+          RC_TAG: engineering-beta-rc-20260831-1
+          TARGET_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          git fetch --tags origin
+
+          existing="$(git ls-remote --tags origin "refs/tags/${RC_TAG}^{}" | awk '{print $1}')"
+          if [ -z "$existing" ]; then
+            existing="$(git ls-remote --tags origin "refs/tags/${RC_TAG}" | awk '{print $1}')"
+          fi
+
+          if [ -n "$existing" ]; then
+            if [ "$existing" != "$TARGET_SHA" ]; then
+              echo "${RC_TAG} already exists at ${existing}, not ${TARGET_SHA}; refusing to retarget." >&2
+              exit 1
+            fi
+            echo "${RC_TAG} already points to ${TARGET_SHA}; nothing to do."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$RC_TAG" "$TARGET_SHA" -m "SKYCOIN4444 engineering beta release candidate 2026-08-31"
+          git push origin "refs/tags/${RC_TAG}"
+
+          resolved="$(git ls-remote --tags origin "refs/tags/${RC_TAG}^{}" | awk '{print $1}')"
+          test "$resolved" = "$TARGET_SHA"
+          echo "Created ${RC_TAG} at exact green SHA ${TARGET_SHA}."
