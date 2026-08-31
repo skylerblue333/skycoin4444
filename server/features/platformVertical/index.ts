@@ -103,7 +103,12 @@ export type PlatformVerticalFailure =
   | { ok: false; stage: "auth"; auth: AuthDecision }
   | { ok: false; stage: "identity-binding"; reason: string }
   | { ok: false; stage: "mfa"; mfa: MfaDecision; reason: string }
-  | { ok: false; stage: "permissions"; permissions: PermissionDecision };
+  | { ok: false; stage: "permissions"; permissions: PermissionDecision }
+  | {
+      ok: false;
+      stage: "course-adapter" | "ledger-adapter" | "notification-adapter";
+      reason: string;
+    };
 
 export interface PlatformVerticalSuccess {
   ok: true;
@@ -132,11 +137,15 @@ function hasSatisfiedMfa(decision: MfaDecision, factors: readonly FactorEnrollme
  *
  * Security-sensitive effects are fail-closed: course enrollment, credential creation,
  * payment planning, ledger planning, notifications, and audit success records occur
- * only after identity binding, SkyAuth, SkyMFA, and SkyPermissions succeed.
+ * only after identity binding, SkyAuth, SkyMFA, and SkyPermissions succeed. Adapter
+ * exceptions are converted to explicit failure results instead of being reported as
+ * successful vertical executions.
  *
  * The payment/ledger/notification outputs are plans only. This function does not
  * execute external payments, persist ledger entries, send notifications, verify MFA
- * proofs, or provide production identity/authentication enforcement.
+ * proofs, or provide production identity/authentication enforcement. Adapter failure
+ * handling is not a distributed transaction: earlier local/domain work may already
+ * have occurred when a later adapter becomes unavailable.
  */
 export function executePlatformVertical(
   request: PlatformVerticalRequest,
@@ -175,11 +184,21 @@ export function executePlatformVertical(
   });
   if (!permissions.allowed) return { ok: false, stage: "permissions", permissions };
 
-  const enrollment = adapters.enrollCourse({
-    subjectId: identity.id,
-    courseId: request.course.courseId,
-    achievementId: request.course.achievementId,
-  });
+  let enrollment: CourseEnrollment;
+  try {
+    enrollment = adapters.enrollCourse({
+      subjectId: identity.id,
+      courseId: request.course.courseId,
+      achievementId: request.course.achievementId,
+    });
+  } catch {
+    return {
+      ok: false,
+      stage: "course-adapter",
+      reason: "course enrollment adapter unavailable",
+    };
+  }
+
   const credential = createEducationCredential({
     id: `cred:${enrollment.enrollmentId}`,
     issuerId: request.course.issuerId,
@@ -197,18 +216,36 @@ export function executePlatformVertical(
       provider: request.payment.provider,
       paymentMethodReference: request.payment.paymentMethodReference,
     });
-    ledgerPlan = adapters.planLedger({
-      subjectId: identity.id,
-      referenceId: request.payment.intent.id,
-      amountMinor: request.payment.intent.amountMinor,
-      currency: request.payment.intent.currency,
-    });
+    try {
+      ledgerPlan = adapters.planLedger({
+        subjectId: identity.id,
+        referenceId: request.payment.intent.id,
+        amountMinor: request.payment.intent.amountMinor,
+        currency: request.payment.intent.currency,
+      });
+    } catch {
+      return {
+        ok: false,
+        stage: "ledger-adapter",
+        reason: "ledger planning adapter unavailable",
+      };
+    }
   }
 
-  const notificationPlan = adapters.planNotification({
-    subjectId: identity.id,
-    referenceId: enrollment.enrollmentId,
-  });
+  let notificationPlan: NotificationPlan;
+  try {
+    notificationPlan = adapters.planNotification({
+      subjectId: identity.id,
+      referenceId: enrollment.enrollmentId,
+    });
+  } catch {
+    return {
+      ok: false,
+      stage: "notification-adapter",
+      reason: "notification planning adapter unavailable",
+    };
+  }
+
   const audit = createAuditRecord({
     actorId: identity.id,
     action: request.requestedAction,

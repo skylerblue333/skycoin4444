@@ -164,4 +164,57 @@ describe("SKYCOIN4444 platform vertical", () => {
     });
     expect(ports.enrollCourse).not.toHaveBeenCalled();
   });
+
+  it("returns an explicit failure when the course adapter is unavailable", () => {
+    const ports = adapters();
+    vi.mocked(ports.enrollCourse).mockImplementation(() => {
+      throw new Error("course store unavailable");
+    });
+
+    const result = executePlatformVertical(request(), ports);
+
+    expect(result).toEqual({
+      ok: false,
+      stage: "course-adapter",
+      reason: "course enrollment adapter unavailable",
+    });
+    expect(ports.planLedger).not.toHaveBeenCalled();
+    expect(ports.planNotification).not.toHaveBeenCalled();
+  });
+
+  it("returns an explicit failure and stops before notification when the ledger adapter is unavailable", () => {
+    const ports = adapters();
+    vi.mocked(ports.planLedger).mockImplementation(() => {
+      throw new Error("ledger unavailable");
+    });
+
+    const result = executePlatformVertical(request(), ports);
+
+    expect(result).toEqual({
+      ok: false,
+      stage: "ledger-adapter",
+      reason: "ledger planning adapter unavailable",
+    });
+    expect(ports.enrollCourse).toHaveBeenCalledTimes(1);
+    expect(ports.planLedger).toHaveBeenCalledTimes(1);
+    expect(ports.planNotification).not.toHaveBeenCalled();
+  });
+
+  it("returns an explicit failure when the notification adapter is unavailable", () => {
+    const ports = adapters();
+    vi.mocked(ports.planNotification).mockImplementation(() => {
+      throw new Error("notification service unavailable");
+    });
+
+    const result = executePlatformVertical(request(), ports);
+
+    expect(result).toEqual({
+      ok: false,
+      stage: "notification-adapter",
+      reason: "notification planning adapter unavailable",
+    });
+    expect(ports.enrollCourse).toHaveBeenCalledTimes(1);
+    expect(ports.planLedger).toHaveBeenCalledTimes(1);
+    expect(ports.planNotification).toHaveBeenCalledTimes(1);
+  });
 });
