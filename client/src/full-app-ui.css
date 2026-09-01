@@ -36,9 +36,20 @@ a { text-underline-offset: 3px; }
 
 img, video, canvas, svg { max-width: 100%; }
 
-[data-slot="card"], .premium-surface {
+/* Universal premium surfaces used by both modern and legacy pages. */
+[data-slot="card"], .premium-surface, .card {
   border-radius: 1rem;
+  border-color: color-mix(in oklab, var(--border) 78%, transparent);
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 34px rgb(15 23 42 / 0.045);
+}
+
+.card {
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.card:hover {
+  border-color: color-mix(in oklab, var(--ring) 28%, var(--border));
 }
 
 [data-slot="dialog-content"], [role="dialog"] {
@@ -46,20 +57,144 @@ img, video, canvas, svg { max-width: 100%; }
   box-shadow: 0 24px 80px rgb(15 23 42 / 0.2);
 }
 
+/* Normalize page containers so older routes read like one product. */
+.container {
+  max-width: 1500px;
+}
+
+.container.py-8,
+.container.py-6,
+.container.py-10,
+.container.py-12 {
+  position: relative;
+}
+
+.container.py-8::before,
+.container.py-6::before,
+.container.py-10::before,
+.container.py-12::before {
+  content: "";
+  position: absolute;
+  inset: -1rem -1rem auto;
+  height: 14rem;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at 20% 0%, rgb(99 102 241 / 0.09), transparent 60%);
+}
+
+/* Legacy headings gain the same compact hierarchy as newer ExperienceShell pages. */
+h1, h2, h3 {
+  letter-spacing: -0.018em;
+}
+
+h1 {
+  text-wrap: balance;
+}
+
+p, li {
+  text-wrap: pretty;
+}
+
+/* Form controls and common legacy control classes. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+  min-height: 2.5rem;
+  border-radius: 0.75rem;
+}
+
+textarea { min-height: 6rem; }
+
+button,
+[role="button"],
+a.inline-flex {
+  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+button:not(:disabled):active,
+[role="button"]:not([aria-disabled="true"]):active,
+a.inline-flex:active {
+  transform: translateY(1px);
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Tables become usable in narrow layouts without rewriting every page. */
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
 }
 
+th, td {
+  vertical-align: middle;
+}
+
 thead th {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 
 tbody tr { transition: background-color 140ms ease; }
 tbody tr:hover { background: rgb(248 250 252 / 0.82); }
+
+.table-wrapper,
+[data-slot="table-container"] {
+  overflow-x: auto;
+  border-radius: 1rem;
+}
+
+/* Improve common tabs, chips and secondary navigation used throughout generated pages. */
+[role="tablist"] {
+  gap: 0.25rem;
+  border-radius: 0.9rem;
+}
+
+[role="tab"] {
+  border-radius: 0.7rem;
+}
+
+nav a,
+aside a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Media and chart frames stop overflowing old layouts. */
+.recharts-responsive-container,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+}
+
+iframe {
+  border-radius: 1rem;
+}
+
+/* Common loading/empty-state treatment for legacy pages. */
+.animate-pulse {
+  border-radius: 0.75rem;
+}
+
+[aria-busy="true"] {
+  cursor: progress;
+}
+
+/* Subtle enter animation without forcing motion on users who disable it. */
+.animate-page-in {
+  animation: sky-page-enter 220ms ease-out both;
+}
+
+@keyframes sky-page-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 code, pre, kbd, samp { font-variant-ligatures: none; }
 
@@ -82,9 +217,38 @@ pre {
   background-clip: padding-box;
 }
 
+/* Keep grids readable on small devices even when old pages use dense columns. */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .container.py-8,
+  .container.py-10,
+  .container.py-12 {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  table {
+    min-width: 36rem;
+  }
+
+  [role="dialog"] {
+    max-width: calc(100vw - 1.5rem);
+  }
+}
+
 @media (max-width: 640px) {
   h1 { text-wrap: balance; }
   button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+
+  .card,
+  [data-slot="card"],
+  .premium-surface {
+    border-radius: 0.9rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -101,6 +265,11 @@ pre {
     radial-gradient(circle at 15% 0%, rgb(99 102 241 / 0.1), transparent 28rem),
     radial-gradient(circle at 85% 8%, rgb(14 165 233 / 0.08), transparent 26rem),
     var(--background);
+}
+
+.dark .card {
+  background: color-mix(in oklab, var(--card) 93%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 18px 44px rgb(0 0 0 / 0.14);
 }
 
 .dark tbody tr:hover { background: rgb(30 41 59 / 0.62); }
