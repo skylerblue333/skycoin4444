@@ -1,349 +1,141 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
-import { AlertCircle, Heart, MessageCircle, Share2, Eye, Radio } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { Link } from "wouter";
+import { toast } from "sonner";
+import {
+  Calendar,
+  Eye,
+  Heart,
+  MessageCircle,
+  Play,
+  Radio,
+  Search,
+  Send,
+  Share2,
+  Sparkles,
+  Users,
+  Video,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ExperienceShell, SurfaceCard } from "@/components/ecosystem/ExperienceShell";
 
-interface LiveStream {
-  id: string;
-  title: string;
-  streamer: string;
-  viewers: number;
-  likes: number;
-  comments: number;
-  status: 'live' | 'ended' | 'scheduled';
-  thumbnail: string;
-  startTime: number;
-  endTime?: number;
-  category: string;
-}
+const CATEGORIES = ["For you", "Gaming", "Music", "Education", "Crypto", "Technology"] as const;
 
-interface Comment {
-  id: string;
-  author: string;
-  text: string;
-  timestamp: number;
-  likes: number;
-}
+const PREVIEW_STREAMS = [
+  { id: "studio", title: "Creator Studio Walkthrough", creator: "SKYCOIN4444 Demo", category: "Technology", gradient: "from-violet-700 via-indigo-700 to-sky-500" },
+  { id: "gaming", title: "Games Center Showcase", creator: "SKYCOIN4444 Demo", category: "Gaming", gradient: "from-fuchsia-700 via-purple-700 to-indigo-700" },
+  { id: "learn", title: "Education Hub Tour", creator: "SKYCOIN4444 Demo", category: "Education", gradient: "from-emerald-600 via-cyan-600 to-blue-600" },
+  { id: "market", title: "Market UI Preview", creator: "SKYCOIN4444 Demo", category: "Crypto", gradient: "from-amber-600 via-orange-600 to-rose-600" },
+] as const;
 
 export default function Live() {
-  const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
-  const [streams, setStreams] = useState<LiveStream[]>([]);
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState(PREVIEW_STREAMS[0].id);
+  const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("For you");
+  const [draft, setDraft] = useState("");
+  const [messages, setMessages] = useState<string[]>([]);
   const [liked, setLiked] = useState(false);
-  const [viewerCount, setViewerCount] = useState(0);
 
-  // Initialize with mock data
-  useEffect(() => {
-    try {
-      const mockStreams: LiveStream[] = [
-        {
-          id: '1',
-          title: 'SKYCOIN4444 Live Trading Session',
-          streamer: 'Skyler Spillers',
-          viewers: 2543,
-          likes: 1200,
-          comments: 340,
-          status: 'live',
-          thumbnail: 'https://via.placeholder.com/400x225?text=LIVE+Trading',
-          startTime: Date.now() - 3600000,
-          category: 'Finance',
-        },
-        {
-          id: '2',
-          title: 'Hope AI Product Demo',
-          streamer: 'Hope AI Team',
-          viewers: 1890,
-          likes: 950,
-          comments: 280,
-          status: 'live',
-          thumbnail: 'https://via.placeholder.com/400x225?text=AI+Demo',
-          startTime: Date.now() - 1800000,
-          category: 'Technology',
-        },
-        {
-          id: '3',
-          title: 'ShadowChat Community Q&A',
-          streamer: 'Community Manager',
-          viewers: 756,
-          likes: 420,
-          comments: 150,
-          status: 'live',
-          thumbnail: 'https://via.placeholder.com/400x225?text=Community+QA',
-          startTime: Date.now() - 900000,
-          category: 'Community',
-        },
-      ];
+  const selected = PREVIEW_STREAMS.find((stream) => stream.id === selectedId) ?? PREVIEW_STREAMS[0];
+  const visibleStreams = useMemo(
+    () => category === "For you" ? PREVIEW_STREAMS : PREVIEW_STREAMS.filter((stream) => stream.category === category),
+    [category],
+  );
 
-      const mockComments: Comment[] = [
-        {
-          id: '1',
-          author: 'CryptoEnthusiast',
-          text: 'Amazing stream! Love the insights on market trends.',
-          timestamp: Date.now() - 120000,
-          likes: 45,
-        },
-        {
-          id: '2',
-          author: 'TechLover',
-          text: 'The AI integration is incredible. This is the future!',
-          timestamp: Date.now() - 90000,
-          likes: 32,
-        },
-        {
-          id: '3',
-          author: 'SkyFan',
-          text: 'Can\'t wait to see what\'s next for SKYCOIN4444',
-          timestamp: Date.now() - 60000,
-          likes: 28,
-        },
-      ];
-
-      setStreams(mockStreams);
-      setActiveStream(mockStreams[0]);
-      setComments(mockComments);
-      setViewerCount(mockStreams[0].viewers);
-      setIsLoading(false);
-    } catch (err) {
-      setError('Failed to load live streams. Please try again.');
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Simulate viewer count changes
-  useEffect(() => {
-    if (!activeStream) return;
-
-    const interval = setInterval(() => {
-      setViewerCount((prev) => {
-        const change = Math.floor(Math.random() * 100) - 40;
-        return Math.max(100, prev + change);
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [activeStream]);
-
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-
-    const comment: Comment = {
-      id: String(comments.length + 1),
-      author: 'You',
-      text: newComment,
-      timestamp: Date.now(),
-      likes: 0,
-    };
-
-    setComments([comment, ...comments]);
-    setNewComment('');
+  const sendMessage = () => {
+    const message = draft.trim();
+    if (!message) return;
+    setMessages((items) => [...items, message]);
+    setDraft("");
   };
-
-  const handleLike = () => {
-    setLiked(!liked);
-    if (activeStream) {
-      setActiveStream({
-        ...activeStream,
-        likes: activeStream.likes + (liked ? -1 : 1),
-      });
-    }
-  };
-
-  const handleStreamSelect = (stream: LiveStream) => {
-    setActiveStream(stream);
-    setViewerCount(stream.viewers);
-    setComments([]);
-    setLiked(false);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="text-center">
-          <Spinner className="w-12 h-12 mx-auto mb-4" />
-          <p className="text-white">Loading live streams...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-900 to-black border-b border-purple-500/30 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Radio className="w-6 h-6 text-red-500 animate-pulse" />
-            <h1 className="text-2xl font-bold">LIVE</h1>
-          </div>
-          <Button variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-900">
-            Go Live
-          </Button>
-        </div>
+    <ExperienceShell
+      title="SkyLive"
+      subtitle="A polished creator and streaming surface, ready for real media-service integration."
+      icon={Radio}
+      accent="indigo"
+      badge="UI preview"
+      actions={
+        <Link href="/live-stream-setup">
+          <Button className="rounded-xl bg-indigo-600 shadow-md shadow-indigo-200 hover:bg-indigo-700"><Video className="mr-2 h-4 w-4" /> Creator setup</Button>
+        </Link>
+      }
+    >
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1" aria-label="Stream categories">
+        {CATEGORIES.map((item) => (
+          <button key={item} type="button" onClick={() => setCategory(item)} className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition-colors ${category === item ? "bg-indigo-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"}`}>{item}</button>
+        ))}
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {error && (
-          <div className="mb-6 p-4 bg-red-900/30 border border-red-500 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <p className="text-red-200">{error}</p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Stream */}
-          <div className="lg:col-span-2">
-            {activeStream ? (
-              <div className="space-y-4">
-                {/* Video Player */}
-                <div className="relative bg-black rounded-lg overflow-hidden border border-purple-500/30">
-                  <div className="aspect-video bg-gradient-to-br from-purple-900 to-black flex items-center justify-center relative">
-                    <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 px-3 py-1 rounded-full">
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                      <span className="text-sm font-bold">LIVE</span>
-                    </div>
-                    <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/70 px-3 py-1 rounded-full">
-                      <Eye className="w-4 h-4" />
-                      <span className="text-sm font-semibold">{viewerCount.toLocaleString()}</span>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-4xl font-bold mb-2">▶</p>
-                      <p className="text-gray-400">Live Video Stream</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stream Info */}
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">{activeStream.title}</h2>
-                    <p className="text-gray-400">by {activeStream.streamer}</p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-4 flex-wrap">
-                    <Button
-                      variant={liked ? 'default' : 'outline'}
-                      className={`flex items-center gap-2 ${
-                        liked ? 'bg-red-600 hover:bg-red-700' : 'border-purple-500 text-purple-400'
-                      }`}
-                      onClick={handleLike}
-                    >
-                      <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-                      {activeStream.likes.toLocaleString()}
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2 border-purple-500 text-purple-400">
-                      <MessageCircle className="w-5 h-5" />
-                      {activeStream.comments.toLocaleString()}
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2 border-purple-500 text-purple-400">
-                      <Share2 className="w-5 h-5" />
-                      Share
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Comments Section */}
-                <Card className="bg-black border-purple-500/30 p-4">
-                  <h3 className="text-lg font-bold mb-4">Live Chat</h3>
-
-                  {/* Comment Input */}
-                  <div className="flex gap-2 mb-4">
-                    <Input
-                      placeholder="Say something..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                      className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
-                    />
-                    <Button
-                      onClick={handleAddComment}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      Send
-                    </Button>
-                  </div>
-
-                  {/* Comments List */}
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {comments.length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">No comments yet. Be the first!</p>
-                    ) : (
-                      comments.map((comment) => (
-                        <div key={comment.id} className="bg-gray-900/50 p-3 rounded border border-gray-800">
-                          <div className="flex items-start justify-between mb-1">
-                            <p className="font-semibold text-purple-400">{comment.author}</p>
-                            <span className="text-xs text-gray-500">
-                              {Math.floor((Date.now() - comment.timestamp) / 60000)}m ago
-                            </span>
-                          </div>
-                          <p className="text-gray-300 text-sm mb-2">{comment.text}</p>
-                          <button className="text-xs text-gray-500 hover:text-purple-400">
-                            👍 {comment.likes}
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </Card>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-5">
+          <SurfaceCard className="overflow-hidden">
+            <div className={`relative aspect-video min-h-[320px] bg-gradient-to-br ${selected.gradient}`}>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_30%,rgba(255,255,255,.22),transparent_35%)]" />
+              <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-slate-950/70 px-3 py-1.5 text-xs font-bold text-white backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5 text-indigo-300" /> Preview media
               </div>
-            ) : (
-              <div className="bg-gray-900 rounded-lg p-8 text-center">
-                <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-                <p className="text-gray-400">No active stream selected</p>
+              <div className="absolute right-4 top-4 rounded-full bg-slate-950/60 px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur">No live viewer count</div>
+              <div className="absolute inset-0 grid place-items-center">
+                <button type="button" aria-label="Preview stream player" onClick={() => toast("Media playback is not connected in this engineering preview.")} className="grid h-20 w-20 place-items-center rounded-full border border-white/40 bg-white/20 text-white shadow-2xl backdrop-blur transition-transform hover:scale-105">
+                  <Play className="ml-1 h-8 w-8 fill-current" />
+                </button>
               </div>
-            )}
-          </div>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/80 to-transparent p-5 pt-20 text-white">
+                <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">{selected.category} · demo fixture</div>
+                <h2 className="mt-1 text-2xl font-black md:text-3xl">{selected.title}</h2>
+                <p className="mt-1 text-sm text-white/70">{selected.creator}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+              <div className="flex items-center gap-2">
+                <Button onClick={() => setLiked((value) => !value)} variant="outline" className={`rounded-xl ${liked ? "border-pink-200 bg-pink-50 text-pink-700" : "border-slate-200"}`}><Heart className={`mr-2 h-4 w-4 ${liked ? "fill-current" : ""}`} /> {liked ? "Liked" : "Like"}</Button>
+                <Button onClick={() => toast("Share targets are not connected in this engineering preview.")} variant="outline" className="rounded-xl border-slate-200"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-slate-400">
+                <span className="flex items-center gap-1"><Eye className="h-4 w-4" /> Viewer metrics unavailable</span>
+                <span className="flex items-center gap-1"><Users className="h-4 w-4" /> Audience service pending</span>
+              </div>
+            </div>
+          </SurfaceCard>
 
-          {/* Streams List */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold">Live Streams</h3>
-            {streams.map((stream) => (
-              <Card
-                key={stream.id}
-                className={`cursor-pointer transition-all border-2 ${
-                  activeStream?.id === stream.id
-                    ? 'border-purple-500 bg-purple-900/20'
-                    : 'border-gray-700 bg-gray-900/50 hover:border-purple-500/50'
-                }`}
-                onClick={() => handleStreamSelect(stream)}
-              >
-                <div className="p-3 space-y-2">
-                  <div className="relative">
-                    <div className="aspect-video bg-gradient-to-br from-gray-800 to-black rounded overflow-hidden flex items-center justify-center">
-                      <span className="text-gray-600">Stream</span>
-                    </div>
-                    <div className="absolute top-2 left-2 bg-red-600 px-2 py-1 rounded text-xs font-bold flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                      LIVE
-                    </div>
-                    <div className="absolute bottom-2 right-2 bg-black/70 px-2 py-1 rounded text-xs flex items-center gap-1">
-                      <Eye className="w-3 h-3" />
-                      {stream.viewers.toLocaleString()}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm line-clamp-2">{stream.title}</p>
-                    <p className="text-xs text-gray-400">{stream.streamer}</p>
-                  </div>
-                  <div className="flex gap-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-3 h-3" /> {stream.likes}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MessageCircle className="w-3 h-3" /> {stream.comments}
-                    </span>
-                  </div>
-                </div>
-              </Card>
-            ))}
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <div><h2 className="text-lg font-bold">Preview channels</h2><p className="text-xs text-slate-500">Interface fixtures only — not active broadcasts.</p></div>
+              <div className="relative hidden sm:block"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input className="h-9 w-52 rounded-xl border-slate-200 bg-white pl-9" placeholder="Filter channels" /></div>
+            </div>
+            {visibleStreams.length ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {visibleStreams.map((stream) => (
+                  <button key={stream.id} type="button" onClick={() => setSelectedId(stream.id)} className={`overflow-hidden rounded-2xl border bg-white text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md ${selectedId === stream.id ? "border-indigo-300 ring-2 ring-indigo-100" : "border-slate-200"}`}>
+                    <div className={`relative aspect-video bg-gradient-to-br ${stream.gradient}`}><span className="absolute left-2 top-2 rounded-full bg-slate-950/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">Preview</span><div className="absolute inset-0 grid place-items-center"><Play className="h-7 w-7 fill-white/90 text-white/90" /></div></div>
+                    <div className="p-3"><div className="line-clamp-1 text-sm font-bold text-slate-800">{stream.title}</div><div className="mt-1 text-xs text-slate-400">{stream.category}</div></div>
+                  </button>
+                ))}
+              </div>
+            ) : <SurfaceCard className="p-8 text-center text-sm text-slate-500">No preview fixture is assigned to this category yet.</SurfaceCard>}
           </div>
         </div>
+
+        <div className="space-y-5">
+          <SurfaceCard className="overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 p-4"><div><h2 className="font-bold">Live chat preview</h2><p className="text-xs text-slate-400">Local UI state only</p></div><MessageCircle className="h-5 w-5 text-indigo-600" /></div>
+            <div className="h-80 space-y-3 overflow-y-auto bg-slate-50/70 p-4">
+              <div className="rounded-xl border border-indigo-100 bg-indigo-50 p-3 text-xs leading-5 text-indigo-800">Chat is not connected to a realtime service. Messages entered here remain in this browser session.</div>
+              {messages.length === 0 ? <div className="grid h-44 place-items-center text-center"><div><MessageCircle className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-2 text-sm font-medium text-slate-500">No preview messages yet</p></div></div> : messages.map((message, index) => <div key={`${index}-${message}`} className="rounded-xl border border-slate-200 bg-white p-3"><div className="text-xs font-bold text-indigo-700">You · preview</div><p className="mt-1 text-sm text-slate-700">{message}</p></div>)}
+            </div>
+            <div className="flex gap-2 border-t border-slate-100 p-3"><Input value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => event.key === "Enter" && sendMessage()} className="rounded-xl border-slate-200" placeholder="Try the chat UI..." /><Button onClick={sendMessage} aria-label="Send preview message" className="rounded-xl bg-indigo-600 px-3 hover:bg-indigo-700"><Send className="h-4 w-4" /></Button></div>
+          </SurfaceCard>
+
+          <SurfaceCard className="p-5">
+            <div className="flex items-center gap-2"><Calendar className="h-5 w-5 text-indigo-600" /><h2 className="font-bold">Creator readiness</h2></div>
+            <div className="mt-4 space-y-3">
+              {["Streaming provider", "Realtime chat", "Moderation controls", "Audience analytics"].map((item) => <div key={item} className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2.5 text-sm"><span className="text-slate-600">{item}</span><span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-500">Pending</span></div>)}
+            </div>
+            <Link href="/live-stream-setup"><Button variant="outline" className="mt-4 w-full rounded-xl border-indigo-200 text-indigo-700 hover:bg-indigo-50"><Radio className="mr-2 h-4 w-4" /> Open creator setup</Button></Link>
+          </SurfaceCard>
+        </div>
       </div>
-    </div>
+    </ExperienceShell>
   );
 }
