@@ -5,6 +5,7 @@ const globalCss = fs.readFileSync('client/src/index.css', 'utf8');
 const card = fs.readFileSync('client/src/components/ui/card.tsx', 'utf8');
 const button = fs.readFileSync('client/src/components/ui/button.tsx', 'utf8');
 const input = fs.readFileSync('client/src/components/ui/input.tsx', 'utf8');
+const profile = fs.readFileSync('client/src/pages/Profile.tsx', 'utf8');
 const workflow = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
 
 describe('shared UX modernization foundation', () => {
@@ -24,6 +25,14 @@ describe('shared UX modernization foundation', () => {
     expect(button).toMatch(/active:scale/);
     expect(input).toMatch(/rounded-xl/);
     expect(input).toMatch(/focus-visible:ring-primary/);
+  });
+
+  it('modernizes profile without inventing unavailable social data', () => {
+    expect(profile).toMatch(/Profile workspace/);
+    expect(profile).toMatch(/Profile activity/);
+    expect(profile).toMatch(/Activation readiness/);
+    expect(profile).toMatch(/avoids synthetic followers/);
+    expect(profile).not.toMatch(/Math\.random/);
   });
 
   it('checks out the exact PR head for canonical CI', () => {
