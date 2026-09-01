@@ -1,16 +1,25 @@
-/**
- * DatingHome — Full Dating System Hub
- * AI-ranked match feed, compatibility scores, boost monetization
- * Tinder-style + AI intelligence layer
- */
 import { useState } from "react";
-import { Heart, X, Star, Zap, Brain, MessageCircle, Settings, ChevronRight, Flame, Shield, Crown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import {
+  Brain,
+  CheckCircle2,
+  ChevronRight,
+  Crown,
+  Heart,
+  MapPin,
+  MessageCircle,
+  RotateCcw,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  X,
+  Zap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ExperienceShell, SurfaceCard } from "@/components/ecosystem/ExperienceShell";
 
-const MOCK_PROFILES = [
+const SAMPLE_PROFILES = [
   {
     id: 1,
     name: "Alex Rivera",
@@ -20,11 +29,10 @@ const MOCK_PROFILES = [
     interests: ["Web3", "Music", "Travel", "DeFi"],
     compatibility: 94,
     trustScore: 87,
-    isVerified: true,
-    isPremium: false,
-    avatar: null,
-    aiSummary: "High compatibility: shared interests in crypto and nightlife. Communication style: direct and enthusiastic.",
-    intentTag: "serious",
+    verified: true,
+    intent: "Serious",
+    gradient: "from-fuchsia-500 via-pink-500 to-orange-300",
+    aiSummary: "Preview analysis: shared interests and communication preferences indicate a potentially strong match.",
   },
   {
     id: 2,
@@ -35,11 +43,10 @@ const MOCK_PROFILES = [
     interests: ["AI", "Philosophy", "Coffee", "Running"],
     compatibility: 88,
     trustScore: 92,
-    isVerified: true,
-    isPremium: true,
-    avatar: null,
-    aiSummary: "Strong intellectual match. Both value depth over surface. Potential for meaningful connection.",
-    intentTag: "networking",
+    verified: true,
+    intent: "Networking",
+    gradient: "from-violet-500 via-indigo-500 to-sky-400",
+    aiSummary: "Preview analysis: strong overlap in intellectual interests and preference for deeper conversation.",
   },
   {
     id: 3,
@@ -50,217 +57,158 @@ const MOCK_PROFILES = [
     interests: ["Startups", "Cooking", "Gaming", "Hiking"],
     compatibility: 82,
     trustScore: 79,
-    isVerified: false,
-    isPremium: false,
-    avatar: null,
-    aiSummary: "Creative energy match. Shared entrepreneurial mindset. Good conversation potential.",
-    intentTag: "casual",
+    verified: false,
+    intent: "Casual",
+    gradient: "from-emerald-400 via-cyan-500 to-blue-500",
+    aiSummary: "Preview analysis: creative interests and entrepreneurial themes provide useful conversation starters.",
   },
-];
-
-const INTENT_COLORS: Record<string, string> = {
-  serious: "bg-pink-500/20 text-pink-400",
-  casual: "bg-blue-500/20 text-blue-400",
-  networking: "bg-purple-500/20 text-purple-400",
-};
+] as const;
 
 export default function DatingHome() {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [showAI, setShowAI] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [likedIds, setLikedIds] = useState<number[]>([]);
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const profile = SAMPLE_PROFILES[currentIndex];
 
-  const profile = MOCK_PROFILES[currentIdx];
+  const advance = () => {
+    setShowAnalysis(false);
+    setCurrentIndex((value) => Math.min(value + 1, SAMPLE_PROFILES.length));
+  };
 
-  const handleLike = () => {
+  const like = () => {
     if (!profile) return;
-    setLikedIds(prev => [...prev, profile.id]);
-    toast.success(`You liked ${profile.name}! 💜`);
-    setCurrentIdx(prev => Math.min(prev + 1, MOCK_PROFILES.length - 1));
+    setLikedIds((ids) => (ids.includes(profile.id) ? ids : [...ids, profile.id]));
+    toast.success(`${profile.name} added to your preview likes.`);
+    advance();
   };
 
-  const handlePass = () => {
-    setCurrentIdx(prev => Math.min(prev + 1, MOCK_PROFILES.length - 1));
-  };
-
-  const handleSuperLike = () => {
-    toast("Super Like requires Premium — upgrade to unlock!", { icon: "⭐" });
+  const reset = () => {
+    setCurrentIndex(0);
+    setLikedIds([]);
+    setShowAnalysis(false);
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 max-w-md mx-auto space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <Heart className="w-5 h-5 text-pink-500" />
-            ShadowMatch
-          </h1>
-          <p className="text-xs text-muted-foreground">AI-powered connections</p>
-        </div>
-        <div className="flex gap-2">
-          <Link href="/dating/matchmaker">
-            <Button variant="outline" size="sm" className="gap-1">
-              <Brain className="w-3.5 h-3.5" />
-              AI
-            </Button>
-          </Link>
-          <Button variant="outline" size="sm" onClick={() => toast("Settings coming soon")}>
-            <Settings className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="card p-2 text-center">
-          <div className="text-lg font-bold text-pink-400">{likedIds.length}</div>
-          <div className="text-xs text-muted-foreground">Liked</div>
-        </div>
-        <div className="card p-2 text-center">
-          <div className="text-lg font-bold text-purple-400">3</div>
-          <div className="text-xs text-muted-foreground">Matches</div>
-        </div>
-        <div className="card p-2 text-center">
-          <div className="text-lg font-bold text-blue-400">94%</div>
-          <div className="text-xs text-muted-foreground">Top Match</div>
-        </div>
-      </div>
-
-      {/* Main card */}
-      {profile ? (
-        <div className="card overflow-hidden">
-          {/* Profile image area */}
-          <div className="relative h-72 bg-gradient-to-br from-purple-900 via-pink-900 to-blue-900 flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-4xl font-bold text-white">
-              {profile.name[0]}
-            </div>
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex gap-1.5">
-              {profile.isVerified && (
-                <Badge className="bg-blue-500/90 text-white text-xs gap-1">
-                  <Shield className="w-2.5 h-2.5" />
-                  Verified
-                </Badge>
-              )}
-              {profile.isPremium && (
-                <Badge className="bg-yellow-500/90 text-white text-xs gap-1">
-                  <Crown className="w-2.5 h-2.5" />
-                  Premium
-                </Badge>
-              )}
-            </div>
-            {/* Compatibility score */}
-            <div className="absolute top-3 right-3 w-12 h-12 rounded-full bg-black/60 backdrop-blur flex flex-col items-center justify-center">
-              <div className="text-sm font-bold text-green-400">{profile.compatibility}%</div>
-              <div className="text-xs text-muted-foreground">match</div>
-            </div>
-            {/* Intent tag */}
-            <div className="absolute bottom-3 left-3">
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${INTENT_COLORS[profile.intentTag]}`}>
-                {profile.intentTag}
-              </span>
-            </div>
-          </div>
-
-          {/* Profile info */}
-          <div className="p-4 space-y-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold">{profile.name}, {profile.age}</h2>
-                <span className="text-xs text-muted-foreground">Trust: {profile.trustScore}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">{profile.location}</p>
-            </div>
-            <p className="text-sm text-muted-foreground">{profile.bio}</p>
-
-            {/* Interests */}
-            <div className="flex flex-wrap gap-1.5">
-              {profile.interests.map(i => (
-                <span key={i} className="px-2 py-0.5 rounded-full bg-secondary text-xs">{i}</span>
-              ))}
-            </div>
-
-            {/* AI Summary toggle */}
-            <button
-              onClick={() => setShowAI(!showAI)}
-              className="flex items-center gap-2 text-xs text-purple-400 hover:text-purple-300 transition-colors"
-            >
-              <Brain className="w-3.5 h-3.5" />
-              {showAI ? "Hide" : "Show"} AI Analysis
-              <ChevronRight className={`w-3 h-3 transition-transform ${showAI ? "rotate-90" : ""}`} />
-            </button>
-            {showAI && (
-              <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300">
-                {profile.aiSummary}
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="card p-8 text-center">
-          <Heart className="w-12 h-12 text-pink-500/30 mx-auto mb-3" />
-          <h3 className="font-semibold">You've seen everyone!</h3>
-          <p className="text-sm text-muted-foreground mt-1">Check back later for new matches.</p>
-        </div>
-      )}
-
-      {/* Action buttons */}
-      {profile && (
-        <div className="flex items-center justify-center gap-4">
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-14 h-14 rounded-full border-2 border-red-500/30 hover:border-red-500 hover:bg-red-500/10"
-            onClick={handlePass}
-          >
-            <X className="w-6 h-6 text-red-400" />
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-12 h-12 rounded-full border-2 border-yellow-500/30 hover:border-yellow-500 hover:bg-yellow-500/10"
-            onClick={handleSuperLike}
-          >
-            <Star className="w-5 h-5 text-yellow-400" />
-          </Button>
-          <Button
-            size="lg"
-            className="w-14 h-14 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400"
-            onClick={handleLike}
-          >
-            <Heart className="w-6 h-6 text-white" />
-          </Button>
-        </div>
-      )}
-
-      {/* Navigation links */}
-      <div className="grid grid-cols-2 gap-2">
-        <Link href="/dating/matches">
-          <Button variant="outline" className="w-full gap-2 text-sm">
-            <MessageCircle className="w-4 h-4" />
-            My Matches
+    <ExperienceShell
+      title="SkyLife Dating"
+      subtitle="Discover compatible connections with transparent preview states."
+      icon={Heart}
+      accent="pink"
+      badge="UI preview"
+      actions={
+        <Link href="/dating-matches">
+          <Button variant="outline" className="rounded-xl border-slate-200 bg-white">
+            <MessageCircle className="mr-2 h-4 w-4" /> Matches
           </Button>
         </Link>
-        <Link href="/dating/premium">
-          <Button className="w-full gap-2 text-sm bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400">
-            <Crown className="w-4 h-4" />
-            Go Premium
-          </Button>
-        </Link>
-      </div>
+      }
+    >
+      <div className="grid gap-5 xl:grid-cols-[240px_minmax(0,1fr)_300px]">
+        <SurfaceCard className="h-fit p-3">
+          <p className="px-3 pb-2 pt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Discover</p>
+          {[
+            [Sparkles, "Suggested", `${SAMPLE_PROFILES.length} preview`],
+            [Heart, "Liked", String(likedIds.length)],
+            [MessageCircle, "Matches", "Not connected"],
+            [ShieldCheck, "Safety", "Review tools"],
+          ].map(([Icon, label, value]) => (
+            <div key={String(label)} className="flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-slate-50">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-pink-50 text-pink-600"><Icon className="h-4 w-4" /></span>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-slate-800">{String(label)}</div>
+                <div className="truncate text-xs text-slate-400">{String(value)}</div>
+              </div>
+              <ChevronRight className="h-4 w-4 text-slate-300" />
+            </div>
+          ))}
+          <div className="mt-3 rounded-xl bg-slate-50 p-3 text-xs leading-5 text-slate-500">
+            Profiles on this screen are sample fixtures for interface validation, not live members.
+          </div>
+        </SurfaceCard>
 
-      {/* Boost CTA */}
-      <div className="card p-3 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border-pink-500/20 flex items-center gap-3">
-        <Flame className="w-8 h-8 text-orange-400 shrink-0" />
-        <div className="flex-1">
-          <div className="text-sm font-semibold">Boost your profile</div>
-          <div className="text-xs text-muted-foreground">10x more visibility for 30 min — $2.99</div>
+        <div className="min-w-0">
+          {profile ? (
+            <SurfaceCard className="overflow-hidden">
+              <div className={`relative min-h-[420px] bg-gradient-to-br ${profile.gradient} p-6 md:min-h-[520px]`}>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(255,255,255,.28),transparent_45%)]" />
+                <div className="relative flex h-full min-h-[370px] flex-col justify-between md:min-h-[468px]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex gap-2">
+                      <span className="rounded-full bg-black/30 px-3 py-1 text-xs font-semibold text-white backdrop-blur">Sample profile</span>
+                      {profile.verified ? <span className="flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-blue-700"><CheckCircle2 className="h-3.5 w-3.5" /> Preview verified</span> : null}
+                    </div>
+                    <span className="rounded-full bg-black/35 px-3 py-1 text-sm font-bold text-white backdrop-blur">{profile.compatibility}% match</span>
+                  </div>
+
+                  <div className="mx-auto grid h-36 w-36 place-items-center rounded-full border-4 border-white/60 bg-white/20 text-6xl font-black text-white shadow-2xl backdrop-blur-sm md:h-44 md:w-44">
+                    {profile.name.charAt(0)}
+                  </div>
+
+                  <div className="rounded-2xl bg-slate-950/50 p-5 text-white backdrop-blur-md">
+                    <div className="flex flex-wrap items-end justify-between gap-3">
+                      <div>
+                        <h2 className="text-3xl font-black tracking-tight">{profile.name}, {profile.age}</h2>
+                        <p className="mt-1 flex items-center gap-1 text-sm text-white/75"><MapPin className="h-4 w-4" /> {profile.location}</p>
+                      </div>
+                      <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">{profile.intent}</span>
+                    </div>
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-white/85">{profile.bio}</p>
+                    <div className="mt-4 flex flex-wrap gap-2">{profile.interests.map((interest) => <span key={interest} className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium">{interest}</span>)}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 border-t border-slate-100 p-4 md:grid-cols-[1fr_auto] md:items-center">
+                <button type="button" onClick={() => setShowAnalysis((value) => !value)} className="flex items-center gap-2 text-left text-sm font-semibold text-violet-700 hover:text-violet-900">
+                  <Brain className="h-4 w-4" /> {showAnalysis ? "Hide" : "Show"} compatibility preview
+                  <ChevronRight className={`h-4 w-4 transition-transform ${showAnalysis ? "rotate-90" : ""}`} />
+                </button>
+                <div className="text-xs text-slate-400">Trust fixture: {profile.trustScore}/100</div>
+                {showAnalysis ? <div className="rounded-xl border border-violet-100 bg-violet-50 p-3 text-sm leading-6 text-violet-800 md:col-span-2">{profile.aiSummary}</div> : null}
+              </div>
+            </SurfaceCard>
+          ) : (
+            <SurfaceCard className="grid min-h-[520px] place-items-center p-8 text-center">
+              <div>
+                <Heart className="mx-auto h-12 w-12 text-pink-200" />
+                <h2 className="mt-4 text-xl font-bold">Preview complete</h2>
+                <p className="mt-2 text-sm text-slate-500">You reached the end of the sample profile set.</p>
+                <Button onClick={reset} className="mt-5 rounded-xl bg-pink-600 hover:bg-pink-700"><RotateCcw className="mr-2 h-4 w-4" /> Restart preview</Button>
+              </div>
+            </SurfaceCard>
+          )}
+
+          {profile ? (
+            <div className="mt-5 flex items-center justify-center gap-4" aria-label="Profile actions">
+              <Button aria-label="Pass profile" onClick={advance} variant="outline" className="h-14 w-14 rounded-full border-2 border-slate-200 bg-white p-0 shadow-sm"><X className="h-6 w-6 text-slate-500" /></Button>
+              <Button aria-label="Super like preview" onClick={() => toast("Premium action is not connected in this engineering preview.")} variant="outline" className="h-12 w-12 rounded-full border-2 border-amber-200 bg-white p-0 shadow-sm"><Star className="h-5 w-5 text-amber-500" /></Button>
+              <Button aria-label="Like profile" onClick={like} className="h-14 w-14 rounded-full bg-pink-600 p-0 shadow-lg shadow-pink-200 hover:bg-pink-700"><Heart className="h-6 w-6 fill-current" /></Button>
+            </div>
+          ) : null}
         </div>
-        <Button size="sm" className="bg-orange-500 hover:bg-orange-400 shrink-0" onClick={() => toast("Boost purchased! Your profile is now featured 🔥")}>
-          <Zap className="w-3.5 h-3.5 mr-1" />
-          Boost
-        </Button>
+
+        <div className="space-y-5">
+          <SurfaceCard className="p-5">
+            <div className="flex items-center justify-between"><h2 className="font-bold">Profile readiness</h2><span className="text-xs font-semibold text-emerald-600">Preview</span></div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-3/4 rounded-full bg-emerald-500" /></div>
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              {["Add clear photos", "Write a useful bio", "Set matching intent", "Review privacy settings"].map((item, index) => <div key={item} className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${index < 3 ? "text-emerald-500" : "text-slate-300"}`} /> {item}</div>)}
+            </div>
+          </SurfaceCard>
+
+          <SurfaceCard className="overflow-hidden p-5">
+            <div className="flex items-center gap-2 text-pink-700"><Zap className="h-5 w-5" /><h2 className="font-bold">Visibility tools</h2></div>
+            <p className="mt-2 text-sm leading-6 text-slate-500">Boost and premium controls are presentation-only until billing and entitlement services are connected and verified.</p>
+            <Button onClick={() => toast("Boost is unavailable in this engineering preview.")} variant="outline" className="mt-4 w-full rounded-xl border-pink-200 text-pink-700 hover:bg-pink-50"><Zap className="mr-2 h-4 w-4" /> Preview boost</Button>
+          </SurfaceCard>
+
+          <SurfaceCard className="p-5">
+            <div className="flex items-center gap-2"><Crown className="h-5 w-5 text-amber-500" /><h2 className="font-bold">Premium experience</h2></div>
+            <p className="mt-2 text-sm leading-6 text-slate-500">See how premium benefits can be presented without implying an active subscription product.</p>
+            <Link href="/dating-premium"><Button variant="ghost" className="mt-2 w-full justify-between rounded-xl text-slate-700">Open premium preview <ChevronRight className="h-4 w-4" /></Button></Link>
+          </SurfaceCard>
+        </div>
       </div>
-    </div>
+    </ExperienceShell>
   );
 }
