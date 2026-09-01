@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
@@ -57,8 +58,8 @@ interface ExperienceShellProps {
   icon: LucideIcon;
   accent: ExperienceAccent;
   badge?: string;
-  actions?: React.ReactNode;
-  children: React.ReactNode;
+  actions?: ReactNode;
+  children: ReactNode;
 }
 
 export function ExperienceShell({
@@ -144,6 +145,6 @@ export function ExperienceShell({
   );
 }
 
-export function SurfaceCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+export function SurfaceCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-200/40 ${className}`}>{children}</section>;
 }
