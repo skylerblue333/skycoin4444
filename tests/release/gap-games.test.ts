@@ -6,9 +6,14 @@ import {
   isLegalCheckersStep,
   isLegalChessGeometry,
   isMemoryMatch,
+  moveSnake,
   resolveHighLow,
+  rollDice,
   scoreTowerStack,
   scoreTrivia,
+  spinRoulette,
+  ticTacToeWinner,
+  validateAssemblyOrder,
   validateWordChain,
 } from '../../client/src/lib/gapGames';
 
@@ -57,8 +62,22 @@ describe('gap game engineering-beta domain cores', () => {
     expect(isLegalChessGeometry('bishop', 0, 7, 'white')).toBe(false);
   });
 
-  it('documents all eight gap cores without claiming full game services', () => {
-    expect(Object.keys(gapGameCapabilities)).toHaveLength(8);
+  it('fills deterministic dice and roulette simulation gaps', () => {
+    expect(rollDice(1, 6)).toBeGreaterThanOrEqual(1);
+    expect(rollDice(1, 6)).toBeLessThanOrEqual(6);
+    expect(spinRoulette(12).value).toBeGreaterThanOrEqual(0);
+    expect(spinRoulette(12).value).toBeLessThanOrEqual(36);
+  });
+
+  it('fills snake, tic-tac-toe, and assembly puzzle domain gaps', () => {
+    expect(moveSnake({ x: 1, y: 1 }, 'right', 3, 3)).toEqual({ x: 2, y: 1, collided: false });
+    expect(moveSnake({ x: 2, y: 1 }, 'right', 3, 3).collided).toBe(true);
+    expect(ticTacToeWinner(['X', 'X', 'X', null, 'O', null, 'O', null, null])).toBe('X');
+    expect(validateAssemblyOrder(['frame', 'engine', 'wheels'], ['frame', 'engine', 'wheels'])).toEqual({ correct: true, placed: 3, total: 3 });
+  });
+
+  it('documents thirteen local gap cores without claiming production services', () => {
+    expect(Object.keys(gapGameCapabilities)).toHaveLength(13);
     expect(gapGameCapabilities.chess).toMatch(/remain.*work/i);
   });
 });

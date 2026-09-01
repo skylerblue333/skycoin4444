@@ -93,6 +93,38 @@ export function isLegalChessGeometry(piece: 'king' | 'queen' | 'rook' | 'bishop'
   return dx === 0 && ty - fy === direction;
 }
 
+export function rollDice(seed: number, sides = 6) {
+  if (!Number.isInteger(seed) || !Number.isInteger(sides) || sides < 2) throw new Error('invalid dice input');
+  return ((seed * 9301 + 49297) % 233280) % sides + 1;
+}
+
+export function spinRoulette(seed: number) {
+  if (!Number.isInteger(seed)) throw new Error('seed must be an integer');
+  const value = Math.abs((seed * 1103515245 + 12345) % 37);
+  const color = value === 0 ? 'green' : ([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(value) ? 'red' : 'black');
+  return { value, color } as const;
+}
+
+export function moveSnake(head: { x: number; y: number }, direction: 'up' | 'down' | 'left' | 'right', width: number, height: number) {
+  if (width < 2 || height < 2) throw new Error('invalid board');
+  const delta = direction === 'up' ? [0,-1] : direction === 'down' ? [0,1] : direction === 'left' ? [-1,0] : [1,0];
+  const x = head.x + delta[0], y = head.y + delta[1];
+  return { x, y, collided: x < 0 || y < 0 || x >= width || y >= height };
+}
+
+export function ticTacToeWinner(cells: Array<'X' | 'O' | null>) {
+  if (cells.length !== 9) throw new Error('board must have nine cells');
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  for (const [a,b,c] of lines) if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
+  return cells.every(Boolean) ? 'draw' : null;
+}
+
+export function validateAssemblyOrder(order: string[], required: string[]) {
+  if (new Set(order).size !== order.length || new Set(required).size !== required.length) throw new Error('parts must be unique');
+  const correct = order.length === required.length && order.every((part, index) => part === required[index]);
+  return { correct, placed: order.filter((part, index) => part === required[index]).length, total: required.length };
+}
+
 export const gapGameCapabilities = {
   chess: 'local move-geometry validator; check/checkmate, castling, en-passant and occupancy remain UI/integration work',
   highLow: 'deterministic round resolver',
@@ -102,4 +134,9 @@ export const gapGameCapabilities = {
   towerStack: 'precision/placement scoring core',
   mines: 'validated deterministic minefield adjacency generator',
   checkers: 'local diagonal step validator; captures/kings can be layered by UI state',
+  dice: 'deterministic simulated die roller',
+  roulette: 'deterministic simulated 0-36 wheel result',
+  snake: 'bounded grid movement and collision detector',
+  ticTacToe: 'local winner/draw detector',
+  assemblyPuzzle: 'ordered-parts completion validator',
 } as const;
