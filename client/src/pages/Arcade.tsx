@@ -1,129 +1,180 @@
-import { useAuth } from "@/_core/hooks/useAuth";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Trophy, Swords, Star, Zap, Crown, Target, Dices, CircleDot, Circle, Spade, Flame, Coins } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "wouter";
+import { Gamepad2, ShieldCheck } from "lucide-react";
+import {
+  createMemoryDeck,
+  createMinesBoard,
+  isLegalCheckersStep,
+  isLegalChessGeometry,
+  isMemoryMatch,
+  resolveHighLow,
+  scoreTowerStack,
+  scoreTrivia,
+  validateWordChain,
+} from "@/lib/gapGames";
+
+const trivia = [
+  { id: "wallet", prompt: "Which secret should never be shared?", choices: ["Public address", "Recovery phrase", "Block height"], correctIndex: 1 },
+  { id: "hash", prompt: "What does a cryptographic hash help verify?", choices: ["Data integrity", "Market price", "Identity automatically"], correctIndex: 0 },
+];
 
 export default function Arcade() {
-  const { isAuthenticated } = useAuth();
-  const { data: tournaments, isLoading } = trpc.gamefi.tournaments.useQuery();
-  const { data: quests } = trpc.gamefi.quests.useQuery();
+  const [currentCard, setCurrentCard] = useState(7);
+  const [highLowResult, setHighLowResult] = useState("Choose higher or lower.");
+  const memoryDeck = useMemo(() => createMemoryDeck(["SKY", "AI", "WEB3", "CODE"]), []);
+  const [memoryOpen, setMemoryOpen] = useState<number[]>([]);
+  const [memoryMatched, setMemoryMatched] = useState<number[]>([]);
+  const [wordInput, setWordInput] = useState("");
+  const [words, setWords] = useState<string[]>(["block"]);
+  const [triviaAnswers, setTriviaAnswers] = useState<Record<string, number>>({});
+  const [towerOverlaps, setTowerOverlaps] = useState<number[]>([]);
+  const mines = useMemo(() => createMinesBoard(4, 4, [2, 7, 12]), []);
+  const [revealedMines, setRevealedMines] = useState<number[]>([]);
+  const [boardInput, setBoardInput] = useState({ from: "57", to: "42" });
+  const [chessMessage, setChessMessage] = useState("Knight example: 57 → 42");
+  const [checkersMessage, setCheckersMessage] = useState("Red example: 49 → 40");
 
-  const gameTypes = [
-    { name: "PvP Arena", icon: Swords, color: "oklch(0.7_0.2_0)", desc: "1v1 and team battles" },
-    { name: "Tournaments", icon: Trophy, color: "oklch(0.8_0.15_90)", desc: "Compete for prizes" },
-    { name: "Quests", icon: Target, color: "oklch(0.72 0.28 305)", desc: "Daily & weekly missions" },
-    { name: "Ranked", icon: Crown, color: "oklch(0.7_0.15_280)", desc: "Climb the ladder" },
-  ];
+  const playHighLow = (guess: "higher" | "lower") => {
+    const next = ((currentCard * 7 + 3) % 13) + 1;
+    const result = resolveHighLow(currentCard, next, guess);
+    setHighLowResult(`${currentCard} → ${next}: ${result.outcome.toUpperCase()}`);
+    setCurrentCard(next);
+  };
+
+  const flipMemory = (index: number) => {
+    if (memoryMatched.includes(index) || memoryOpen.includes(index) || memoryOpen.length >= 2) return;
+    const next = [...memoryOpen, index];
+    setMemoryOpen(next);
+    if (next.length === 2) {
+      if (isMemoryMatch(memoryDeck[next[0]], memoryDeck[next[1]])) {
+        setMemoryMatched((current) => [...current, ...next]);
+        setMemoryOpen([]);
+      } else {
+        window.setTimeout(() => setMemoryOpen([]), 650);
+      }
+    }
+  };
+
+  const addWord = () => {
+    const candidate = [...words, wordInput];
+    const result = validateWordChain(candidate);
+    if (result.valid) {
+      setWords(candidate);
+      setWordInput("");
+    }
+  };
+
+  const triviaScore = scoreTrivia(trivia, triviaAnswers);
+  const towerScore = scoreTowerStack(towerOverlaps);
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-6xl mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            <span className="bg-gradient-to-r from-[oklch(0.8_0.15_90)] to-[oklch(0.7_0.2_0)] bg-clip-text text-transparent">Arcade</span>
-          </h1>
-          <p className="text-muted-foreground">Play games, earn tokens, compete in tournaments, and climb the leaderboards.</p>
+          <Badge variant="outline" className="mb-3">Engineering beta · simulated play only</Badge>
+          <h1 className="flex items-center gap-2 text-3xl font-bold"><Gamepad2 className="h-7 w-7" /> SKY4444 Arcade Lab</h1>
+          <p className="mt-2 max-w-3xl text-muted-foreground">
+            Eight local game experiences backed by tested deterministic domain logic. No real-money wagering, custody, blockchain settlement, token payouts, or production multiplayer services are performed here.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {gameTypes.map(g => (
-            <Card key={g.name} className="p-4 border-border/50 bg-card/80 hover:border-primary/30 transition-all text-center cursor-pointer">
-              <g.icon className="w-6 h-6 mx-auto mb-2" style={{ color: g.color }} />
-              <h3 className="font-semibold text-sm">{g.name}</h3>
-              <p className="text-xs text-muted-foreground mt-1">{g.desc}</p>
-            </Card>
-          ))}
+        <div className="mb-8 grid gap-3 sm:grid-cols-3">
+          <Link href="/game/crash"><Card className="p-4 hover:border-primary"><strong>Crash</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
+          <Link href="/game/slots"><Card className="p-4 hover:border-primary"><strong>Slots</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
+          <Link href="/game/blackjack"><Card className="p-4 hover:border-primary"><strong>Blackjack</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
         </div>
 
-        {/* Casino Games */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-            <Coins className="w-5 h-5 text-yellow-400" /> Casino Games
-            <Badge className="text-[10px] bg-yellow-500/20 text-yellow-400 border-yellow-500/30 ml-1">SKY444 Wagering</Badge>
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <Tabs defaultValue="high-low">
+          <TabsList className="mb-6 flex h-auto flex-wrap justify-start">
             {[
-              { name: "Crash", icon: Flame, color: "from-red-600 to-orange-600", href: "/game/crash", desc: "Ride the curve" },
-              { name: "Slots", icon: Star, color: "from-purple-600 to-pink-600", href: "/game/slots", desc: "Spin to win" },
-              { name: "Blackjack", icon: Spade, color: "from-slate-700 to-slate-900", href: "/game/blackjack", desc: "Beat the dealer" },
-              { name: "Dice", icon: Dices, color: "from-blue-600 to-purple-600", href: "/game/dice", desc: "Over or under" },
-              { name: "Roulette", icon: CircleDot, color: "from-red-700 to-red-900", href: "/game/roulette", desc: "Spin the wheel" },
-              { name: "Plinko", icon: Circle, color: "from-yellow-500 to-orange-500", href: "/game/plinko", desc: "Drop the ball" },
-            ].map(game => (
-              <Link key={game.name} href={game.href}>
-                <Card className="p-4 border-border/50 bg-card/80 hover:border-primary/30 transition-all text-center cursor-pointer group hover:scale-105">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${game.color} flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform`}>
-                    <game.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-bold text-sm">{game.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{game.desc}</p>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </div>
+              ["high-low", "High-Low"], ["memory", "Memory"], ["word", "Word Chain"], ["trivia", "Trivia"],
+              ["tower", "Tower"], ["mines", "Mines"], ["chess", "Chess"], ["checkers", "Checkers"],
+            ].map(([value, label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+          </TabsList>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Trophy className="w-5 h-5 text-[oklch(0.8_0.15_90)]" /> Tournaments</h2>
-            {isLoading ? (
-              <div className="space-y-3">{[1,2,3].map(i => <Card key={i} className="p-4 border-border/50 animate-pulse"><div className="h-20 bg-muted rounded" /></Card>)}</div>
-            ) : tournaments && tournaments.length > 0 ? (
-              <div className="space-y-3">
-                {tournaments.map((t: any) => (
-                  <Card key={t.id} className="p-4 border-border/50 bg-card/80 hover:border-primary/30 transition-all">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-sm">{t.name}</h3>
-                      <Badge variant="secondary" className="text-[10px]">{t.status}</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">{t.description || "Compete for token rewards!"}</p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">{t.currentPlayers}/{t.maxPlayers} players</span>
-                      <span className="font-mono text-primary">Prize: {t.prizePool} SKY444</span>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card className="p-8 text-center border-border/50 bg-card/80">
-                <Trophy className="w-10 h-10 text-primary/50 mx-auto mb-3" />
-                <h3 className="font-semibold mb-1">No tournaments yet</h3>
-                <p className="text-xs text-muted-foreground">Tournaments are coming soon!</p>
-              </Card>
-            )}
-          </div>
+          <TabsContent value="high-low">
+            <GameCard title="High-Low" description="Predict whether the deterministic next card is higher or lower.">
+              <div className="text-5xl font-bold">{currentCard}</div>
+              <div className="flex gap-2"><Button onClick={() => playHighLow("higher")}>Higher</Button><Button variant="outline" onClick={() => playHighLow("lower")}>Lower</Button></div>
+              <p className="text-sm text-muted-foreground">{highLowResult}</p>
+            </GameCard>
+          </TabsContent>
 
-          <div>
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Target className="w-5 h-5 text-[oklch(0.72 0.28 305)]" /> Active Quests</h2>
-            {quests && quests.length > 0 ? (
-              <div className="space-y-3">
-                {quests.map((q: any) => (
-                  <Card key={q.id} className="p-4 border-border/50 bg-card/80 hover:border-primary/30 transition-all">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-sm">{q.title}</h3>
-                      <Badge className="text-[10px] bg-[oklch(0.8_0.15_90)]/20 text-[oklch(0.8_0.15_90)]">{q.xpReward} XP</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-2">{q.description}</p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground">{q.type} quest</span>
-                      <span className="font-mono text-primary">+{q.tokenReward} SKY444</span>
-                    </div>
-                  </Card>
-                ))}
+          <TabsContent value="memory">
+            <GameCard title="Memory Match" description="Match all four symbol pairs.">
+              <div className="grid grid-cols-4 gap-2">
+                {memoryDeck.map((card, index) => {
+                  const visible = memoryOpen.includes(index) || memoryMatched.includes(index);
+                  return <Button key={card.id} variant={visible ? "default" : "outline"} className="h-20" onClick={() => flipMemory(index)}>{visible ? card.value : "?"}</Button>;
+                })}
               </div>
-            ) : (
-              <Card className="p-8 text-center border-border/50 bg-card/80">
-                <Target className="w-10 h-10 text-primary/50 mx-auto mb-3" />
-                <h3 className="font-semibold mb-1">No quests available</h3>
-                <p className="text-xs text-muted-foreground">Daily and weekly quests are coming soon!</p>
-              </Card>
-            )}
-          </div>
-        </div>
+              <p className="text-sm text-muted-foreground">Matched {memoryMatched.length / 2}/4 pairs</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="word">
+            <GameCard title="Word Chain" description="Each new word must start with the previous word’s final letter, and repeats are rejected.">
+              <div className="flex flex-wrap gap-2">{words.map((word) => <Badge key={word}>{word}</Badge>)}</div>
+              <div className="flex gap-2"><Input value={wordInput} onChange={(event) => setWordInput(event.target.value)} placeholder="Try key, yield, data..." /><Button onClick={addWord}>Add</Button></div>
+              <p className="text-sm text-muted-foreground">Current chain: {validateWordChain(words).valid ? "valid" : "invalid"}</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="trivia">
+            <GameCard title="Crypto Trivia" description="Answer the deterministic local question set.">
+              {trivia.map((question) => <div key={question.id} className="space-y-2 rounded-lg border p-4"><p className="font-medium">{question.prompt}</p><div className="flex flex-wrap gap-2">{question.choices.map((choice, index) => <Button key={choice} variant={triviaAnswers[question.id] === index ? "default" : "outline"} onClick={() => setTriviaAnswers((current) => ({ ...current, [question.id]: index }))}>{choice}</Button>)}</div></div>)}
+              <p className="font-medium">Score: {triviaScore.correct}/{triviaScore.total} ({triviaScore.percentage}%)</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="tower">
+            <GameCard title="Tower Stack" description="Place blocks; precision falls as overlap decreases. A miss ends the run.">
+              <div className="flex gap-2"><Button onClick={() => setTowerOverlaps((current) => [...current, 1])}>Perfect</Button><Button variant="outline" onClick={() => setTowerOverlaps((current) => [...current, 0.75])}>Good</Button><Button variant="destructive" onClick={() => setTowerOverlaps((current) => [...current, 0])}>Miss</Button><Button variant="ghost" onClick={() => setTowerOverlaps([])}>Reset</Button></div>
+              <p>Placed: {towerScore.placed} · Score: {towerScore.score}</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="mines">
+            <GameCard title="Mines" description="Reveal a deterministic 4×4 minefield generated by the tested adjacency engine.">
+              <div className="grid w-fit grid-cols-4 gap-1">{mines.map((value, index) => <Button key={index} variant="outline" className="h-12 w-12 p-0" onClick={() => setRevealedMines((current) => current.includes(index) ? current : [...current, index])}>{revealedMines.includes(index) ? (value === -1 ? "✹" : value) : "?"}</Button>)}</div>
+              <p className="text-sm text-muted-foreground">Simulation only; no wager or payout.</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="chess">
+            <GameCard title="Web3 Chess Move Lab" description="Validate local chess-piece movement geometry. Occupancy, check/checkmate, castling and en-passant are not yet modeled.">
+              <BoardInputs value={boardInput} onChange={setBoardInput} />
+              <div className="flex flex-wrap gap-2">{(["king", "queen", "rook", "bishop", "knight", "pawn"] as const).map((piece) => <Button key={piece} variant="outline" onClick={() => setChessMessage(`${piece}: ${isLegalChessGeometry(piece, Number(boardInput.from), Number(boardInput.to), "white") ? "legal geometry" : "illegal geometry"}`)}>{piece}</Button>)}</div>
+              <p>{chessMessage}</p>
+            </GameCard>
+          </TabsContent>
+
+          <TabsContent value="checkers">
+            <GameCard title="Checkers Move Lab" description="Validate bounded diagonal red/black steps; captures and full board-state rules remain separate work.">
+              <BoardInputs value={boardInput} onChange={setBoardInput} />
+              <div className="flex gap-2"><Button onClick={() => setCheckersMessage(`red: ${isLegalCheckersStep(Number(boardInput.from), Number(boardInput.to), "red") ? "legal" : "illegal"}`)}>Red</Button><Button variant="outline" onClick={() => setCheckersMessage(`black: ${isLegalCheckersStep(Number(boardInput.from), Number(boardInput.to), "black") ? "legal" : "illegal"}`)}>Black</Button></div>
+              <p>{checkersMessage}</p>
+            </GameCard>
+          </TabsContent>
+        </Tabs>
+
+        <Card className="mt-8 border-primary/30">
+          <CardContent className="flex gap-3 p-5 text-sm text-muted-foreground"><ShieldCheck className="h-5 w-5 shrink-0 text-primary" /> These games intentionally remain local engineering-beta experiences. Multiplayer matchmaking, durable rankings, real rewards, payments, custody and blockchain execution require separately verified integrations.</CardContent>
+        </Card>
       </div>
     </div>
   );
+}
+
+function GameCard({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
+  return <Card><CardHeader><CardTitle>{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader><CardContent className="space-y-5">{children}</CardContent></Card>;
+}
+
+function BoardInputs({ value, onChange }: { value: { from: string; to: string }; onChange: (value: { from: string; to: string }) => void }) {
+  return <div className="grid max-w-sm grid-cols-2 gap-2"><Input aria-label="From square" value={value.from} onChange={(event) => onChange({ ...value, from: event.target.value })} placeholder="from 0-63" /><Input aria-label="To square" value={value.to} onChange={(event) => onChange({ ...value, to: event.target.value })} placeholder="to 0-63" /></div>;
 }
