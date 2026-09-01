@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "catalogVersion": "1.0.0",
+  "catalogTitle": "SKYCOIN4444 Mission Control Engineering Beta Surface",
+  "canonicalRepository": "skylerblue333/skycoin4444",
+  "releaseChannel": "invitation-only-engineering-beta",
+  "sourceOfTruth": "BETA_SCOPE.md",
+  "statusVocabulary": {
+    "available_in_beta": "Deployed, release-approved, and verified in the current beta environment.",
+    "engineering_beta": "Verified first-party source-control or CI integration without independently verified external-provider operation.",
+    "planned": "Represented in the product direction but unavailable to testers.",
+    "unavailable": "Excluded from the current beta or blocked by unverified dependencies."
+  },
+  "betaJourney": {
+    "name": "Mission Control discovery and one verified non-financial workflow",
+    "steps": [
+      "Review the capability catalog and availability labels.",
+      "Sign in only when the deployed authentication and session path is verified.",
+      "Use a profile only when deployed persistence, consent, and privacy controls are verified.",
+      "Complete one approved non-financial course or creator workflow.",
+      "Submit feedback through the monitored beta support route."
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "mission-control-catalog",
+      "name": "Mission Control discovery",
+      "status": "available_in_beta",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "routes": ["/mission-control"],
+        "packages": ["client/src/pages/MissionControl.tsx"]
+      },
+      "requirements": [
+        "The deployed route passes a release-environment smoke test.",
+        "Every displayed capability has a current catalog status.",
+        "Unavailable capabilities cannot be mistaken for provider-backed services."
+      ],
+      "ownerRole": "Beta release owner"
+    },
+    {
+      "id": "account-profile",
+      "name": "Account and profile",
+      "status": "engineering_beta",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "packages": ["SkyAuth", "SkyIdentity", "SkyConsent", "SkyPrivacy"]
+      },
+      "requirements": [
+        "Authentication and session configuration are independently verified in the beta environment.",
+        "Persistence, consent, privacy notice, deletion/support path, and failure behavior are verified before promotion to available_in_beta."
+      ],
+      "ownerRole": "Identity and privacy owner"
+    },
+    {
+      "id": "curated-course-or-creator-workflow",
+      "name": "Curated course or creator workflow",
+      "status": "engineering_beta",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "packages": ["SkyClassroom", "SkyCreatorStudio"]
+      },
+      "requirements": [
+        "One specific workflow is selected and named in the release record.",
+        "The end-to-end path has automated and release-environment smoke-test evidence.",
+        "The workflow does not require any excluded financial, custody, or unverified provider operation."
+      ],
+      "ownerRole": "Experience owner"
+    },
+    {
+      "id": "feedback-and-support",
+      "name": "Feedback and support intake",
+      "status": "available_in_beta",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "documentation": [
+          "BETA_SCOPE.md",
+          "BETA_RELEASE_CHECKLIST.md",
+          "SECURITY.md"
+        ]
+      },
+      "requirements": [
+        "A monitored feedback destination and triage owner are recorded in the release record.",
+        "Security-sensitive reports follow SECURITY.md rather than a public feedback channel."
+      ],
+      "ownerRole": "Beta operations owner"
+    },
+    {
+      "id": "financial-and-live-web3",
+      "name": "Financial, custody, and live Web3 operations",
+      "status": "unavailable",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "packages": [
+          "SkyPayments",
+          "SkyCheckout",
+          "SkyAccounting",
+          "Sky4WalletEngine",
+          "Sky4CrossChainBridge",
+          "Sky4StakingEngine",
+          "Sky4CoreLedger"
+        ]
+      },
+      "requirements": [
+        "Separate security, operational, provider, legal, and release evidence is required before any public exposure."
+      ],
+      "ownerRole": "Not assigned for this beta"
+    },
+    {
+      "id": "external-provider-integrations",
+      "name": "External provider integrations",
+      "status": "unavailable",
+      "source": {
+        "repository": "skylerblue333/skycoin4444",
+        "packages": ["provider adapters and configured server integrations"]
+      },
+      "requirements": [
+        "Each provider must be configured, least-privilege reviewed, tested for success and failure behavior, monitored, and separately release-approved."
+      ],
+      "ownerRole": "Integration owner"
+    }
+  ],
+  "excludedCategories": [
+    "payments",
+    "banking",
+    "financial settlement",
+    "trading",
+    "lending and borrowing",
+    "wallet custody",
+    "private-key or seed handling",
+    "token issuance or transfer",
+    "NFT transfer",
+    "blockchain transaction execution",
+    "cross-chain bridging",
+    "staking",
+    "validator or mining operation",
+    "governance execution",
+    "identity proofing or KYC/AML decisions",
+    "unverified AI, cloud, messaging, storage, analytics, OAuth, or blockchain-provider operation"
+  ],
+  "releaseEvidenceRequired": [
+    "canonical commit SHA",
+    "successful exact-head required CI checks",
+    "immutable engineering-beta RC tag",
+    "deployed-environment smoke-test record",
+    "dependency and data-boundary record",
+    "known-issues and support route",
+    "rollback action and release owner"
+  ]
+}
