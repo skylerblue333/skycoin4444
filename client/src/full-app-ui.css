@@ -1,0 +1,106 @@
+html { scroll-behavior: smooth; }
+
+body {
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 15% 0%, rgb(99 102 241 / 0.07), transparent 28rem),
+    radial-gradient(circle at 85% 8%, rgb(14 165 233 / 0.05), transparent 26rem),
+    var(--background);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgb(99 102 241 / 0.2); }
+
+:focus-visible {
+  outline: 3px solid rgb(99 102 241 / 0.28);
+  outline-offset: 2px;
+}
+
+#root { min-height: 100vh; }
+
+main { isolation: isolate; }
+
+button, input, textarea, select { font: inherit; }
+
+input, textarea, select {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.09);
+}
+
+a { text-underline-offset: 3px; }
+
+img, video, canvas, svg { max-width: 100%; }
+
+[data-slot="card"], .premium-surface {
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 34px rgb(15 23 42 / 0.045);
+}
+
+[data-slot="dialog-content"], [role="dialog"] {
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 80px rgb(15 23 42 / 0.2);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead th {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+tbody tr { transition: background-color 140ms ease; }
+tbody tr:hover { background: rgb(248 250 252 / 0.82); }
+
+code, pre, kbd, samp { font-variant-ligatures: none; }
+
+pre {
+  overflow-x: auto;
+  border-radius: 0.9rem;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.65) transparent;
+}
+
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184 / 0.55);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+@media (max-width: 640px) {
+  h1 { text-wrap: balance; }
+  button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 15% 0%, rgb(99 102 241 / 0.1), transparent 28rem),
+    radial-gradient(circle at 85% 8%, rgb(14 165 233 / 0.08), transparent 26rem),
+    var(--background);
+}
+
+.dark tbody tr:hover { background: rgb(30 41 59 / 0.62); }
