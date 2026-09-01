@@ -58,10 +58,10 @@ export function validateDatingProfile(profile: ProfileFormData) {
 }
 
 export function toSavedDatingProfile(profile: ProfileFormData): SavedProfile {
+  const { photos, ...persistable } = profile;
   return {
-    ...profile,
-    photos: undefined as never,
-    photoCount: profile.photos.length,
+    ...persistable,
+    photoCount: photos.length,
     savedAt: new Date().toISOString(),
     storage: 'browser-session',
   };
