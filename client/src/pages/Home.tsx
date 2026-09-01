@@ -22,7 +22,7 @@ const MODULES = [
   { title: "SkyLive", detail: "Creator and streaming interface", href: "/live", icon: Radio, className: "from-indigo-500 to-blue-700" },
   { title: "Dating", detail: "Connection discovery preview", href: "/dating-home", icon: Heart, className: "from-pink-500 to-rose-700" },
   { title: "Marketplace", detail: "Commerce integration surface", href: "/marketplace", icon: ShoppingBag, className: "from-orange-500 to-amber-700" },
-  { title: "Education", detail: "Learning and course experiences", href: "/education", icon: GraduationCap, className: "from-emerald-500 to-teal-700" },
+  { title: "Education", detail: "Learning and course experiences", href: "/school", icon: GraduationCap, className: "from-emerald-500 to-teal-700" },
   { title: "Analytics", detail: "Metrics and reporting interfaces", href: "/analytics", icon: BarChart3, className: "from-cyan-500 to-sky-700" },
 ] as const;
 
