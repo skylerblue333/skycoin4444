@@ -26,11 +26,11 @@ test('course catalog has twelve tracks and nine authored gap cores', () => {
   }
 });
 
-test('game catalog separates routed surfaces from tested local gap cores', () => {
+test('all twenty catalog games now have a live beta surface and thirteen have local gap cores', () => {
   assert.equal(catalog.games.length, 20);
   assertUniqueIds(catalog.games, 'game');
-  assert.equal(catalog.games.filter((game) => game.gapDomainCore).length, 8);
-  assert.ok(catalog.games.filter((game) => game.existingSurface).length >= 7);
+  assert.equal(catalog.games.filter((game) => game.gapDomainCore).length, 13);
+  assert.equal(catalog.games.filter((game) => game.existingSurface).length, 20);
   for (const game of catalog.games) {
     assert.equal(typeof game.existingSurface, 'boolean');
     assert.equal(typeof game.gapDomainCore, 'boolean');
@@ -40,4 +40,5 @@ test('game catalog separates routed surfaces from tested local gap cores', () =>
 test('catalog does not claim production external services', () => {
   assert.equal(catalog.status, 'engineering-beta');
   assert.match(catalog.purpose, /does not claim live payments/i);
+  assert.match(catalog.purpose, /does not claim.*wagering/i);
 });
