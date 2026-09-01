@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "status": "engineering-beta",
-  "purpose": "Canonical discovery catalog for SkySchool learning content and gaming capabilities. UI surfaces, local domain cores, and archive-only evidence are tracked separately. This registry does not claim live payments, wagering, blockchain settlement, or production multiplayer services.",
+  "purpose": "Canonical discovery catalog for SkySchool learning content and gaming capabilities. UI surfaces, local domain cores, and archive-only evidence are tracked separately. This registry does not claim live payments, wagering, blockchain settlement, token payouts, custody, or production multiplayer services.",
   "courses": [
     {"id":"btc-101","title":"Bitcoin Fundamentals","level":"beginner","category":"blockchain","lessons":5,"archiveBaseline":true,"authoredGapCore":false},
     {"id":"eth-101","title":"Ethereum & Smart Contracts","level":"beginner","category":"smart-contracts","lessons":5,"archiveBaseline":true,"authoredGapCore":false},
@@ -18,24 +18,24 @@
   ],
   "games": [
     {"id":"blackjack","title":"Blackjack","kind":"card","mode":"single-player","existingSurface":true,"gapDomainCore":false},
-    {"id":"roulette","title":"Roulette","kind":"chance","mode":"single-player","existingSurface":false,"gapDomainCore":false},
+    {"id":"roulette","title":"Roulette","kind":"chance","mode":"single-player","existingSurface":true,"gapDomainCore":true},
     {"id":"slots","title":"Slots","kind":"arcade","mode":"single-player","existingSurface":true,"gapDomainCore":false},
-    {"id":"dice","title":"Dice","kind":"chance","mode":"single-player","existingSurface":false,"gapDomainCore":false},
-    {"id":"snake","title":"Snake","kind":"arcade","mode":"single-player","existingSurface":false,"gapDomainCore":false},
-    {"id":"tic-tac-toe","title":"Tic-Tac-Toe","kind":"board","mode":"local","existingSurface":false,"gapDomainCore":false},
-    {"id":"assembly-puzzle","title":"Assembly Puzzle","kind":"puzzle","mode":"single-player","existingSurface":false,"gapDomainCore":false},
+    {"id":"dice","title":"Dice","kind":"chance","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"snake","title":"Snake","kind":"arcade","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"tic-tac-toe","title":"Tic-Tac-Toe","kind":"board","mode":"local","existingSurface":true,"gapDomainCore":true},
+    {"id":"assembly-puzzle","title":"Assembly Puzzle","kind":"puzzle","mode":"single-player","existingSurface":true,"gapDomainCore":true},
     {"id":"crash","title":"Crash","kind":"arcade-simulation","mode":"single-player","existingSurface":true,"gapDomainCore":false},
     {"id":"block-builder","title":"Block Builder","kind":"puzzle","mode":"single-player","existingSurface":true,"gapDomainCore":false},
     {"id":"crypto-quiz","title":"Crypto Quiz","kind":"quiz","mode":"single-player","existingSurface":true,"gapDomainCore":false},
     {"id":"token-tap","title":"Token Tap","kind":"arcade","mode":"single-player","existingSurface":true,"gapDomainCore":false},
     {"id":"gamefi-quest-board","title":"GameFi Quest Board","kind":"quest","mode":"progression","existingSurface":true,"gapDomainCore":false},
-    {"id":"chess","title":"Web3 Chess","kind":"board","mode":"two-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"high-low","title":"High-Low","kind":"card","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"memory-match","title":"Memory Match","kind":"puzzle","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"word-chain","title":"Word Chain","kind":"word","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"crypto-trivia","title":"Crypto Trivia","kind":"quiz","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"tower-stack","title":"Tower Stack","kind":"arcade","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"mines","title":"Mines","kind":"puzzle-simulation","mode":"single-player","existingSurface":false,"gapDomainCore":true},
-    {"id":"checkers","title":"Checkers","kind":"board","mode":"two-player","existingSurface":false,"gapDomainCore":true}
+    {"id":"chess","title":"Web3 Chess","kind":"board","mode":"two-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"high-low","title":"High-Low","kind":"card","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"memory-match","title":"Memory Match","kind":"puzzle","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"word-chain","title":"Word Chain","kind":"word","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"crypto-trivia","title":"Crypto Trivia","kind":"quiz","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"tower-stack","title":"Tower Stack","kind":"arcade","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"mines","title":"Mines","kind":"puzzle-simulation","mode":"single-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"checkers","title":"Checkers","kind":"board","mode":"two-player","existingSurface":true,"gapDomainCore":true}
   ]
 }
