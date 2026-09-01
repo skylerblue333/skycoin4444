@@ -13,9 +13,11 @@ function assertUniqueIds(items, label) {
   assert.equal(new Set(ids).size, ids.length, `${label} ids must be unique`);
 }
 
-test('course catalog has meaningful gap-fill coverage', () => {
-  assert.ok(catalog.courses.length >= 12);
+test('course catalog has twelve tracks and nine authored gap cores', () => {
+  assert.equal(catalog.courses.length, 12);
   assertUniqueIds(catalog.courses, 'course');
+  assert.equal(catalog.courses.filter((course) => course.authoredGapCore).length, 9);
+  assert.equal(catalog.courses.filter((course) => course.archiveBaseline).length, 3);
   for (const course of catalog.courses) {
     assert.match(course.id, /^[a-z0-9-]+$/);
     assert.ok(course.title.length >= 4);
@@ -24,11 +26,14 @@ test('course catalog has meaningful gap-fill coverage', () => {
   }
 });
 
-test('game catalog records verified surfaces separately from gaps', () => {
-  assert.ok(catalog.games.length >= 20);
+test('game catalog separates routed surfaces from tested local gap cores', () => {
+  assert.equal(catalog.games.length, 20);
   assertUniqueIds(catalog.games, 'game');
+  assert.equal(catalog.games.filter((game) => game.gapDomainCore).length, 8);
+  assert.ok(catalog.games.filter((game) => game.existingSurface).length >= 7);
   for (const game of catalog.games) {
     assert.equal(typeof game.existingSurface, 'boolean');
+    assert.equal(typeof game.gapDomainCore, 'boolean');
   }
 });
 
