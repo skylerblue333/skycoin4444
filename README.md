@@ -44,6 +44,9 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/INTEGRATION_CONTRACTS.md`](docs/INTEGRATION_CONTRACTS.md) — cross-product contracts and fail-closed behavior.
 - [`docs/ENGINEERING_BETA_LIMITATIONS.md`](docs/ENGINEERING_BETA_LIMITATIONS.md) — explicit non-production limitations.
 - [`docs/CANONICAL_ARCHITECTURE_INVENTORY.md`](docs/CANONICAL_ARCHITECTURE_INVENTORY.md) — evidence-based authoritative-vs-legacy inventory rules.
+- [`BETA_SCOPE.md`](BETA_SCOPE.md) — Mission Control invitation-only beta promise, included surfaces, and explicit exclusions.
+- [`BETA_RELEASE_CHECKLIST.md`](BETA_RELEASE_CHECKLIST.md) — required evidence for every beta promotion.
+- [`catalogs/mission-control-beta.json`](catalogs/mission-control-beta.json) — machine-readable beta capability register and availability labels.
 - [`SECURITY.md`](SECURITY.md) — security reporting and current threat boundaries.
 
 Historical audit/readiness documents should be treated as dated evidence snapshots unless they explicitly identify a newer default-branch SHA.
