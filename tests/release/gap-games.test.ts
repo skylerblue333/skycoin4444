@@ -51,7 +51,7 @@ describe('gap game engineering-beta domain cores', () => {
 
   it('validates bounded checkers and chess geometry', () => {
     expect(isLegalCheckersStep(49, 40, 'red')).toBe(true);
-    expect(isLegalCheckersStep(49, 42, 'red')).toBe(false);
+    expect(isLegalCheckersStep(49, 41, 'red')).toBe(false);
     expect(isLegalChessGeometry('knight', 57, 42, 'white')).toBe(true);
     expect(isLegalChessGeometry('rook', 0, 7, 'white')).toBe(true);
     expect(isLegalChessGeometry('bishop', 0, 7, 'white')).toBe(false);
