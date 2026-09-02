@@ -9,7 +9,7 @@ const routeSource =
 
 const lazyPages = new Map();
 for (const match of appSource.matchAll(
-  /const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]\.\/pages\/([^'"]+)['"]\)\)/g
+  /const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]\.\/pages\/([^'"]+)['"]\)/g
 )) {
   lazyPages.set(match[1], match[2]);
 }
