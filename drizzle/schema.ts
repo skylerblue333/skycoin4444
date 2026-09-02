@@ -1,5 +1,5 @@
 
-import { mysqlTable, varchar, text, int, float, boolean, timestamp, primaryKey } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, int, float, boolean, timestamp, primaryKey, uniqueIndex } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
@@ -208,6 +208,20 @@ export const betaFeedback = mysqlTable("beta_feedback", {
 
 export type BetaFeedback = typeof betaFeedback.$inferSelect;
 export type InsertBetaFeedback = typeof betaFeedback.$inferInsert;
+
+// ============ SKY SCHOOL COURSE PROGRESS TABLE ============
+export const courseProgress = mysqlTable("course_progress", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  courseId: varchar("course_id", { length: 120 }).notNull(),
+  lessonId: varchar("lesson_id", { length: 120 }).notNull(),
+  completedAt: timestamp("completed_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userCourseLessonUnique: uniqueIndex("course_progress_user_course_lesson_unique").on(table.userId, table.courseId, table.lessonId),
+}));
+
+export type CourseProgress = typeof courseProgress.$inferSelect;
+export type InsertCourseProgress = typeof courseProgress.$inferInsert;
 
 // ============ TOKEN BALANCES TABLE ============
 export const tokenBalances = mysqlTable("token_balances", {
