@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import BetaAreaCatalog from "./pages/BetaAreaCatalog";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -1638,6 +1639,7 @@ function Router() {
         <Route path="/mining-dashboard" component={MiningDashboard} />
         <Route path="/mining-pool-selector" component={MiningPoolSelector} />
         <Route path="/mission-control" component={MissionControl} />
+        <Route path="/beta-catalog" component={BetaAreaCatalog} />
         <Route path="/mobile" component={Mobile} />
         <Route path="/mobile-app" component={MobileApp} />
         <Route path="/mobile-gaming" component={MobileGaming} />
