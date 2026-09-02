@@ -11,7 +11,7 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 | Launchable beta routes            |    13 |
 | Controlled or unavailable routes  |    64 |
 | Legacy unverified routes          |   987 |
-| Routes missing a lazy page source |    12 |
+| Routes missing a lazy page source |     3 |
 
 ## Launchable beta routes
 

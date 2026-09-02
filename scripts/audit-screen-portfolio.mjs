@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import prettier from "prettier";
 
 const root = process.cwd();
 const appSource = await readFile(path.join(root, "client/src/App.tsx"), "utf8");
@@ -11,6 +12,12 @@ for (const match of appSource.matchAll(
   /const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]\.\/pages\/([^'"]+)['"]\)\)/g
 )) {
   lazyPages.set(match[1], match[2]);
+}
+const directPages = new Map();
+for (const match of appSource.matchAll(
+  /import\s+(\w+)\s+from\s+['"]\.\/pages\/([^'"]+)['"]/g
+)) {
+  directPages.set(match[1], match[2]);
 }
 
 const protectedBetaPaths = new Set([
@@ -52,10 +59,12 @@ for (const match of routeSource.matchAll(
   routes.push({
     path: routePath,
     component,
-    page: lazyPages.get(component) ?? component,
+    page: lazyPages.get(component) ?? directPages.get(component) ?? component,
     readiness: classify(routePath),
     requiresAuth: protectedBetaPaths.has(routePath),
-    sourceExists: Boolean(lazyPages.get(component)),
+    sourceExists: Boolean(
+      lazyPages.get(component) || directPages.get(component)
+    ),
   });
 }
 
@@ -68,6 +77,7 @@ const inventory = {
   source: "client/src/App.tsx",
   totalRoutes: routes.length,
   totalLazyPages: lazyPages.size,
+  totalDirectPages: directPages.size,
   counts,
   launchableBetaRoutes: routes
     .filter(route => route.readiness === "launchable_beta")
@@ -107,9 +117,12 @@ const markdown = [
   "Routes classified as controlled or unavailable must not be promoted merely because a component exists. Financial settlement, custody, signing, production-chain writes, transfers, staking, and provider-backed operations require separate evidence and release approval.",
   "",
 ].join("\n");
+const formattedMarkdown = await prettier.format(`${markdown}\n`, {
+  parser: "markdown",
+});
 await writeFile(
   path.join(root, "docs/release/SCREEN_PORTFOLIO_INVENTORY.md"),
-  `${markdown}\n`
+  formattedMarkdown
 );
 
 console.log(
