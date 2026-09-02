@@ -157,6 +157,19 @@
 
 ---
 
+## Actual ecosystem build continuation
+
+- [x] Re-establish the canonical flagship repository working tree and verify the current main baseline.
+- [x] Inventory existing apps, packages, routes, migrations, and beta gates in the canonical codebase.
+- [x] Identify the next incomplete capability in the required sequence after foundations and education.
+- [x] Implement the next controlled beta slice with explicit availability and fail-closed high-risk behavior.
+- [x] Run repository checks, tests, builds, and route-level verification; record evidence.
+- [x] Commit and merge the verified implementation to the canonical GitHub repository through PR #232.
+- [ ] Deploy the course-progress migration and run release-environment smoke tests before changing catalog status.
+- [ ] Add controlled read-only/testnet NFT and protocol views after the first education journey is independently verified.
+
+> Scope guard: do not enable live financial settlement, custody, or production chain execution without independent evidence and explicit release approval.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
