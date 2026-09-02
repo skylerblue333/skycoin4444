@@ -234,6 +234,14 @@
 - [ ] Add route smoke, safety, and regression coverage for the new batch.
 - [ ] Run full gates, push through GitHub CI, and merge the verified batch.
 
+## Read-only Web3 and protocol batch
+
+- [ ] Audit Web3, NFT, wallet, protocol, and explorer routes for truthful read-only data and unsafe action paths.
+- [ ] Select views that can be promoted with local or explicitly labeled fixtures and no signing, custody, transfers, or chain writes.
+- [ ] Implement the selected read-only views and clear unavailable states for all high-risk actions.
+- [ ] Add route, safety, and regression coverage to the local smoke and release suites.
+- [ ] Run all gates, push through GitHub CI, and merge the verified batch.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release

@@ -32,6 +32,11 @@ const protocolSignals = [
   ["Mainnet", "No connection configured", "unavailable"],
 ] as const;
 
+const tokenMetadata = [
+  { symbol: "SKY444", name: "Skycoin beta token metadata", network: "local", decimals: 8, address: "not deployed" },
+  { symbol: "SKYTEST", name: "Testnet fixture token metadata", network: "testnet", decimals: 8, address: "0xtest…metadata" },
+] as const;
+
 export default function BetaWeb3Sandbox() {
   const [query, setQuery] = useState("");
   const [network, setNetwork] = useState<"all" | NFTFixture["network"]>("all");
@@ -74,6 +79,17 @@ export default function BetaWeb3Sandbox() {
               <CardContent><Badge variant={status === "verified" ? "default" : "outline"}>{status}</Badge></CardContent>
             </Card>
           ))}
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader><CardTitle className="flex items-center gap-2"><Database className="h-5 w-5" />Token metadata registry</CardTitle><CardDescription>Schema-validated display metadata only; no balances, pricing, minting, or transfer claims.</CardDescription></CardHeader>
+            <CardContent className="space-y-3">{tokenMetadata.map((token) => <div key={token.symbol} className="rounded-lg border p-4"><div className="flex items-center justify-between gap-3"><div><p className="font-semibold">{token.symbol}</p><p className="text-sm text-muted-foreground">{token.name}</p></div><Badge variant="outline">{token.network}</Badge></div><p className="mt-2 text-xs text-muted-foreground">Decimals: {token.decimals} · Contract: {token.address}</p></div>)}</CardContent>
+          </Card>
+          <Card className="border-amber-500/30 bg-amber-500/5">
+            <CardHeader><CardTitle className="flex items-center gap-2"><LockKeyhole className="h-5 w-5" />Wallet observation</CardTitle><CardDescription>Connection and signing are not part of this beta.</CardDescription></CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground"><p>No address, balance, transaction history, or portfolio value is displayed.</p><p>No wallet connector, private-key input, signature request, custody, transfer, or chain submission is available.</p><Badge variant="outline" className="border-destructive/40 text-destructive">Wallet actions unavailable</Badge></CardContent>
+          </Card>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
