@@ -195,6 +195,37 @@
 - [ ] Run typecheck, tests, build, smoke checks, and diff validation after the repair.
 - [ ] Push the verified repair through a GitHub pull request and report remaining local steps.
 
+## Mac download diagnosis
+
+- [ ] Confirm the first blocking error in the downloaded terminal output.
+- [ ] Distinguish missing optional tools from required runtime prerequisites.
+- [ ] Verify the repository contains the local environment template and setup scripts.
+- [ ] Provide a corrected, copy-pasteable Mac launch sequence with recovery for interrupted installs.
+
+## Latest Mac install diagnosis
+
+- [ ] Confirm that the latest output still fails before development-server startup.
+- [ ] Explain the `zsh: command not found: #` comment-line noise without treating it as the main blocker.
+- [ ] Provide the exact next step for the unresolved `esbuild` macOS linker failure.
+- [ ] State when `pnpm local:smoke` is safe to run and when the localhost URL should be opened.
+
+## Mac build failure diagnosis
+
+- [ ] Capture the exact error lines immediately above `failed in 154 ms at pnpm build`.
+- [ ] Determine whether the failure is still the macOS linker issue or a separate project build error.
+- [ ] Apply the smallest safe repair or prerequisite change.
+- [ ] Verify install, build, server startup, and smoke-test order.
+
+## Full portfolio beta readiness
+
+- [ ] Inventory every registered screen and map it to a capability, route, package, and readiness state.
+- [ ] Separate launchable beta surfaces from controlled, unavailable, legacy, and unsafe routes.
+- [ ] Make the beta catalog the single source of truth for what users can test locally.
+- [ ] Add route smoke coverage for every launchable beta surface and fail-closed coverage for gated surfaces.
+- [ ] Improve local startup diagnostics so the full test path is obvious and repeatable.
+- [ ] Implement high-value route batches without fabricating production activity or enabling high-risk side effects.
+- [ ] Push verified batches through GitHub CI and document the complete local test matrix.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
