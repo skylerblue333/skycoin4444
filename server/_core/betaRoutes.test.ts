@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { registerBetaRoutes } from "./betaRoutes";
+import { db } from "../db";
 
-type Handler = (req: unknown, res: Record<string, unknown>) => void;
+type Handler = (req: unknown, res: Record<string, unknown>) => void | Promise<void>;
 
 type FakeApp = {
   routes: Record<string, Handler>;
@@ -19,12 +20,16 @@ function createFakeApp(): FakeApp {
 }
 
 function createResponse() {
-  const body: { headers: Record<string, string>; payload?: unknown } = {
+  const body: { headers: Record<string, string>; payload?: unknown; statusCode?: number } = {
     headers: {},
   };
   const response: Record<string, unknown> = {
     set(name: string, value: string) {
       body.headers[name] = value;
+      return response;
+    },
+    status(code: number) {
+      body.statusCode = code;
       return response;
     },
     json(payload: unknown) {
@@ -49,6 +54,32 @@ describe("beta status routes", () => {
       catalogAreas: 30,
       liveFinancialOrChainExecution: false,
     });
+  });
+
+  it("reports ready only when the database probe succeeds", async () => {
+    const app = createFakeApp();
+    registerBetaRoutes(app as never);
+    const { body, response } = createResponse();
+    const execute = vi.spyOn(db, "execute").mockResolvedValueOnce([] as never);
+
+    await app.routes["/api/beta/readiness"]({}, response);
+
+    expect(execute).toHaveBeenCalledOnce();
+    expect(body.payload).toMatchObject({ status: "ready", database: "ok", liveFinancialOrChainExecution: false });
+    execute.mockRestore();
+  });
+
+  it("fails closed when the database probe is unavailable", async () => {
+    const app = createFakeApp();
+    registerBetaRoutes(app as never);
+    const { body, response } = createResponse();
+    const execute = vi.spyOn(db, "execute").mockRejectedValueOnce(new Error("database offline"));
+
+    await app.routes["/api/beta/readiness"]({}, response);
+
+    expect(body.statusCode).toBe(503);
+    expect(body.payload).toMatchObject({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
+    execute.mockRestore();
   });
 
   it("serves all registered areas with no-store caching", () => {
