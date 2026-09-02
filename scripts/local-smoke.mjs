@@ -15,6 +15,7 @@ const checks = [
   ["course catalog", "/course-catalog"],
   ["beta commerce", "/beta-commerce"],
   ["beta web3", "/beta-web3"],
+  ["local AI sandbox", "/a-i-tools-hub"],
   ["beta feedback", "/beta-feedback"],
   ["community hub", "/community-hub"],
   ["activity feed", "/activity-feed"],

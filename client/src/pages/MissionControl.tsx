@@ -47,6 +47,11 @@ const BETA_JOURNEYS = [
     label: "Beta feedback",
     detail: "Send a monitored product report or reproduction note.",
   },
+  {
+    path: "/a-i-tools-hub",
+    label: "Local AI sandbox",
+    detail: "Draft, extract actions, and scan sensitive wording in-browser.",
+  },
 ] as const;
 
 const TABS = [
