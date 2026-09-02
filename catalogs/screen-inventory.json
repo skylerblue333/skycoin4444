@@ -1,7 +1,7 @@
 {
   "source": "client/src/App.tsx",
   "totalRoutes": 1064,
-  "totalLazyPages": 1052,
+  "totalLazyPages": 1055,
   "totalDirectPages": 7,
   "counts": {
     "launchable_beta": 13,
@@ -23,11 +23,7 @@
     "/profile",
     "/sign-up-flow"
   ],
-  "missingSourceRoutes": [
-    "/sign-up-flow",
-    "/sky-school-quiz",
-    "/voice-commands"
-  ],
+  "missingSourceRoutes": [],
   "routes": [
     {
       "path": "/",
@@ -6771,7 +6767,7 @@
       "page": "SignUpFlow",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/sign-up_old",
@@ -6827,7 +6823,7 @@
       "page": "SkySchoolQuiz",
       "readiness": "legacy_unverified",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/sky-store",
@@ -8323,7 +8319,7 @@
       "page": "VoiceCommands",
       "readiness": "legacy_unverified",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/voice-commands-registry",
