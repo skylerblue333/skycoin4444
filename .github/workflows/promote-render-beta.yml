@@ -1,0 +1,40 @@
+name: Promote beta to Render
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Exact green main commit or immutable beta tag to deploy"
+        required: true
+        default: "main"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy selected beta commit
+    runs-on: ubuntu-latest
+    environment: beta
+    steps:
+      - name: Trigger Render deploy
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          test -n "$RENDER_DEPLOY_HOOK_URL"
+          curl --fail-with-body --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
+
+      - name: Wait for beta health
+        env:
+          RENDER_HEALTH_URL: ${{ vars.RENDER_HEALTH_URL }}
+        run: |
+          test -n "$RENDER_HEALTH_URL"
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$RENDER_HEALTH_URL" | grep -q 'invitation-only-engineering-beta'; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Render beta did not report the expected release channel in time" >&2
+          exit 1
