@@ -170,6 +170,14 @@
 
 > Scope guard: do not enable live financial settlement, custody, or production chain execution without independent evidence and explicit release approval.
 
+## Fast product build
+
+- [ ] Ship one end-to-end user workflow with real server persistence and clear authenticated states.
+- [ ] Add release-environment smoke coverage for sign-in, database migration, and the primary workflow.
+- [ ] Ship the next highest-value product surface as a governed pull request with CI evidence.
+- [ ] Keep high-risk financial, custody, and production-chain actions explicitly unavailable until provider and independent-evidence gates pass.
+- [ ] Push every verified product increment through GitHub pull requests and merge only after required CI succeeds.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
