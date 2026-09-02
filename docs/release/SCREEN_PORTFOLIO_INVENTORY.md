@@ -1,0 +1,34 @@
+# Skycoin4444 Screen Portfolio Inventory
+
+Generated from client/src/App.tsx. This report is an engineering inventory, not a claim that every historical screen is production-ready.
+
+## Summary
+
+| Measure                           | Count |
+| --------------------------------- | ----: |
+| Registered routes                 |  1064 |
+| Lazy page modules                 |  1052 |
+| Launchable beta routes            |    13 |
+| Controlled or unavailable routes  |    64 |
+| Legacy unverified routes          |   987 |
+| Routes missing a lazy page source |    12 |
+
+## Launchable beta routes
+
+- /
+- /activity-feed
+- /community-hub
+- /course-catalog
+- /mission-control
+- /beta-catalog
+- /beta-journey
+- /beta-commerce
+- /beta-web3
+- /beta-feedback
+- /onboarding
+- /profile
+- /sign-up-flow
+
+## Safety boundary
+
+Routes classified as controlled or unavailable must not be promoted merely because a component exists. Financial settlement, custody, signing, production-chain writes, transfers, staking, and provider-backed operations require separate evidence and release approval.
