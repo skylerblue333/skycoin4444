@@ -25,17 +25,20 @@ const publicUserFields = {
   createdAt: users.createdAt,
 };
 
-function publicProfile(user: typeof users.$inferSelect, followerCount: number, email: string | null) {
+export function publicProfile(user: typeof users.$inferSelect, followerCount: number, viewerId?: string) {
+  const isOwnProfile = viewerId === user.id;
+  const isRedacted = user.profileVisibility === "private" && !isOwnProfile;
   return {
     id: user.id,
-    username: user.username,
-    name: user.name,
-    bio: user.bio,
-    avatar: user.avatar,
+    username: isRedacted ? null : user.username,
+    name: isRedacted ? null : user.name,
+    bio: isRedacted ? null : user.bio,
+    avatar: isRedacted ? null : user.avatar,
     verified: user.verified ?? false,
     createdAt: user.createdAt,
-    email,
-    followerCount,
+    email: isOwnProfile ? user.email : null,
+    profileVisibility: user.profileVisibility,
+    followerCount: isRedacted ? 0 : followerCount,
     level: null,
     xp: null,
     reputation: null,
@@ -62,8 +65,7 @@ export const userProfileProcedure = publicProcedure
       .from(follows)
       .where(eq(follows.followingId, requestedId));
 
-    const isOwnProfile = ctx.user?.id === requestedId;
-    return publicProfile(user, followerRows.length, isOwnProfile ? user.email : null);
+    return publicProfile(user, followerRows.length, ctx.user?.id);
   });
 
 const updateProfileInput = z
@@ -72,6 +74,7 @@ const updateProfileInput = z
     name: z.string().trim().min(1).max(255).optional(),
     bio: z.string().trim().max(255).nullable().optional(),
     avatar: z.string().trim().max(255).nullable().optional(),
+    profileVisibility: z.enum(["public", "members", "private"]).optional(),
     username: z.string().trim().min(2).max(64).regex(/^[A-Za-z0-9_.-]+$/, "Username contains unsupported characters").optional(),
   })
   .refine(value => Object.values(value).some(field => field !== undefined), {
@@ -87,6 +90,7 @@ export const userUpdateProfileProcedure = protectedProcedure
     if (input.bio !== undefined) updates.bio = input.bio;
     if (input.avatar !== undefined) updates.avatar = input.avatar;
     if (input.username !== undefined) updates.username = input.username;
+    if (input.profileVisibility !== undefined) updates.profileVisibility = input.profileVisibility;
 
     try {
       await db.update(users).set(updates).where(eq(users.id, ctx.user.id));
@@ -102,7 +106,7 @@ export const userUpdateProfileProcedure = protectedProcedure
     if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found after update" });
 
     const followerRows = await db.select({ id: follows.id }).from(follows).where(eq(follows.followingId, ctx.user.id));
-    return publicProfile(updated, followerRows.length, updated.email);
+    return publicProfile(updated, followerRows.length, ctx.user.id);
   });
 
 export const userFollowersProcedure = publicProcedure

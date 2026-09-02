@@ -23,6 +23,7 @@ export const users = mysqlTable("users", {
   name: varchar("name", { length: 255 }),
   bio: varchar("bio", { length: 255 }),
   avatar: varchar("avatar", { length: 255 }),
+  profileVisibility: varchar("profile_visibility", { length: 16 }).default("public").notNull(), // public | members | private
   balance: float("balance").default(0),
   role: varchar("role", { length: 255 }).default("user"), // admin | user
   verified: boolean("verified").default(false),
