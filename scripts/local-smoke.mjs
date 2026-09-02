@@ -4,6 +4,7 @@ const baseUrl = (process.env.LOCAL_BASE_URL ?? "http://localhost:3000").replace(
 const checks = [
   ["home", "/"],
   ["beta health", "/api/beta/health"],
+  ["beta readiness", "/api/beta/readiness"],
   ["beta catalog", "/api/beta/areas"],
 ];
 
@@ -13,8 +14,13 @@ for (const [label, path] of checks) {
   console.log(`PASS ${label}: ${response.status}`);
 }
 
+const readinessResponse = await fetch(`${baseUrl}/api/beta/readiness`);
+const readiness = await readinessResponse.json();
+if (!readinessResponse.ok || readiness.status !== "ready" || readiness.database !== "ok") throw new Error("Readiness failed: database is not available");
+console.log("PASS readiness: application and database are available");
+
 const health = await fetch(`${baseUrl}/api/beta/health`).then((response) => response.json());
-if (health.liveFinancialOrChainExecution !== false) throw new Error("Safety gate failed: live financial or chain execution is not false");
+if (health.liveFinancialOrChainExecution !== false || readiness.liveFinancialOrChainExecution !== false) throw new Error("Safety gate failed: live financial or chain execution is not false");
 console.log("PASS safety gate: live financial and chain execution disabled");
 
 const publicAuth = await fetch(`${baseUrl}/api/trpc/auth.me`).then((response) => response.json());
