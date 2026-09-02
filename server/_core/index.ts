@@ -9,6 +9,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { registerObservability } from "./observability";
 
 const DEFAULT_BODY_LIMIT = "2mb";
 
@@ -36,6 +37,7 @@ async function startServer() {
   const server = createServer(app);
 
   app.disable("x-powered-by");
+  registerObservability(app);
 
   app.use((_req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
