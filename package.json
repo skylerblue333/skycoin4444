@@ -18,6 +18,11 @@
     "test": "vitest run",
     "test:integration": "vitest run tests/release",
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
+    "local:up": "docker compose -f docker-compose.local.yml up -d",
+    "local:db": "node scripts/local-db.mjs migrate",
+    "local:reset": "node scripts/local-db.mjs reset",
+    "dev:local": "NODE_ENV=development tsx watch server/_core/index.ts",
+    "local:smoke": "node scripts/local-smoke.mjs",
     "check:packages": "tsc --noEmit -p tsconfig.packages.json",
     "check:secrets": "node scripts/check-credential-patterns.mjs",
     "audit:markers": "node scripts/audit-beta-markers.mjs"

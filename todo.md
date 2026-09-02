@@ -178,6 +178,15 @@
 - [ ] Keep high-risk financial, custody, and production-chain actions explicitly unavailable until provider and independent-evidence gates pass.
 - [ ] Push every verified product increment through GitHub pull requests and merge only after required CI succeeds.
 
+## Local machine test phase
+
+- [ ] Add one-command local startup instructions with required environment variables and port behavior.
+- [ ] Add a safe development database bootstrap/reset path that cannot run against production by accident.
+- [ ] Add clearly labeled development fixtures for the working beta workflows without fabricating reviews, ratings, testimonials, or production activity.
+- [ ] Add a repeatable local smoke test covering auth state, SkySchool progress, Community, Activity Feed, feedback, and controlled Web3.
+- [ ] Add a local test-phase guide with expected results, troubleshooting, and reset instructions.
+- [ ] Verify the complete local flow on one machine and push the test-phase update through GitHub CI.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release

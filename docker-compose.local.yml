@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: skycoin4444-mysql-local
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: skycoin_local_root
+      MYSQL_DATABASE: skycoin4444_local
+      MYSQL_USER: skycoin
+      MYSQL_PASSWORD: skycoin_local
+    ports:
+      - "3307:3306"
+    volumes:
+      - skycoin4444_mysql_local:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uskycoin", "-pskycoin_local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  skycoin4444_mysql_local:
