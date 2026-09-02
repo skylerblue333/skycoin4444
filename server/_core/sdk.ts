@@ -349,6 +349,7 @@ function buildCronUser(
     name: userInfo.name || "Manus Scheduled Task",
     bio: null,
     avatar: null,
+    profileVisibility: "public",
     email: null,
     balance: null,
     role: "user",
