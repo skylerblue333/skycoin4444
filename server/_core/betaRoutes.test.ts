@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-import { registerBetaRoutes } from "./betaRoutes";
-import { db } from "../db";
+import { describe, expect, it } from "vitest";
+import { createBetaReadinessHandler, registerBetaRoutes } from "./betaRoutes";
 
 type Handler = (req: unknown, res: Record<string, unknown>) => void | Promise<void>;
 
@@ -57,29 +56,22 @@ describe("beta status routes", () => {
   });
 
   it("reports ready only when the database probe succeeds", async () => {
-    const app = createFakeApp();
-    registerBetaRoutes(app as never);
     const { body, response } = createResponse();
-    const findFirst = vi.spyOn(db.query.users, "findFirst").mockResolvedValueOnce(undefined);
+    const handler = createBetaReadinessHandler(async () => undefined);
 
-    await app.routes["/api/beta/readiness"]({}, response);
+    await handler({}, response);
 
-    expect(findFirst).toHaveBeenCalledOnce();
     expect(body.payload).toMatchObject({ status: "ready", database: "ok", liveFinancialOrChainExecution: false });
-    findFirst.mockRestore();
   });
 
   it("fails closed when the database probe is unavailable", async () => {
-    const app = createFakeApp();
-    registerBetaRoutes(app as never);
     const { body, response } = createResponse();
-    const findFirst = vi.spyOn(db.query.users, "findFirst").mockRejectedValueOnce(new Error("database offline"));
+    const handler = createBetaReadinessHandler(async () => { throw new Error("database offline"); });
 
-    await app.routes["/api/beta/readiness"]({}, response);
+    await handler({}, response);
 
     expect(body.statusCode).toBe(503);
     expect(body.payload).toMatchObject({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
-    findFirst.mockRestore();
   });
 
   it("serves all registered areas with no-store caching", () => {

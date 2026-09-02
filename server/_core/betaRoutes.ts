@@ -1,8 +1,21 @@
-import type { Express } from "express";
+import type { Express, RequestHandler } from "express";
 import { skycoinBetaAreas } from "../../packages/area-registry/src/index";
 import { db } from "../db";
 
 const RELEASE_CHANNEL = "invitation-only-engineering-beta" as const;
+
+type DatabaseProbe = () => Promise<unknown>;
+
+export function createBetaReadinessHandler(probe: DatabaseProbe = () => db.query.users.findFirst({ columns: { id: true } })): RequestHandler {
+  return async (_req, res) => {
+    try {
+      await probe();
+      res.json({ status: "ready", database: "ok", liveFinancialOrChainExecution: false });
+    } catch {
+      res.status(503).json({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
+    }
+  };
+}
 
 export function registerBetaRoutes(app: Express) {
   app.get("/api/beta/health", (_req, res) => {
@@ -15,14 +28,7 @@ export function registerBetaRoutes(app: Express) {
     });
   });
 
-  app.get("/api/beta/readiness", async (_req, res) => {
-    try {
-      await db.query.users.findFirst({ columns: { id: true } });
-      res.json({ status: "ready", database: "ok", liveFinancialOrChainExecution: false });
-    } catch {
-      res.status(503).json({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
-    }
-  });
+  app.get("/api/beta/readiness", createBetaReadinessHandler());
 
   app.get("/api/beta/areas", (_req, res) => {
     res.set("Cache-Control", "no-store");
