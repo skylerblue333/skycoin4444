@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import BetaAreaCatalog from "./pages/BetaAreaCatalog";
 import BetaJourney from "./pages/BetaJourney";
+import BetaCommerceSandbox from "./pages/BetaCommerceSandbox";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -1642,6 +1643,7 @@ function Router() {
         <Route path="/mission-control" component={MissionControl} />
         <Route path="/beta-catalog" component={BetaAreaCatalog} />
         <Route path="/beta-journey" component={BetaJourney} />
+        <Route path="/beta-commerce" component={BetaCommerceSandbox} />
         <Route path="/mobile" component={Mobile} />
         <Route path="/mobile-app" component={MobileApp} />
         <Route path="/mobile-gaming" component={MobileGaming} />
