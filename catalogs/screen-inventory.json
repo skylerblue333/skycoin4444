@@ -2,6 +2,7 @@
   "source": "client/src/App.tsx",
   "totalRoutes": 1064,
   "totalLazyPages": 1052,
+  "totalDirectPages": 7,
   "counts": {
     "launchable_beta": 13,
     "legacy_unverified": 987,
@@ -23,18 +24,9 @@
     "/sign-up-flow"
   ],
   "missingSourceRoutes": [
-    "/",
-    "/home",
-    "/beta-catalog",
-    "/beta-journey",
-    "/beta-commerce",
-    "/beta-web3",
-    "/beta-feedback",
-    "/not-found",
     "/sign-up-flow",
     "/sky-school-quiz",
-    "/voice-commands",
-    "/404"
+    "/voice-commands"
   ],
   "routes": [
     {
@@ -43,7 +35,7 @@
       "page": "Home",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/a-b-testing",
@@ -3707,7 +3699,7 @@
       "page": "Home",
       "readiness": "legacy_unverified",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/hope-a-i",
@@ -4587,7 +4579,7 @@
       "page": "BetaAreaCatalog",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/beta-journey",
@@ -4595,7 +4587,7 @@
       "page": "BetaJourney",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/beta-commerce",
@@ -4603,7 +4595,7 @@
       "page": "BetaCommerceSandbox",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/beta-web3",
@@ -4611,7 +4603,7 @@
       "page": "BetaWeb3Sandbox",
       "readiness": "launchable_beta",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/beta-feedback",
@@ -4619,7 +4611,7 @@
       "page": "BetaFeedback",
       "readiness": "launchable_beta",
       "requiresAuth": true,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/mobile",
@@ -4947,7 +4939,7 @@
       "page": "NotFound",
       "readiness": "legacy_unverified",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     },
     {
       "path": "/notes-app",
@@ -8547,7 +8539,7 @@
       "page": "NotFound",
       "readiness": "legacy_unverified",
       "requiresAuth": false,
-      "sourceExists": false
+      "sourceExists": true
     }
   ]
 }
