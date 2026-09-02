@@ -80,4 +80,4 @@ If the core journey is unavailable, data integrity/privacy is in doubt, an autho
 
 The canonical Mission Control beta application is this repository. External repositories and internal packages may act as source libraries, reference implementations, experiments, or historical evidence; they are not independently deployable beta services unless separately named in a release record.
 
-See [`catalogs/mission-control-beta.json`](catalogs/mission-control-beta.json) for the machine-readable surface register and [`BETA_RELEASE_CHECKLIST.md`](BETA_RELEASE_CHECKLIST.md) for the release procedure.
+See [`catalogs/mission-control-beta.json`](catalogs/mission-control-beta.json) for the machine-readable surface register, [`docs/BETA_AREA_READINESS_MATRIX.md`](docs/BETA_AREA_READINESS_MATRIX.md) for the all-areas workstream gates, and [`BETA_RELEASE_CHECKLIST.md`](BETA_RELEASE_CHECKLIST.md) for the release procedure. Testers can use the `/beta-catalog` route to inspect the current status and evidence gate for every registered area.
