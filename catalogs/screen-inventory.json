@@ -1,10 +1,10 @@
 {
   "source": "client/src/App.tsx",
-  "totalRoutes": 1064,
+  "totalRoutes": 1065,
   "totalLazyPages": 1055,
-  "totalDirectPages": 7,
+  "totalDirectPages": 8,
   "counts": {
-    "launchable_beta": 14,
+    "launchable_beta": 15,
     "legacy_unverified": 986,
     "controlled_or_unavailable": 64
   },
@@ -15,6 +15,7 @@
     "/community-hub",
     "/course-catalog",
     "/mission-control",
+    "/beta-workspace",
     "/beta-catalog",
     "/beta-journey",
     "/beta-commerce",
@@ -4566,6 +4567,14 @@
       "path": "/mission-control",
       "component": "MissionControl",
       "page": "MissionControl",
+      "readiness": "launchable_beta",
+      "requiresAuth": false,
+      "sourceExists": true
+    },
+    {
+      "path": "/beta-workspace",
+      "component": "BetaWorkspace",
+      "page": "BetaWorkspace",
       "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true

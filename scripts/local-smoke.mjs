@@ -10,6 +10,7 @@ const checks = [
   ["beta readiness", "/api/beta/readiness"],
   ["beta catalog", "/api/beta/areas"],
   ["mission control", "/mission-control"],
+  ["beta workspace", "/beta-workspace"],
   ["beta catalog page", "/beta-catalog"],
   ["beta journey", "/beta-journey"],
   ["course catalog", "/course-catalog"],

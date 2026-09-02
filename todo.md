@@ -242,6 +242,15 @@
 - [ ] Add route, safety, and regression coverage to the local smoke and release suites.
 - [ ] Run all gates, push through GitHub CI, and merge the verified batch.
 
+## Significant ecosystem progress track
+
+- [x] Baseline the current route readiness, backend contracts, persisted workflows, and highest-value legacy gaps.
+- [x] Build a unified beta workspace that makes the working education, community, activity, feedback, profile, AI sandbox, and Web3 evidence journeys easy to discover.
+- [ ] Promote multiple safe legacy routes only when they have truthful behavior, explicit boundaries, and automated coverage.
+- [ ] Expand real persistence and observability around the selected workflows without fabricating activity, reviews, balances, or provider results.
+- [x] Add route-level smoke coverage and fail-closed regression tests for the broader beta surface.
+- [ ] Run all repository gates and merge the substantial batch through GitHub CI.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
