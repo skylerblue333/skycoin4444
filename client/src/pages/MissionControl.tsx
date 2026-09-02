@@ -11,6 +11,7 @@ import {
   Sparkles,
   Rocket,
   Store,
+  ArrowUpRight,
 } from "lucide-react";
 import { GOLD } from "./mission-control/shared";
 import { TodaySection } from "./mission-control/TodaySection";
@@ -19,6 +20,34 @@ import { OpportunitiesSection } from "./mission-control/OpportunitiesSection";
 import { MissionsSection } from "./mission-control/MissionsSection";
 import { StartupSection } from "./mission-control/StartupSection";
 import { MarketplaceSection } from "./mission-control/MarketplaceSection";
+
+const BETA_JOURNEYS = [
+  {
+    path: "/beta-journey",
+    label: "SkySchool journey",
+    detail: "Read the approved education path and completion gates.",
+  },
+  {
+    path: "/community-hub",
+    label: "Community Hub",
+    detail: "Browse communities, join, and publish a build thread.",
+  },
+  {
+    path: "/activity-feed",
+    label: "Activity Feed",
+    detail: "Publish updates, react, and reply to real posts.",
+  },
+  {
+    path: "/beta-web3",
+    label: "Web3 evidence room",
+    detail: "Inspect controlled local and testnet fixtures without writes.",
+  },
+  {
+    path: "/beta-feedback",
+    label: "Beta feedback",
+    detail: "Send a monitored product report or reproduction note.",
+  },
+] as const;
 
 const TABS = [
   {
@@ -78,24 +107,69 @@ export default function MissionControl() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#050510] text-white flex flex-col items-center justify-center gap-4 px-6 text-center">
-        <h1 className="text-3xl font-bold">Mission Control</h1>
-        <p className="text-white/50 max-w-md">
-          Mission Control is an invitation-only engineering-beta discovery
-          surface. Sign in only when the beta environment has been
-          release-approved for account access.
-        </p>
-        <div className="flex gap-3">
-          <a href={getLoginUrl()}>
-            <Button style={{ backgroundColor: GOLD, color: "#000" }}>
-              Sign in
-            </Button>
-          </a>
-          <Link href="/">
-            <Button variant="outline" className="border-white/20 text-white/80">
-              Back home
-            </Button>
-          </Link>
+      <div className="min-h-screen bg-[#050510] text-white">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-amber-200/70">
+                Skycoin4444
+              </p>
+              <h1 className="mt-2 text-4xl font-black tracking-tight">
+                Mission Control
+              </h1>
+              <p className="mt-2 max-w-2xl text-white/55">
+                A truthful local beta launchpad. Start with a working journey;
+                sign in only when you need protected persistence.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <a href={getLoginUrl()}>
+                <Button style={{ backgroundColor: GOLD, color: "#000" }}>
+                  Sign in
+                </Button>
+              </a>
+              <Link href="/">
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-white/80"
+                >
+                  Home
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="mb-8 rounded-xl border border-amber-400/30 bg-amber-400/[0.06] p-5">
+            <p className="text-sm font-medium text-amber-100">
+              Engineering-beta boundary
+            </p>
+            <p className="mt-2 text-sm leading-6 text-white/60">
+              These are the routes currently intended for local testing.
+              Financial settlement, custody, token transfers, signing,
+              production-chain execution, and provider-backed AI remain
+              unavailable.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {BETA_JOURNEYS.map(journey => (
+              <Link
+                key={journey.path}
+                href={journey.path}
+                className="group rounded-xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-amber-300/50 hover:bg-white/[0.06]"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="font-semibold text-white">
+                      {journey.label}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-white/50">
+                      {journey.detail}
+                    </p>
+                  </div>
+                  <ArrowUpRight className="h-5 w-5 shrink-0 text-amber-200/70 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     );
