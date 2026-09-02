@@ -8,14 +8,15 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 | --------------------------------- | ----: |
 | Registered routes                 |  1064 |
 | Lazy page modules                 |  1055 |
-| Launchable beta routes            |    13 |
+| Launchable beta routes            |    14 |
 | Controlled or unavailable routes  |    64 |
-| Legacy unverified routes          |   987 |
+| Legacy unverified routes          |   986 |
 | Routes missing a lazy page source |     0 |
 
 ## Launchable beta routes
 
 - /
+- /a-i-tools-hub
 - /activity-feed
 - /community-hub
 - /course-catalog

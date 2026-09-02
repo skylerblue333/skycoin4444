@@ -1,265 +1,105 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Clipboard, FileText, LockKeyhole, ScanSearch, Sparkles, Wand2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import {
-  Sparkles, Code2, FileText, Image, TrendingUp, Shield,
-  Zap, Brain, Globe, Search, ChevronRight, Lock,
-  Cpu, Eye, MessageSquare, BarChart3, Wand2, Bot,
-  FlaskConical, Crosshair, Fingerprint, Radio, Layers
-} from "lucide-react";
 
-const TOOLS = [
-  {
-    id: "code-studio",
-    name: "AI Code Studio",
-    desc: "Generate, debug, and refactor code in any language. Full stack, smart contracts, scripts.",
-    icon: Code2,
-    color: "from-blue-500 to-cyan-500",
-    badge: "LIVE",
-    badgeColor: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    href: "/ai-code-studio",
-    category: "dev",
-  },
-  {
-    id: "copy-studio",
-    name: "AI Copy Studio",
-    desc: "12 copy types — ads, emails, tweets, SEO, product descriptions. 8 tone modes.",
-    icon: FileText,
-    color: "from-purple-500 to-pink-500",
-    badge: "LIVE",
-    badgeColor: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    href: "/ai-copy-studio",
-    category: "content",
-  },
-  {
-    id: "hope-ai",
-    name: "Hope AI",
-    desc: "Your personal AI companion. Voice chat, emotional support, life coaching, and grey-area tools.",
-    icon: Brain,
-    color: "from-pink-500 to-rose-500",
-    badge: "LIVE",
-    badgeColor: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-    href: "/hope-ai",
-    category: "personal",
-  },
-  {
-    id: "ai-brain",
-    name: "AI Brain",
-    desc: "Multi-model AI hub. GPT-5, Claude, Gemini. Switch models mid-conversation.",
-    icon: Cpu,
-    color: "from-violet-500 to-purple-500",
-    badge: "LIVE",
-    badgeColor: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-    href: "/ai-brain",
-    category: "chat",
-  },
-  {
-    id: "market-scanner",
-    name: "Market Scanner",
-    desc: "AI-powered crypto market analysis. Trend detection, sentiment scoring, entry signals.",
-    icon: TrendingUp,
-    color: "from-green-500 to-emerald-500",
-    badge: "BETA",
-    badgeColor: "bg-green-500/10 text-green-400 border-green-500/20",
-    href: "/ai-trading",
-    category: "finance",
-  },
-  {
-    id: "ai-engineer",
-    name: "AI Engineer",
-    desc: "44 specialized AI agents. Architecture, security, testing, DevOps, blockchain.",
-    icon: Bot,
-    color: "from-orange-500 to-amber-500",
-    badge: "LIVE",
-    badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-    href: "/ai-engineer",
-    category: "dev",
-  },
-  {
-    id: "osint",
-    name: "OSINT Toolkit",
-    desc: "Open-source intelligence gathering. Domain lookup, social footprint, data aggregation.",
-    icon: Search,
-    color: "from-slate-500 to-zinc-500",
-    badge: "GREY",
-    badgeColor: "bg-slate-500/10 text-slate-400 border-slate-500/20",
-    href: "/hope-ai?tool=osint",
-    category: "grey",
-  },
-  {
-    id: "deepfake-detect",
-    name: "Deepfake Detector",
-    desc: "AI-powered media authenticity analysis. Detect manipulated images, audio, and video.",
-    icon: Eye,
-    color: "from-red-500 to-rose-500",
-    badge: "GREY",
-    badgeColor: "bg-red-500/10 text-red-400 border-red-500/20",
-    href: "/hope-ai?tool=deepfake",
-    category: "grey",
-  },
-  {
-    id: "cipher",
-    name: "Cipher Tools",
-    desc: "Encryption, steganography, hash cracking (ethical), secure messaging protocols.",
-    icon: Lock,
-    color: "from-cyan-500 to-teal-500",
-    badge: "GREY",
-    badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-    href: "/hope-ai?tool=cipher",
-    category: "grey",
-  },
-  {
-    id: "social-engineer",
-    name: "Social Engineering Sim",
-    desc: "Phishing simulation, awareness training, red-team scenario generator for security teams.",
-    icon: Fingerprint,
-    color: "from-yellow-500 to-orange-500",
-    badge: "GREY",
-    badgeColor: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    href: "/hope-ai?tool=social-eng",
-    category: "grey",
-  },
-  {
-    id: "network-scanner",
-    name: "Network Recon",
-    desc: "Ethical network scanning, port analysis, vulnerability mapping for authorized systems.",
-    icon: Radio,
-    color: "from-indigo-500 to-blue-500",
-    badge: "GREY",
-    badgeColor: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-    href: "/hope-ai?tool=network",
-    category: "grey",
-  },
-  {
-    id: "ai-moderation",
-    name: "AI Moderation",
-    desc: "Content moderation engine. Toxic content detection, spam filtering, fraud signals.",
-    icon: Shield,
-    color: "from-emerald-500 to-green-500",
-    badge: "LIVE",
-    badgeColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    href: "/ai-engineer?agent=moderation",
-    category: "safety",
-  },
-];
+const SAMPLE =
+  "We need a clear beta plan for the Skycoin ecosystem. The team should test the education flow locally before inviting members. Keep payment, custody, and chain execution disabled until independent evidence is approved.";
 
-const CATEGORIES = [
-  { id: "all", label: "All Tools" },
-  { id: "dev", label: "Dev" },
-  { id: "content", label: "Content" },
-  { id: "chat", label: "Chat" },
-  { id: "finance", label: "Finance" },
-  { id: "personal", label: "Personal" },
-  { id: "grey", label: "Grey Area" },
-  { id: "safety", label: "Safety" },
+type Operation = "outline" | "actions" | "safety";
+
+function runLocalOperation(input: string, operation: Operation) {
+  const text = input.trim();
+  if (!text) return "Add a short product note to generate a local draft.";
+  const sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+  if (operation === "outline") {
+    return sentences.slice(0, 6).map((sentence, index) => `${index + 1}. ${sentence}`).join("\n");
+  }
+  if (operation === "actions") {
+    const actions = sentences.filter(sentence => /\b(need|must|should|ship|test|review|keep|add|build|create)\b/i.test(sentence));
+    return actions.length ? actions.map(sentence => `□ ${sentence}`).join("\n") : "No action-shaped sentences found. Try words such as must, should, test, or ship.";
+  }
+  const sensitiveTerms = ["seed phrase", "private key", "password", "api key", "secret", "custody", "transfer"];
+  const matches = sensitiveTerms.filter(term => text.toLowerCase().includes(term));
+  return matches.length
+    ? `Review required before sharing:\n${matches.map(term => `• Sensitive term detected: ${term}`).join("\n")}\n\nThis local scan does not transmit or store your text.`
+    : "No configured sensitive terms detected. This local scan is a heuristic, not a security review.";
+}
+
+const LOCAL_TOOLS = [
+  { icon: Wand2, label: "Draft helper", detail: "Turn product notes into a local outline or action list." },
+  { icon: ScanSearch, label: "Safety scan", detail: "Find common secret and custody terms before sharing text." },
+  { icon: FileText, label: "Evidence note", detail: "Prepare a concise release or reproduction note without provider calls." },
 ];
 
 export default function AIToolsHub() {
-  
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [query, setQuery] = useState("");
+  const [input, setInput] = useState(SAMPLE);
+  const [operation, setOperation] = useState<Operation>("outline");
+  const output = useMemo(() => runLocalOperation(input, operation), [input, operation]);
 
-  const filtered = TOOLS.filter(t => {
-    const matchCat = activeCategory === "all" || t.category === activeCategory;
-    const matchQ = !query || t.name.toLowerCase().includes(query.toLowerCase()) || t.desc.toLowerCase().includes(query.toLowerCase());
-    return matchCat && matchQ;
-  });
+  async function copyOutput() {
+    await navigator.clipboard?.writeText(output);
+    toast.success("Local draft copied");
+  }
 
   return (
-    <div className="min-h-screen bg-[#07050f]">
-      {/* Hero */}
-      <div className="relative overflow-hidden py-16 px-4">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10" style={{ background: "oklch(0.72 0.28 305)" }} />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-10" style={{ background: "oklch(0.72 0.28 340)" }} />
-        </div>
-        <div className="max-w-screen-xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium mb-6">
-            <Sparkles className="w-3.5 h-3.5" /> AI-Powered Tools Suite
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-            The AI{" "}
-            <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
-              Arsenal
-            </span>
-          </h1>
-          <p className="text-lg text-white/50 max-w-xl mx-auto mb-8">
-            {TOOLS.length} tools. Code generation, content creation, market analysis, and grey-area capabilities — all in one place.
-          </p>
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-            <input value={query} onChange={e => setQuery(e.target.value)}
-              placeholder="Search tools…"
-              className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-purple-500/40 transition-colors" />
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-screen-xl mx-auto px-4 pb-16">
-        {/* Category filter */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-8" style={{ scrollbarWidth: "none" }}>
-          {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setActiveCategory(c.id)}
-              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeCategory === c.id ? "text-white" : "text-white/40 hover:text-white/70 bg-white/3 hover:bg-white/5"}`}
-              style={activeCategory === c.id ? { background: "linear-gradient(135deg, oklch(0.72 0.28 305 / 0.3), oklch(0.72 0.28 340 / 0.2))", border: "1px solid oklch(0.72 0.28 305 / 0.3)" } : {}}>
-              {c.label}
-              {c.id === "grey" && <span className="ml-1.5 text-[10px] text-orange-400">⚠</span>}
-            </button>
-          ))}
-        </div>
-
-        {/* Grey area warning */}
-        {activeCategory === "grey" && (
-          <div className="mb-6 p-4 rounded-2xl border border-orange-500/20 bg-orange-500/5">
-            <div className="flex items-start gap-3">
-              <FlaskConical className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-orange-300 mb-1">Grey Area Tools — Use Responsibly</p>
-                <p className="text-xs text-white/50">These tools are provided for educational, research, and authorized security testing purposes only. Misuse may violate laws. By accessing these tools you agree to use them ethically and legally.</p>
-              </div>
+    <div className="min-h-screen bg-[#07050f] text-white">
+      <header className="border-b border-white/10 bg-[#07050f]/95">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
+          <div className="flex items-center gap-3">
+            <Link href="/mission-control" className="text-white/45 hover:text-white" aria-label="Back to Mission Control">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div>
+              <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-amber-300" /><h1 className="font-black tracking-tight">Local AI Sandbox</h1><Badge variant="outline" className="border-amber-400/40 text-amber-200">Test only</Badge></div>
+              <p className="mt-1 text-xs text-white/45">Useful drafting tools that never call an external provider</p>
             </div>
           </div>
-        )}
-
-        {/* Tools grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(tool => {
-            const Icon = tool.icon;
-            return (
-              <Link key={tool.id} href={tool.href}>
-                <div className="group relative bg-[#0e0a1a]/90 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-all duration-200 cursor-pointer overflow-hidden h-full">
-                  <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r ${tool.color} opacity-30 group-hover:opacity-70 transition-opacity`} />
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${tool.color} p-0.5`}>
-                      <div className="w-full h-full rounded-[14px] bg-[#0e0a1a] flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    <Badge className={`text-[10px] ${tool.badgeColor}`}>{tool.badge}</Badge>
-                  </div>
-                  <h3 className="text-base font-bold text-white mb-2 group-hover:text-purple-200 transition-colors">{tool.name}</h3>
-                  <p className="text-sm text-white/45 leading-relaxed mb-4">{tool.desc}</p>
-                  <div className="flex items-center gap-1 text-xs text-purple-400 group-hover:text-purple-300 transition-colors">
-                    Open Tool <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          <Link href="/beta-feedback" className="text-sm text-amber-200 hover:text-amber-100">Report a problem →</Link>
         </div>
+      </header>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <Search className="w-10 h-10 text-white/20 mx-auto mb-3" />
-            <p className="text-white/40">No tools match "{query}"</p>
+      <main className="mx-auto max-w-6xl space-y-8 px-4 py-10">
+        <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200/70">Provider boundary</p>
+            <h2 className="mt-3 max-w-3xl text-4xl font-black tracking-tight">Work with the idea before you wire the model.</h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/55">This sandbox is intentionally local and deterministic. It helps you prepare notes, inspect sensitive wording, and create evidence without pretending that an AI provider is connected.</p>
           </div>
-        )}
-      </div>
+          <div className="rounded-2xl border border-amber-400/25 bg-amber-400/[0.06] p-5">
+            <LockKeyhole className="h-5 w-5 text-amber-200" />
+            <h3 className="mt-4 font-semibold text-amber-100">No external calls</h3>
+            <p className="mt-2 text-sm leading-6 text-white/55">Text stays in this browser tab. Provider-backed generation, memory, voice, image generation, and agent actions remain unavailable until separately configured and approved.</p>
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between gap-3"><div><p className="text-xs uppercase tracking-[0.2em] text-white/35">Input</p><h3 className="mt-2 text-xl font-bold">Product note</h3></div><Badge variant="outline" className="border-white/15 text-white/55">Browser local</Badge></div>
+            <Textarea value={input} onChange={event => setInput(event.target.value)} className="mt-5 min-h-56 resize-y border-white/10 bg-black/20 text-white placeholder:text-white/25" placeholder="Write a note, requirement, or reproduction…" maxLength={12000} />
+            <div className="mt-4 flex flex-wrap gap-2">
+              {(["outline", "actions", "safety"] as Operation[]).map(item => (
+                <Button key={item} size="sm" variant={operation === item ? "default" : "outline"} onClick={() => setOperation(item)} className={operation === item ? "bg-amber-300 text-black hover:bg-amber-200" : "border-white/15 text-white/65"}>
+                  {item === "outline" ? "Outline" : item === "actions" ? "Extract actions" : "Safety scan"}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between gap-3"><div><p className="text-xs uppercase tracking-[0.2em] text-white/35">Output</p><h3 className="mt-2 text-xl font-bold">Local result</h3></div><Button size="sm" variant="outline" onClick={copyOutput} className="border-white/15 text-white/65"><Clipboard className="mr-2 h-3.5 w-3.5" />Copy</Button></div>
+            <pre className="mt-5 min-h-56 whitespace-pre-wrap rounded-xl border border-white/10 bg-black/30 p-4 font-mono text-sm leading-6 text-amber-100/85">{output}</pre>
+            <p className="mt-3 text-xs leading-5 text-white/35">Generated locally from your current input. Treat it as a draft, not an AI assurance or security verdict.</p>
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-4 flex items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.2em] text-white/35">Sandbox modules</p><h3 className="mt-2 text-2xl font-bold">Small tools, clear boundaries</h3></div><Link href="/beta-catalog" className="text-sm text-amber-200 hover:text-amber-100">View beta status →</Link></div>
+          <div className="grid gap-4 md:grid-cols-3">{LOCAL_TOOLS.map(tool => { const Icon = tool.icon; return <div key={tool.label} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><Icon className="h-5 w-5 text-amber-200" /><h4 className="mt-4 font-semibold">{tool.label}</h4><p className="mt-2 text-sm leading-6 text-white/45">{tool.detail}</p></div>; })}</div>
+        </section>
+      </main>
     </div>
   );
 }

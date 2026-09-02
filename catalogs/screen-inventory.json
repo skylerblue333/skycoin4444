@@ -4,12 +4,13 @@
   "totalLazyPages": 1055,
   "totalDirectPages": 7,
   "counts": {
-    "launchable_beta": 13,
-    "legacy_unverified": 987,
+    "launchable_beta": 14,
+    "legacy_unverified": 986,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
     "/",
+    "/a-i-tools-hub",
     "/activity-feed",
     "/community-hub",
     "/course-catalog",
@@ -165,7 +166,7 @@
       "path": "/a-i-tools-hub",
       "component": "AIToolsHub",
       "page": "AIToolsHub",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },

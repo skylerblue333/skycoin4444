@@ -41,6 +41,7 @@ const launchablePaths = new Set([
   "/profile",
   "/onboarding",
   "/sign-up-flow",
+  "/a-i-tools-hub",
 ]);
 const controlledPattern =
   /(wallet|custody|checkout|payment|bank|trading|lending|staking|bridge|token|nft|blockchain|validator|yield|swap|ledger|financial|mining|governance|kyc|aml)/i;

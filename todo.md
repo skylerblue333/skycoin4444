@@ -226,6 +226,14 @@
 - [ ] Implement high-value route batches without fabricating production activity or enabling high-risk side effects.
 - [ ] Push verified batches through GitHub CI and document the complete local test matrix.
 
+## AI, community, and protocol batch
+
+- [ ] Audit candidate AI, community, and protocol screens for existing contracts and unsafe provider or chain side effects.
+- [ ] Select a small local-testable batch with real inputs, useful outputs, and explicit unavailable states.
+- [ ] Implement the sandbox and read-only workflows without enabling live provider calls, signing, custody, transfers, or chain writes.
+- [ ] Add route smoke, safety, and regression coverage for the new batch.
+- [ ] Run full gates, push through GitHub CI, and merge the verified batch.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release

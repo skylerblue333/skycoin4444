@@ -30,13 +30,15 @@ The local test account is named **Local Test User** and is created only by the l
 
 ## Smoke test
 
+The smoke matrix includes `/a-i-tools-hub`, a deterministic browser-local AI sandbox for outlining, action extraction, and sensitive-term scanning. It does not call an AI provider and does not require provider credentials.
+
 In a second terminal:
 
 ```bash
 pnpm local:smoke
 ```
 
-Expected results are successful HTTP checks for the home page, beta health, and beta catalog, followed by confirmation that live financial or chain execution is disabled and signed-out `auth.me` returns `null`.
+Expected results are successful HTTP checks for the home page, beta health, beta catalog, and the local AI sandbox, followed by confirmation that live financial or chain execution is disabled and signed-out `auth.me` returns `null`. If the route checks pass but readiness parsing fails with `Unexpected token '<'`, `LOCAL_BASE_URL` is pointing at a Vite-only app shell rather than the canonical backend process; start `pnpm dev:local` and use the port it prints.
 
 Then manually exercise these routes:
 
@@ -47,6 +49,7 @@ Then manually exercise these routes:
 | `/activity-feed` | Publish a post, like it, open comments, reply, refresh, and confirm the post, reaction, and reply remain. |
 | `/beta-feedback` | Submit a clear bug or content report and confirm the success state. |
 | `/beta-web3` | Search local/testnet fixtures and confirm there are no wallet, signing, custody, transfer, or mainnet-write controls. |
+| `/a-i-tools-hub` | Run outline, action extraction, and safety scan against a note; confirm the result is local-only and no provider-backed controls are presented. |
 
 ## Reset
 
