@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { assertBetaSideEffectAllowed } from "../../packages/contracts/src/index";
 import {
   getBetaArea,
   skycoinBetaAreas,
@@ -37,6 +38,29 @@ describe("all-area beta registry", () => {
     expect(getBetaArea("exchange")?.betaAvailability).toBe("gated_unavailable");
     expect(getBetaArea("payments")?.betaAvailability).toBe("gated_unavailable");
     expect(getBetaArea("bridge")?.betaAvailability).toBe("gated_unavailable");
+  });
+
+  it("keeps live side effects fail-closed in engineering beta", () => {
+    expect(() =>
+      assertBetaSideEffectAllowed("controlled_test_beta", "read_only")
+    ).not.toThrow();
+    expect(() =>
+      assertBetaSideEffectAllowed("controlled_test_beta", "quote")
+    ).not.toThrow();
+
+    for (const sideEffect of [
+      "settlement",
+      "custody",
+      "token_transfer",
+      "chain_execution",
+    ] as const) {
+      expect(() =>
+        assertBetaSideEffectAllowed("controlled_test_beta", sideEffect)
+      ).toThrow(/disabled/);
+      expect(() =>
+        assertBetaSideEffectAllowed("gated_unavailable", sideEffect)
+      ).toThrow(/unavailable/);
+    }
   });
 
   it("requires provider and data-boundary evidence for AI areas", () => {
