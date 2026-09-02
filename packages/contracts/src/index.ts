@@ -58,6 +58,36 @@ export const betaAreaManifestSchema = areaManifestSchema.extend({
 });
 export type BetaAreaManifest = z.infer<typeof betaAreaManifestSchema>;
 
+export const betaSideEffectSchema = z.enum([
+  "read_only",
+  "quote",
+  "settlement",
+  "custody",
+  "token_transfer",
+  "chain_execution",
+]);
+export type BetaSideEffect = z.infer<typeof betaSideEffectSchema>;
+
+export function assertBetaSideEffectAllowed(
+  availability: BetaAvailability,
+  sideEffect: BetaSideEffect
+): void {
+  if (availability === "gated_unavailable") {
+    throw new Error(`Beta capability is unavailable for ${sideEffect}`);
+  }
+
+  if (
+    sideEffect === "settlement" ||
+    sideEffect === "custody" ||
+    sideEffect === "token_transfer" ||
+    sideEffect === "chain_execution"
+  ) {
+    throw new Error(
+      `Live side effect is disabled in engineering beta: ${sideEffect}`
+    );
+  }
+}
+
 export function assertLiveIntegration(
   state: IntegrationState,
   integrationName: string
