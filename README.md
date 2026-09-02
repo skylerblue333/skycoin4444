@@ -17,6 +17,23 @@ The repository also contains a verified cross-product integration vertical conne
 
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
+## One-machine beta test launch
+
+For the fastest local test phase, use Docker Desktop or Docker Engine with Compose. The local path creates only a labeled development account and never targets a production database.
+
+```bash
+git clone https://github.com/skylerblue333/skycoin4444.git
+cd skycoin4444
+pnpm install --frozen-lockfile
+cp .env.local.example .env.local
+pnpm local:doctor
+pnpm local:up
+pnpm local:db
+pnpm dev:local
+```
+
+In a second terminal, run `pnpm local:smoke`. Then open the printed local URL and exercise `/course-catalog`, `/community-hub`, `/activity-feed`, `/beta-feedback`, `/profile`, and `/beta-web3`. Use `pnpm local:reset` only when you intentionally want to clear the local database. Read [`docs/LOCAL_TEST_PHASE.md`](docs/LOCAL_TEST_PHASE.md) for expected outcomes and recovery steps.
+
 ## Canonical execution surface
 
 The root `package.json` is the canonical engineering-beta workspace surface:
