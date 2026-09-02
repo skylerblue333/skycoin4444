@@ -187,6 +187,14 @@
 - [ ] Add a local test-phase guide with expected results, troubleshooting, and reset instructions.
 - [ ] Verify the complete local flow on one machine and push the test-phase update through GitHub CI.
 
+## Diagnosis and repair
+
+- [ ] Read the attached failure report and map each symptom to a reproducible target.
+- [ ] Reproduce confirmed failures locally and classify code defects versus missing machine prerequisites.
+- [ ] Apply targeted fixes with safe diagnostics and no production-side-effect expansion.
+- [ ] Run typecheck, tests, build, smoke checks, and diff validation after the repair.
+- [ ] Push the verified repair through a GitHub pull request and report remaining local steps.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release

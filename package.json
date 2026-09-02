@@ -23,6 +23,7 @@
     "local:reset": "node scripts/local-db.mjs reset",
     "dev:local": "NODE_ENV=development tsx watch server/_core/index.ts",
     "local:smoke": "node scripts/local-smoke.mjs",
+    "local:doctor": "node scripts/local-doctor.mjs",
     "check:packages": "tsc --noEmit -p tsconfig.packages.json",
     "check:secrets": "node scripts/check-credential-patterns.mjs",
     "audit:markers": "node scripts/audit-beta-markers.mjs"
