@@ -60,26 +60,26 @@ describe("beta status routes", () => {
     const app = createFakeApp();
     registerBetaRoutes(app as never);
     const { body, response } = createResponse();
-    const execute = vi.spyOn(db, "execute").mockResolvedValueOnce([] as never);
+    const findFirst = vi.spyOn(db.query.users, "findFirst").mockResolvedValueOnce(undefined);
 
     await app.routes["/api/beta/readiness"]({}, response);
 
-    expect(execute).toHaveBeenCalledOnce();
+    expect(findFirst).toHaveBeenCalledOnce();
     expect(body.payload).toMatchObject({ status: "ready", database: "ok", liveFinancialOrChainExecution: false });
-    execute.mockRestore();
+    findFirst.mockRestore();
   });
 
   it("fails closed when the database probe is unavailable", async () => {
     const app = createFakeApp();
     registerBetaRoutes(app as never);
     const { body, response } = createResponse();
-    const execute = vi.spyOn(db, "execute").mockRejectedValueOnce(new Error("database offline"));
+    const findFirst = vi.spyOn(db.query.users, "findFirst").mockRejectedValueOnce(new Error("database offline"));
 
     await app.routes["/api/beta/readiness"]({}, response);
 
     expect(body.statusCode).toBe(503);
     expect(body.payload).toMatchObject({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
-    execute.mockRestore();
+    findFirst.mockRestore();
   });
 
   it("serves all registered areas with no-store caching", () => {
