@@ -190,6 +190,23 @@ export const auditLedger = mysqlTable("audit_ledger", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ============ ENGINEERING BETA FEEDBACK TABLE ============
+export const betaFeedback = mysqlTable("beta_feedback", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  category: varchar("category", { length: 64 }).notNull(),
+  severity: varchar("severity", { length: 32 }).notNull(),
+  route: varchar("route", { length: 255 }).notNull(),
+  summary: varchar("summary", { length: 255 }).notNull(),
+  details: text("details").notNull(),
+  expected: text("expected").notNull(),
+  actual: text("actual").notNull(),
+  status: varchar("status", { length: 32 }).default("received").notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+});
+
+export type BetaFeedback = typeof betaFeedback.$inferSelect;
+export type InsertBetaFeedback = typeof betaFeedback.$inferInsert;
 
 // ============ TOKEN BALANCES TABLE ============
 export const tokenBalances = mysqlTable("token_balances", {

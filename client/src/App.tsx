@@ -10,6 +10,7 @@ import BetaAreaCatalog from "./pages/BetaAreaCatalog";
 import BetaJourney from "./pages/BetaJourney";
 import BetaCommerceSandbox from "./pages/BetaCommerceSandbox";
 import BetaWeb3Sandbox from "./pages/BetaWeb3Sandbox";
+import BetaFeedback from "./pages/BetaFeedback";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -1646,6 +1647,7 @@ function Router() {
         <Route path="/beta-journey" component={BetaJourney} />
         <Route path="/beta-commerce" component={BetaCommerceSandbox} />
         <Route path="/beta-web3" component={BetaWeb3Sandbox} />
+        <Route path="/beta-feedback" component={BetaFeedback} />
         <Route path="/mobile" component={Mobile} />
         <Route path="/mobile-app" component={MobileApp} />
         <Route path="/mobile-gaming" component={MobileGaming} />

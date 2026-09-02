@@ -146,7 +146,7 @@ export default function BetaJourney() {
                 `SECURITY.md`.
               </p>
             </div>
-            <Link href="/bug-reporting">
+            <Link href="/beta-feedback">
               <Button className="shrink-0">Report feedback</Button>
             </Link>
           </CardContent>
