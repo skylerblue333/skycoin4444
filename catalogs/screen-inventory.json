@@ -1,10 +1,10 @@
 {
   "source": "client/src/App.tsx",
-  "totalRoutes": 1066,
+  "totalRoutes": 1067,
   "totalLazyPages": 1055,
-  "totalDirectPages": 9,
+  "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 17,
+    "launchable_beta": 18,
     "legacy_unverified": 985,
     "controlled_or_unavailable": 64
   },
@@ -18,6 +18,7 @@
     "/mission-control",
     "/beta-workspace",
     "/operational-readiness",
+    "/discovery-center",
     "/beta-catalog",
     "/beta-journey",
     "/beta-commerce",
@@ -4585,6 +4586,14 @@
       "path": "/operational-readiness",
       "component": "OperationalReadiness",
       "page": "OperationalReadiness",
+      "readiness": "launchable_beta",
+      "requiresAuth": false,
+      "sourceExists": true
+    },
+    {
+      "path": "/discovery-center",
+      "component": "DiscoveryCenter",
+      "page": "DiscoveryCenter",
       "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true

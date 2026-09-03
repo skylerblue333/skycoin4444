@@ -270,6 +270,14 @@
 - [x] Add route smoke and release regression coverage for healthy, degraded, unavailable, and gated states.
 - [ ] Run full checks, security scans, inventory audit, and GitHub CI before merging.
 
+## Discovery and notification tranche
+
+- [x] Audit search, bookmarks, notification, history, and preferences routes for real contracts and fabricated states.
+- [x] Select a safe connected workflow that supports authenticated discovery, bookmarking, and notification review without financial or chain side effects.
+- [x] Implement persistence, validation, and ownership checks for the selected workflow.
+- [x] Add local smoke coverage and release regressions for empty, success, failure, and unauthorized states.
+- [ ] Run full checks, security scans, inventory audit, and GitHub CI before merging.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
