@@ -251,6 +251,17 @@
 - [x] Add route-level smoke coverage and fail-closed regression tests for the broader beta surface.
 - [ ] Run all repository gates and merge the substantial batch through GitHub CI.
 
+## Finished ecosystem release program
+
+- [x] Define the release contract for launchable, controlled, unavailable, and legacy-unverified routes.
+- [x] Build one shared beta shell with capability navigation, readiness status, feedback entry, and local test guidance.
+- [ ] Promote safe high-value families in batches: education, community, feed, identity/privacy, AI sandbox, Web3 evidence, creator tools, and observability.
+- [ ] Replace unsupported legacy screens with truthful unavailable or controlled states; remove fabricated balances, activity, reviews, provider results, and production claims.
+- [ ] Expand real persistence, authorization, validation, audit events, and failure-state coverage for every promoted workflow.
+- [ ] Keep payments, custody, signing, transfers, settlement, and production-chain writes fail-closed pending independent evidence and release approval.
+- [ ] Run local database smoke tests, production-like checks, security scans, accessibility checks, and full CI before each tranche merge.
+- [ ] Publish a release report showing completed capabilities, known limits, test evidence, and the remaining legacy route inventory.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
