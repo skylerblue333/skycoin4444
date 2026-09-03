@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 23,
-    "legacy_unverified": 981,
+    "launchable_beta": 24,
+    "legacy_unverified": 980,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -13,6 +13,7 @@
     "/a-i-tools-hub",
     "/activity-feed",
     "/activity-evidence",
+    "/arcade",
     "/community-hub",
     "/course-catalog",
     "/creator-analytics",
@@ -719,7 +720,7 @@
       "path": "/arcade",
       "component": "Arcade",
       "page": "Arcade",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
