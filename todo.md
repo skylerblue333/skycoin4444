@@ -287,6 +287,15 @@
 - [x] Add migration, API, unauthorized, and UI regression coverage plus local smoke checks.
 - [ ] Run full gates, security scans, and GitHub CI before merging.
 
+## Durable creator persistence tranche
+
+- [x] Audit creator draft schema, migration tooling, and existing creator beta contracts.
+- [x] Add durable user-owned creator drafts with bounded title/brief fields and review state.
+- [x] Add authenticated list, create, update-state, delete, and clear procedures with ownership checks.
+- [x] Connect Creator Evidence Studio to database persistence and truthful unavailable states for publishing/monetization.
+- [x] Add migration, API, UI, local smoke, and release regression coverage.
+- [ ] Run full gates, security scans, and GitHub CI before merging.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
