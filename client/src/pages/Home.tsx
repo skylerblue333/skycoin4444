@@ -8,6 +8,7 @@ import {
   Boxes,
   Compass,
   GraduationCap,
+  Gamepad2,
   Heart,
   Languages,
   LayoutDashboard,
@@ -58,6 +59,15 @@ const experiences = [
     icon: GraduationCap,
   },
   {
+    title: "SkyGaming",
+    kicker: "Deterministic arcade lab",
+    description:
+      "Play tested local game experiences without real-money wagering, token payouts, custody, or production multiplayer.",
+    href: "/arcade",
+    status: "Local test lab",
+    icon: Gamepad2,
+  },
+  {
     title: "SkyMarket",
     kicker: "Modern commerce rehearsal",
     description:
@@ -106,7 +116,7 @@ const experiences = [
 
 const stats = [
   { value: "23", label: "launchable beta routes" },
-  { value: "8", label: "headline journeys" },
+  { value: "9", label: "headline journeys" },
   { value: "1", label: "unified workspace" },
   { value: "0", label: "missing routed source files" },
 ] as const;
@@ -145,7 +155,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-white/60 sm:text-lg">
-              Move through social, live creator tools, learning, commerce,
+              Move through social, live creator tools, learning, gaming, commerce,
               language exchange, dating, digital-asset evidence, and HopeAI
               without getting lost in the wider historical screen inventory.
               Every promoted journey is labeled by what it actually proves.
@@ -367,7 +377,7 @@ export default function Home() {
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-white/50">
                 Use the workspace as mission control, jump directly into the
-                eight headline journeys, and keep high-risk production actions
+                nine headline journeys, and keep high-risk production actions
                 gated until the evidence exists.
               </p>
             </div>
