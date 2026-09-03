@@ -6,9 +6,9 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 
 | Measure                           | Count |
 | --------------------------------- | ----: |
-| Registered routes                 |  1066 |
+| Registered routes                 |  1067 |
 | Lazy page modules                 |  1055 |
-| Launchable beta routes            |    17 |
+| Launchable beta routes            |    18 |
 | Controlled or unavailable routes  |    64 |
 | Legacy unverified routes          |   985 |
 | Routes missing a lazy page source |     0 |
@@ -24,6 +24,7 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 - /mission-control
 - /beta-workspace
 - /operational-readiness
+- /discovery-center
 - /beta-catalog
 - /beta-journey
 - /beta-commerce
