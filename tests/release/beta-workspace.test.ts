@@ -1,24 +1,31 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
+import { ecosystemAreas } from "../../client/src/lib/ecosystemBeta";
 
 const source = fs.readFileSync("client/src/pages/BetaWorkspace.tsx", "utf8");
 const app = fs.readFileSync("client/src/App.tsx", "utf8");
 
-describe("unified beta workspace", () => {
-  it("is registered and exposes the working journeys", () => {
+describe("unified competitive beta workspace", () => {
+  it("is registered and links every headline area", () => {
     expect(app).toMatch(/path="\/beta-workspace" component=\{BetaWorkspace\}/);
-    for (const route of ["/course-catalog", "/community-hub", "/activity-feed", "/profile", "/beta-feedback", "/a-i-tools-hub", "/beta-web3", "/creator-analytics"]) {
-      expect(source).toContain(`route: "${route}"`);
+    expect(ecosystemAreas).toHaveLength(6);
+    for (const area of ecosystemAreas) {
+      expect(area.route).toMatch(/^\//);
+      expect(area.testGoal.length).toBeGreaterThan(20);
+      expect(area.boundary.length).toBeGreaterThan(30);
     }
-    expect(source).toMatch(/20 launchable beta routes/);
-    expect(source).toMatch(/Creator evidence studio/);
+    expect(source).toMatch(/23 launchable routes/);
+    expect(source).toMatch(
+      /Social, creator, asset, commerce, language, and dating/
+    );
   });
 
-  it("keeps unsupported high-risk capability classes explicit", () => {
-    expect(source).toMatch(/Payments and settlement/);
-    expect(source).toMatch(/Wallet custody and signing/);
-    expect(source).toMatch(/Production chain execution/);
+  it("uses evidence language and keeps high-risk capabilities explicit", () => {
+    expect(source).toMatch(/not a claim of traffic, scale, custody/);
+    expect(source).toMatch(/Payment processing and financial settlement/);
+    expect(source).toMatch(/Wallet custody, signing, transfers/);
+    expect(source).toMatch(/Public livestream ingest/);
+    expect(source).toMatch(/Unverified people, sellers, products/);
     expect(source).toMatch(/Provider-backed AI actions/);
-    expect(source).toMatch(/High-risk actions remain gated/);
   });
 });
