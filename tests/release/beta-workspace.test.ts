@@ -8,15 +8,15 @@ const app = fs.readFileSync("client/src/App.tsx", "utf8");
 describe("unified competitive beta workspace", () => {
   it("is registered and links every headline area", () => {
     expect(app).toMatch(/path="\/beta-workspace" component=\{BetaWorkspace\}/);
-    expect(ecosystemAreas).toHaveLength(6);
+    expect(ecosystemAreas).toHaveLength(8);
     for (const area of ecosystemAreas) {
       expect(area.route).toMatch(/^\//);
       expect(area.testGoal.length).toBeGreaterThan(20);
       expect(area.boundary.length).toBeGreaterThan(30);
     }
-    expect(source).toMatch(/23 launchable routes/);
+    expect(source).toMatch(/24 launchable routes/);
     expect(source).toMatch(
-      /Social, creator, asset, commerce, language, and dating/
+      /Social, creator, asset, commerce, language, dating, learning, and gaming/
     );
   });
 
