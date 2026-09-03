@@ -12,6 +12,7 @@ const checks = [
   ["mission control", "/mission-control"],
   ["beta workspace", "/beta-workspace"],
   ["creator evidence studio", "/creator-analytics"],
+  ["operational readiness", "/operational-readiness"],
   ["beta catalog page", "/beta-catalog"],
   ["beta journey", "/beta-journey"],
   ["course catalog", "/course-catalog"],

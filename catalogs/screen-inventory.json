@@ -1,10 +1,10 @@
 {
   "source": "client/src/App.tsx",
-  "totalRoutes": 1065,
+  "totalRoutes": 1066,
   "totalLazyPages": 1055,
-  "totalDirectPages": 8,
+  "totalDirectPages": 9,
   "counts": {
-    "launchable_beta": 16,
+    "launchable_beta": 17,
     "legacy_unverified": 985,
     "controlled_or_unavailable": 64
   },
@@ -17,6 +17,7 @@
     "/creator-analytics",
     "/mission-control",
     "/beta-workspace",
+    "/operational-readiness",
     "/beta-catalog",
     "/beta-journey",
     "/beta-commerce",
@@ -4576,6 +4577,14 @@
       "path": "/beta-workspace",
       "component": "BetaWorkspace",
       "page": "BetaWorkspace",
+      "readiness": "launchable_beta",
+      "requiresAuth": false,
+      "sourceExists": true
+    },
+    {
+      "path": "/operational-readiness",
+      "component": "OperationalReadiness",
+      "page": "OperationalReadiness",
       "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true

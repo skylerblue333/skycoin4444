@@ -262,6 +262,14 @@
 - [ ] Run local database smoke tests, production-like checks, security scans, accessibility checks, and full CI before each tranche merge.
 - [ ] Publish a release report showing completed capabilities, known limits, test evidence, and the remaining legacy route inventory.
 
+## Observability and operational readiness tranche
+
+- [x] Audit existing health, readiness, observability, API status, and audit-log contracts for truthful data and unsafe claims.
+- [x] Build a unified operational readiness view with clear service states, evidence timestamps, and local test guidance.
+- [x] Promote only safe observability routes with no fabricated uptime, traffic, revenue, user, or production-chain metrics.
+- [x] Add route smoke and release regression coverage for healthy, degraded, unavailable, and gated states.
+- [ ] Run full checks, security scans, inventory audit, and GitHub CI before merging.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
