@@ -142,6 +142,20 @@ export const notifications = mysqlTable("notifications", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ============ NOTIFICATION PREFERENCES TABLE ============
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  inAppEnabled: boolean("in_app_enabled").default(true).notNull(),
+  productUpdatesEnabled: boolean("product_updates_enabled").default(false).notNull(),
+  securityAlertsEnabled: boolean("security_alerts_enabled").default(true).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userUnique: uniqueIndex("notification_preferences_user_unique").on(table.userId),
+}));
+
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+
 // ============ MESSAGES TABLE ============
 export const messages = mysqlTable("messages", {
   id: varchar("id", { length: 255 }).primaryKey(),

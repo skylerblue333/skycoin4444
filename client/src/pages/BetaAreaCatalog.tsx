@@ -12,7 +12,7 @@ const statusLabel: Record<string, string> = {
 
 const screenSummary = [
   { label: "Registered routes", value: "1,067" },
-  { label: "Launchable beta", value: "18" },
+  { label: "Launchable beta", value: "19" },
   { label: "Controlled / unavailable", value: "64" },
   { label: "Legacy unverified", value: "985" },
 ] as const;
