@@ -311,7 +311,7 @@
 - [x] Connect notification creation and display behavior to preferences without enabling external delivery.
 - [ ] Add a truthful user-owned activity evidence view with bounded event history and no inferred analytics.
 - [x] Add migration, UI, API, smoke, and safety regression coverage.
-- [ ] Run full gates, security scans, and GitHub CI before merging.
+- [x] Run full gates, security scans, and GitHub CI before merging.
 
 ## Notes
 

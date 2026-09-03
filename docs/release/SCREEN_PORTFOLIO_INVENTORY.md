@@ -8,9 +8,9 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 | --------------------------------- | ----: |
 | Registered routes                 |  1067 |
 | Lazy page modules                 |  1055 |
-| Launchable beta routes            |    18 |
+| Launchable beta routes            |    19 |
 | Controlled or unavailable routes  |    64 |
-| Legacy unverified routes          |   985 |
+| Legacy unverified routes          |   984 |
 | Routes missing a lazy page source |     0 |
 
 ## Launchable beta routes
@@ -30,6 +30,7 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 - /beta-commerce
 - /beta-web3
 - /beta-feedback
+- /notification-preferences
 - /onboarding
 - /profile
 - /sign-up-flow

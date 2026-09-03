@@ -4,8 +4,8 @@
   "totalLazyPages": 1055,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 18,
-    "legacy_unverified": 985,
+    "launchable_beta": 19,
+    "legacy_unverified": 984,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -24,6 +24,7 @@
     "/beta-commerce",
     "/beta-web3",
     "/beta-feedback",
+    "/notification-preferences",
     "/onboarding",
     "/profile",
     "/sign-up-flow"
@@ -5002,7 +5003,7 @@
       "path": "/notification-preferences",
       "component": "NotificationPreferences",
       "page": "NotificationPreferences",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
