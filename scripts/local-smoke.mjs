@@ -18,6 +18,7 @@ const checks = [
   ["discovery center", "/discovery-center"],
   ["notification preferences", "/notification-preferences"],
   ["activity evidence", "/activity-evidence"],
+  ["arcade lab", "/arcade"],
   ["creator live studio", "/live-streaming"],
   ["language exchange lab", "/language-partner-discovery"],
   ["dating profile setup", "/dating-profile-setup"],

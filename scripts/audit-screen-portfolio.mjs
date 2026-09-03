@@ -28,6 +28,7 @@ const protectedBetaPaths = new Set([
   "/beta-feedback",
 ]);
 const launchablePaths = new Set([
+  "/arcade",
   "/",
   "/mission-control",
   "/beta-catalog",

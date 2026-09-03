@@ -1,5 +1,12 @@
 export type EcosystemAreaId =
-  "social" | "live" | "finance" | "commerce" | "language" | "dating";
+  | "social"
+  | "live"
+  | "finance"
+  | "commerce"
+  | "language"
+  | "dating"
+  | "education"
+  | "gaming";
 
 export type EcosystemArea = {
   id: EcosystemAreaId;
@@ -58,7 +65,7 @@ export const ecosystemAreas: readonly EcosystemArea[] = [
   {
     id: "commerce",
     name: "Privacy-first commerce",
-    inspiration: "Marketplace browsing without illicit trade",
+    inspiration: "Modern marketplace browsing",
     description:
       "Search a clearly labeled fixture catalog, build a local cart, and inspect deterministic checkout math.",
     route: "/beta-commerce",
@@ -91,6 +98,32 @@ export const ecosystemAreas: readonly EcosystemArea[] = [
     testGoal: "Save a valid profile, reload, and confirm the draft restores.",
     boundary:
       "No matching, messaging, discovery, identity verification, server persistence, or safety-screening claim.",
+  },
+  {
+    id: "education",
+    name: "SkySchool learning",
+    inspiration: "Structured learning journey",
+    description:
+      "Browse authored lessons, complete deterministic assessments, and exercise the verified course flow.",
+    route: "/course-catalog",
+    status: "Working beta",
+    testGoal:
+      "Open a course, complete an assessment step, and verify the documented progress behavior.",
+    boundary:
+      "No claim of accreditation, proctored exams, universal credential recognition, or production-scale learning analytics.",
+  },
+  {
+    id: "gaming",
+    name: "SkyGaming arcade",
+    inspiration: "Interactive local game lab",
+    description:
+      "Play deterministic local game experiences backed by tested domain logic and explicit simulation boundaries.",
+    route: "/arcade",
+    status: "Local test lab",
+    testGoal:
+      "Play at least three local games, reset their state, and confirm no financial or chain action is offered.",
+    boundary:
+      "No real-money wagering, custody, blockchain settlement, token payouts, durable rankings, or production multiplayer.",
   },
 ] as const;
 

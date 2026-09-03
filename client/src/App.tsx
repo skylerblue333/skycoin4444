@@ -14,6 +14,7 @@ import BetaFeedback from "./pages/BetaFeedback";
 import BetaWorkspace from "./pages/BetaWorkspace";
 import OperationalReadiness from "./pages/OperationalReadiness";
 import DiscoveryCenter from "./pages/DiscoveryCenter";
+import BetaNavigation from "./components/BetaNavigation";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -2160,6 +2161,7 @@ function App() {
       <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
           <Toaster />
+          <BetaNavigation />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

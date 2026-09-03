@@ -45,6 +45,11 @@ const sharedTools = [
     detail: "Review account identity and privacy controls.",
   },
   {
+    name: "HopeAI lab",
+    route: "/a-i-tools-hub",
+    detail: "Explore the verified safe local AI sandbox.",
+  },
+  {
     name: "Beta feedback",
     route: "/beta-feedback",
     detail: "Report a bug, safety issue, or evidence gap.",
@@ -112,7 +117,7 @@ export default function BetaWorkspace() {
             href="/beta-catalog"
             className="hidden text-sm text-amber-200 hover:text-amber-100 sm:block"
           >
-            23 launchable routes →
+            24 launchable routes →
           </Link>
         </div>
       </header>
@@ -124,7 +129,7 @@ export default function BetaWorkspace() {
               One coherent test surface
             </p>
             <h2 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">
-              Social, creator, asset, commerce, language, and dating journeys.
+              Social, creator, asset, commerce, language, dating, learning, and gaming journeys.
             </h2>
             <p className="mt-5 max-w-3xl text-base leading-7 text-white/60">
               Competitor-inspired interaction quality, implemented only where
@@ -306,7 +311,8 @@ export default function BetaWorkspace() {
                 Create an account, publish social activity, test creator
                 devices, inspect the asset boundary, build a fixture cart,
                 generate a language plan, save an adult dating-profile draft,
-                then submit feedback. Refresh after each save to verify the
+                complete a learning step, play deterministic arcade games, then
+                submit feedback. Refresh after each save to verify the
                 documented persistence model.
               </p>
             </div>
