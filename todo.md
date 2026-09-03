@@ -278,6 +278,15 @@
 - [x] Add local smoke coverage and release regressions for empty, success, failure, and unauthorized states.
 - [ ] Run full checks, security scans, inventory audit, and GitHub CI before merging.
 
+## Durable discovery persistence tranche
+
+- [x] Audit the existing schema, migration tooling, and discovery/notification contracts.
+- [x] Add durable user-owned bookmark and search-history tables with indexes and timestamps.
+- [x] Add authenticated procedures for list, create, delete, and clear operations with validation and ownership checks.
+- [x] Connect Discovery Center to durable state while preserving unauthenticated search and explicit local fallback messaging.
+- [x] Add migration, API, unauthorized, and UI regression coverage plus local smoke checks.
+- [ ] Run full gates, security scans, and GitHub CI before merging.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
