@@ -33,9 +33,11 @@ const auditSource = fs.readFileSync(
   "scripts/audit-screen-portfolio.mjs",
   "utf8"
 );
+const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
+const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
 
 describe("competitive ecosystem beta", () => {
-  it("defines six truthful competitor-inspired areas", () => {
+  it("defines eight truthful ecosystem areas", () => {
     expect(ecosystemAreas.map(area => area.id)).toEqual([
       "social",
       "live",
@@ -43,6 +45,8 @@ describe("competitive ecosystem beta", () => {
       "commerce",
       "language",
       "dating",
+      "education",
+      "gaming",
     ]);
     expect(ecosystemAreas.every(area => area.boundary.startsWith("No "))).toBe(
       true
@@ -58,7 +62,7 @@ describe("competitive ecosystem beta", () => {
     expect(normalized.social).toBe(true);
     expect(normalized.live).toBe(false);
     const next = setEcosystemAreaComplete(normalized, "live", true);
-    expect(getEcosystemProgressPercent(next)).toBe(33);
+    expect(getEcosystemProgressPercent(next)).toBe(25);
   });
 
   it("replaces fake live claims with a real local device preview", () => {
@@ -115,13 +119,17 @@ describe("competitive ecosystem beta", () => {
     );
   });
 
-  it("promotes only the three newly evidenced routes", () => {
+  it("promotes evidenced competitive routes including the tested arcade", () => {
     for (const route of [
       "/live-streaming",
       "/language-partner-discovery",
       "/dating-profile-setup",
+      "/arcade",
     ]) {
       expect(auditSource).toContain('"' + route + '"');
     }
+    expect(arcadeSource).toMatch(/Thirteen local game experiences/);
+    expect(arcadeSource).toMatch(/No real-money wagering/);
+    expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
   });
 });
