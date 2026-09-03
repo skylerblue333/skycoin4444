@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { notifications } from "../../drizzle/schema";
+import { notificationPreferences, notifications } from "../../drizzle/schema";
 import { db } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
@@ -16,8 +16,11 @@ export const notificationsRouter = router({
         .optional()
     )
     .query(async ({ ctx, input }) => {
-      const limit = input?.limit ?? 30;
-      const unreadOnly = input?.unreadOnly ?? false;
+          const limit = input?.limit ?? 30;
+    const unreadOnly = input?.unreadOnly ?? false;
+    const preferences = await db.query.notificationPreferences.findFirst({ where: eq(notificationPreferences.userId, ctx.user.id) });
+    if (preferences && !preferences.inAppEnabled) return [];
+
       const ownership = eq(notifications.userId, ctx.user.id);
       const where = unreadOnly
         ? and(ownership, eq(notifications.read, false))
@@ -32,6 +35,8 @@ export const notificationsRouter = router({
     }),
 
   unreadCount: protectedProcedure.query(async ({ ctx }) => {
+    const preferences = await db.query.notificationPreferences.findFirst({ where: eq(notificationPreferences.userId, ctx.user.id) });
+    if (preferences && !preferences.inAppEnabled) return { count: 0 };
     const rows = await db
       .select({ id: notifications.id })
       .from(notifications)

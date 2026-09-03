@@ -12,6 +12,7 @@ const checks = [
   ["creator evidence studio", "/creator-analytics"],
   ["operational readiness", "/operational-readiness"],
   ["discovery center", "/discovery-center"],
+  ["notification preferences", "/notification-preferences"],
   ["beta catalog page", "/beta-catalog"],
   ["beta journey", "/beta-journey"],
   ["course catalog", "/course-catalog"],
