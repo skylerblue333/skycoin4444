@@ -309,7 +309,7 @@
 - [x] Audit notification delivery, preference, audit-ledger, and activity-feed contracts for real ownership and unsupported metrics.
 - [x] Add durable user-owned notification preferences with safe defaults and validation.
 - [x] Connect notification creation and display behavior to preferences without enabling external delivery.
-- [ ] Add a truthful user-owned activity evidence view with bounded event history and no inferred analytics.
+- [x] Add a truthful user-owned activity evidence view with bounded event history and no inferred analytics.
 - [x] Add migration, UI, API, smoke, and safety regression coverage.
 - [x] Run full gates, security scans, and GitHub CI before merging.
 

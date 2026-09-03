@@ -6,9 +6,9 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 
 | Measure                           | Count |
 | --------------------------------- | ----: |
-| Registered routes                 |  1067 |
-| Lazy page modules                 |  1055 |
-| Launchable beta routes            |    19 |
+| Registered routes                 |  1068 |
+| Lazy page modules                 |  1056 |
+| Launchable beta routes            |    20 |
 | Controlled or unavailable routes  |    64 |
 | Legacy unverified routes          |   984 |
 | Routes missing a lazy page source |     0 |
@@ -18,6 +18,7 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 - /
 - /a-i-tools-hub
 - /activity-feed
+- /activity-evidence
 - /community-hub
 - /course-catalog
 - /creator-analytics

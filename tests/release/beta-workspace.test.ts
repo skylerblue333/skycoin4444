@@ -10,7 +10,7 @@ describe("unified beta workspace", () => {
     for (const route of ["/course-catalog", "/community-hub", "/activity-feed", "/profile", "/beta-feedback", "/a-i-tools-hub", "/beta-web3", "/creator-analytics"]) {
       expect(source).toContain(`route: "${route}"`);
     }
-    expect(source).toMatch(/19 launchable beta routes/);
+    expect(source).toMatch(/20 launchable beta routes/);
     expect(source).toMatch(/Creator evidence studio/);
   });
 

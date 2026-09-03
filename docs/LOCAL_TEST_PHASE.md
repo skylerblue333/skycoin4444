@@ -54,6 +54,7 @@ Then manually exercise these routes:
 | `/discovery-center` | Search while signed out, then sign in and save a result; refresh and verify the durable bookmark and account-owned search history remain. |
 | `/creator-analytics` | Sign in, save a content brief, mark it ready for review, refresh, and verify the draft persists; confirm publishing and monetization remain unavailable. |
 | `/operational-readiness` | Verify the page shows JSON-backed health/readiness states and does not invent uptime, traffic, revenue, or chain claims. |
+| `/activity-evidence` | Sign in, complete a lesson or publish a post, then verify the bounded account-owned event appears without inferred analytics or wallet/chain activity. |
 
 ## Reset
 

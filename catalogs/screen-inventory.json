@@ -1,10 +1,10 @@
 {
   "source": "client/src/App.tsx",
-  "totalRoutes": 1067,
-  "totalLazyPages": 1055,
+  "totalRoutes": 1068,
+  "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 19,
+    "launchable_beta": 20,
     "legacy_unverified": 984,
     "controlled_or_unavailable": 64
   },
@@ -12,6 +12,7 @@
     "/",
     "/a-i-tools-hub",
     "/activity-feed",
+    "/activity-evidence",
     "/community-hub",
     "/course-catalog",
     "/creator-analytics",
@@ -365,6 +366,14 @@
       "page": "ActivityFeed",
       "readiness": "launchable_beta",
       "requiresAuth": true,
+      "sourceExists": true
+    },
+    {
+      "path": "/activity-evidence",
+      "component": "ActivityEvidence",
+      "page": "ActivityEvidence",
+      "readiness": "launchable_beta",
+      "requiresAuth": false,
       "sourceExists": true
     },
     {

@@ -47,6 +47,7 @@ const launchablePaths = new Set([
   "/operational-readiness",
   "/discovery-center",
   "/notification-preferences",
+  "/activity-evidence",
 ]);
 const controlledPattern =
   /(wallet|custody|checkout|payment|bank|trading|lending|staking|bridge|token|nft|blockchain|validator|yield|swap|ledger|financial|mining|governance|kyc|aml)/i;
