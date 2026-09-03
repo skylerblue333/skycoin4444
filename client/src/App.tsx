@@ -57,6 +57,7 @@ const Achievements = lazy(() => import('./pages/Achievements'));
 const ActionObjects = lazy(() => import('./pages/ActionObjects'));
 const ActionPanel = lazy(() => import('./pages/ActionPanel'));
 const ActivityFeed = lazy(() => import('./pages/ActivityFeed'));
+const ActivityEvidence = lazy(() => import('./pages/ActivityEvidence'));
 const ActivityTracking = lazy(() => import('./pages/ActivityTracking'));
 const AdaptivePersonalization = lazy(() => import('./pages/AdaptivePersonalization'));
 const AdaptiveRoadmap = lazy(() => import('./pages/AdaptiveRoadmap'));
@@ -1120,6 +1121,7 @@ function Router() {
         <Route path="/action-objects" component={ActionObjects} />
         <Route path="/action-panel" component={ActionPanel} />
         <Route path="/activity-feed" component={ActivityFeed} />
+        <Route path="/activity-evidence" component={ActivityEvidence} />
         <Route path="/activity-tracking" component={ActivityTracking} />
         <Route path="/adaptive-personalization" component={AdaptivePersonalization} />
         <Route path="/adaptive-roadmap" component={AdaptiveRoadmap} />
