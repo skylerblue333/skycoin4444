@@ -11,6 +11,7 @@ const checks = [
   ["beta catalog", "/api/beta/areas"],
   ["mission control", "/mission-control"],
   ["beta workspace", "/beta-workspace"],
+  ["creator evidence studio", "/creator-analytics"],
   ["beta catalog page", "/beta-catalog"],
   ["beta journey", "/beta-journey"],
   ["course catalog", "/course-catalog"],

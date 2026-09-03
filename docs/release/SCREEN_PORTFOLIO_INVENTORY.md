@@ -8,9 +8,9 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 | --------------------------------- | ----: |
 | Registered routes                 |  1065 |
 | Lazy page modules                 |  1055 |
-| Launchable beta routes            |    15 |
+| Launchable beta routes            |    16 |
 | Controlled or unavailable routes  |    64 |
-| Legacy unverified routes          |   986 |
+| Legacy unverified routes          |   985 |
 | Routes missing a lazy page source |     0 |
 
 ## Launchable beta routes
@@ -20,6 +20,7 @@ Generated from client/src/App.tsx. This report is an engineering inventory, not 
 - /activity-feed
 - /community-hub
 - /course-catalog
+- /creator-analytics
 - /mission-control
 - /beta-workspace
 - /beta-catalog

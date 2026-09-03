@@ -7,10 +7,11 @@ const app = fs.readFileSync("client/src/App.tsx", "utf8");
 describe("unified beta workspace", () => {
   it("is registered and exposes the working journeys", () => {
     expect(app).toMatch(/path="\/beta-workspace" component=\{BetaWorkspace\}/);
-    for (const route of ["/course-catalog", "/community-hub", "/activity-feed", "/profile", "/beta-feedback", "/a-i-tools-hub", "/beta-web3"]) {
+    for (const route of ["/course-catalog", "/community-hub", "/activity-feed", "/profile", "/beta-feedback", "/a-i-tools-hub", "/beta-web3", "/creator-analytics"]) {
       expect(source).toContain(`route: "${route}"`);
     }
-    expect(source).toMatch(/14 launchable beta routes/);
+    expect(source).toMatch(/16 launchable beta routes/);
+    expect(source).toMatch(/Creator evidence studio/);
   });
 
   it("keeps unsupported high-risk capability classes explicit", () => {

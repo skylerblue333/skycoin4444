@@ -4,8 +4,8 @@
   "totalLazyPages": 1055,
   "totalDirectPages": 8,
   "counts": {
-    "launchable_beta": 15,
-    "legacy_unverified": 986,
+    "launchable_beta": 16,
+    "legacy_unverified": 985,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -14,6 +14,7 @@
     "/activity-feed",
     "/community-hub",
     "/course-catalog",
+    "/creator-analytics",
     "/mission-control",
     "/beta-workspace",
     "/beta-catalog",
@@ -1895,7 +1896,7 @@
       "path": "/creator-analytics",
       "component": "CreatorAnalytics",
       "page": "CreatorAnalytics",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
