@@ -14,7 +14,7 @@ cp .env.local.example .env.local
 pnpm local:doctor
 ```
 
-The supplied `.env.local.example` points to `127.0.0.1:3307` and a database named `skycoin4444_local`. The local database script refuses to reset or migrate any non-local hostname or database name.
+The supplied `.env.local.example` points to `127.0.0.1:3307` and a database named `skycoin4444_local`. The local database script refuses to reset or migrate any non-local hostname or database name. The migration set includes durable discovery bookmarks/search history and durable creator evidence drafts.
 
 ## Start the local test environment
 
@@ -24,9 +24,10 @@ pnpm local:db
 pnpm dev:local
 ```
 
-Open `http://localhost:3000/`. If port 3000 is busy, the server prints the actual port it selected. Set `LOCAL_BASE_URL` to that URL when running the smoke test.
+Open `http://localhost:3000/`. If port 3000 is busy, the server prints the actual port it selected. Set `BACKEND_BASE_URL` to that URL when running the smoke test; `LOCAL_BASE_URL` remains accepted as a compatibility alias.
 
-The local test account is named **Local Test User** and is created only by the local database bootstrap. With `LOCAL_TEST_MODE=true`, development requests use this account when no OAuth session is present. The bypass is active only when both `NODE_ENV=development` and `LOCAL_TEST_MODE=true` are set.
+The local test account is named **Local Test User** and is created only by the local database bootstrap. Run `pnpm local:db` after every schema migration so migrations 0001 through 0007 are applied in order.
+ With `LOCAL_TEST_MODE=true`, development requests use this account when no OAuth session is present. The bypass is active only when both `NODE_ENV=development` and `LOCAL_TEST_MODE=true` are set.
 
 ## Smoke test
 
@@ -50,6 +51,9 @@ Then manually exercise these routes:
 | `/beta-feedback` | Submit a clear bug or content report and confirm the success state. |
 | `/beta-web3` | Search local/testnet fixtures and confirm there are no wallet, signing, custody, transfer, or mainnet-write controls. |
 | `/a-i-tools-hub` | Run outline, action extraction, and safety scan against a note; confirm the result is local-only and no provider-backed controls are presented. |
+| `/discovery-center` | Search while signed out, then sign in and save a result; refresh and verify the durable bookmark and account-owned search history remain. |
+| `/creator-analytics` | Sign in, save a content brief, mark it ready for review, refresh, and verify the draft persists; confirm publishing and monetization remain unavailable. |
+| `/operational-readiness` | Verify the page shows JSON-backed health/readiness states and does not invent uptime, traffic, revenue, or chain claims. |
 
 ## Reset
 
@@ -64,7 +68,8 @@ This command is intentionally blocked unless `DATABASE_URL` points to localhost 
 
 ## Troubleshooting
 
-If `pnpm install` reports slow tarballs or a timeout, rerun it after checking the network; the repository `.npmrc` has extended fetch timeouts and retries. The `gh` command is not required—use the documented `git clone` command. If MySQL is not ready, wait a few seconds and rerun `pnpm local:db`. If port 3307 is occupied, stop the conflicting process or change the host-side port in `docker-compose.local.yml` and update `DATABASE_URL` in `.env.local` to match. If protected pages show signed-out state, verify `.env.local` contains `LOCAL_TEST_MODE=true`, restart `pnpm dev:local`, and confirm the local database contains `local-test-user`.
+If `pnpm install` reports slow tarballs or a timeout, rerun it after checking the network; the repository `.npmrc` has extended fetch timeouts and retries. The `gh` command is not required—use the documented `git clone` command. If MySQL is not ready, wait a few seconds and rerun `pnpm local:db`. If the smoke test reports that an API returned `text/html`, you are targeting the Vite app shell; start `pnpm dev:local`, use its printed backend port, and run `BACKEND_BASE_URL=http://localhost:<port> pnpm local:smoke`.
+ If port 3307 is occupied, stop the conflicting process or change the host-side port in `docker-compose.local.yml` and update `DATABASE_URL` in `.env.local` to match. If protected pages show signed-out state, verify `.env.local` contains `LOCAL_TEST_MODE=true`, restart `pnpm dev:local`, and confirm the local database contains `local-test-user`.
 
 ## Current limits
 
