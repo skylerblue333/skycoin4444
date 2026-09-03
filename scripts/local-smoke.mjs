@@ -1,9 +1,7 @@
 import process from "node:process";
 
-const baseUrl = (process.env.LOCAL_BASE_URL ?? "http://localhost:3000").replace(
-  /\/$/,
-  ""
-);
+const baseUrl = (process.env.BACKEND_BASE_URL ?? process.env.LOCAL_BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
 const checks = [
   ["home", "/"],
   ["beta health", "/api/beta/health"],
@@ -28,42 +26,31 @@ const checks = [
   ["sign-up flow", "/sign-up-flow"],
 ];
 
+async function fetchJson(path, label) {
+  const response = await fetch(`${baseUrl}${path}`, { headers: { accept: "application/json" } });
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!response.ok) throw new Error(`${label} failed: ${response.status} ${response.statusText}`);
+  if (!contentType.includes("application/json")) {
+    throw new Error(`${label} returned ${contentType || "no content type"}. This usually means LOCAL_BASE_URL points at a Vite-only app shell. Start pnpm dev:local and set BACKEND_BASE_URL to the backend port.`);
+  }
+  return response.json();
+}
+
 for (const [label, path] of checks) {
   const response = await fetch(`${baseUrl}${path}`);
-  if (!response.ok)
-    throw new Error(
-      `${label} failed: ${response.status} ${response.statusText}`
-    );
+  if (!response.ok) throw new Error(`${label} failed: ${response.status} ${response.statusText}`);
   console.log(`PASS ${label}: ${response.status}`);
 }
 
-const readinessResponse = await fetch(`${baseUrl}/api/beta/readiness`);
-const readiness = await readinessResponse.json();
-if (
-  !readinessResponse.ok ||
-  readiness.status !== "ready" ||
-  readiness.database !== "ok"
-)
-  throw new Error("Readiness failed: database is not available");
+const readiness = await fetchJson("/api/beta/readiness", "Readiness");
+if (readiness.status !== "ready" || readiness.database !== "ok") throw new Error(`Readiness failed: status=${readiness.status ?? "unknown"}, database=${readiness.database ?? "unknown"}. Run pnpm local:up && pnpm local:db, then restart pnpm dev:local.`);
 console.log("PASS readiness: application and database are available");
 
-const health = await fetch(`${baseUrl}/api/beta/health`).then(response =>
-  response.json()
-);
-if (
-  health.liveFinancialOrChainExecution !== false ||
-  readiness.liveFinancialOrChainExecution !== false
-)
-  throw new Error(
-    "Safety gate failed: live financial or chain execution is not false"
-  );
+const health = await fetchJson("/api/beta/health", "Health");
+if (health.liveFinancialOrChainExecution !== false || readiness.liveFinancialOrChainExecution !== false) throw new Error("Safety gate failed: live financial or chain execution is not explicitly false");
 console.log("PASS safety gate: live financial and chain execution disabled");
 
-const publicAuth = await fetch(`${baseUrl}/api/trpc/auth.me`).then(response =>
-  response.json()
-);
-if (publicAuth?.result?.data?.json !== null)
-  throw new Error("Expected signed-out auth.me to return null");
+const publicAuth = await fetchJson("/api/trpc/auth.me", "Auth state");
+if (publicAuth?.result?.data?.json !== null) throw new Error("Expected signed-out auth.me to return null when local test mode is disabled");
 console.log("PASS signed-out auth state");
-
 console.log(`Local smoke test passed for ${baseUrl}`);

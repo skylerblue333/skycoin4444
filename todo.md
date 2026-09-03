@@ -296,6 +296,14 @@
 - [x] Add migration, API, UI, local smoke, and release regression coverage.
 - [ ] Run full gates, security scans, and GitHub CI before merging.
 
+## Production-like local verification tranche
+
+- [x] Audit local database, migration, readiness, and smoke assumptions after migrations 0006 and 0007.
+- [x] Improve diagnostics for missing Docker, missing DATABASE_URL, wrong server targets, and migration failures.
+- [x] Expand local smoke coverage to verify durable discovery and creator API contracts where the backend is available.
+- [x] Document exact commands, expected URLs, readiness JSON, and safe failure interpretation.
+- [ ] Run full repository gates, security scans, and GitHub CI before merging.
+
 ## Notes
 
 - All 1,066+ screens must be fully functional before RC1 release
