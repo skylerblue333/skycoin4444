@@ -249,6 +249,21 @@ export const searchHistory = mysqlTable("search_history", {
 export type DiscoveryBookmark = typeof discoveryBookmarks.$inferSelect;
 export type SearchHistory = typeof searchHistory.$inferSelect;
 
+// ============ CREATOR EVIDENCE DRAFTS TABLE ============
+export const creatorEvidenceDrafts = mysqlTable("creator_evidence_drafts", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  title: varchar("title", { length: 120 }).notNull(),
+  brief: text("brief").notNull(),
+  status: varchar("status", { length: 32 }).default("draft").notNull(), // draft | ready_for_review | archived
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userUpdatedAtIndex: uniqueIndex("creator_evidence_drafts_user_updated_at_index").on(table.userId, table.updatedAt, table.id),
+}));
+
+export type CreatorEvidenceDraft = typeof creatorEvidenceDrafts.$inferSelect;
+
 // ============ TOKEN BALANCES TABLE ============
 export const tokenBalances = mysqlTable("token_balances", {
   id: varchar("id", { length: 255 }).primaryKey(),
