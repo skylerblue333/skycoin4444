@@ -14,10 +14,10 @@ describe("discovery center", () => {
   });
 
   it("labels browser-local bookmarks and prevents unsupported claims", () => {
-    expect(source).toContain("browser-local");
-    expect(source).toContain("BOOKMARK_KEY");
+    expect(source).toContain("durable");
+    expect(source).toContain("account-owned");
     expect(source).toMatch(/No transactions or purchases/);
     expect(source).toMatch(/No wallet or chain lookups/);
-    expect(source).not.toMatch(/purchaseVolume:|searchVolume:|rankingScore:|walletBalance:|transferCount:/);
+    expect(source).not.toMatch(/purchaseVolume:|searchVolume:|rankingScore:|walletBalance:|transferCount:|localStorage/);
   });
 });

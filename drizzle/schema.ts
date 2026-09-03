@@ -223,6 +223,32 @@ export const courseProgress = mysqlTable("course_progress", {
 export type CourseProgress = typeof courseProgress.$inferSelect;
 export type InsertCourseProgress = typeof courseProgress.$inferInsert;
 
+// ============ DISCOVERY PERSISTENCE TABLES ============
+export const discoveryBookmarks = mysqlTable("discovery_bookmarks", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  targetKind: varchar("target_kind", { length: 32 }).notNull(), // user | post | product
+  targetId: varchar("target_id", { length: 255 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  detail: text("detail").notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userTargetUnique: uniqueIndex("discovery_bookmarks_user_target_unique").on(table.userId, table.targetKind, table.targetId),
+  userCreatedAtIndex: uniqueIndex("discovery_bookmarks_user_created_at_index").on(table.userId, table.createdAt, table.id),
+}));
+
+export const searchHistory = mysqlTable("search_history", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  query: varchar("query", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userCreatedAtIndex: uniqueIndex("search_history_user_created_at_index").on(table.userId, table.createdAt, table.id),
+}));
+
+export type DiscoveryBookmark = typeof discoveryBookmarks.$inferSelect;
+export type SearchHistory = typeof searchHistory.$inferSelect;
+
 // ============ TOKEN BALANCES TABLE ============
 export const tokenBalances = mysqlTable("token_balances", {
   id: varchar("id", { length: 255 }).primaryKey(),
