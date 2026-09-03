@@ -44,6 +44,7 @@ const launchablePaths = new Set([
   "/a-i-tools-hub",
   "/beta-workspace",
   "/creator-analytics",
+  "/operational-readiness",
 ]);
 const controlledPattern =
   /(wallet|custody|checkout|payment|bank|trading|lending|staking|bridge|token|nft|blockchain|validator|yield|swap|ledger|financial|mining|governance|kyc|aml)/i;

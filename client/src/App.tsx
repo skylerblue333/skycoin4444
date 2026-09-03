@@ -12,6 +12,7 @@ import BetaCommerceSandbox from "./pages/BetaCommerceSandbox";
 import BetaWeb3Sandbox from "./pages/BetaWeb3Sandbox";
 import BetaFeedback from "./pages/BetaFeedback";
 import BetaWorkspace from "./pages/BetaWorkspace";
+import OperationalReadiness from "./pages/OperationalReadiness";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -1645,6 +1646,7 @@ function Router() {
         <Route path="/mining-pool-selector" component={MiningPoolSelector} />
         <Route path="/mission-control" component={MissionControl} />
         <Route path="/beta-workspace" component={BetaWorkspace} />
+        <Route path="/operational-readiness" component={OperationalReadiness} />
         <Route path="/beta-catalog" component={BetaAreaCatalog} />
         <Route path="/beta-journey" component={BetaJourney} />
         <Route path="/beta-commerce" component={BetaCommerceSandbox} />
