@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 20,
-    "legacy_unverified": 984,
+    "launchable_beta": 23,
+    "legacy_unverified": 981,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -16,6 +16,9 @@
     "/community-hub",
     "/course-catalog",
     "/creator-analytics",
+    "/dating-profile-setup",
+    "/language-partner-discovery",
+    "/live-streaming",
     "/mission-control",
     "/beta-workspace",
     "/operational-readiness",
@@ -2292,7 +2295,7 @@
       "path": "/dating-profile-setup",
       "component": "DatingProfileSetup",
       "page": "DatingProfileSetup",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -4028,7 +4031,7 @@
       "path": "/language-partner-discovery",
       "component": "LanguagePartnerDiscovery",
       "page": "LanguagePartnerDiscovery",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -4228,7 +4231,7 @@
       "path": "/live-streaming",
       "component": "LiveStreaming",
       "page": "LiveStreaming",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },

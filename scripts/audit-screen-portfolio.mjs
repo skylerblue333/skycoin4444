@@ -48,6 +48,9 @@ const launchablePaths = new Set([
   "/discovery-center",
   "/notification-preferences",
   "/activity-evidence",
+  "/live-streaming",
+  "/language-partner-discovery",
+  "/dating-profile-setup",
 ]);
 const controlledPattern =
   /(wallet|custody|checkout|payment|bank|trading|lending|staking|bridge|token|nft|blockchain|validator|yield|swap|ledger|financial|mining|governance|kyc|aml)/i;
