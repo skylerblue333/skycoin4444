@@ -71,7 +71,30 @@ describe("beta status routes", () => {
     await handler({}, response);
 
     expect(body.statusCode).toBe(503);
-    expect(body.payload).toMatchObject({ status: "not_ready", database: "unavailable", liveFinancialOrChainExecution: false });
+    expect(body.payload).toMatchObject({ status: "not_ready", database: "unavailable", configuration: "ok", liveFinancialOrChainExecution: false });
+  });
+
+  it("fails closed before the database probe when production configuration is invalid", async () => {
+    const { body, response } = createResponse();
+    let databaseProbed = false;
+    const handler = createBetaReadinessHandler(
+      async () => {
+        databaseProbed = true;
+      },
+      () => [{ key: "JWT_SECRET", message: "too short" }]
+    );
+
+    await handler({}, response);
+
+    expect(databaseProbed).toBe(false);
+    expect(body.statusCode).toBe(503);
+    expect(body.payload).toMatchObject({
+      status: "not_ready",
+      database: "unknown",
+      configuration: "invalid",
+      configurationIssueKeys: ["JWT_SECRET"],
+      liveFinancialOrChainExecution: false,
+    });
   });
 
   it("serves all registered areas with no-store caching", () => {

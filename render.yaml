@@ -5,13 +5,17 @@ services:
     plan: free
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm run build
     startCommand: pnpm start
-    healthCheckPath: /api/beta/health
+    healthCheckPath: /api/beta/readiness
     autoDeploy: false
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: LOCAL_TEST_MODE
+        value: "false"
+      - key: BETA_ACCESS_MODE
+        value: invite_only
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
@@ -20,7 +24,15 @@ services:
         sync: false
       - key: OAUTH_SERVER_URL
         sync: false
+      - key: VITE_OAUTH_PORTAL_URL
+        sync: false
+      - key: BETA_PUBLIC_ORIGIN
+        sync: false
       - key: OWNER_OPEN_ID
+        sync: false
+      - key: BETA_ALLOWED_EMAILS
+        sync: false
+      - key: BETA_ALLOWED_OPEN_IDS
         sync: false
       - key: BUILT_IN_FORGE_API_URL
         sync: false

@@ -34,6 +34,10 @@ pnpm dev:local
 
 In a second terminal, run `pnpm local:smoke`. Then open the printed local URL and exercise `/course-catalog`, `/community-hub`, `/activity-feed`, `/beta-feedback`, `/profile`, and `/beta-web3`. Use `pnpm local:reset` only when you intentionally want to clear the local database. Read [`docs/LOCAL_TEST_PHASE.md`](docs/LOCAL_TEST_PHASE.md) for expected outcomes and recovery steps.
 
+## Invitation beta deployment
+
+The repository now contains a fail-closed production configuration contract, OAuth-only invitation admission, a guarded empty managed-MySQL bootstrap, a non-secret `.env.beta.example`, and a Render web-service blueprint. These are deployment prerequisites, not evidence that a public beta is already live. See [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md).
+
 ## Canonical execution surface
 
 The root `package.json` is the canonical engineering-beta workspace surface:
@@ -58,6 +62,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.
 - [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
 - [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
+- [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md) — invitation-only deployment, production configuration, managed-database bootstrap, and verification gates.
 - [`docs/INTEGRATION_CONTRACTS.md`](docs/INTEGRATION_CONTRACTS.md) — cross-product contracts and fail-closed behavior.
 - [`docs/ENGINEERING_BETA_LIMITATIONS.md`](docs/ENGINEERING_BETA_LIMITATIONS.md) — explicit non-production limitations.
 - [`docs/CANONICAL_ARCHITECTURE_INVENTORY.md`](docs/CANONICAL_ARCHITECTURE_INVENTORY.md) — evidence-based authoritative-vs-legacy inventory rules.
