@@ -4,20 +4,28 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 24,
-    "legacy_unverified": 980,
+    "launchable_beta": 32,
+    "legacy_unverified": 972,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
     "/",
     "/a-i-tools-hub",
+    "/accessibility-settings",
     "/activity-feed",
     "/activity-evidence",
+    "/advanced-search",
     "/arcade",
+    "/blog-editor",
+    "/calculator",
+    "/calendar",
     "/community-hub",
     "/course-catalog",
     "/creator-analytics",
     "/dating-profile-setup",
+    "/event-planner",
+    "/file-converter",
+    "/help-center",
     "/language-partner-discovery",
     "/live-streaming",
     "/mission-control",
@@ -312,7 +320,7 @@
       "path": "/accessibility-settings",
       "component": "AccessibilitySettings",
       "page": "AccessibilitySettings",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -504,7 +512,7 @@
       "path": "/advanced-search",
       "component": "AdvancedSearch",
       "page": "AdvancedSearch",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -984,7 +992,7 @@
       "path": "/blog-editor",
       "component": "BlogEditor",
       "page": "BlogEditor",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1152,7 +1160,7 @@
       "path": "/calculator",
       "component": "Calculator",
       "page": "Calculator",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1160,7 +1168,7 @@
       "path": "/calendar",
       "component": "Calendar",
       "page": "Calendar",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -2944,7 +2952,7 @@
       "path": "/event-planner",
       "component": "EventPlanner",
       "page": "EventPlanner",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -3144,7 +3152,7 @@
       "path": "/file-converter",
       "component": "FileConverter",
       "page": "FileConverter",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -3704,7 +3712,7 @@
       "path": "/help-center",
       "component": "HelpCenter",
       "page": "HelpCenter",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },

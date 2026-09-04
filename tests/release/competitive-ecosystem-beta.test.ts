@@ -33,6 +33,9 @@ const auditSource = fs.readFileSync(
   "scripts/audit-screen-portfolio.mjs",
   "utf8"
 );
+const evidenceRegistry = JSON.parse(
+  fs.readFileSync("catalogs/beta-route-evidence.json", "utf8")
+);
 const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
 const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
 
@@ -119,14 +122,18 @@ describe("competitive ecosystem beta", () => {
     );
   });
 
-  it("promotes evidenced competitive routes including the tested arcade", () => {
+  it("promotes evidenced competitive routes through the shared registry", () => {
+    const registryRoutes = new Set(
+      evidenceRegistry.routes.map((entry: { route: string }) => entry.route)
+    );
+    expect(auditSource).toMatch(/beta-route-evidence\.json/);
     for (const route of [
       "/live-streaming",
       "/language-partner-discovery",
       "/dating-profile-setup",
       "/arcade",
     ]) {
-      expect(auditSource).toContain('"' + route + '"');
+      expect(registryRoutes.has(route)).toBe(true);
     }
     expect(arcadeSource).toMatch(/Thirteen local game experiences/);
     expect(arcadeSource).toMatch(/No real-money wagering/);

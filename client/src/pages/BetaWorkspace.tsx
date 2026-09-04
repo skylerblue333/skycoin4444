@@ -30,6 +30,16 @@ import {
 
 const sharedTools = [
   {
+    name: "Beta route search",
+    route: "/advanced-search",
+    detail: "Search all evidence-backed launchable routes and boundaries.",
+  },
+  {
+    name: "Help center",
+    route: "/help-center",
+    detail: "Search verified testing guidance and support paths.",
+  },
+  {
     name: "Community hub",
     route: "/community-hub",
     detail: "Create and join persisted communities.",
@@ -117,7 +127,7 @@ export default function BetaWorkspace() {
             href="/beta-catalog"
             className="hidden text-sm text-amber-200 hover:text-amber-100 sm:block"
           >
-            24 launchable routes →
+            32 launchable routes →
           </Link>
         </div>
       </header>
@@ -258,7 +268,7 @@ export default function BetaWorkspace() {
               <Sparkles className="h-5 w-5 text-violet-200" />
               <CardTitle className="mt-2">Shared platform tools</CardTitle>
               <CardDescription className="text-white/50">
-                Use these across the six headline test journeys.
+                Use these across the headline test journeys.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">

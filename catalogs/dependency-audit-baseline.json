@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "lockfilePath": "pnpm-lock.yaml",
+  "lockfileGitBlobSha": "502abe09815b280aec99a155d499aecb4273bb27",
+  "auditCommand": "pnpm audit --prod --audit-level high",
+  "auditConclusion": "success",
+  "evidenceRunId": 33817960900,
+  "evidenceRunUrl": "https://github.com/skylerblue333/skycoin4444/actions/runs/33817960900",
+  "evidenceCommit": "57cab729255c20de9a29b95743e7740b53a3c57e",
+  "note": "Fallback evidence is valid only while pnpm-lock.yaml is byte-for-byte identical. A changed lockfile requires a successful live audit."
+}

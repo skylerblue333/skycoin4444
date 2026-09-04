@@ -45,7 +45,7 @@ describe("ecosystem navigation and visual foundation", () => {
     ]) {
       expect(home).toContain(route);
     }
-    expect(home).toMatch(/24 beta routes/);
+    expect(home).toMatch(/32 beta routes/);
     expect(home).toMatch(/9.*headline journeys/);
     expect(home).toMatch(/No invented users, traffic, balances/);
   });

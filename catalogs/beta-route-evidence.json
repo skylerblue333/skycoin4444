@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "description": "Evidence registry for routes that may be classified as launchable_beta by scripts/audit-screen-portfolio.mjs. Adding a route here is not enough by itself: its implementation and tests must support the evidence recorded.",
+  "routes": [
+    {
+      "route": "/",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/a-i-tools-hub",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/activity-feed",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/activity-evidence",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/arcade",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/community-hub",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/course-catalog",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/creator-analytics",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/dating-profile-setup",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/language-partner-discovery",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/live-streaming",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/mission-control",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-workspace",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/operational-readiness",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/discovery-center",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-catalog",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-journey",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-commerce",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-web3",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/beta-feedback",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/notification-preferences",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/onboarding",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/profile",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/sign-up-flow",
+      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+      "persistence": "Route-specific; see implementation and release docs",
+      "evidence": [
+        "existing launchable-beta classification",
+        "canonical CI history"
+      ],
+      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+    },
+    {
+      "route": "/calculator",
+      "capability": "Local arithmetic calculator with deterministic history",
+      "persistence": "Browser localStorage history",
+      "evidence": [
+        "interactive calculator UI",
+        "deterministic arithmetic helpers",
+        "release regression test"
+      ],
+      "boundary": "No financial advice, exchange pricing, provider calls, or server persistence."
+    },
+    {
+      "route": "/calendar",
+      "capability": "Local event planner with create, complete, filter, and restore",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "validated event creation",
+        "local persistence",
+        "release regression test"
+      ],
+      "boundary": "No external calendar synchronization, invitations, reminders, or server persistence."
+    },
+    {
+      "route": "/help-center",
+      "capability": "Searchable beta help and support navigation",
+      "persistence": "None",
+      "evidence": [
+        "search/filter behavior",
+        "verified internal support links",
+        "release regression test"
+      ],
+      "boundary": "No fabricated support agents, SLA, live chat, or ticket resolution."
+    },
+    {
+      "route": "/accessibility-settings",
+      "capability": "Local accessibility preference preview",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "text scale control",
+        "contrast preview",
+        "reduced-motion preview",
+        "release regression test"
+      ],
+      "boundary": "Preferences are local beta settings and do not certify WCAG conformance across all historical pages."
+    },
+    {
+      "route": "/file-converter",
+      "capability": "Local text/JSON/CSV/TSV conversion utility",
+      "persistence": "None",
+      "evidence": [
+        "browser FileReader input",
+        "deterministic conversions",
+        "local download",
+        "release regression test"
+      ],
+      "boundary": "No server upload, OCR, binary conversion, cloud storage, or malware scanning."
+    },
+    {
+      "route": "/blog-editor",
+      "capability": "Local blog drafting workspace with preview and autosave",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "title/body editing",
+        "word count",
+        "local autosave",
+        "release regression test"
+      ],
+      "boundary": "No publication, remote collaboration, moderation approval, or server persistence."
+    },
+    {
+      "route": "/advanced-search",
+      "capability": "Searchable launchable-beta route directory",
+      "persistence": "None",
+      "evidence": [
+        "route registry search",
+        "category-free deterministic filtering",
+        "release regression test"
+      ],
+      "boundary": "Search covers the beta promotion registry only, not users, private records, or web content."
+    },
+    {
+      "route": "/event-planner",
+      "capability": "Local drag-and-drop event floor planner",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "table add/remove",
+        "drag layout",
+        "restored saved layout",
+        "release regression test"
+      ],
+      "boundary": "No real-time sync, guest invitations, venue booking, external maps, or server persistence."
+    }
+  ]
+}
