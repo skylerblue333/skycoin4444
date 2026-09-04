@@ -23,6 +23,20 @@ describe("event fabric server registry", () => {
     ]);
     expect(snapshot.idempotencyRecordExpiryConfigured).toBe(false);
     expect(snapshot.dispatcherConfigured).toBe(false);
+    expect(snapshot.dispatcherMode).toBe("disabled");
+    expect(snapshot.internalConsumer).toBe("platform-event-observer");
+    expect(snapshot.durableConsumerReceipts).toBe(true);
+    expect(snapshot.externalTransportConfigured).toBe(false);
+    expect(snapshot.productionDeliveryClaim).toBe(false);
+  });
+
+  it("reports the internal dispatcher only when explicitly enabled", () => {
+    const snapshot = getEventFabricSnapshot({
+      EVENT_OUTBOX_DISPATCHER_ENABLED: "true",
+    } as NodeJS.ProcessEnv);
+
+    expect(snapshot.dispatcherConfigured).toBe(true);
+    expect(snapshot.dispatcherMode).toBe("internal_observer");
     expect(snapshot.externalTransportConfigured).toBe(false);
     expect(snapshot.productionDeliveryClaim).toBe(false);
   });
