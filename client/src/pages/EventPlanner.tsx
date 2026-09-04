@@ -91,11 +91,12 @@ export default function EventPlanner() {
   const onMouseDown = (event: React.MouseEvent, id: string) => {
     event.preventDefault();
     const table = tables.find(item => item.id === id);
-    if (!table) return;
+    const bounds = canvasRef.current?.getBoundingClientRect();
+    if (!table || !bounds) return;
     setDragging(id);
     setOffset({
-      x: event.clientX - table.x,
-      y: event.clientY - table.y,
+      x: event.clientX - bounds.left - table.x,
+      y: event.clientY - bounds.top - table.y,
     });
   };
 
