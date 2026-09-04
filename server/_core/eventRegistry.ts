@@ -33,7 +33,12 @@ const descriptors: readonly EventDescriptor[] = [
 
 export const skycoinEventRegistry = compileEventRegistry(descriptors);
 
-export function getEventFabricSnapshot() {
+export function getEventFabricSnapshot(
+  env: NodeJS.ProcessEnv = process.env
+) {
+  const internalDispatcherEnabled =
+    env.EVENT_OUTBOX_DISPATCHER_ENABLED === "true";
+
   return Object.freeze({
     contract: "skycoin4444.event-fabric.v1" as const,
     registryFingerprint: skycoinEventRegistry.fingerprint,
@@ -46,11 +51,16 @@ export function getEventFabricSnapshot() {
       "social.post.create",
     ] as const,
     idempotencyRecordExpiryConfigured: false as const,
-    dispatcherConfigured: false as const,
+    dispatcherConfigured: internalDispatcherEnabled,
+    dispatcherMode: internalDispatcherEnabled
+      ? ("internal_observer" as const)
+      : ("disabled" as const),
+    internalConsumer: "platform-event-observer" as const,
+    durableConsumerReceipts: true as const,
     externalTransportConfigured: false as const,
     productionDeliveryClaim: false as const,
     limitation:
-      "Selected create mutations support actor-scoped replay-safe Idempotency-Key handling and transactionally persist outbox events, but no external broker/transport, automatic idempotency-record expiry, or background dispatcher is claimed.",
+      "Selected create mutations support replay-safe Idempotency-Key handling. The optional dispatcher can lease, retry, dead-letter, and internally observe outbox events with durable consumer receipts, but no external broker/transport, automatic idempotency-record expiry, or exactly-once external delivery is claimed.",
   });
 }
 
