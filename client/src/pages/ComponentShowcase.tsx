@@ -222,7 +222,7 @@ export default function ComponentsShowcase() {
     setTimeout(() => {
       const aiResponse: Message = {
         role: "assistant",
-        content: `This is a **demo response**. In a real app, you would call a tRPC mutation here:\n\n\`\`\`typescript\nconst chatMutation = trpc.ai.chat.useMutation({\n  onSuccess: (response) => {\n    setChatMessages(prev => [...prev, {\n      role: "assistant",\n      content: response.choices[0].message.content\n    }]);\n  }\n});\n\nchatMutation.mutate({ messages: newMessages });\n\`\`\`\n\nYour message was: "${content}"`,
+        content: `This is a **local canned demo response**. No AI provider is contacted. A separately configured integration could call a server procedure such as:\n\n\`\`\`typescript\nconst chatMutation = trpc.ai.chat.useMutation({\n  onSuccess: (response) => {\n    setChatMessages(prev => [...prev, {\n      role: "assistant",\n      content: response.choices[0].message.content\n    }]);\n  }\n});\n\nchatMutation.mutate({ messages: newMessages });\n\`\`\`\n\nYour message was: "${content}"`,
       };
       setChatMessages([...newMessages, aiResponse]);
       setIsChatLoading(false);
@@ -232,6 +232,15 @@ export default function ComponentsShowcase() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="container max-w-6xl mx-auto">
+        <section className="mb-8 rounded-2xl border border-amber-500/25 bg-amber-500/5 p-5">
+          <p className="text-sm font-semibold">Interactive component lab</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This page exercises local UI components and demo state. The AI chat
+            example returns a canned local response; it does not contact an AI
+            provider, create production data, process payments, or perform
+            irreversible server actions.
+          </p>
+        </section>
         <div className="space-y-2 justify-between flex">
           <h2 className="text-3xl font-bold tracking-tight mb-6">
             Shadcn/ui Component Library
