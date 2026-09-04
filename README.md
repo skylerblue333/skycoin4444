@@ -25,6 +25,8 @@ The social beta now has database-enforced uniqueness for likes and follows. Foll
 
 Post creation and beta-feedback submission now support actor-scoped, replay-safe `Idempotency-Key` handling backed by the durable idempotency ledger. Matching retries replay the stored response; key reuse with different input fails closed.
 
+The canonical server now applies production CSP/HSTS plus framing, opener, resource, MIME, referrer, permissions, and origin-agent controls. The default HTML no longer contains an implicit analytics-provider hook; analytics must be added as an explicit reviewed integration.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -76,6 +78,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
+- [`docs/BROWSER_SECURITY.md`](docs/BROWSER_SECURITY.md) — production CSP/HSTS, browser isolation headers, and analytics privacy boundary.
 - [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
 - [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
 - [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md) — invitation-only deployment, production configuration, managed-database bootstrap, and verification gates.
