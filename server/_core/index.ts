@@ -10,6 +10,7 @@ import { registerEventFabricRoutes } from "./eventRegistry";
 import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import { closeDatabasePool } from "../db";
 import { serveStatic, setupVite } from "./vite";
 import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
@@ -19,8 +20,13 @@ import { createDependencyReadinessCoordinator } from "./readiness";
 import {
   createOutboxDispatcherService,
   registerOutboxDispatcherRoutes,
-  registerOutboxDispatcherSignals,
 } from "./outboxDispatcher";
+import {
+  ApplicationShutdownCoordinator,
+  applicationShutdownOptionsFromEnv,
+  registerApplicationShutdownSignals,
+  registerShutdownDiagnostics,
+} from "./shutdown";
 import {
   ConcurrencyGate,
   RuntimeLifecycle,
@@ -29,7 +35,6 @@ import {
   createDrainGuard,
   createShutdownController,
   registerRuntimeRoutes,
-  registerShutdownSignals,
   runtimeOptionsFromEnv,
 } from "./runtimeControl";
 
@@ -67,6 +72,28 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   configureHttpServer(server, runtimeOptions);
+  const httpShutdown = createShutdownController(
+    server,
+    lifecycle,
+    runtimeOptions.shutdownGraceMs
+  );
+  const applicationShutdown = new ApplicationShutdownCoordinator({
+    lifecycle,
+    http: httpShutdown,
+    backgroundHooks: [
+      {
+        name: "event-outbox-dispatcher",
+        run: () => outboxDispatcher.stop(),
+      },
+    ],
+    finalHooks: [
+      {
+        name: "mysql-pool",
+        run: () => closeDatabasePool(),
+      },
+    ],
+    options: applicationShutdownOptionsFromEnv(),
+  });
 
   app.disable("x-powered-by");
   registerSecurityHeaders(app);
@@ -78,6 +105,7 @@ async function startServer() {
     concurrency,
     dependencyReadiness
   );
+  registerShutdownDiagnostics(app, applicationShutdown);
   app.use(createDrainGuard(lifecycle));
   app.use(createConcurrencyMiddleware(concurrency));
 
@@ -107,13 +135,7 @@ async function startServer() {
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
-  const shutdownController = createShutdownController(
-    server,
-    lifecycle,
-    runtimeOptions.shutdownGraceMs
-  );
-  registerOutboxDispatcherSignals(outboxDispatcher);
-  registerShutdownSignals(shutdownController);
+  registerApplicationShutdownSignals(applicationShutdown);
 
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
