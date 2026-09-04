@@ -64,6 +64,14 @@ Required readiness currently covers production configuration and database reacha
 
 See `docs/READINESS.md` for the exact contract and limitations.
 
+## Coordinated shutdown behavior
+
+The canonical process has one SIGTERM/SIGINT owner. Deployment shutdown first makes readiness false, then stops the optional internal outbox dispatcher, drains HTTP, and finally closes the MySQL pool. Per-resource cleanup is bounded by `SHUTDOWN_RESOURCE_TIMEOUT_MS`; HTTP drain keeps its separate `SHUTDOWN_GRACE_MS` bound.
+
+`GET /api/runtime/shutdown` exposes a non-secret shutdown phase/error-count snapshot for engineering diagnostics. This source-level behavior is not evidence that a deployment platform has been configured with a sufficient termination grace period; that platform setting must still be verified separately.
+
+See `docs/SHUTDOWN.md`.
+
 ## Deployment verification
 
 A candidate deployment is not beta-ready until all of these are recorded:
