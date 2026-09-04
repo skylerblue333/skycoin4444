@@ -17,6 +17,7 @@ import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
 import { createDependencyReadinessCoordinator } from "./readiness";
 import { registerDatabasePoolRoutes } from "./databasePoolRoutes";
+import { registerFatalRuntimeMonitoring } from "./fatalRuntime";
 import {
   handleStartupFailure,
   listenHttpServer,
@@ -45,6 +46,8 @@ import {
 } from "./runtimeControl";
 
 const DEFAULT_BODY_LIMIT = "2mb";
+
+registerFatalRuntimeMonitoring();
 
 async function startServer() {
   assertProductionBetaConfig();
