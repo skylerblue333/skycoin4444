@@ -49,6 +49,8 @@ Session signing supports one bounded rotation overlap: `JWT_SECRET` is the activ
 
 Session token input is bounded before cryptographic verification: canonical JWTs must use exactly three non-empty base64url compact segments and be no larger than 4096 characters. Newly issued sessions also include an `iat` timestamp.
 
+Production browser sessions now use the `__Host-app_session_id` cookie, requiring Secure transport, Path=/, and no Domain attribute. The legacy `app_session_id` name remains for non-production local development only; production authentication ignores it and login/logout clear it during migration.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
