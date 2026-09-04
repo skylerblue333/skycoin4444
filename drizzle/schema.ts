@@ -572,6 +572,59 @@ export const moderationLogs = mysqlTable("moderation_logs", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+// ============ EVENT FABRIC TABLES ============
+export const eventOutbox = mysqlTable("event_outbox", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  eventType: varchar("event_type", { length: 160 }).notNull(),
+  schemaVersion: int("schema_version").notNull(),
+  producer: varchar("producer", { length: 160 }).notNull(),
+  aggregateType: varchar("aggregate_type", { length: 128 }).notNull(),
+  aggregateId: varchar("aggregate_id", { length: 255 }).notNull(),
+  correlationId: varchar("correlation_id", { length: 255 }).notNull(),
+  causationId: varchar("causation_id", { length: 255 }),
+  actorId: varchar("actor_id", { length: 255 }),
+  idempotencyKey: varchar("idempotency_key", { length: 255 }),
+  payload: text("payload").notNull(),
+  metadata: text("metadata"),
+  state: varchar("state", { length: 32 }).default("pending").notNull(),
+  attempts: int("attempts").default(0).notNull(),
+  availableAt: timestamp("available_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  leasedUntil: timestamp("leased_until"),
+  publishedAt: timestamp("published_at"),
+  lastError: text("last_error"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  eventIdempotencyUnique: uniqueIndex("event_outbox_event_idempotency_unique").on(
+    table.eventType,
+    table.idempotencyKey
+  ),
+}));
+
+export type EventOutbox = typeof eventOutbox.$inferSelect;
+export type InsertEventOutbox = typeof eventOutbox.$inferInsert;
+
+export const idempotencyRecords = mysqlTable("idempotency_records", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  scope: varchar("scope", { length: 128 }).notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 255 }).notNull(),
+  requestHash: varchar("request_hash", { length: 64 }).notNull(),
+  state: varchar("state", { length: 32 }).default("in_progress").notNull(),
+  resourceId: varchar("resource_id", { length: 255 }),
+  responseStatus: int("response_status"),
+  responseBody: text("response_body"),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  scopeKeyUnique: uniqueIndex("idempotency_records_scope_key_unique").on(
+    table.scope,
+    table.idempotencyKey
+  ),
+}));
+
+export type IdempotencyRecord = typeof idempotencyRecords.$inferSelect;
+export type InsertIdempotencyRecord = typeof idempotencyRecords.$inferInsert;
+
 export const platformMetrics = mysqlTable("platform_metrics", {
   id: varchar("id", { length: 255 }).primaryKey(),
   metricType: varchar("metric_type", { length: 255 }).notNull(), // dau | mau | tvl | volume
