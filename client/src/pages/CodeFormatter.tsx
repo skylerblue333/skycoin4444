@@ -1,75 +1,108 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useMemo, useState } from "react";
+import { Braces, Clipboard, WandSparkles } from "lucide-react";
+import { formatCode } from "@/lib/betaFormUtilities";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Search, Settings } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+
+type Mode = "json-pretty" | "json-minify" | "normalize-whitespace";
+const SAMPLE = '{"beta":true,"routes":43,"boundary":"local formatter"}';
 
 export default function CodeFormatter() {
-  const { isAuthenticated } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [source, setSource] = useState(SAMPLE);
+  const [mode, setMode] = useState<Mode>("json-pretty");
+  const [result, setResult] = useState(() => formatCode(SAMPLE, "json-pretty"));
+  const [error, setError] = useState("");
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>CodeFormatter</CardTitle>
-            <CardDescription>Sign in to access this feature</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full">Sign In</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const description = useMemo(
+    () =>
+      mode === "normalize-whitespace"
+        ? "Trims trailing whitespace and collapses repeated blank lines."
+        : "Parses valid JSON before formatting, so malformed input is rejected.",
+    [mode]
+  );
+
+  const apply = () => {
+    try {
+      setResult(formatCode(source, mode));
+      setError("");
+    } catch (cause) {
+      setResult("");
+      setError(cause instanceof Error ? cause.message : "Formatting failed");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">CodeFormatter</h1>
-            <p className="text-muted-foreground mt-2">Code formatting</p>
-          </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New
-          </Button>
+    <main className="min-h-screen bg-background p-4 md:p-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header>
+          <Badge variant="outline">Browser-local developer utility</Badge>
+          <h1 className="mt-3 text-3xl font-bold">Code formatter</h1>
+          <p className="mt-2 text-muted-foreground">
+            Pretty-print or minify valid JSON, or normalize plain-text whitespace.
+          </p>
+        </header>
+
+        <div className="grid gap-5 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <Braces className="h-5 w-5 text-primary" />
+              <CardTitle className="mt-2">Input</CardTitle>
+              <CardDescription>{description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <select
+                value={mode}
+                onChange={event => setMode(event.target.value as Mode)}
+                className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+              >
+                <option value="json-pretty">JSON pretty</option>
+                <option value="json-minify">JSON minify</option>
+                <option value="normalize-whitespace">Normalize whitespace</option>
+              </select>
+              <Textarea
+                value={source}
+                onChange={event => setSource(event.target.value)}
+                className="min-h-[360px] font-mono"
+              />
+              <Button type="button" onClick={apply}>
+                <WandSparkles className="mr-2 h-4 w-4" />
+                Format
+              </Button>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Output</CardTitle>
+              <CardDescription>No code is executed by this formatter.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                value={result}
+                readOnly
+                className="min-h-[360px] font-mono"
+                aria-label="Formatted output"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!result}
+                onClick={() => navigator.clipboard.writeText(result)}
+              >
+                <Clipboard className="mr-2 h-4 w-4" />
+                Copy output
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button variant="outline" size="icon">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No data available. Start by creating a new item.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <p className="text-xs text-muted-foreground">
+          This is not a JavaScript/TypeScript compiler, linter, sandbox, or Prettier replacement. It does not upload code to a server.
+        </p>
       </div>
-    </div>
+    </main>
   );
 }
