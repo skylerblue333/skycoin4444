@@ -99,6 +99,7 @@ export async function verifySessionJwt(
   try {
     const { payload } = await jwtVerify(compactToken, keys.active, {
       algorithms: ["HS256"],
+      typ: "JWT",
     });
     return Object.freeze({
       payload,
@@ -113,6 +114,7 @@ export async function verifySessionJwt(
         keys.previous,
         {
           algorithms: ["HS256"],
+          typ: "JWT",
         }
       );
       return Object.freeze({
