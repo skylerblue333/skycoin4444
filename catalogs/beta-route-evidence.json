@@ -378,6 +378,107 @@
         "release regression test"
       ],
       "boundary": "Submitting or approving a request does not itself erase account data; no request can be marked completed until a verified purge operation exists."
+    },
+    {
+      "route": "/notes-app",
+      "capability": "Browser-local searchable notes workspace with create, edit, delete, and timestamped autosave",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "create/edit/delete note flow",
+        "deterministic text search helper",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No account sync, collaboration, cloud backup, or server persistence."
+    },
+    {
+      "route": "/todo-list",
+      "capability": "Browser-local task manager with priorities, completion state, filtering, and deletion",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "task create/complete/delete flow",
+        "priority selection",
+        "open/done filtering",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No reminders, shared assignment, server sync, or calendar integration."
+    },
+    {
+      "route": "/color-picker-dialog",
+      "capability": "Local validated hex/RGB color picker with copy and saved palette",
+      "persistence": "Browser localStorage for saved palette",
+      "evidence": [
+        "3/6-digit hex normalization",
+        "RGB conversion",
+        "native color input",
+        "saved palette controls",
+        "release regression test"
+      ],
+      "boundary": "No cloud palette sync, design-system publishing, or external color API."
+    },
+    {
+      "route": "/markdown-rendering",
+      "capability": "Safe browser-local markdown subset editor and preview",
+      "persistence": "Browser localStorage for source text",
+      "evidence": [
+        "heading/list/quote/code/paragraph parser",
+        "no dangerouslySetInnerHTML",
+        "local source persistence",
+        "release regression test"
+      ],
+      "boundary": "Raw HTML and JavaScript are never executed; inline markdown formatting is intentionally limited."
+    },
+    {
+      "route": "/satisfaction-survey",
+      "capability": "Browser-local CSAT survey lab with rating, area, note, and local history",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "1-5 rating flow",
+        "area selection",
+        "local response history",
+        "link to durable Beta Feedback",
+        "release regression test"
+      ],
+      "boundary": "Survey responses never leave this browser; durable reports require the authenticated Beta Feedback route."
+    },
+    {
+      "route": "/theme-settings",
+      "capability": "Local light/dark application theme control with density preview",
+      "persistence": "Browser localStorage through ThemeContext plus local density key",
+      "evidence": [
+        "switchable ThemeProvider integration",
+        "theme toggle",
+        "density preview",
+        "release regression test"
+      ],
+      "boundary": "No account-level theme sync, cross-device preference service, or claim that density restyles every historical screen."
+    },
+    {
+      "route": "/quiz-builder",
+      "capability": "Browser-local multiple-choice quiz builder and deterministic scorer",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "2-6 option validation",
+        "correct-answer selection",
+        "question add/remove",
+        "deterministic scoring",
+        "release regression test"
+      ],
+      "boundary": "No certificates, grades, credentials, instructor analytics, or server persistence."
+    },
+    {
+      "route": "/about",
+      "capability": "Truthful engineering-beta orientation explaining implemented areas, activation, evidence, and unavailable claims",
+      "persistence": "None",
+      "evidence": [
+        "evidence-before-claims overview",
+        "durable activation description",
+        "explicit non-claims",
+        "deployment-gate orientation",
+        "release regression test"
+      ],
+      "boundary": "No public user-count, revenue, reward, provider, financial, blockchain, regulatory, or production-availability claims beyond verified repository evidence."
     }
   ]
 }
