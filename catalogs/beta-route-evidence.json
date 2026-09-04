@@ -479,6 +479,78 @@
         "release regression test"
       ],
       "boundary": "No public user-count, revenue, reward, provider, financial, blockchain, regulatory, or production-availability claims beyond verified repository evidence."
+    },
+    {
+      "route": "/code-formatter",
+      "capability": "Browser-local JSON formatter and plain-text normalizer",
+      "persistence": "None",
+      "evidence": [
+        "deterministic JSON pretty printer",
+        "plain-text whitespace normalization",
+        "copyable local output",
+        "release regression test"
+      ],
+      "boundary": "Not a compiler, linter, transpiler, IDE, or server-backed code service."
+    },
+    {
+      "route": "/content-calendar",
+      "capability": "Browser-local content planning calendar with date, channel, status, ordering, and deletion",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "validated dated content items",
+        "deterministic chronological ordering",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No scheduling API, social publishing, collaboration, analytics, or server sync."
+    },
+    {
+      "route": "/address-book",
+      "capability": "Browser-local searchable contact planner with validation and deletion",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "name/email validation",
+        "search across contact fields",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No address lookup, messaging, CRM sync, device-contact sync, or server persistence."
+    },
+    {
+      "route": "/checkbox-group-form",
+      "capability": "Deterministic multi-select checkbox interaction lab with summary and reset",
+      "persistence": "None",
+      "evidence": [
+        "deterministic toggle helper",
+        "visible selection summary",
+        "reset control",
+        "release regression test"
+      ],
+      "boundary": "Selections are not saved, submitted, synchronized, or used for personalization."
+    },
+    {
+      "route": "/confirmation-dialog",
+      "capability": "Typed-confirmation dialog interaction rehearsal with local success state",
+      "persistence": "React memory only",
+      "evidence": [
+        "exact phrase matcher",
+        "dialog confirmation gate",
+        "local success state",
+        "release regression test"
+      ],
+      "boundary": "No account deletion, purchase, payment, server mutation, or irreversible operation is connected."
+    },
+    {
+      "route": "/component-showcase",
+      "capability": "Interactive design-system component laboratory covering the shared UI library",
+      "persistence": "Local component/demo state only",
+      "evidence": [
+        "broad shared component coverage",
+        "interactive controls and dialogs",
+        "explicit canned AI demo boundary",
+        "release regression test"
+      ],
+      "boundary": "The page is a UI demonstration; the AI example is canned locally and no provider, payment, production data, or irreversible server action is invoked."
     }
   ]
 }
