@@ -35,6 +35,16 @@ Liveness answers whether the process runtime is still serving. Readiness is true
 
 These endpoints are engineering runtime signals. They are not an SLA, external monitoring proof, or production availability certification.
 
+## Runtime-fatal monitoring
+
+The canonical entry point registers a synchronous `uncaughtExceptionMonitor` observer.
+
+For an uncaught exception, including an unhandled rejection promoted to an uncaught exception under Node's default rejection mode, the observer writes one bounded redacted fatal record to stderr. It does not install an `uncaughtException` handler, an `unhandledRejection` handler, or an async recovery path.
+
+This preserves Node's default process termination behavior instead of attempting to continue execution in an undefined state. An external process supervisor is required if automatic restart is desired; no such supervisor is claimed by this repository.
+
+See `docs/FATAL_RUNTIME.md`.
+
 ## Graceful shutdown
 
 SIGTERM and SIGINT are owned by one application shutdown coordinator.
@@ -93,4 +103,4 @@ Invalid or incoherent values fail fast rather than silently weakening the runtim
 
 ## Verification
 
-Unit tests cover lifecycle transitions, overload accounting, configuration validation, HTTP-server option application, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.
+Unit tests cover lifecycle transitions, overload accounting, configuration validation, HTTP-server option application, fatal-monitor redaction/non-interference, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.
