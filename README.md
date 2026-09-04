@@ -45,6 +45,8 @@ Canonical request correlation now uses a server-generated ID for every request. 
 
 Session issuance now uses one bounded absolute TTL for both the signed JWT and browser cookie. The engineering-beta default is 7 days, the minimum is 15 minutes, and the hard maximum is 30 days; production startup rejects invalid values. This remains a stateless JWT session and does not claim server-side token revocation.
 
+Session signing supports one bounded rotation overlap: `JWT_SECRET` is the active signing/verification key, while optional `JWT_SECRET_PREVIOUS` is verification-only. The two keys must be distinct and at least 32 bytes; the previous key should be removed after the deliberate compatibility window.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -103,6 +105,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — internal request IDs, untrusted external correlation, operational-error redaction, and logging limits.
 - [`docs/SESSION_SECURITY.md`](docs/SESSION_SECURITY.md) — bounded JWT/cookie lifetime, validation, logout semantics, and revocation limitations.
+- [`docs/SESSION_KEY_ROTATION.md`](docs/SESSION_KEY_ROTATION.md) — active/previous signing-key rotation, overlap procedure, and removal boundary.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
 - [`docs/BROWSER_SECURITY.md`](docs/BROWSER_SECURITY.md) — production CSP/HSTS, browser isolation headers, and analytics privacy boundary.
