@@ -3,7 +3,10 @@ import { skycoinBetaAreas } from "../../packages/area-registry/src/index";
 import { db } from "../db";
 import { betaAdmissionSnapshot } from "./betaAdmission";
 import { inspectProductionBetaConfig } from "./productionConfig";
-import type { ReadinessAssessor } from "./readiness";
+import type {
+  DependencyReadinessSnapshot,
+  ReadinessAssessor,
+} from "./readiness";
 
 const RELEASE_CHANNEL = "invitation-only-engineering-beta" as const;
 
@@ -70,7 +73,7 @@ export function createCoordinatedBetaReadinessHandler(
   readiness: ReadinessAssessor
 ): RequestHandler {
   return async (_req, res) => {
-    let dependencyReadiness;
+    let dependencyReadiness: DependencyReadinessSnapshot;
     try {
       dependencyReadiness = await readiness.assess();
     } catch {
