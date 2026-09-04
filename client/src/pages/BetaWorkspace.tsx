@@ -30,6 +30,16 @@ import {
 
 const sharedTools = [
   {
+    name: "Beta route search",
+    route: "/advanced-search",
+    detail: "Search all evidence-backed launchable routes and boundaries.",
+  },
+  {
+    name: "Help center",
+    route: "/help-center",
+    detail: "Search verified testing guidance and support paths.",
+  },
+  {
     name: "Community hub",
     route: "/community-hub",
     detail: "Create and join persisted communities.",
