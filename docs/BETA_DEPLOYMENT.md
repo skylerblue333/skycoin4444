@@ -56,6 +56,14 @@ After OAuth returns an identity, the server checks the invitation policy **befor
 
 Production OAuth callbacks are restricted to `/api/oauth/callback` on the configured `BETA_PUBLIC_ORIGIN`.
 
+## Shared readiness behavior
+
+The canonical server now uses one dependency-readiness assessor for both `/api/runtime/ready` and `/api/beta/readiness`.
+
+Required readiness currently covers production configuration and database reachability. Database probing is timeout-bounded and short-lived results are cached to avoid health-check stampedes. The optional internal event dispatcher is reported as disabled/ok/degraded but does not currently gate required readiness.
+
+See `docs/READINESS.md` for the exact contract and limitations.
+
 ## Deployment verification
 
 A candidate deployment is not beta-ready until all of these are recorded:
@@ -65,15 +73,16 @@ A candidate deployment is not beta-ready until all of these are recorded:
 3. managed database bootstrap or reviewed forward migration evidence;
 4. Render/service deployment identifier and HTTPS URL;
 5. `/api/beta/health` returns `status=ok`;
-6. `/api/beta/readiness` returns `status=ready`, `database=ok`, and `configuration=ok`;
-7. an invited account can complete OAuth and load a protected route;
-8. an uninvited account is denied without receiving a session;
-9. profile update survives refresh;
-10. one social or SkySchool action survives refresh;
-11. beta feedback reaches durable storage;
-12. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
-13. `/delete-account` records a durable request and does not claim deletion completion;
-14. rollback target, privacy-request owner, and response owner are recorded.
+6. `/api/runtime/ready` returns HTTP 200 with required dependency status `ready`;
+7. `/api/beta/readiness` returns `status=ready`, `database=ok`, and `configuration=ok`;
+8. an invited account can complete OAuth and load a protected route;
+9. an uninvited account is denied without receiving a session;
+10. profile update survives refresh;
+11. one social or SkySchool action survives refresh;
+12. beta feedback reaches durable storage;
+13. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
+14. `/delete-account` records a durable request and does not claim deletion completion;
+15. rollback target, privacy-request owner, and response owner are recorded.
 
 ## Privacy operations
 
