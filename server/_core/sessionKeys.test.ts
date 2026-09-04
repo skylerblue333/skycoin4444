@@ -159,6 +159,23 @@ describe("session JWT input boundary", () => {
     ).toThrow(/compact/);
   });
 
+  it("rejects a compact token without the canonical JWT type", async () => {
+    const token = await new SignJWT({
+      openId: "user-1",
+      appId: "skycoin4444-beta",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime(Math.floor(Date.now() / 1_000) + 3_600)
+      .sign(new TextEncoder().encode(activeSecret));
+
+    await expect(
+      verifySessionJwt(
+        token,
+        sessionSigningKeysFromSecrets(activeSecret)
+      )
+    ).rejects.toBeDefined();
+  });
+
   it("rejects oversized tokens before cryptographic verification", async () => {
     const oversized =
       "a." +
