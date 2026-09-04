@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 52,
-    "legacy_unverified": 952,
+    "launchable_beta": 60,
+    "legacy_unverified": 944,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -640,7 +640,7 @@
       "path": "/alert-dialog",
       "component": "AlertDialog",
       "page": "AlertDialog",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1040,7 +1040,7 @@
       "path": "/breadcrumb-navigation",
       "component": "BreadcrumbNavigation",
       "page": "BreadcrumbNavigation",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1176,7 +1176,7 @@
       "path": "/calendar-view",
       "component": "CalendarView",
       "page": "CalendarView",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1432,7 +1432,7 @@
       "path": "/code-highlighting",
       "component": "CodeHighlighting",
       "page": "CodeHighlighting",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1464,7 +1464,7 @@
       "path": "/code-samples",
       "component": "CodeSamples",
       "page": "CodeSamples",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -2176,7 +2176,7 @@
       "path": "/data-grid",
       "component": "DataGrid",
       "page": "DataGrid",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -5192,7 +5192,7 @@
       "path": "/pagination",
       "component": "Pagination",
       "page": "Pagination",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -5768,7 +5768,7 @@
       "path": "/progress-bar",
       "component": "ProgressBar",
       "page": "ProgressBar",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
