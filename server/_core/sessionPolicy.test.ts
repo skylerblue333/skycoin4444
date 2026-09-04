@@ -31,6 +31,16 @@ describe("session lifetime policy", () => {
         SESSION_TTL_MS: "not-a-number",
       } as NodeJS.ProcessEnv)
     ).toThrow(/SESSION_TTL_MS/);
+    expect(() =>
+      sessionLifetimePolicyFromEnv({
+        SESSION_TTL_MS: "9e5",
+      } as NodeJS.ProcessEnv)
+    ).toThrow(/decimal digits/);
+    expect(() =>
+      sessionLifetimePolicyFromEnv({
+        SESSION_TTL_MS: "900000.0",
+      } as NodeJS.ProcessEnv)
+    ).toThrow(/decimal digits/);
 
     expect(() => validateSessionTtlMs(60_000)).toThrow(
       /SESSION_TTL_MS/
