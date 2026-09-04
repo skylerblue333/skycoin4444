@@ -103,6 +103,6 @@ describe("beta privacy controls", () => {
     ).toHaveLength(67);
     expect(
       inventory.routes.filter(route => route.readiness === "legacy_unverified")
-    ).toHaveLength(945);
+    ).toHaveLength(937);
   });
 });
