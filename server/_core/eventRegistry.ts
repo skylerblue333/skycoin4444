@@ -40,11 +40,17 @@ export function getEventFabricSnapshot() {
     descriptors: skycoinEventRegistry.descriptors,
     durableOutboxSchema: true as const,
     idempotencyLedgerSchema: true as const,
+    idempotencyHeader: "Idempotency-Key" as const,
+    idempotentMutationScopes: [
+      "beta.feedback.submit",
+      "social.post.create",
+    ] as const,
+    idempotencyRecordExpiryConfigured: false as const,
     dispatcherConfigured: false as const,
     externalTransportConfigured: false as const,
     productionDeliveryClaim: false as const,
     limitation:
-      "Events are transactionally persisted to the local database outbox by selected mutations, but no external broker/transport or background dispatcher is claimed.",
+      "Selected create mutations support actor-scoped replay-safe Idempotency-Key handling and transactionally persist outbox events, but no external broker/transport, automatic idempotency-record expiry, or background dispatcher is claimed.",
   });
 }
 
