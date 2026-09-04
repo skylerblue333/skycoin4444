@@ -517,6 +517,90 @@
         "release regression test"
       ],
       "boundary": "No account sync, shared assignment, team presence, notifications, approvals, external ticketing integration, or server persistence."
+    },
+    {
+      "route": "/date-input-form",
+      "capability": "Local date-only validation and calendar-day comparison form",
+      "persistence": "None",
+      "evidence": [
+        "normalizeDateOnly validation",
+        "timezone-stable day distance",
+        "native date inputs",
+        "release regression test"
+      ],
+      "boundary": "No appointment booking, reminder delivery, calendar sync, provider integration, or server persistence."
+    },
+    {
+      "route": "/date-picker-dialog",
+      "capability": "Local six-week month-grid date picker with deterministic month navigation and selection",
+      "persistence": "Session-only component state",
+      "evidence": [
+        "42-cell month grid helper",
+        "previous/next month navigation",
+        "single-date selection",
+        "release regression test"
+      ],
+      "boundary": "No event creation, calendar provider integration, reminder scheduling, booking, or durable persistence."
+    },
+    {
+      "route": "/password-input-form",
+      "capability": "Local password-field behavior lab with show/hide, confirmation, and transparent strength heuristics",
+      "persistence": "None",
+      "evidence": [
+        "show/hide control",
+        "confirmation match state",
+        "deterministic password heuristic",
+        "release regression test"
+      ],
+      "boundary": "No authentication, password storage, breach checking, credential management, transmission, or security guarantee."
+    },
+    {
+      "route": "/text-input-form",
+      "capability": "Local configurable text-input validation lab with required state, max length, and live counts",
+      "persistence": "Session-only component state",
+      "evidence": [
+        "required-state validation",
+        "max-length validation",
+        "live word/character counts",
+        "release regression test"
+      ],
+      "boundary": "No form submission, server-side sanitization, persistence, or production form generation."
+    },
+    {
+      "route": "/text-tools",
+      "capability": "Browser-local text counter and deterministic transform workspace",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "word/character/line counts",
+        "case and line transforms",
+        "local draft persistence",
+        "release regression test"
+      ],
+      "boundary": "No AI rewriting, translation provider, cloud sync, or server processing."
+    },
+    {
+      "route": "/context-menu",
+      "capability": "Local context-menu interaction lab with viewport clamping and equivalent button actions",
+      "persistence": "Session-only component state",
+      "evidence": [
+        "right-click menu trigger",
+        "viewport clamp helper",
+        "dismissal and local actions",
+        "release regression test"
+      ],
+      "boundary": "No file mutation, browser-setting changes, account writes, operating-system menu changes, or privileged actions."
+    },
+    {
+      "route": "/community-guidelines",
+      "capability": "Searchable engineering-beta community safety and integrity guidelines with reporting links",
+      "persistence": "None",
+      "evidence": [
+        "searchable guideline set",
+        "privacy/scam/consent/beta-integrity rules",
+        "Beta Feedback and Privacy Center links",
+        "release regression test"
+      ],
+      "boundary": "Guidelines are beta product rules, not legal advice, regulatory certification, emergency response, or law-enforcement service."
     }
   ]
 }
