@@ -30,15 +30,20 @@ function loadItems(): BoardItem[] {
 
 export default function ProjectBoard() {
   const [items, setItems] = useState<BoardItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [title, setTitle] = useState("");
   const [detail, setDetail] = useState("");
   const [search, setSearch] = useState("");
 
-  useEffect(() => setItems(loadItems()), []);
+  useEffect(() => {
+    setItems(loadItems());
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  }, [hydrated, items]);
 
   const visible = useMemo(
     () => items.filter(item => matchesSearch(search, [item.title, item.detail, item.status])),
