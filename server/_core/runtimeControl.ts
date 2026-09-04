@@ -1,5 +1,6 @@
 import type { RequestHandler, Express } from "express";
 import type { Server } from "node:http";
+import type { ReadinessAssessor } from "./readiness";
 
 export type RuntimePhase = "starting" | "ready" | "draining" | "stopped";
 
@@ -231,7 +232,8 @@ export function configureHttpServer(
 export function registerRuntimeRoutes(
   app: Express,
   lifecycle: RuntimeLifecycle,
-  concurrency: ConcurrencyGate
+  concurrency: ConcurrencyGate,
+  readiness?: ReadinessAssessor
 ): void {
   app.get("/api/runtime/live", (_req, res) => {
     const snapshot = lifecycle.snapshot();
@@ -242,13 +244,39 @@ export function registerRuntimeRoutes(
     });
   });
 
-  app.get("/api/runtime/ready", (_req, res) => {
+  app.get("/api/runtime/ready", async (_req, res) => {
     const snapshot = lifecycle.snapshot();
+    const runtimeReady = lifecycle.isReady();
+    let dependencyReadiness = null;
+    let dependencyProbeFailed = false;
+
+    if (runtimeReady && readiness) {
+      try {
+        dependencyReadiness = await readiness.assess();
+      } catch {
+        dependencyProbeFailed = true;
+      }
+    }
+
+    const dependenciesReady =
+      !readiness ||
+      (!dependencyProbeFailed &&
+        dependencyReadiness?.status === "ready");
+    const ready = runtimeReady && dependenciesReady;
+
     res.set("Cache-Control", "no-store");
-    res.status(lifecycle.isReady() ? 200 : 503).json({
-      status: lifecycle.isReady() ? "ready" : "not_ready",
+    res.status(ready ? 200 : 503).json({
+      status: ready ? "ready" : "not_ready",
       runtime: snapshot,
       concurrency: concurrency.snapshot(),
+      dependencies: dependencyProbeFailed
+        ? {
+            contract: "skycoin4444.dependency-readiness.v1",
+            status: "not_ready",
+            probe: "unavailable",
+            productionCertification: false,
+          }
+        : dependencyReadiness,
     });
   });
 

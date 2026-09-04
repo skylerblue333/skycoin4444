@@ -15,6 +15,7 @@ import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
+import { createDependencyReadinessCoordinator } from "./readiness";
 import {
   createOutboxDispatcherService,
   registerOutboxDispatcherRoutes,
@@ -59,6 +60,9 @@ async function startServer() {
   const lifecycle = new RuntimeLifecycle();
   const concurrency = new ConcurrencyGate(runtimeOptions.maxInFlightRequests);
   const outboxDispatcher = createOutboxDispatcherService();
+  const dependencyReadiness = createDependencyReadinessCoordinator({
+    dispatcher: outboxDispatcher,
+  });
 
   const app = express();
   const server = createServer(app);
@@ -68,7 +72,12 @@ async function startServer() {
   registerSecurityHeaders(app);
   registerObservability(app);
   registerRequestSecurity(app);
-  registerRuntimeRoutes(app, lifecycle, concurrency);
+  registerRuntimeRoutes(
+    app,
+    lifecycle,
+    concurrency,
+    dependencyReadiness
+  );
   app.use(createDrainGuard(lifecycle));
   app.use(createConcurrencyMiddleware(concurrency));
 
@@ -77,7 +86,7 @@ async function startServer() {
 
   registerStorageProxy(app);
   registerOAuthRoutes(app);
-  registerBetaRoutes(app);
+  registerBetaRoutes(app, dependencyReadiness);
   registerPlatformKernelRoutes(app);
   registerEventFabricRoutes(app);
   registerOutboxDispatcherRoutes(app, outboxDispatcher);

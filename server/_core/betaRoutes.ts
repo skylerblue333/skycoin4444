@@ -3,6 +3,10 @@ import { skycoinBetaAreas } from "../../packages/area-registry/src/index";
 import { db } from "../db";
 import { betaAdmissionSnapshot } from "./betaAdmission";
 import { inspectProductionBetaConfig } from "./productionConfig";
+import type {
+  DependencyReadinessSnapshot,
+  ReadinessAssessor,
+} from "./readiness";
 
 const RELEASE_CHANNEL = "invitation-only-engineering-beta" as const;
 
@@ -65,7 +69,62 @@ export function createBetaReadinessHandler(
   };
 }
 
-export function registerBetaRoutes(app: Express) {
+export function createCoordinatedBetaReadinessHandler(
+  readiness: ReadinessAssessor
+): RequestHandler {
+  return async (_req, res) => {
+    let dependencyReadiness: DependencyReadinessSnapshot;
+    try {
+      dependencyReadiness = await readiness.assess();
+    } catch {
+      res.set("Cache-Control", "no-store");
+      res.status(503).json({
+        status: "not_ready",
+        database: "unknown",
+        configuration: "invalid",
+        configurationIssueKeys: [
+          "DEPENDENCY_READINESS_PROBE_FAILED",
+        ],
+        dependencyReadiness: {
+          contract: "skycoin4444.dependency-readiness.v1",
+          status: "not_ready",
+          probe: "unavailable",
+          productionCertification: false,
+        },
+        ...runtimeSnapshot(),
+      });
+      return;
+    }
+
+    const ready = dependencyReadiness.status === "ready";
+    const configuration =
+      dependencyReadiness.configuration.status === "ok"
+        ? "ok"
+        : "invalid";
+    const database =
+      dependencyReadiness.database.status === "ok"
+        ? "ok"
+        : dependencyReadiness.database.status === "skipped"
+          ? "unknown"
+          : "unavailable";
+
+    res.set("Cache-Control", "no-store");
+    res.status(ready ? 200 : 503).json({
+      status: ready ? "ready" : "not_ready",
+      database,
+      configuration,
+      configurationIssueKeys:
+        dependencyReadiness.configuration.issueKeys,
+      dependencyReadiness,
+      ...runtimeSnapshot(),
+    });
+  };
+}
+
+export function registerBetaRoutes(
+  app: Express,
+  readiness?: ReadinessAssessor
+) {
   app.get("/api/beta/health", (_req, res) => {
     res.json({
       status: "ok",
@@ -75,7 +134,12 @@ export function registerBetaRoutes(app: Express) {
     });
   });
 
-  app.get("/api/beta/readiness", createBetaReadinessHandler());
+  app.get(
+    "/api/beta/readiness",
+    readiness
+      ? createCoordinatedBetaReadinessHandler(readiness)
+      : createBetaReadinessHandler()
+  );
 
   app.get("/api/beta/areas", (_req, res) => {
     res.set("Cache-Control", "no-store");

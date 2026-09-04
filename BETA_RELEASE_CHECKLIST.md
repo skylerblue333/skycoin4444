@@ -36,6 +36,7 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | Persistence, migrations, backups, consent, privacy notice, self-data export, and deletion-request/support behavior are verified before accepting user data. | Deployment and operational record; deletion requests must not be described as completed without verified purge evidence. | Data owner | [ ] |
 | Every enabled external provider is configured, least-privilege reviewed, tested for success/failure, and monitored; otherwise its route is unavailable. | Provider verification record.                                     | Integration owner               | [ ]      |
 | Logs, error reporting, and an on-call or response owner are recorded.                                                                                   | Operations record.                                                | Beta operations owner           | [ ]      |
+| Both runtime and beta readiness endpoints report required dependencies ready on the exact deployed release.                                             | `/api/runtime/ready` and `/api/beta/readiness` records with matching release SHA/context. | Operations owner | [ ] |
 
 ## 4. Route-level beta smoke test
 
