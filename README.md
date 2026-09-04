@@ -13,13 +13,17 @@ The default branch has a reproducible pnpm workspace and a real CI pipeline. Cur
 - production client/server build;
 - high-severity production dependency audit.
 
-The repository also contains a verified cross-product integration vertical connecting identity, authentication, MFA, permissions, credentials, payment planning, audit, and narrow course/ledger/notification adapters. That integration is intentionally fail-closed at security and financial boundaries.\n\nA typed platform kernel now compiles the canonical capability registry into a dependency-aware DAG, fingerprints the normalized graph, propagates hard/soft degradation, and provides deterministic retry/circuit-breaker primitives plus async request correlation. The server also has an explicit runtime lifecycle with liveness/readiness, graceful drain, bounded HTTP timeouts, and a process-local concurrency bulkhead. These are engineering control-plane foundations; they do not convert registry or runtime state into production certification.
+The repository also contains a verified cross-product integration vertical connecting identity, authentication, MFA, permissions, credentials, payment planning, audit, and narrow course/ledger/notification adapters. That integration is intentionally fail-closed at security and financial boundaries.
+
+A typed platform kernel now compiles the canonical capability registry into a dependency-aware DAG, fingerprints the normalized graph, propagates hard/soft degradation, and provides deterministic retry/circuit-breaker primitives plus async request correlation. The server also has an explicit runtime lifecycle with liveness/readiness, graceful drain, bounded HTTP timeouts, and a process-local concurrency bulkhead. These are engineering control-plane foundations; they do not convert registry or runtime state into production certification.
 
 A transactional event fabric now defines versioned domain-event envelopes, a deterministic event-registry fingerprint, a durable database outbox, and idempotency-record contracts. Selected real beta mutations persist their business state and domain event atomically. No external event broker or dispatcher is claimed yet.
 
 Cookie-authenticated unsafe browser mutations now pass a fail-closed same-origin request boundary in production, and production session cookies are always marked Secure. This is a targeted CSRF/origin defense, not a claim of penetration testing or audited security.
 
 The social beta now has database-enforced uniqueness for likes and follows. Follow creation, its notification, and its domain event commit atomically, while concurrent duplicate likes/follows resolve against named unique constraints instead of relying on race-prone application checks.
+
+Post creation and beta-feedback submission now support actor-scoped, replay-safe `Idempotency-Key` handling backed by the durable idempotency ledger. Matching retries replay the stored response; key reuse with different input fails closed.
 
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
@@ -65,10 +69,13 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 
 ## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.\n- [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.\n- [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.
+- [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.
+- [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
 - [`docs/EVENT_FABRIC.md`](docs/EVENT_FABRIC.md) — versioned events, transactional outbox, idempotency contracts, and delivery boundaries.
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
+- [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
 - [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
 - [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
 - [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md) — invitation-only deployment, production configuration, managed-database bootstrap, and verification gates.
