@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Express, Request, Response, NextFunction } from "express";
+import { runWithRequestContext } from "./requestContext";
 
 export type HttpRequestSignal = {
   event: "http_request";
@@ -34,6 +35,7 @@ export function registerObservability(app: Express): void {
         ? suppliedRequestId
         : randomUUID();
     const startedAt = Date.now();
+
     res.setHeader("X-Request-ID", requestId);
     res.on("finish", () => {
       if (req.path.startsWith("/api/")) {
@@ -44,6 +46,15 @@ export function registerObservability(app: Express): void {
         );
       }
     });
-    next();
+
+    runWithRequestContext(
+      {
+        requestId,
+        startedAt,
+        method: req.method,
+        path: req.path,
+      },
+      next
+    );
   });
 }
