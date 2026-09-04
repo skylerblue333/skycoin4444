@@ -33,6 +33,23 @@ The SDK also applies the same hard bounds when another internal caller explicitl
 
 This removes the previous one-year default from canonical session issuance.
 
+## Production cookie isolation
+
+Canonical production browser sessions use `__Host-app_session_id`.
+
+The `__Host-` cookie prefix gives the browser an enforceable host-only boundary: the cookie must be Secure, must use `Path=/`, and cannot carry a Domain attribute. This reduces parent-domain/sibling-cookie shadowing and cookie-tossing risk for the authenticated session name.
+
+Non-production environments retain `app_session_id` so local HTTP development remains possible.
+
+Migration behavior is fail-closed:
+
+- production authentication reads only `__Host-app_session_id`;
+- production CSRF/origin detection considers only that active cookie name;
+- successful production OAuth login clears the old `app_session_id` cookie before/while establishing the new session;
+- production logout clears both the host-prefixed and legacy names.
+
+A user with only the legacy production cookie may need to authenticate again. No old-cookie compatibility authentication is claimed.
+
 ## Token input boundary
 
 Before HS256 verification, the canonical verifier applies a narrow compact-JWT input boundary:

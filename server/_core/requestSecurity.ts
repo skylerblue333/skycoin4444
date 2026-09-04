@@ -1,6 +1,6 @@
 import type { Express, RequestHandler } from "express";
-import { COOKIE_NAME } from "@shared/const";
 import { parseCookieHeader } from "./cookieParser";
+import { getSessionCookieName } from "./cookies";
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
@@ -25,9 +25,14 @@ export type RequestSecurityInput = Readonly<{
   requestOrigin?: string;
 }>;
 
-function hasSessionCookie(cookieHeader: string | undefined): boolean {
+function hasSessionCookie(
+  cookieHeader: string | undefined,
+  env: NodeJS.ProcessEnv
+): boolean {
   if (!cookieHeader) return false;
-  return Boolean(parseCookieHeader(cookieHeader)[COOKIE_NAME]);
+  return Boolean(
+    parseCookieHeader(cookieHeader)[getSessionCookieName(env)]
+  );
 }
 
 function normalizeOrigin(value: string): string | null {
@@ -48,7 +53,10 @@ export function evaluateCookieMutationOrigin(
   env: NodeJS.ProcessEnv = process.env
 ): RequestSecurityDecision {
   const method = input.method.toUpperCase();
-  if (!UNSAFE_METHODS.has(method) || !hasSessionCookie(input.cookieHeader)) {
+  if (
+    !UNSAFE_METHODS.has(method) ||
+    !hasSessionCookie(input.cookieHeader, env)
+  ) {
     return Object.freeze({
       allowed: true as const,
       reason: "not_ambient_cookie_mutation" as const,
