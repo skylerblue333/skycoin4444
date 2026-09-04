@@ -41,6 +41,16 @@ Development may use bounded fallback scanning through `DEV_PORT_FALLBACK_SPAN`. 
 
 See `docs/STARTUP.md`.
 
+## Fatal runtime behavior
+
+The canonical server synchronously observes Node `uncaughtExceptionMonitor` events and emits one bounded credential-redacted record containing the fatal origin and summary.
+
+The application intentionally does not install an `uncaughtException` or `unhandledRejection` recovery listener. A fatal exception therefore remains fatal under Node's default behavior.
+
+If a deployment relies on automatic restart after a process crash, that restart policy must be configured and verified in the hosting environment. This repository does not claim such an external supervisor is active.
+
+See `docs/FATAL_RUNTIME.md`.
+
 ## Database pool guardrails
 
 The canonical MySQL2 client now uses explicit bounded pool settings instead of relying on driver defaults.
