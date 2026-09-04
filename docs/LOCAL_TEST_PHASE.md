@@ -14,7 +14,7 @@ cp .env.local.example .env.local
 pnpm local:doctor
 ```
 
-The supplied `.env.local.example` points to `127.0.0.1:3307` and a database named `skycoin4444_local`. The local database script refuses to reset or migrate any non-local hostname or database name. The migration set includes durable discovery bookmarks/search history and durable creator evidence drafts.
+The supplied `.env.local.example` points to `127.0.0.1:3307` and a database named `skycoin4444_local`. The local database script refuses to reset or synchronize any non-local hostname or database name. Local beta databases are disposable and are synchronized directly from the canonical `drizzle/schema.ts` with Drizzle Kit; the older SQL files are retained as historical evidence and are not replayed as the local bootstrap.
 
 ## Start the local test environment
 
@@ -26,7 +26,7 @@ pnpm dev:local
 
 Open `http://localhost:3000/`. If port 3000 is busy, the server prints the actual port it selected. Set `BACKEND_BASE_URL` to that URL when running the smoke test; `LOCAL_BASE_URL` remains accepted as a compatibility alias.
 
-The local test account is named **Local Test User** and is created only by the local database bootstrap. Run `pnpm local:db` after every schema migration so migrations 0001 through 0007 are applied in order.
+The local test account is named **Local Test User** and is created only by the local database bootstrap. Run `pnpm local:db` after current schema changes so the disposable local database is synchronized from `drizzle/schema.ts`. `pnpm local:reset` drops only a guarded localhost database ending in `_local`, then rebuilds it from the same canonical schema.
  With `LOCAL_TEST_MODE=true`, development requests use this account when no OAuth session is present. The bypass is active only when both `NODE_ENV=development` and `LOCAL_TEST_MODE=true` are set.
 
 ## Smoke test
@@ -74,4 +74,4 @@ If `pnpm install` reports slow tarballs or a timeout, rerun it after checking th
 
 ## Current limits
 
-This local phase validates application behavior and safety boundaries. It is not evidence of production availability, provider reliability, financial settlement, custody security, or mainnet correctness. Those remain separately gated.
+This local phase validates application behavior, the current Drizzle schema, durable account-owned workflows, and safety boundaries. It is not evidence of a shared/staging database migration, production availability, provider reliability, financial settlement, custody security, or mainnet correctness. A managed beta database must have its own reviewed bootstrap/migration record before deployment.
