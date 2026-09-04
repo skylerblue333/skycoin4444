@@ -72,6 +72,15 @@ The canonical process has one SIGTERM/SIGINT owner. Deployment shutdown first ma
 
 See `docs/SHUTDOWN.md`.
 
+## Dead-letter operations
+
+If the internal outbox dispatcher is enabled for a deployment, administrators have a bounded tRPC recovery surface:
+
+- `eventOperations.deadLetters` for metadata-only inspection;
+- `eventOperations.replayDeadLetter` for one-event guarded replay with atomic audit.
+
+The API does not return event payloads or raw stored error strings. There is no automatic replay, bulk replay, or dedicated operations UI. A beta operator should record why a replay was requested outside the API if human-readable incident context must be retained; the application stores only a digest of the supplied reason.
+
 ## Deployment verification
 
 A candidate deployment is not beta-ready until all of these are recorded:
