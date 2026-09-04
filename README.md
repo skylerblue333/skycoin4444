@@ -47,6 +47,8 @@ Session issuance now uses one bounded absolute TTL for both the signed JWT and b
 
 Session signing supports one bounded rotation overlap: `JWT_SECRET` is the active signing/verification key, while optional `JWT_SECRET_PREVIOUS` is verification-only. The two keys must be distinct and at least 32 bytes; the previous key should be removed after the deliberate compatibility window.
 
+Session token input is bounded before cryptographic verification: canonical JWTs must use exactly three non-empty base64url compact segments and be no larger than 4096 characters. Newly issued sessions also include an `iat` timestamp.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
