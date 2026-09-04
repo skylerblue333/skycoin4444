@@ -6,6 +6,7 @@ import {
   clampProgress,
   filterAndSortRows,
   getPageWindow,
+  shiftSupportedMonth,
   tokenizeCodeLine,
 } from "../../client/src/lib/betaPresentationLab";
 
@@ -49,6 +50,12 @@ describe("beta promotion batch 05 helpers", () => {
     expect(february.find(cell => cell.day === 29)?.isoDate).toBe("2028-02-29");
     expect(february.length % 7).toBe(0);
     expect(() => buildMonthCells(1969, 0)).toThrow();
+    expect(shiftSupportedMonth(1970, 0, -1)).toBeNull();
+    expect(shiftSupportedMonth(2100, 11, 1)).toBeNull();
+    expect(shiftSupportedMonth(2026, 0, -1)).toEqual({
+      year: 2025,
+      monthIndex: 11,
+    });
   });
 
   it("tokenizes a bounded code subset without execution", () => {
@@ -84,6 +91,11 @@ describe("beta promotion batch 05 helpers", () => {
       { label: "Beta Workspace", path: "/beta-workspace" },
       { label: "Privacy Settings", path: "/beta-workspace/privacy_settings" },
     ]);
+    expect(buildBreadcrumbs("/settings/%")).toEqual([
+      { label: "Home", path: "/" },
+      { label: "Settings", path: "/settings" },
+      { label: "%", path: "/settings/%" },
+    ]);
   });
 });
 
@@ -107,6 +119,10 @@ describe("beta promotion batch 05 pages", () => {
     expect(sources["/alert-dialog"]).toMatch(/No notification service, account mutation, purchase, deletion, payment, or irreversible action/i);
     expect(sources["/breadcrumb-navigation"]).toMatch(/does not change application routing, browser history, permissions, or remote state/i);
     expect(sources["/code-samples"]).toMatch(/does not execute them, provision services, create credentials, or contact external providers/i);
+    expect(sources["/calendar-view"]).toMatch(/disabled=\{!previousMonth\}/);
+    expect(sources["/calendar-view"]).toMatch(/disabled=\{!nextMonth\}/);
+    expect(sources["/alert-dialog"]).toContain('from "@/components/ui/alert-dialog"');
+    expect(sources["/alert-dialog"]).toContain("AlertDialogAction");
   });
 
   it("records all eight promotions with synchronized evidence", () => {
@@ -123,6 +139,13 @@ describe("beta promotion batch 05 pages", () => {
       legacy_unverified: 937,
       controlled_or_unavailable: 64,
     });
+    const launchablePaths = inventory.routes
+      .filter((entry: { readiness: string }) => entry.readiness === "launchable_beta")
+      .map((entry: { path: string }) => entry.path);
+    expect(inventory.launchableBetaRoutes).toHaveLength(67);
+    expect(new Set(inventory.launchableBetaRoutes)).toEqual(
+      new Set(launchablePaths)
+    );
 
     for (const route of routes) {
       expect(
