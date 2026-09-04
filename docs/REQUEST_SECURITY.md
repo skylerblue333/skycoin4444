@@ -32,6 +32,12 @@ This relaxed local behavior is not used in production.
 
 Authorization, admission, CSRF/origin checks, and audit identity never rely on a caller-selected request ID.
 
+## Session credential input
+
+Cookie and Bearer session credentials are eventually processed by the same canonical JWT verifier. Before signature work, the token must be a compact three-segment base64url JWT no larger than 4096 characters.
+
+This reduces avoidable cryptographic work on malformed or oversized credential values. It does not claim a WAF, reverse-proxy header limit, distributed abuse control, or token-theft detection.
+
 ## Session lifetime and revocation
 
 The canonical browser cookie and signed JWT use the same bounded absolute lifetime from `SESSION_TTL_MS`. The beta default is 7 days and the hard maximum is 30 days.
