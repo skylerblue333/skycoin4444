@@ -1,5 +1,4 @@
 import {
-  COOKIE_NAME,
   OAUTH_STATE_COOKIE,
   decodeOAuthState,
 } from "@shared/const";
