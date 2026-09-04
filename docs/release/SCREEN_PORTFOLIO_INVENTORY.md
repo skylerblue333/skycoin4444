@@ -8,9 +8,9 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 | --- | ---: |
 | Registered routes | 1068 |
 | Lazy page modules | 1056 |
-| Launchable beta routes | 59 |
+| Launchable beta routes | 67 |
 | Controlled or unavailable routes | 64 |
-| Legacy unverified routes | 945 |
+| Legacy unverified routes | 937 |
 | Routes missing a lazy page source | 0 |
 
 ## Launchable beta routes
@@ -23,6 +23,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /activity-feed
 - /address-book
 - /advanced-search
+- /alert-dialog
 - /arcade
 - /assignment-tracker
 - /beta-catalog
@@ -32,10 +33,14 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /beta-web3
 - /beta-workspace
 - /blog-editor
+- /breadcrumb-navigation
 - /calculator
 - /calendar
+- /calendar-view
 - /checkbox-group-form
 - /code-formatter
+- /code-highlighting
+- /code-samples
 - /color-picker-dialog
 - /community-guidelines
 - /community-hub
@@ -46,6 +51,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /course-catalog
 - /creator-analytics
 - /data-export
+- /data-grid
 - /date-input-form
 - /date-picker-dialog
 - /dating-profile-setup
@@ -63,9 +69,11 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /notification-preferences
 - /onboarding
 - /operational-readiness
+- /pagination
 - /password-input-form
 - /privacy-settings
 - /profile
+- /progress-bar
 - /project-board
 - /quiz-builder
 - /satisfaction-survey
