@@ -30,6 +30,33 @@ export async function getDb() {
   return db;
 }
 
+let poolClosePromise: Promise<void> | null = null;
+let poolClosed = false;
+
+export function databasePoolSnapshot() {
+  return Object.freeze({
+    configured: Boolean(poolConnection),
+    closed: poolClosed,
+  });
+}
+
+export async function closeDatabasePool(): Promise<void> {
+  if (!poolConnection || poolClosed) return;
+  if (poolClosePromise) return poolClosePromise;
+
+  poolClosePromise = poolConnection
+    .end()
+    .then(() => {
+      poolClosed = true;
+    })
+    .catch(error => {
+      poolClosePromise = null;
+      throw error;
+    });
+
+  return poolClosePromise;
+}
+
 function databaseFailure(operation: string, error: unknown): never {
   const cause = error instanceof Error ? error : new Error(String(error));
   throw new Error(`Database operation failed: ${operation}`, { cause });
