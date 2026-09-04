@@ -1,140 +1,136 @@
-import { useState } from "react";
+import { Link } from "wouter";
+import { AlertTriangle, ArrowLeft, LogIn, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { useLocation } from "wouter";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { startLogin } from "@/const";
+
+function admissionMessage(reason: string | null) {
+  if (reason === "not-invited") {
+    return {
+      title: "This account is not on the beta invite list",
+      detail:
+        "SKYCOIN4444 is currently invitation-only. No session was issued for this account. Ask the beta owner to add your OAuth identity or email before trying again.",
+      tone: "warning" as const,
+    };
+  }
+
+  if (reason === "oauth-unconfigured") {
+    return {
+      title: "Sign-in provider is not configured",
+      detail:
+        "This environment cannot start OAuth yet. No email, password, or local credential was collected. The deployment owner must configure the approved identity provider first.",
+      tone: "warning" as const,
+    };
+  }
+
+  return {
+    title: "Invitation-only engineering beta",
+    detail:
+      "Use the configured identity provider to continue. Access is checked against the beta invitation policy before a session is created and again on protected requests.",
+    tone: "normal" as const,
+  };
+}
 
 export function Signin() {
-  const [, setLocation] = useLocation();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Validation
-      if (!formData.email || !formData.password) {
-        toast.error("Please fill all fields");
-        setLoading(false);
-        return;
-      }
-
-      // Mock signin - in production, call API
-      const token = btoa(`${formData.email}:${formData.password}`);
-      localStorage.setItem("auth_token", token);
-      localStorage.setItem("user_email", formData.email);
-      localStorage.setItem("user_name", formData.email.split("@")[0]);
-
-      toast.success("Welcome back! 🎉");
-      setLocation("/");
-    } catch (error) {
-      toast.error("Sign in failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const reason =
+    typeof window === "undefined"
+      ? null
+      : new URLSearchParams(window.location.search).get("reason");
+  const message = admissionMessage(reason);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-purple-500/20 bg-slate-900/80 backdrop-blur">
-        <CardHeader className="space-y-2 text-center">
-          <div className="text-4xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-            SKYCOIN4444
-          </div>
-          <CardTitle className="text-xl text-white">Sign In</CardTitle>
-          <p className="text-sm text-slate-400">Welcome back to the ecosystem</p>
-        </CardHeader>
+    <main className="min-h-screen bg-[#050510] px-4 py-12 text-white">
+      <div className="mx-auto max-w-lg">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-white/50 hover:text-white"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to ecosystem
+        </Link>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 w-4 h-4 text-purple-400" />
-                <Input
-                  type="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                  disabled={loading}
-                />
-              </div>
+        <Card className="border-white/10 bg-white/[0.03] text-white">
+          <CardHeader className="space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-300/10 text-amber-200">
+              <ShieldCheck className="h-6 w-6" />
             </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-purple-400" />
-                <Input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
-                  disabled={loading}
-                />
-              </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200/70">
+                SKYCOIN4444
+              </p>
+              <CardTitle className="mt-2 text-3xl font-black">
+                Beta sign in
+              </CardTitle>
+              <CardDescription className="mt-2 text-white/50">
+                Authentication is provider-backed only when the deployment has
+                verified OAuth configuration.
+              </CardDescription>
             </div>
+          </CardHeader>
 
-            {/* Submit */}
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
+          <CardContent className="space-y-5">
+            <div
+              className={
+                "rounded-2xl border p-4 " +
+                (message.tone === "warning"
+                  ? "border-amber-400/30 bg-amber-400/[0.06]"
+                  : "border-white/10 bg-black/20")
+              }
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Signing In...
-                </>
-              ) : (
-                "Sign In"
-              )}
+              <div className="flex items-start gap-3">
+                {message.tone === "warning" ? (
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+                ) : (
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-200" />
+                )}
+                <div>
+                  <h1 className="font-bold">{message.title}</h1>
+                  <p className="mt-2 text-sm leading-6 text-white/60">
+                    {message.detail}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => startLogin()}
+              disabled={reason === "oauth-unconfigured"}
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Continue with approved identity provider
             </Button>
 
-            {/* Sign Up Link */}
-            <div className="text-center text-sm text-slate-400">
-              Don't have an account?{" "}
-              <button
-                type="button"
-                onClick={() => setLocation("/signup")}
-                className="text-purple-400 hover:text-purple-300 font-medium"
-              >
-                Create one
-              </button>
-            </div>
+            <p className="text-xs leading-5 text-white/40">
+              This page never accepts a SKYCOIN4444 password and never stores a
+              fabricated authentication token in browser storage. Financial
+              settlement, wallet custody, token transfers, signing, and live
+              chain execution remain outside this beta.
+            </p>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 pt-6 border-t border-slate-700 space-y-2">
-              <p className="text-xs font-semibold text-slate-300">🧪 Demo Credentials:</p>
-              <div className="bg-slate-800 p-3 rounded text-xs text-slate-300 space-y-1">
-                <div><span className="text-slate-500">Email:</span> demo@skycoin.com</div>
-                <div><span className="text-slate-500">Password:</span> demo1234</div>
-              </div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/help-center">
+                <Button type="button" variant="outline">
+                  Beta help
+                </Button>
+              </Link>
+              <Link href="/beta-workspace">
+                <Button type="button" variant="ghost">
+                  Browse public beta labs
+                </Button>
+              </Link>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
 
