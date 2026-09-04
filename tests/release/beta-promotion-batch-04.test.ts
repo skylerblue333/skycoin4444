@@ -112,7 +112,7 @@ describe("beta promotion batch 04 pages", () => {
     expect(sources["/checkbox-group-form"]).toMatch(/not saved, submitted, synchronized, or used for personalization/i);
     expect(sources["/confirmation-dialog"]).toMatch(/No account deletion, purchase, payment, server mutation, or irreversible operation/i);
     expect(sources["/component-showcase"]).toMatch(/local canned demo response/i);
-    expect(sources["/component-showcase"]).toMatch(/does not contact an AI provider/i);
+    expect(sources["/component-showcase"]).toMatch(/does not contact an AI\s+provider/i);
   });
 
   it("records all six promotions with synchronized inventory evidence", () => {
