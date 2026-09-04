@@ -101,6 +101,21 @@ After OAuth returns an identity, the server checks the invitation policy **befor
 
 Production OAuth callbacks are restricted to `/api/oauth/callback` on the configured `BETA_PUBLIC_ORIGIN`.
 
+## HTTP listener resource limits
+
+The canonical HTTP listener applies explicit process-local limits:
+
+- `HTTP_MAX_HEADERS_COUNT=128`;
+- `HTTP_MAX_CONNECTIONS=256`;
+- `HTTP_MAX_REQUESTS_PER_SOCKET=1000`;
+- `MAX_IN_FLIGHT_REQUESTS=128`.
+
+The header limit bounds parsed request-header cardinality. The connection limit bounds simultaneously accepted TCP connections for this single-process Node server. The in-flight request gate remains a separate application-level limit.
+
+`GET /api/runtime/state` exposes these non-secret configured limits.
+
+These values are engineering-beta defaults and must still be reviewed against real traffic, reverse-proxy behavior, hosting quotas, and any future multi-process/cluster architecture.
+
 ## Shared readiness behavior
 
 The canonical server now uses one dependency-readiness assessor for both `/api/runtime/ready` and `/api/beta/readiness`.
