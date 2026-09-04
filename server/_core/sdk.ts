@@ -298,7 +298,6 @@ class SDKServer {
     }
 
     const sessionUserId = session.openId;
-    const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
     if (!user) {
@@ -321,7 +320,7 @@ class SDKServer {
     }
 
     await db.upsertUser({
-      openId: user.openId,
+      openId: session.openId,
     });
 
     return user;
