@@ -123,10 +123,10 @@ describe("beta promotion batch 04 pages", () => {
       inventory.routes.map((entry: { path: string }) => [entry.path, entry])
     );
 
-    expect(registry.routes).toHaveLength(52);
+    expect(registry.routes).toHaveLength(60);
     expect(inventory.counts).toEqual({
-      launchable_beta: 52,
-      legacy_unverified: 952,
+      launchable_beta: 60,
+      legacy_unverified: 944,
       controlled_or_unavailable: 64,
     });
 
