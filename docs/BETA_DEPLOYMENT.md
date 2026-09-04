@@ -105,6 +105,24 @@ The bootstrap refuses localhost, refuses any non-empty database, synchronizes fr
 
 For any non-empty database, do **not** use this command. Prepare and review a forward migration against the exact existing schema instead.
 
+## Production session cookie migration
+
+Production browser authentication uses `__Host-app_session_id` rather than the legacy unprefixed `app_session_id`.
+
+The production cookie is:
+
+- Secure;
+- HttpOnly;
+- `Path=/`;
+- host-only because no Domain attribute is set;
+- `SameSite=None` for the current OAuth/runtime compatibility boundary.
+
+The legacy cookie is not accepted for production authentication. Successful login and logout clear it as cleanup. A deployment moving from the earlier unprefixed cookie should therefore expect some existing browser sessions to re-authenticate.
+
+Deployment verification should inspect the `Set-Cookie` metadata without recording the JWT value and confirm the active session cookie name begins with `__Host-`, includes Secure and Path=/, and has no Domain attribute.
+
+This source behavior does not prove a hosting proxy, browser fleet, or deployed origin is configured correctly.
+
 ## Session signing-key rotation
 
 The canonical session verifier supports one bounded overlap key:
