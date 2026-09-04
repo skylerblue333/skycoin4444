@@ -40,5 +40,5 @@ jobs:
       - run: pnpm --filter @skycoin/skyidentity test
       - run: pnpm run check:packages
       - run: pnpm --filter @skycoin/skyidentity format:check
-      - name: Audit SkyIdentity production dependency surface
-        run: pnpm --filter @skycoin/skyidentity audit --prod --audit-level=high
+      - name: Audit production dependency surface
+        run: node scripts/audit-production-dependencies.mjs
