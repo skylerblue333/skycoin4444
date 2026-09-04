@@ -13,7 +13,7 @@ The default branch has a reproducible pnpm workspace and a real CI pipeline. Cur
 - production client/server build;
 - high-severity production dependency audit.
 
-The repository also contains a verified cross-product integration vertical connecting identity, authentication, MFA, permissions, credentials, payment planning, audit, and narrow course/ledger/notification adapters. That integration is intentionally fail-closed at security and financial boundaries.\n\nA typed platform kernel now compiles the canonical capability registry into a dependency-aware DAG, fingerprints the normalized graph, propagates hard/soft degradation, and provides deterministic retry/circuit-breaker primitives plus async request correlation. The kernel is an engineering control-plane foundation; it does not convert registry status into production certification.
+The repository also contains a verified cross-product integration vertical connecting identity, authentication, MFA, permissions, credentials, payment planning, audit, and narrow course/ledger/notification adapters. That integration is intentionally fail-closed at security and financial boundaries.\n\nA typed platform kernel now compiles the canonical capability registry into a dependency-aware DAG, fingerprints the normalized graph, propagates hard/soft degradation, and provides deterministic retry/circuit-breaker primitives plus async request correlation. The server also has an explicit runtime lifecycle with liveness/readiness, graceful drain, bounded HTTP timeouts, and a process-local concurrency bulkhead. These are engineering control-plane foundations; they do not convert registry or runtime state into production certification.
 
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
@@ -59,7 +59,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 
 ## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.\n- [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.\n- [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.\n- [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
 - [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
 - [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
 - [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md) — invitation-only deployment, production configuration, managed-database bootstrap, and verification gates.
