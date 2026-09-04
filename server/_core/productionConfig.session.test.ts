@@ -52,3 +52,50 @@ describe("production session lifetime configuration", () => {
     });
   });
 });
+
+
+describe("production session signing key rotation", () => {
+  it("accepts one distinct previous verification key", () => {
+    const issues = inspectProductionBetaConfig({
+      ...validProductionEnv,
+      JWT_SECRET_PREVIOUS:
+        "previous-secret-123456789012345678901",
+    });
+
+    expect(
+      issues.find(
+        issue => issue.key === "JWT_SECRET_PREVIOUS"
+      )
+    ).toBeUndefined();
+  });
+
+  it("rejects a short previous key", () => {
+    const issues = inspectProductionBetaConfig({
+      ...validProductionEnv,
+      JWT_SECRET_PREVIOUS: "too-short",
+    });
+
+    expect(
+      issues.find(
+        issue => issue.key === "JWT_SECRET_PREVIOUS"
+      )
+    ).toMatchObject({
+      key: "JWT_SECRET_PREVIOUS",
+    });
+  });
+
+  it("rejects an identical active and previous key", () => {
+    const issues = inspectProductionBetaConfig({
+      ...validProductionEnv,
+      JWT_SECRET_PREVIOUS: validProductionEnv.JWT_SECRET,
+    });
+
+    expect(
+      issues.find(
+        issue => issue.key === "JWT_SECRET_PREVIOUS"
+      )
+    ).toMatchObject({
+      key: "JWT_SECRET_PREVIOUS",
+    });
+  });
+});
