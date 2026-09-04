@@ -212,6 +212,20 @@ function toDispatchMessage(
   });
 }
 
+export function buildOutboxFailurePatch(
+  input: MarkFailureInput
+) {
+  const retry = input.plan.action === "retry";
+  return Object.freeze({
+    state: retry ? ("retry" as const) : ("dead_letter" as const),
+    attempts: input.plan.attempts,
+    availableAt: retry ? input.plan.availableAt : input.now,
+    leasedUntil: null,
+    leaseOwner: null,
+    lastError: sanitizeOperationalError(input.error),
+  });
+}
+
 export class DrizzleOutboxRepository
   implements OutboxLeaseRepository
 {
@@ -281,17 +295,9 @@ export class DrizzleOutboxRepository
   }
 
   async markFailure(input: MarkFailureInput): Promise<boolean> {
-    const retry = input.plan.action === "retry";
     const result = await db
       .update(eventOutbox)
-      .set({
-        state: retry ? "retry" : "dead_letter",
-        attempts: input.plan.attempts,
-        availableAt: retry ? input.plan.availableAt : input.now,
-        leasedUntil: null,
-        leaseOwner: null,
-        lastError: sanitizeOperationalError(input.error),
-      })
+      .set(buildOutboxFailurePatch(input))
       .where(
         and(
           eq(eventOutbox.id, input.id),
