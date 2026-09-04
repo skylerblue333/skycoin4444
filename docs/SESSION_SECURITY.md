@@ -33,6 +33,21 @@ The SDK also applies the same hard bounds when another internal caller explicitl
 
 This removes the previous one-year default from canonical session issuance.
 
+## Token input boundary
+
+Before HS256 verification, the canonical verifier applies a narrow compact-JWT input boundary:
+
+- token length must be 1–4096 characters;
+- token must contain exactly three segments;
+- every segment must be non-empty;
+- every segment must contain only base64url characters `A-Z a-z 0-9 _ -`.
+
+Malformed or oversized values are rejected before cryptographic verification.
+
+This is an application-level bound beneath the HTTP server's broader header-size behavior. It does not replace transport/proxy header limits.
+
+Newly issued canonical session JWTs also include an `iat` issued-at timestamp. Existing signature, expiration, application-identity, and admission checks remain separate controls.
+
 ## Signing-key rotation
 
 The canonical JWT verifier supports one optional previous signing secret during a controlled rotation.
