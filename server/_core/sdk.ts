@@ -7,13 +7,17 @@ import { ForbiddenError } from "@shared/_core/errors";
 import axios, { type AxiosInstance } from "axios";
 import { parseCookieHeader } from "./cookieParser";
 import type { Request } from "express";
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
 import { sanitizeOperationalError } from "./operationalError";
 import { resolveSessionTtlMs } from "./sessionPolicy";
+import {
+  sessionSigningKeysFromSecrets,
+  verifySessionJwt,
+} from "./sessionKeys";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -34,7 +38,6 @@ export type SessionPayload = {
 const EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
 const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
-const MIN_SESSION_SECRET_BYTES = 32;
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
@@ -154,15 +157,11 @@ class SDKServer {
     return new Map(Object.entries(parsed));
   }
 
-  private getSessionSecret() {
-    const secret = ENV.cookieSecret;
-    const encoded = new TextEncoder().encode(secret);
-    if (encoded.byteLength < MIN_SESSION_SECRET_BYTES) {
-      throw new Error(
-        `JWT_SECRET must be configured with at least ${MIN_SESSION_SECRET_BYTES} bytes`
-      );
-    }
-    return encoded;
+  private getSessionKeys() {
+    return sessionSigningKeysFromSecrets(
+      ENV.cookieSecret,
+      ENV.previousCookieSecret
+    );
   }
 
   private requireAppId() {
@@ -205,7 +204,7 @@ class SDKServer {
     const issuedAt = Date.now();
     const expiresInMs = resolveSessionTtlMs(options.expiresInMs);
     const expirationSeconds = Math.floor((issuedAt + expiresInMs) / 1000);
-    const secretKey = this.getSessionSecret();
+    const secretKey = this.getSessionKeys().active;
 
     return new SignJWT({
       openId: payload.openId,
@@ -225,10 +224,10 @@ class SDKServer {
     }
 
     try {
-      const secretKey = this.getSessionSecret();
-      const { payload } = await jwtVerify(cookieValue, secretKey, {
-        algorithms: ["HS256"],
-      });
+      const { payload } = await verifySessionJwt(
+        cookieValue,
+        this.getSessionKeys()
+      );
       const { openId, appId, name } = payload as Record<string, unknown>;
 
       if (!isNonEmptyString(openId) || !isNonEmptyString(appId)) {

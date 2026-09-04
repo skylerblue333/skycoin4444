@@ -33,6 +33,20 @@ The SDK also applies the same hard bounds when another internal caller explicitl
 
 This removes the previous one-year default from canonical session issuance.
 
+## Signing-key rotation
+
+The canonical JWT verifier supports one optional previous signing secret during a controlled rotation.
+
+- `JWT_SECRET` is active and signs every new token.
+- `JWT_SECRET_PREVIOUS` is optional and verification-only.
+- both configured values must be at least 32 bytes;
+- the previous value must differ from the active value;
+- no third or historical key ring is accepted.
+
+A token is checked against the active key first and, only when a previous key is configured, against that previous key. Expiration and HS256 algorithm verification still apply under either key.
+
+See `docs/SESSION_KEY_ROTATION.md`.
+
 ## OAuth state is separate
 
 The OAuth CSRF nonce/state cookie remains a separate short-lived login artifact with its existing 10-minute lifetime.
@@ -83,6 +97,6 @@ This change does not establish:
 - idle-session expiration;
 - concurrent-session caps;
 - token theft detection;
-- signing-key rotation automation;
+- automatic signing-key rotation scheduling or secret-manager integration;
 - external identity-provider assurance;
 - production security certification.
