@@ -14,6 +14,7 @@ import { serveStatic, setupVite } from "./vite";
 import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
+import { registerSecurityHeaders } from "./securityHeaders";
 import {
   ConcurrencyGate,
   RuntimeLifecycle,
@@ -58,18 +59,8 @@ async function startServer() {
   configureHttpServer(server, runtimeOptions);
 
   app.disable("x-powered-by");
+  registerSecurityHeaders(app);
   registerObservability(app);
-
-  app.use((_req, res, next) => {
-    res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    res.setHeader(
-      "Permissions-Policy",
-      "camera=(), microphone=(), geolocation=(), payment=()"
-    );
-    next();
-  });
-
   registerRequestSecurity(app);
   registerRuntimeRoutes(app, lifecycle, concurrency);
   app.use(createDrainGuard(lifecycle));
