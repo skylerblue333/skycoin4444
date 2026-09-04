@@ -52,16 +52,16 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-type UserIdentityUpsert = Pick<
-  schema.InsertUser,
-  'openId'
-> &
-  Partial<
-    Pick<
-      schema.InsertUser,
-      'id' | 'email' | 'name' | 'username' | 'bio' | 'avatar' | 'profileVisibility'
-    >
-  >;
+type UserIdentityUpsert = {
+  openId: string;
+  id?: string;
+  email?: schema.InsertUser['email'];
+  name?: schema.InsertUser['name'];
+  username?: schema.InsertUser['username'];
+  bio?: schema.InsertUser['bio'];
+  avatar?: schema.InsertUser['avatar'];
+  profileVisibility?: schema.InsertUser['profileVisibility'];
+};
 
 export async function upsertUser(data: UserIdentityUpsert) {
   try {
