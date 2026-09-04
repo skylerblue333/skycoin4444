@@ -71,7 +71,15 @@ A candidate deployment is not beta-ready until all of these are recorded:
 9. profile update survives refresh;
 10. one social or SkySchool action survives refresh;
 11. beta feedback reaches durable storage;
-12. rollback target and response owner are recorded.
+12. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
+13. `/delete-account` records a durable request and does not claim deletion completion;
+14. rollback target, privacy-request owner, and response owner are recorded.
+
+## Privacy operations
+
+The engineering beta provides an authenticated self-export over currently integrated account/profile, social, learning, feedback, discovery, creator, notification, and privacy-request tables. The export explicitly does not claim exhaustive coverage of unintegrated legacy or external-provider systems.
+
+Account deletion is currently a **request-and-review workflow**. A tester can record a durable request and see its status. Administrators can approve or reject the request with an operator note. The application intentionally has no API action that marks a request completed, because an automated verified purge across all account-related tables has not yet been implemented. A beta operator must not tell a tester that deletion is complete without separate purge evidence.
 
 ## Explicit limits
 
