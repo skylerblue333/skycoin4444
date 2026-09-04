@@ -141,35 +141,38 @@ export default function ColorPickerDialog() {
               </p>
             ) : (
               palette.map(saved => (
-                <button
-                  key={saved}
-                  type="button"
-                  onClick={() => {
-                    setColor(saved);
-                    setHexInput(saved);
-                  }}
-                  className="rounded-xl border p-2 text-left"
-                >
-                  <div
-                    className="h-14 rounded-lg border"
-                    style={{ backgroundColor: saved }}
-                  />
+                <div key={saved} className="rounded-xl border p-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setColor(saved);
+                      setHexInput(saved);
+                    }}
+                    className="w-full text-left"
+                    aria-label={"Select saved color " + saved}
+                  >
+                    <div
+                      className="h-14 rounded-lg border"
+                      style={{ backgroundColor: saved }}
+                    />
+                  </button>
                   <div className="mt-2 flex items-center justify-between gap-2">
                     <span className="text-xs font-medium">{saved}</span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={event => {
-                        event.stopPropagation();
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      onClick={() =>
                         setPalette(current =>
                           current.filter(value => value !== saved)
-                        );
-                      }}
+                        )
+                      }
+                      aria-label={"Remove saved color " + saved}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
-                    </span>
+                    </Button>
                   </div>
-                </button>
+                </div>
               ))
             )}
           </CardContent>
