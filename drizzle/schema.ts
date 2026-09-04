@@ -1,5 +1,5 @@
 
-import { mysqlTable, varchar, text, int, float, boolean, timestamp, primaryKey, uniqueIndex } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, int, float, boolean, timestamp, primaryKey, uniqueIndex, index } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
@@ -600,6 +600,7 @@ export const eventOutbox = mysqlTable("event_outbox", {
   attempts: int("attempts").default(0).notNull(),
   availableAt: timestamp("available_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   leasedUntil: timestamp("leased_until"),
+  leaseOwner: varchar("lease_owner", { length: 64 }),
   publishedAt: timestamp("published_at"),
   lastError: text("last_error"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -608,10 +609,30 @@ export const eventOutbox = mysqlTable("event_outbox", {
     table.eventType,
     table.idempotencyKey
   ),
+  dispatchIndex: index("event_outbox_dispatch_idx").on(
+    table.state,
+    table.availableAt,
+    table.leasedUntil
+  ),
 }));
 
 export type EventOutbox = typeof eventOutbox.$inferSelect;
 export type InsertEventOutbox = typeof eventOutbox.$inferInsert;
+
+export const eventConsumerReceipts = mysqlTable("event_consumer_receipts", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  eventId: varchar("event_id", { length: 255 }).notNull(),
+  consumer: varchar("consumer", { length: 128 }).notNull(),
+  eventType: varchar("event_type", { length: 160 }).notNull(),
+  processedAt: timestamp("processed_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  eventConsumerUnique: uniqueIndex(
+    "event_consumer_receipts_event_consumer_unique"
+  ).on(table.eventId, table.consumer),
+}));
+
+export type EventConsumerReceipt = typeof eventConsumerReceipts.$inferSelect;
+export type InsertEventConsumerReceipt = typeof eventConsumerReceipts.$inferInsert;
 
 export const idempotencyRecords = mysqlTable("idempotency_records", {
   id: varchar("id", { length: 255 }).primaryKey(),

@@ -17,7 +17,7 @@ The repository also contains a verified cross-product integration vertical conne
 
 A typed platform kernel now compiles the canonical capability registry into a dependency-aware DAG, fingerprints the normalized graph, propagates hard/soft degradation, and provides deterministic retry/circuit-breaker primitives plus async request correlation. The server also has an explicit runtime lifecycle with liveness/readiness, graceful drain, bounded HTTP timeouts, and a process-local concurrency bulkhead. These are engineering control-plane foundations; they do not convert registry or runtime state into production certification.
 
-A transactional event fabric now defines versioned domain-event envelopes, a deterministic event-registry fingerprint, a durable database outbox, and idempotency-record contracts. Selected real beta mutations persist their business state and domain event atomically. No external event broker or dispatcher is claimed yet.
+A transactional event fabric now defines versioned domain-event envelopes, a deterministic event-registry fingerprint, a durable database outbox, and idempotency-record contracts. Selected real beta mutations persist their business state and domain event atomically. An optional internal dispatcher can lease, retry, dead-letter, and idempotently observe outbox events through durable consumer receipts; no external event broker or external-delivery guarantee is claimed.
 
 Cookie-authenticated unsafe browser mutations now pass a fail-closed same-origin request boundary in production, and production session cookies are always marked Secure. This is a targeted CSRF/origin defense, not a claim of penetration testing or audited security.
 
@@ -75,6 +75,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.
 - [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
 - [`docs/EVENT_FABRIC.md`](docs/EVENT_FABRIC.md) — versioned events, transactional outbox, idempotency contracts, and delivery boundaries.
+- [`docs/OUTBOX_DISPATCHER.md`](docs/OUTBOX_DISPATCHER.md) — database leases, retry/dead-letter behavior, durable consumer receipts, and internal dispatch diagnostics.
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.

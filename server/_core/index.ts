@@ -16,6 +16,11 @@ import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
 import {
+  createOutboxDispatcherService,
+  registerOutboxDispatcherRoutes,
+  registerOutboxDispatcherSignals,
+} from "./outboxDispatcher";
+import {
   ConcurrencyGate,
   RuntimeLifecycle,
   configureHttpServer,
@@ -53,6 +58,7 @@ async function startServer() {
   const runtimeOptions = runtimeOptionsFromEnv();
   const lifecycle = new RuntimeLifecycle();
   const concurrency = new ConcurrencyGate(runtimeOptions.maxInFlightRequests);
+  const outboxDispatcher = createOutboxDispatcherService();
 
   const app = express();
   const server = createServer(app);
@@ -74,6 +80,7 @@ async function startServer() {
   registerBetaRoutes(app);
   registerPlatformKernelRoutes(app);
   registerEventFabricRoutes(app);
+  registerOutboxDispatcherRoutes(app, outboxDispatcher);
 
   app.use(
     "/api/trpc",
@@ -96,6 +103,7 @@ async function startServer() {
     lifecycle,
     runtimeOptions.shutdownGraceMs
   );
+  registerOutboxDispatcherSignals(outboxDispatcher);
   registerShutdownSignals(shutdownController);
 
   if (port !== preferredPort) {
@@ -106,6 +114,7 @@ async function startServer() {
     if (lifecycle.currentPhase() === "starting") {
       lifecycle.markReady();
     }
+    outboxDispatcher.start();
     console.log(`Server running on http://localhost:${port}/`);
   });
 }

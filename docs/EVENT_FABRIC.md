@@ -28,9 +28,11 @@ It intentionally reports:
 
 - durable outbox schema: present;
 - idempotency ledger schema: present;
-- background dispatcher: not configured;
+- whether the optional internal dispatcher is enabled;
+- the internal consumer name;
+- durable consumer receipts: present;
 - external transport/broker: not configured;
-- production delivery claim: false.
+- production external-delivery claim: false.
 
 ## Transactional outbox
 
@@ -51,7 +53,7 @@ Other social multi-write operations were also tightened:
 - unlike removal + counter decrement;
 - post deletion + associated likes/comments deletion.
 
-These operations are transactionally grouped, but this does **not** prove serializable behavior under every concurrent race. In particular, the historical `likes` table does not yet enforce a database unique constraint on `(post_id, user_id)`; the application-level duplicate check should not be described as full concurrent duplicate-like protection.
+These operations are transactionally grouped, but this does **not** prove serializable behavior under every concurrent race. The canonical schema now enforces unique non-null like edges on `(post_id, user_id)` and unique non-null follow edges on `(follower_id, following_id)`; migration `0011_social_consistency.sql` also reconciles like counters after deduplication.
 
 ## Event envelope
 
@@ -80,7 +82,7 @@ The pure decision contract distinguishes:
 - conflict when the same key is reused for a different request hash;
 - execute again after expiry or an explicitly failed record.
 
-The schema and decision logic are foundations. Existing HTTP/tRPC mutations are **not** yet globally wrapped by this ledger, so the presence of the table must not be represented as universal idempotent request handling.
+The schema and decision logic are foundations. Only the explicitly documented create mutations are currently wired to durable replay, so the presence of the table must not be represented as universal idempotent request handling.
 
 ## Mutation idempotency
 
@@ -111,18 +113,34 @@ The domain event receives a separate SHA-256 idempotency fingerprint derived fro
 
 Idempotency records currently have no automatic expiry/garbage-collection policy. The current beta therefore treats completed keys as durable replay records until an explicit retention policy is designed and tested. Failed/expired record reclamation is not claimed; callers should use a new key if a record cannot be safely replayed.
 
-## Retry and dead-letter planning
+## Internal outbox dispatcher
 
-The event library can plan deterministic exponential retry delays and a final dead-letter state. It reuses the platform-kernel backoff primitive.
+Migration `0012_outbox_dispatcher.sql` adds lease ownership, a dispatch lookup index, and durable `event_consumer_receipts`.
 
-No background worker currently leases and publishes outbox rows. Therefore:
+The optional runtime dispatcher is disabled by default. When `EVENT_OUTBOX_DISPATCHER_ENABLED=true`, it:
+
+1. selects currently eligible `pending`, `retry`, or expired-`leased` rows in bounded batches;
+2. acquires each row through an optimistic database update that requires the row to still be eligible;
+3. assigns an opaque short-lived lease owner and lease expiry;
+4. invokes the internal `platform-event-observer` consumer;
+5. writes an idempotent durable consumer receipt and one deterministic event-observation metric inside one transaction;
+6. marks the outbox row `published` only after consumer success;
+7. applies deterministic exponential retry on failure;
+8. moves the row to `dead_letter` after the configured maximum attempts.
+
+Consumer receipts make the current internal observer retry-safe: if a crash occurs after the consumer transaction succeeds but before the outbox row is marked published, a later lease may invoke the consumer again, but the unique `(event_id, consumer)` receipt prevents the observer side effect from being counted twice.
+
+The dispatcher remains process-local polling against the shared database. It does not claim an external broker or stream transport.
+
+Therefore:
 
 - no external delivery latency is claimed;
-- no exactly-once delivery is claimed;
+- no exactly-once external delivery is claimed;
 - no broker durability is claimed;
-- no cross-region or multi-replica event processing is claimed.
+- no cross-region delivery guarantee is claimed;
+- no automatic dead-letter replay UI or operator workflow is claimed.
 
-A future dispatcher can build on the outbox lease/state fields after a specific transport and operational model is selected and verified.
+The pure dispatch engine, database repository, retry planner, and runtime diagnostics are reusable foundations for a future verified external transport.
 
 ## Verification
 
@@ -135,6 +153,9 @@ Tests cover:
 - oversized payload rejection;
 - idempotency execute/replay/conflict/in-progress behavior;
 - retry and dead-letter planning;
+- lease loss handling;
+- bounded dispatcher configuration;
+- internal-only transport diagnostics;
 - truthful server registry boundaries.
 
 The canonical repository CI still provides the authoritative exact-head evidence for type checking, linting, credential scanning, marker auditing, tests, integration tests, production build, and production-dependency audit.
