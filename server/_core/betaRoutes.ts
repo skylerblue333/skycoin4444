@@ -70,7 +70,29 @@ export function createCoordinatedBetaReadinessHandler(
   readiness: ReadinessAssessor
 ): RequestHandler {
   return async (_req, res) => {
-    const dependencyReadiness = await readiness.assess();
+    let dependencyReadiness;
+    try {
+      dependencyReadiness = await readiness.assess();
+    } catch {
+      res.set("Cache-Control", "no-store");
+      res.status(503).json({
+        status: "not_ready",
+        database: "unknown",
+        configuration: "invalid",
+        configurationIssueKeys: [
+          "DEPENDENCY_READINESS_PROBE_FAILED",
+        ],
+        dependencyReadiness: {
+          contract: "skycoin4444.dependency-readiness.v1",
+          status: "not_ready",
+          probe: "unavailable",
+          productionCertification: false,
+        },
+        ...runtimeSnapshot(),
+      });
+      return;
+    }
+
     const ready = dependencyReadiness.status === "ready";
     const configuration =
       dependencyReadiness.configuration.status === "ok"
