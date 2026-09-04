@@ -143,6 +143,8 @@ export type HttpRuntimeOptions = Readonly<{
   headersTimeoutMs: number;
   keepAliveTimeoutMs: number;
   maxRequestsPerSocket: number;
+  maxHeadersCount: number;
+  maxConnections: number;
   maxInFlightRequests: number;
   shutdownGraceMs: number;
 }>;
@@ -204,6 +206,18 @@ export function runtimeOptionsFromEnv(
       1,
       100_000
     ),
+    maxHeadersCount: boundedInteger(
+      env.HTTP_MAX_HEADERS_COUNT,
+      128,
+      16,
+      2_000
+    ),
+    maxConnections: boundedInteger(
+      env.HTTP_MAX_CONNECTIONS,
+      256,
+      1,
+      10_000
+    ),
     maxInFlightRequests: boundedInteger(
       env.MAX_IN_FLIGHT_REQUESTS,
       128,
@@ -227,13 +241,16 @@ export function configureHttpServer(
   server.headersTimeout = options.headersTimeoutMs;
   server.keepAliveTimeout = options.keepAliveTimeoutMs;
   server.maxRequestsPerSocket = options.maxRequestsPerSocket;
+  server.maxHeadersCount = options.maxHeadersCount;
+  server.maxConnections = options.maxConnections;
 }
 
 export function registerRuntimeRoutes(
   app: Express,
   lifecycle: RuntimeLifecycle,
   concurrency: ConcurrencyGate,
-  readiness?: ReadinessAssessor
+  readiness?: ReadinessAssessor,
+  options?: HttpRuntimeOptions
 ): void {
   app.get("/api/runtime/live", (_req, res) => {
     const snapshot = lifecycle.snapshot();
@@ -287,6 +304,17 @@ export function registerRuntimeRoutes(
       productionCertification: false,
       runtime: lifecycle.snapshot(),
       concurrency: concurrency.snapshot(),
+      httpLimits: options
+        ? {
+            requestTimeoutMs: options.requestTimeoutMs,
+            headersTimeoutMs: options.headersTimeoutMs,
+            keepAliveTimeoutMs: options.keepAliveTimeoutMs,
+            maxRequestsPerSocket: options.maxRequestsPerSocket,
+            maxHeadersCount: options.maxHeadersCount,
+            maxConnections: options.maxConnections,
+            maxInFlightRequests: options.maxInFlightRequests,
+          }
+        : null,
     });
   });
 }
