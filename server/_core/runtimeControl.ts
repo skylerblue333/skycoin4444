@@ -393,28 +393,3 @@ export function createShutdownController(
 
   return Object.freeze({ shutdown });
 }
-
-export function registerShutdownSignals(
-  controller: ShutdownController
-): () => void {
-  const onTerm = () => {
-    void controller.shutdown("SIGTERM").catch(error => {
-      console.error("[Runtime] graceful SIGTERM shutdown failed", error);
-      process.exitCode = 1;
-    });
-  };
-  const onInt = () => {
-    void controller.shutdown("SIGINT").catch(error => {
-      console.error("[Runtime] graceful SIGINT shutdown failed", error);
-      process.exitCode = 1;
-    });
-  };
-
-  process.once("SIGTERM", onTerm);
-  process.once("SIGINT", onInt);
-
-  return () => {
-    process.off("SIGTERM", onTerm);
-    process.off("SIGINT", onInt);
-  };
-}
