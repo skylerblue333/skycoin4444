@@ -27,6 +27,39 @@ const sources = Object.fromEntries(
   ])
 ) as Record<keyof typeof pagePaths, string>;
 
+
+const registry = JSON.parse(
+  fs.readFileSync("catalogs/beta-route-evidence.json", "utf8")
+) as {
+  routes: Array<{
+    route: string;
+    capability: string;
+    evidence: string[];
+    boundary: string;
+  }>;
+};
+
+const inventory = JSON.parse(
+  fs.readFileSync("catalogs/screen-inventory.json", "utf8")
+) as {
+  counts: Record<string, number>;
+  routes: Array<{
+    path: string;
+    readiness: string;
+    requiresAuth: boolean;
+  }>;
+};
+
+const promotedRoutes = [
+  "/date-input-form",
+  "/date-picker-dialog",
+  "/password-input-form",
+  "/text-input-form",
+  "/text-tools",
+  "/context-menu",
+  "/community-guidelines",
+] as const;
+
 describe("beta seven utility core", () => {
   it("counts and transforms text deterministically", () => {
     expect(countText("one two\nthree")).toEqual({
@@ -127,5 +160,34 @@ describe("beta seven utility pages", () => {
     expect(sources.guidelines).toMatch(
       /Emergency response and law-enforcement services are not provided/i
     );
+  });
+
+
+  it("records all seven promotions with synchronized evidence and inventory", () => {
+    const evidenceByRoute = new Map(
+      registry.routes.map(entry => [entry.route, entry])
+    );
+    const inventoryByPath = new Map(
+      inventory.routes.map(entry => [entry.path, entry])
+    );
+
+    expect(registry.routes).toHaveLength(53);
+    expect(inventory.counts).toEqual({
+      launchable_beta: 53,
+      legacy_unverified: 951,
+      controlled_or_unavailable: 64,
+    });
+
+    for (const route of promotedRoutes) {
+      expect(inventoryByPath.get(route)).toMatchObject({
+        readiness: "launchable_beta",
+        requiresAuth: false,
+      });
+      expect(evidenceByRoute.get(route)?.capability.length).toBeGreaterThan(20);
+      expect(evidenceByRoute.get(route)?.evidence.length).toBeGreaterThanOrEqual(
+        3
+      );
+      expect(evidenceByRoute.get(route)?.boundary.length).toBeGreaterThan(25);
+    }
   });
 });
