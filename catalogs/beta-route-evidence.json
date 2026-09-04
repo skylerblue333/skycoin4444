@@ -342,6 +342,42 @@
         "release regression test"
       ],
       "boundary": "No real-time sync, guest invitations, venue booking, external maps, or server persistence."
+    },
+    {
+      "route": "/privacy-settings",
+      "capability": "Authenticated beta privacy center for profile visibility, export, and deletion-request navigation",
+      "persistence": "Profile visibility stored in MySQL; export and deletion request actions use authenticated server procedures",
+      "evidence": [
+        "authenticated profile visibility control",
+        "links to self-data export and deletion request workflow",
+        "release regression test"
+      ],
+      "boundary": "No regulatory certification, provider-wide coverage, or automated purge claim."
+    },
+    {
+      "route": "/data-export",
+      "capability": "Authenticated self-only JSON export of currently integrated beta account data",
+      "persistence": "Reads current MySQL account-owned records; downloaded snapshot is created locally in the browser",
+      "evidence": [
+        "protected privacy.exportData procedure",
+        "self-scoped table filters",
+        "explicit export scope statement",
+        "release regression test"
+      ],
+      "boundary": "Export covers integrated beta tables only and does not claim exhaustive legacy or external-provider data coverage."
+    },
+    {
+      "route": "/delete-account",
+      "capability": "Durable account deletion-request intake and status history",
+      "persistence": "MySQL privacy_requests table",
+      "evidence": [
+        "typed confirmation phrase",
+        "duplicate active-request prevention",
+        "durable request history",
+        "admin approve/reject review boundary",
+        "release regression test"
+      ],
+      "boundary": "Submitting or approving a request does not itself erase account data; no request can be marked completed until a verified purge operation exists."
     }
   ]
 }
