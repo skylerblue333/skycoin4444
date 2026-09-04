@@ -89,7 +89,7 @@ See `docs/DATABASE_POOL.md`.
 
 The server explicitly configures request, header, keep-alive, requests-per-socket, maximum parsed-header count, and maximum concurrent connection limits. Values are bounded and validated at startup.
 
-`HTTP_MAX_HEADERS_COUNT` defaults to 128, reducing the Node HTTP server's much larger built-in header-count allowance. `HTTP_MAX_CONNECTIONS` defaults to 256; once the process reaches that connection threshold, Node stops accepting additional connections for this single-process server rather than allowing the listener connection count to grow without an application bound.
+`HTTP_MAX_HEADERS_COUNT` defaults to 128, reducing the Node HTTP server's much larger built-in header-count allowance. `HTTP_MAX_CONNECTIONS` defaults to 256; once the process reaches that connection threshold, Node closes or drops additional incoming connections for this single-process server rather than allowing the listener connection count to grow without an application bound.
 
 `GET /api/runtime/state` reports these non-secret HTTP limits together with the existing process-local concurrency counters.
 
