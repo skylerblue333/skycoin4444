@@ -19,7 +19,7 @@ This evidence does **not** establish production deployment, live banking or paym
 
 ## One-machine beta test launch
 
-For the fastest local test phase, use Docker Desktop or Docker Engine with Compose. The local path creates only a labeled development account and never targets a production database.
+For the fastest local test phase, use Docker Desktop or Docker Engine with Compose. The local path creates only a labeled development account and never targets a production database. The disposable local database is synchronized from the current `drizzle/schema.ts`; historical SQL files are not treated as the canonical local bootstrap.
 
 ```bash
 git clone https://github.com/skylerblue333/skycoin4444.git
@@ -49,7 +49,7 @@ pnpm db:push
 pnpm start
 ```
 
-`pnpm db:push` is the schema/migration command. Do not run it against a database you have not intentionally configured and verified.
+`pnpm db:push` is a Drizzle schema/migration command for an intentionally configured database. The guarded local beta path uses `pnpm local:db` instead. Do not run database commands against a shared, staging, or production-like database until its bootstrap/migration plan has been reviewed and recorded.
 
 The canonical application server entry point is `server/_core/index.ts`. The canonical frontend tree is `client/`. Independently testable product/domain libraries live under `packages/`.
 
