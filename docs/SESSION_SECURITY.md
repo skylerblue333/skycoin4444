@@ -42,7 +42,7 @@ Before HS256 verification, the canonical verifier applies a narrow compact-JWT i
 - every segment must be non-empty;
 - every segment must contain only base64url characters `A-Z a-z 0-9 _ -`.
 
-Malformed or oversized values are rejected before cryptographic verification.
+Malformed or oversized values are rejected before cryptographic verification. Signature verification additionally requires HS256 and the canonical `typ: JWT` protected-header value.
 
 This is an application-level bound beneath the HTTP server's broader header-size behavior. It does not replace transport/proxy header limits.
 
