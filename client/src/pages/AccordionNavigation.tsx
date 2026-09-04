@@ -1,25 +1,18 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { BookOpen, Gamepad2, ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-export default function AccordionNavigation() {
-  const [state, setState] = useState(false);
+const sections=[
+ {id:"learn",title:"Learning",icon:BookOpen,detail:"SkySchool lessons, quizzes, and progress evidence."},
+ {id:"play",title:"Gaming",icon:Gamepad2,detail:"Deterministic local arcade and interaction labs."},
+ {id:"safety",title:"Safety",icon:ShieldCheck,detail:"Privacy controls, activity evidence, and explicit beta boundaries."},
+] as const;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-black p-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-white mb-8">AccordionNavigation</h1>
-        <p className="text-slate-400 mb-8">accordion navigation</p>
-        
-        <Card className="bg-slate-900 border-slate-800 p-8">
-          <div className="space-y-6">
-            <p className="text-slate-300">Content for AccordionNavigation page</p>
-            <Button onClick={() => setState(!state)}>
-              {state ? "Deactivate" : "Activate"}
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
-  );
+export default function AccordionNavigation(){
+ return <main className="min-h-screen bg-background p-4 md:p-8"><div className="mx-auto max-w-3xl space-y-6">
+  <header><Badge variant="outline">Navigation interaction lab</Badge><h1 className="mt-3 text-3xl font-bold">Accordion navigation</h1><p className="mt-2 text-muted-foreground">Explore grouped beta-area descriptions using the shared accordion component.</p></header>
+  <Card><CardHeader><CardTitle>Beta areas</CardTitle><CardDescription>Opening a section changes only local component state.</CardDescription></CardHeader><CardContent><Accordion type="single" collapsible>{sections.map(section=>{const Icon=section.icon;return <AccordionItem key={section.id} value={section.id}><AccordionTrigger><span className="flex items-center gap-2"><Icon className="h-4 w-4 text-primary"/>{section.title}</span></AccordionTrigger><AccordionContent>{section.detail}</AccordionContent></AccordionItem>})}</Accordion></CardContent></Card>
+  <p className="text-xs text-muted-foreground">This lab does not change routes, permissions, account state, or remote navigation configuration.</p>
+ </div></main>;
 }
