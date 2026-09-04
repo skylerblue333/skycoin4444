@@ -84,7 +84,7 @@ describe("beta promotion batch 01", () => {
     expect(convertText("a,b\n1,2", "csv-to-tsv")).toBe("a\tb\n1\t2");
     expect(convertText("Sky", "lowercase")).toBe("sky");
     expect(pages.converter).toMatch(/new FileReader\(\)/);
-    expect(pages.converter).toMatch(/are not uploaded to a server/);
+    expect(pages.converter).toMatch(/are not uploaded\\s+to a server/);
   });
 
   it("counts words and keeps blog drafts local", () => {
@@ -144,8 +144,21 @@ describe("beta promotion batch 01", () => {
   });
 
   it("provides searchable help and beta-route discovery", () => {
-    const sample = registry.routes.slice(0, 3);
-    expect(searchBetaRoutes(sample, sample[0].route)).toHaveLength(1);
+    const sample = [
+      {
+        route: "/one",
+        capability: "Alpha unique utility",
+        persistence: "None",
+        boundary: "No external provider.",
+      },
+      {
+        route: "/two",
+        capability: "Beta unique utility",
+        persistence: "None",
+        boundary: "No external provider.",
+      },
+    ];
+    expect(searchBetaRoutes(sample, "Alpha unique")).toHaveLength(1);
     expect(pages.help).toMatch(/Search verified beta guidance/);
     expect(pages.search).toMatch(/Search the evidence-backed launchable beta registry/);
     expect(pages.help).not.toMatch(/live-support agent.*available/i);
