@@ -116,7 +116,7 @@ describe("beta promotion batch 05 pages", () => {
     expect(sources["/data-grid"]).toMatch(/No remote database query, analytics service, user data, or production metrics/i);
     expect(sources["/pagination"]).toMatch(/No API pagination, cursor persistence, remote dataset, or account state/i);
     expect(sources["/progress-bar"]).toMatch(/does not infer deployment, business, learning, financial, or user progress/i);
-    expect(sources["/alert-dialog"]).toMatch(/No notification service, account mutation, purchase, deletion, payment, or irreversible action/i);
+    expect(sources["/alert-dialog"]).toMatch(/No notification service,\s+account mutation,\s+purchase,\s+deletion,\s+payment,\s+or irreversible action/i);
     expect(sources["/breadcrumb-navigation"]).toMatch(/does not change application routing, browser history, permissions, or remote state/i);
     expect(sources["/code-samples"]).toMatch(/does not execute them, provision services, create credentials, or contact external providers/i);
     expect(sources["/calendar-view"]).toMatch(/disabled=\{!previousMonth\}/);
