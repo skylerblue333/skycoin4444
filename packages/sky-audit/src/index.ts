@@ -29,6 +29,15 @@ function compareCodeUnits(left: string, right: string): number {
   return left < right ? -1 : 1;
 }
 
+function isLeapYear(year: number): boolean {
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+}
+
+function daysInMonth(year: number, month: number): number {
+  if (month === 2) return isLeapYear(year) ? 29 : 28;
+  return [4, 6, 9, 11].includes(month) ? 30 : 31;
+}
+
 function parseInstant(value: string): string {
   const normalized = value.trim();
   const match = ISO_INSTANT.exec(normalized);
@@ -45,14 +54,17 @@ function parseInstant(value: string): string {
   if (month < 1 || month > 12 || hour > 23 || minute > 59 || second > 59) {
     throw new Error("occurredAt must be a real ISO date-time");
   }
-  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
-  if (day < 1 || day > daysInMonth) throw new Error("occurredAt must be a real ISO date-time");
+  if (day < 1 || day > daysInMonth(year, month)) {
+    throw new Error("occurredAt must be a real ISO date-time");
+  }
 
   if (zone !== "Z" && zone !== "z") {
     const [offsetHourText, offsetMinuteText] = zone.slice(1).split(":");
     const offsetHour = Number(offsetHourText);
     const offsetMinute = Number(offsetMinuteText);
-    if (offsetHour > 23 || offsetMinute > 59) throw new Error("occurredAt must contain a valid UTC offset");
+    if (offsetHour > 23 || offsetMinute > 59) {
+      throw new Error("occurredAt must contain a valid UTC offset");
+    }
   }
 
   const milliseconds = Date.parse(normalized);
@@ -60,26 +72,77 @@ function parseInstant(value: string): string {
   return new Date(milliseconds).toISOString();
 }
 
+function normalizeMetadata(
+  metadata: Record<string, string | number | boolean> | undefined,
+): Array<[string, string | number | boolean]> {
+  return Object.entries(metadata ?? {})
+    .map(([key, value]) => {
+      if (typeof value === "number" && !Number.isFinite(value)) {
+        throw new Error(`metadata.${key} must be a finite number`);
+      }
+      return [key, value] as [string, string | number | boolean];
+    })
+    .sort(([left], [right]) => compareCodeUnits(left, right));
+}
+
 export function canonicalizeAudit(input: AuditInput): string {
   const actorId = requireText(input.actorId, "actorId");
   const action = requireText(input.action, "action");
   const resource = requireText(input.resource, "resource");
   const occurredAt = parseInstant(input.occurredAt);
-  const metadata = Object.entries(input.metadata ?? {}).sort(([a], [b]) => compareCodeUnits(a, b));
-  return JSON.stringify({ actorId, action, resource, occurredAt, severity: input.severity ?? "info", metadata });
+  const metadata = normalizeMetadata(input.metadata);
+  return JSON.stringify({
+    actorId,
+    action,
+    resource,
+    occurredAt,
+    severity: input.severity ?? "info",
+    metadata,
+  });
+}
+
+function deterministicAuditHash(canonical: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < canonical.length; index += 1) {
+    hash ^= canonical.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }
 
 export function createAuditRecord(input: AuditInput): AuditRecord {
   const canonical = canonicalizeAudit(input);
-  let hash = 2166136261;
-  for (const char of canonical) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return { ...input, actorId: input.actorId.trim(), action: input.action.trim(), resource: input.resource.trim(), occurredAt: parseInstant(input.occurredAt), severity: input.severity ?? "info", id: `aud_${(hash >>> 0).toString(16).padStart(8, "0")}`, canonical };
+  return {
+    ...input,
+    actorId: input.actorId.trim(),
+    action: input.action.trim(),
+    resource: input.resource.trim(),
+    occurredAt: parseInstant(input.occurredAt),
+    severity: input.severity ?? "info",
+    id: `aud_${deterministicAuditHash(canonical).toString(16).padStart(8, "0")}`,
+    canonical,
+  };
 }
 
-export function redactAuditMetadata(metadata: Record<string, unknown>, blockedKeys = ["password", "token", "secret", "authorization"]): Record<string, unknown> {
-  const blocked = new Set(blockedKeys.map((key) => key.toLowerCase()));
-  return Object.fromEntries(Object.entries(metadata).map(([key, value]) => [key, blocked.has(key.toLowerCase()) ? "[REDACTED]" : value]));
+function sensitiveKeyParts(key: string): { compact: string; words: string[] } {
+  const spaced = key.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
+  const words = spaced.split(/[^a-z0-9]+/).filter(Boolean);
+  return { compact: words.join(""), words };
+}
+
+export function redactAuditMetadata(
+  metadata: Record<string, unknown>,
+  blockedKeys = ["password", "token", "secret", "authorization"],
+): Record<string, unknown> {
+  const blocked = blockedKeys.map(key => sensitiveKeyParts(key));
+  return Object.fromEntries(
+    Object.entries(metadata).map(([key, value]) => {
+      const candidate = sensitiveKeyParts(key);
+      const shouldRedact = blocked.some(blockedKey =>
+        candidate.compact === blockedKey.compact ||
+        blockedKey.words.some(word => candidate.words.includes(word)),
+      );
+      return [key, shouldRedact ? "[REDACTED]" : value];
+    }),
+  );
 }
