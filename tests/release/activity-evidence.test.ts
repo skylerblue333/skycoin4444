@@ -14,6 +14,8 @@ describe("activity evidence", () => {
     expect(router).toContain("protectedProcedure");
     expect(router).toContain("eq(posts.userId, userId)");
     expect(router).toContain("eq(courseProgress.userId, userId)");
+    expect(router).toContain("eq(privacyRequests.userId, userId)");
+    expect(router).toContain("Recorded a privacy request");
     expect(router).toContain("slice(0, 50)");
   });
 
