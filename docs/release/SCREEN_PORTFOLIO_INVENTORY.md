@@ -8,9 +8,9 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 | --- | ---: |
 | Registered routes | 1068 |
 | Lazy page modules | 1056 |
-| Launchable beta routes | 43 |
+| Launchable beta routes | 49 |
 | Controlled or unavailable routes | 64 |
-| Legacy unverified routes | 961 |
+| Legacy unverified routes | 955 |
 | Routes missing a lazy page source | 0 |
 
 ## Launchable beta routes
@@ -21,6 +21,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /accessibility-settings
 - /activity-evidence
 - /activity-feed
+- /address-book
 - /advanced-search
 - /arcade
 - /beta-catalog
@@ -32,8 +33,13 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /blog-editor
 - /calculator
 - /calendar
+- /checkbox-group-form
+- /code-formatter
 - /color-picker-dialog
 - /community-hub
+- /component-showcase
+- /confirmation-dialog
+- /content-calendar
 - /course-catalog
 - /creator-analytics
 - /data-export
