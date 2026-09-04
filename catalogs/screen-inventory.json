@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 43,
-    "legacy_unverified": 961,
+    "launchable_beta": 46,
+    "legacy_unverified": 958,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -768,7 +768,7 @@
       "path": "/assignment-tracker",
       "component": "AssignmentTracker",
       "page": "AssignmentTracker",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -2584,7 +2584,7 @@
       "path": "/document-editor",
       "component": "DocumentEditor",
       "page": "DocumentEditor",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -5784,7 +5784,7 @@
       "path": "/project-board",
       "component": "ProjectBoard",
       "page": "ProjectBoard",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
