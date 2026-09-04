@@ -27,14 +27,22 @@ These endpoints are engineering runtime signals. They are not an SLA, external m
 
 ## Graceful shutdown
 
-SIGTERM and SIGINT begin a drain:
+SIGTERM and SIGINT are owned by one application shutdown coordinator.
 
-- readiness becomes false;
-- new non-runtime requests receive HTTP 503 with Retry-After;
-- idle keep-alive connections are closed when supported;
-- the HTTP server stops accepting new connections;
-- active connections receive a bounded grace period;
-- if the grace period expires, remaining connections are force-closed and the failure is surfaced.
+The ordered sequence is:
+
+1. runtime lifecycle moves to `draining`, which immediately makes runtime readiness false;
+2. bounded background hooks stop new internal outbox polling and wait for its current cycle;
+3. idle HTTP keep-alive connections are closed when supported and the server stops accepting new connections;
+4. active HTTP connections receive the configured grace period;
+5. after HTTP drain, final resource hooks close the MySQL pool;
+6. resource failures are aggregated after later cleanup hooks have still been attempted.
+
+New non-runtime requests receive HTTP 503 with Retry-After once draining begins.
+
+If the HTTP grace period expires, remaining connections are force-closed and the shutdown failure is surfaced. Each non-HTTP resource hook also has its own bounded timeout.
+
+The diagnostic route `GET /api/runtime/shutdown` reports phase, reason, timestamps, hook counts, and error count without exposing raw resource errors.
 
 ## Overload protection
 
@@ -61,6 +69,7 @@ Optional environment variables:
 - HTTP_MAX_REQUESTS_PER_SOCKET
 - MAX_IN_FLIGHT_REQUESTS
 - SHUTDOWN_GRACE_MS
+- SHUTDOWN_RESOURCE_TIMEOUT_MS
 
 Invalid or incoherent values fail fast rather than silently weakening the runtime boundary.
 

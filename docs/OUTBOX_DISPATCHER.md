@@ -92,9 +92,11 @@ The registry endpoint `GET /api/platform/events/registry` also reports whether t
 
 ## Shutdown behavior
 
-The polling timer is unreferenced so it cannot keep the process alive by itself. SIGTERM/SIGINT handlers stop future polling and wait for the currently in-flight dispatch cycle before returning.
+The polling timer is unreferenced so it cannot keep the process alive by itself.
 
-The HTTP runtime still owns the canonical graceful-server shutdown path. This dispatcher integration does not claim coordinated distributed draining across replicas.
+The dispatcher no longer registers its own SIGTERM/SIGINT handler. The canonical application shutdown coordinator owns process signals and invokes `dispatcher.stop()` as the first bounded background-resource hook before HTTP drain begins. That stops future polling and waits for the current dispatch cycle within the configured resource-hook timeout.
+
+This integration does not claim coordinated distributed draining across replicas.
 
 ## Limitations
 

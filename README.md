@@ -29,6 +29,8 @@ The canonical server now applies production CSP/HSTS plus framing, opener, resou
 
 Runtime and beta readiness now share one dependency-readiness assessor with bounded database timeouts, short cache/in-flight deduplication, fail-closed required configuration/database checks, and optional dispatcher degradation reporting.
 
+The server now has a single coordinated shutdown owner: it marks draining first, stops background dispatch, drains HTTP, then closes the MySQL pool, with bounded cleanup hooks and non-secret shutdown diagnostics.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -76,6 +78,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.
 - [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.
 - [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
+- [`docs/SHUTDOWN.md`](docs/SHUTDOWN.md) — coordinated signal ownership, ordered resource drain, MySQL pool close, and timeout semantics.
 - [`docs/READINESS.md`](docs/READINESS.md) — shared configuration/database readiness, timeout/cache behavior, and optional dependency degradation.
 - [`docs/EVENT_FABRIC.md`](docs/EVENT_FABRIC.md) — versioned events, transactional outbox, idempotency contracts, and delivery boundaries.
 - [`docs/OUTBOX_DISPATCHER.md`](docs/OUTBOX_DISPATCHER.md) — database leases, retry/dead-letter behavior, durable consumer receipts, and internal dispatch diagnostics.

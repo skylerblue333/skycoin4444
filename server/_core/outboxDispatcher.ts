@@ -475,22 +475,3 @@ export function registerOutboxDispatcherRoutes(
     });
   });
 }
-
-export function registerOutboxDispatcherSignals(
-  dispatcher: OutboxDispatcherService
-): () => void {
-  const onTerm = () => {
-    void dispatcher.stop();
-  };
-  const onInt = () => {
-    void dispatcher.stop();
-  };
-
-  process.once("SIGTERM", onTerm);
-  process.once("SIGINT", onInt);
-
-  return () => {
-    process.off("SIGTERM", onTerm);
-    process.off("SIGINT", onInt);
-  };
-}
