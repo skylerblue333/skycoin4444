@@ -96,7 +96,11 @@ export function inspectProductionBetaConfig(
   }
 
   const admission = betaAdmissionSnapshot(env);
-  if (!admission.configured) {
+  const hasInvitedIdentity =
+    admission.ownerConfigured ||
+    admission.allowedEmailCount > 0 ||
+    admission.allowedOpenIdCount > 0;
+  if (!hasInvitedIdentity) {
     issues.push({
       key: "BETA_ALLOWED_EMAILS/BETA_ALLOWED_OPEN_IDS/OWNER_OPEN_ID",
       message: "at least one invited identity must be configured",
