@@ -589,6 +589,102 @@
         "release regression test"
       ],
       "boundary": "The page is a UI demonstration; the AI example is canned locally and no provider, payment, production data, or irreversible server action is invoked."
+    },
+    {
+      "route": "/calendar-view",
+      "capability": "Interactive deterministic month-grid calendar viewer with date selection",
+      "persistence": "React state only",
+      "evidence": [
+        "validated UTC month-grid generation",
+        "previous/next month navigation",
+        "date selection",
+        "release regression test"
+      ],
+      "boundary": "No Google/iCloud sync, event storage, reminders, invitations, or server persistence."
+    },
+    {
+      "route": "/code-highlighting",
+      "capability": "Safe browser-local lexical code highlighting preview",
+      "persistence": "Browser localStorage for source text",
+      "evidence": [
+        "bounded token classifier",
+        "React text rendering without code execution",
+        "local source persistence",
+        "release regression test"
+      ],
+      "boundary": "No code execution, compilation, linting, AI-provider call, or server upload."
+    },
+    {
+      "route": "/data-grid",
+      "capability": "Searchable sortable data-grid interaction lab over labeled fixtures",
+      "persistence": "None",
+      "evidence": [
+        "deterministic filtering",
+        "multi-column sorting",
+        "explicit fixture dataset",
+        "release regression test"
+      ],
+      "boundary": "No remote database query, analytics service, user data, or production metrics."
+    },
+    {
+      "route": "/pagination",
+      "capability": "Bounded pagination lab over a deterministic local fixture list",
+      "persistence": "React state only",
+      "evidence": [
+        "safe page clamping",
+        "page-size selection",
+        "previous/next and direct page controls",
+        "release regression test"
+      ],
+      "boundary": "No API pagination, cursor persistence, remote dataset, or account state."
+    },
+    {
+      "route": "/progress-bar",
+      "capability": "Accessible bounded progress-control lab",
+      "persistence": "React state only",
+      "evidence": [
+        "0-100 clamp helper",
+        "range and numeric controls",
+        "shared Progress component",
+        "release regression test"
+      ],
+      "boundary": "Demo state does not infer deployment, business, learning, financial, or user progress."
+    },
+    {
+      "route": "/alert-dialog",
+      "capability": "Blocking alert acknowledgement interaction lab",
+      "persistence": "React state only",
+      "evidence": [
+        "shared dialog flow",
+        "local acknowledgement state",
+        "explicit non-destructive copy",
+        "release regression test"
+      ],
+      "boundary": "No notification service, account mutation, purchase, deletion, payment, or irreversible action."
+    },
+    {
+      "route": "/breadcrumb-navigation",
+      "capability": "Route-like path to readable breadcrumb preview lab",
+      "persistence": "React state only",
+      "evidence": [
+        "deterministic breadcrumb builder",
+        "cumulative path output",
+        "shared Breadcrumb component",
+        "release regression test"
+      ],
+      "boundary": "No application-route mutation, browser-history change, permission change, or remote state."
+    },
+    {
+      "route": "/code-samples",
+      "capability": "Searchable static developer-example catalog with local copy controls",
+      "persistence": "None",
+      "evidence": [
+        "labeled static examples",
+        "local search",
+        "clipboard copy",
+        "release regression test"
+      ],
+      "boundary": "Samples are not executed and do not provision services, create credentials, or contact external providers."
     }
   ]
 }
