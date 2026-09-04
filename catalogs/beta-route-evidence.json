@@ -164,13 +164,18 @@
     },
     {
       "route": "/beta-journey",
-      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
-      "persistence": "Route-specific; see implementation and release docs",
+      "capability": "Five-gate non-financial beta journey aligned to durable account activation evidence",
+      "persistence": "Journey completion is measured by the onboarding activation status and account-owned records",
       "evidence": [
-        "existing launchable-beta classification",
-        "canonical CI history"
+        "invitation-only sign-in boundary",
+        "durable profile route",
+        "durable SkySchool progress",
+        "durable social post path",
+        "durable feedback path",
+        "activity evidence inspection",
+        "release regression test"
       ],
-      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+      "boundary": "Journey guidance does not itself create evidence and does not issue credentials, rewards, payments, wallet actions, or provider-backed services."
     },
     {
       "route": "/beta-commerce",
@@ -214,13 +219,17 @@
     },
     {
       "route": "/onboarding",
-      "capability": "Previously verified SKYCOIN4444 engineering-beta route",
-      "persistence": "Route-specific; see implementation and release docs",
+      "capability": "Durable invited-account activation dashboard across profile, learning, social, and feedback",
+      "persistence": "Account-owned MySQL records through authenticated server procedures",
       "evidence": [
-        "existing launchable-beta classification",
-        "canonical CI history"
+        "protected activation.status query",
+        "profile completeness from users table",
+        "persisted course_progress evidence",
+        "persisted posts evidence",
+        "persisted beta_feedback evidence",
+        "release regression test"
       ],
-      "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
+      "boundary": "No token airdrops, rewards, certificates, live-provider claims, payment capability, custody, signing, or blockchain execution."
     },
     {
       "route": "/profile",
