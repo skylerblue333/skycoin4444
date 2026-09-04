@@ -1,130 +1,315 @@
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Users, Plus, Trash2, Move, Save, Wifi, WifiOff, Share2, Clock } from "lucide-react";
+import {
+  Calendar,
+  Move,
+  Plus,
+  RotateCcw,
+  Save,
+  Trash2,
+  Users,
+} from "lucide-react";
+import {
+  nextFloorTablePosition,
+  normalizeFloorTables,
+  type FloorTable,
+} from "@/lib/betaUtilities";
 
-interface TableItem { id: string; x: number; y: number; label: string; seats: number; color: string; }
+const STORAGE_KEY = "sky4444.eventplanner-layout";
+const COLORS = [
+  "bg-blue-500",
+  "bg-emerald-500",
+  "bg-amber-500",
+  "bg-rose-500",
+  "bg-purple-500",
+  "bg-cyan-500",
+] as const;
 
-const COLORS = ["bg-blue-500","bg-emerald-500","bg-amber-500","bg-rose-500","bg-purple-500","bg-cyan-500"];
+const initialTables: FloorTable[] = [
+  {
+    id: "t1",
+    x: 100,
+    y: 90,
+    label: "Table 1",
+    seats: 8,
+    color: "bg-blue-500",
+  },
+  {
+    id: "t2",
+    x: 280,
+    y: 90,
+    label: "Table 2",
+    seats: 6,
+    color: "bg-emerald-500",
+  },
+  {
+    id: "t3",
+    x: 190,
+    y: 220,
+    label: "VIP Table",
+    seats: 10,
+    color: "bg-amber-500",
+  },
+];
 
 export default function EventPlanner() {
-  const [tables, setTables] = useState<TableItem[]>([
-    { id: "t1", x: 100, y: 80, label: "Table 1", seats: 8, color: "bg-blue-500" },
-    { id: "t2", x: 280, y: 80, label: "Table 2", seats: 6, color: "bg-emerald-500" },
-    { id: "t3", x: 190, y: 200, label: "VIP Table", seats: 10, color: "bg-amber-500" },
-  ]);
-  const [dragging, setDragging] = useState<string|null>(null);
+  const [tables, setTables] = useState<FloorTable[]>(initialTables);
+  const [dragging, setDragging] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [online, setOnline] = useState(true);
   const [saved, setSaved] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    try {
+      const restored = normalizeFloorTables(
+        JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]")
+      );
+      if (restored.length > 0) setTables(restored);
+    } catch {
+      setTables(initialTables);
+    }
+  }, []);
+
   const addTable = () => {
-    const id = `t${Date.now()}`;
-    setTables(p => [...p, { id, x: 50 + Math.random()*300, y: 50 + Math.random()*200, label: `Table ${p.length+1}`, seats: 6, color: COLORS[p.length % COLORS.length] }]);
+    setTables(current => {
+      if (current.length >= 40) return current;
+      const position = nextFloorTablePosition(current.length);
+      return [
+        ...current,
+        {
+          id: `table-${current.length + 1}`,
+          ...position,
+          label: `Table ${current.length + 1}`,
+          seats: 6,
+          color: COLORS[current.length % COLORS.length],
+        },
+      ];
+    });
   };
 
-  const onMouseDown = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    const t = tables.find(t => t.id === id)!;
+  const onMouseDown = (event: React.MouseEvent, id: string) => {
+    event.preventDefault();
+    const table = tables.find(item => item.id === id);
+    if (!table) return;
     setDragging(id);
-    setOffset({ x: e.clientX - t.x, y: e.clientY - t.y });
+    setOffset({
+      x: event.clientX - table.x,
+      y: event.clientY - table.y,
+    });
   };
 
-  const onMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!dragging) return;
-    setTables(p => p.map(t => t.id === dragging ? { ...t, x: e.clientX - offset.x, y: e.clientY - offset.y } : t));
-  }, [dragging, offset]);
-
-  const onMouseUp = () => setDragging(null);
+  const onMouseMove = useCallback(
+    (event: React.MouseEvent) => {
+      if (!dragging || !canvasRef.current) return;
+      const bounds = canvasRef.current.getBoundingClientRect();
+      const x = Math.max(
+        0,
+        Math.min(bounds.width - 110, event.clientX - bounds.left - offset.x)
+      );
+      const y = Math.max(
+        65,
+        Math.min(bounds.height - 80, event.clientY - bounds.top - offset.y)
+      );
+      setTables(current =>
+        current.map(table =>
+          table.id === dragging
+            ? { ...table, x: Math.round(x), y: Math.round(y) }
+            : table
+        )
+      );
+    },
+    [dragging, offset]
+  );
 
   const saveLayout = () => {
-    localStorage.setItem("eventplanner_layout", JSON.stringify(tables));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tables));
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    window.setTimeout(() => setSaved(false), 1200);
   };
 
-  const totalSeats = tables.reduce((s, t) => s + t.seats, 0);
+  const resetLayout = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setTables(initialTables);
+    setSaved(false);
+  };
+
+  const totalSeats = tables.reduce((sum, table) => sum + table.seats, 0);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-100">
-      <div className="border-b border-slate-800/60 bg-[#0d0d14]/90 backdrop-blur sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="font-bold text-white text-lg leading-none">Event Floor Planner</h1>
-              <p className="text-xs text-slate-500 mt-0.5">Drag-and-drop · Offline-first · Real-time sync</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge className={`text-xs border-0 ${online?"bg-emerald-500/15 text-emerald-400":"bg-rose-500/15 text-rose-400"}`}>
-              {online ? <Wifi className="h-3 w-3 mr-1 inline" /> : <WifiOff className="h-3 w-3 mr-1 inline" />}
-              {online ? "Online" : "Offline (IndexedDB)"}
+    <main className="min-h-screen bg-[#0a0a0f] text-slate-100">
+      <div className="mx-auto max-w-7xl px-4 py-10">
+        <header className="mb-8 flex flex-col gap-5 border-b border-slate-800 pb-7 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <Badge
+              variant="outline"
+              className="mb-3 border-violet-400/30 text-violet-200"
+            >
+              Launchable beta · browser-local layout
             </Badge>
-            <Button size="sm" variant="outline" onClick={() => setOnline(p => !p)} className="border-slate-700 text-slate-400 text-xs">Toggle Offline</Button>
-            <Button size="sm" onClick={addTable} className="bg-violet-600 hover:bg-violet-700 text-white text-xs"><Plus className="h-3.5 w-3.5 mr-1" />Add Table</Button>
-            <Button size="sm" onClick={saveLayout} className={`text-xs ${saved?"bg-emerald-600":"bg-slate-700 hover:bg-slate-600"} text-white`}>
-              <Save className="h-3.5 w-3.5 mr-1" />{saved ? "Saved!" : "Save Layout"}
+            <h1 className="flex items-center gap-3 text-4xl font-black">
+              <Calendar className="h-8 w-8 text-violet-300" />
+              Event Floor Planner
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
+              Drag tables, change capacity, add or remove seating, and save the
+              layout locally. There is no real-time sync, venue booking, guest
+              invitation, or external map service.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="outline"
+              onClick={resetLayout}
+              className="border-slate-700 bg-transparent text-slate-200"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Reset
+            </Button>
+            <Button onClick={addTable} className="bg-violet-600 hover:bg-violet-500">
+              <Plus className="mr-2 h-4 w-4" />
+              Add table
+            </Button>
+            <Button onClick={saveLayout} className="bg-slate-700 hover:bg-slate-600">
+              <Save className="mr-2 h-4 w-4" />
+              {saved ? "Saved locally" : "Save layout"}
             </Button>
           </div>
-        </div>
-      </div>
+        </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Stats sidebar */}
-        <div className="space-y-4">
-          {[
-            { label: "Tables", value: tables.length, icon: Move, color: "text-violet-400" },
-            { label: "Total Seats", value: totalSeats, icon: Users, color: "text-blue-400" },
-            { label: "Sync Status", value: online ? "Live" : "Local", icon: online ? Wifi : WifiOff, color: online ? "text-emerald-400" : "text-rose-400" },
-          ].map(s => (
-            <div key={s.label} className="bg-slate-900/40 rounded-xl border border-slate-800/60 p-4">
-              <div className="flex items-center gap-2 mb-1"><s.icon className={`h-4 w-4 ${s.color}`} /><span className="text-xs text-slate-500">{s.label}</span></div>
-              <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
-            </div>
-          ))}
-          <div className="bg-slate-900/40 rounded-xl border border-slate-800/60 p-4">
-            <h3 className="text-xs font-semibold text-slate-400 mb-3 uppercase">Tables</h3>
-            <div className="space-y-2">
-              {tables.map(t => (
-                <div key={t.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`h-3 w-3 rounded-full ${t.color}`} />
-                    <span className="text-xs text-slate-300">{t.label}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-slate-500">{t.seats}p</span>
-                    <button onClick={() => setTables(p => p.filter(x => x.id !== t.id))} className="text-slate-700 hover:text-rose-400 ml-1"><Trash2 className="h-3 w-3" /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Canvas */}
-        <div className="lg:col-span-3">
-          <div ref={canvasRef} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
-            className="relative bg-slate-900/40 rounded-2xl border border-slate-800/60 overflow-hidden select-none"
-            style={{ height: 480, backgroundImage: "radial-gradient(circle, #334155 1px, transparent 1px)", backgroundSize: "32px 32px" }}>
-            {/* Stage */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-700/60 border border-slate-600/60 rounded-lg px-12 py-3 text-xs text-slate-400 font-semibold tracking-widest uppercase">STAGE</div>
-            {tables.map(t => (
-              <div key={t.id} onMouseDown={e => onMouseDown(e, t.id)}
-                className={`absolute cursor-grab active:cursor-grabbing rounded-xl border-2 border-white/10 p-3 min-w-[90px] text-center shadow-lg transition-shadow ${dragging===t.id?"shadow-2xl scale-105":""}`}
-                style={{ left: t.x, top: t.y, background: "rgba(15,15,25,0.85)" }}>
-                <div className={`h-2 w-2 rounded-full ${t.color} mx-auto mb-1`} />
-                <div className="text-xs font-bold text-white">{t.label}</div>
-                <div className="text-xs text-slate-500">{t.seats} seats</div>
+        <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
+          <aside className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <Move className="h-4 w-4 text-violet-300" />
+                <div className="mt-2 text-2xl font-black">{tables.length}</div>
+                <div className="text-xs text-slate-500">Tables</div>
               </div>
-            ))}
-            <div className="absolute bottom-3 right-3 text-xs text-slate-700">Drag tables to arrange · {online ? "Auto-syncing" : "Saved locally"}</div>
-          </div>
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                <Users className="h-4 w-4 text-sky-300" />
+                <div className="mt-2 text-2xl font-black">{totalSeats}</div>
+                <div className="text-xs text-slate-500">Seats</div>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+              <h2 className="text-sm font-bold">Table controls</h2>
+              <div className="mt-3 space-y-3">
+                {tables.map(table => (
+                  <div
+                    key={table.id}
+                    className="rounded-xl border border-slate-800 bg-black/20 p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${table.color}`} />
+                      <input
+                        aria-label={`${table.label} name`}
+                        value={table.label}
+                        maxLength={40}
+                        onChange={event =>
+                          setTables(current =>
+                            current.map(item =>
+                              item.id === table.id
+                                ? { ...item, label: event.target.value }
+                                : item
+                            )
+                          )
+                        }
+                        className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none"
+                      />
+                      <button
+                        type="button"
+                        aria-label={`Delete ${table.label}`}
+                        onClick={() =>
+                          setTables(current =>
+                            current.filter(item => item.id !== table.id)
+                          )
+                        }
+                        className="text-slate-600 hover:text-rose-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <label className="mt-3 flex items-center justify-between gap-3 text-xs text-slate-400">
+                      Seats
+                      <input
+                        type="number"
+                        min={1}
+                        max={20}
+                        value={table.seats}
+                        onChange={event => {
+                          const seats = Math.max(
+                            1,
+                            Math.min(20, Number(event.target.value) || 1)
+                          );
+                          setTables(current =>
+                            current.map(item =>
+                              item.id === table.id ? { ...item, seats } : item
+                            )
+                          );
+                        }}
+                        className="w-16 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-right text-slate-200"
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <section>
+            <div
+              ref={canvasRef}
+              onMouseMove={onMouseMove}
+              onMouseUp={() => setDragging(null)}
+              onMouseLeave={() => setDragging(null)}
+              className="relative min-h-[540px] overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/45 select-none"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, rgba(100,116,139,.45) 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+              }}
+            >
+              <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-xl border border-slate-700 bg-slate-800/80 px-16 py-3 text-xs font-bold uppercase tracking-[0.22em] text-slate-400">
+                Stage
+              </div>
+
+              {tables.map(table => (
+                <button
+                  type="button"
+                  key={table.id}
+                  onMouseDown={event => onMouseDown(event, table.id)}
+                  className={
+                    "absolute min-w-[104px] cursor-grab rounded-2xl border border-white/10 bg-slate-950/90 p-3 text-center shadow-xl active:cursor-grabbing " +
+                    (dragging === table.id ? "ring-2 ring-violet-400" : "")
+                  }
+                  style={{ left: table.x, top: table.y }}
+                >
+                  <span
+                    className={`mx-auto mb-2 block h-2.5 w-2.5 rounded-full ${table.color}`}
+                  />
+                  <strong className="block max-w-[120px] truncate text-xs">
+                    {table.label || "Untitled"}
+                  </strong>
+                  <span className="mt-1 block text-[11px] text-slate-500">
+                    {table.seats} seats
+                  </span>
+                </button>
+              ))}
+
+              {tables.length === 0 && (
+                <div className="absolute inset-0 grid place-items-center text-sm text-slate-500">
+                  Add a table to start planning.
+                </div>
+              )}
+
+              <div className="absolute bottom-3 right-4 text-[11px] text-slate-600">
+                Local browser workspace · drag tables to arrange
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
