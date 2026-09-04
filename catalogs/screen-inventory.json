@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 43,
-    "legacy_unverified": 961,
+    "launchable_beta": 49,
+    "legacy_unverified": 955,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -432,7 +432,7 @@
       "path": "/address-book",
       "component": "AddressBook",
       "page": "AddressBook",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1328,7 +1328,7 @@
       "path": "/checkbox-group-form",
       "component": "CheckboxGroupForm",
       "page": "CheckboxGroupForm",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1424,7 +1424,7 @@
       "path": "/code-formatter",
       "component": "CodeFormatter",
       "page": "CodeFormatter",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1616,7 +1616,7 @@
       "path": "/component-showcase",
       "component": "ComponentShowcase",
       "page": "ComponentShowcase",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1632,7 +1632,7 @@
       "path": "/confirmation-dialog",
       "component": "ConfirmationDialog",
       "page": "ConfirmationDialog",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1696,7 +1696,7 @@
       "path": "/content-calendar",
       "component": "ContentCalendar",
       "page": "ContentCalendar",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
