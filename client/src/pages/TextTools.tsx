@@ -1,75 +1,88 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useEffect, useMemo, useState } from "react";
+import { Clipboard, RotateCcw, Type } from "lucide-react";
+import { countText, transformText, type TextTransform } from "@/lib/betaFormUtilities";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Search, Settings } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+
+const STORAGE_KEY = "skycoin4444-beta-text-tools-v1";
+
+const transforms: Array<{ mode: TextTransform; label: string }> = [
+  { mode: "uppercase", label: "UPPERCASE" },
+  { mode: "lowercase", label: "lowercase" },
+  { mode: "title-case", label: "Title Case" },
+  { mode: "trim-lines", label: "Trim lines" },
+  { mode: "sort-lines", label: "Sort lines" },
+  { mode: "dedupe-lines", label: "Dedupe lines" },
+];
 
 export default function TextTools() {
-  const { isAuthenticated } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [value, setValue] = useState(() => localStorage.getItem(STORAGE_KEY) ?? "");
+  const counts = useMemo(() => countText(value), [value]);
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>TextTools</CardTitle>
-            <CardDescription>Sign in to access this feature</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full">Sign In</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, value);
+  }, [value]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">TextTools</h1>
-            <p className="text-muted-foreground mt-2">Text utilities</p>
-          </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New
-          </Button>
-        </div>
+    <main className="min-h-screen bg-background p-4 md:p-8">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <header>
+          <Badge variant="outline">Browser-local text utility</Badge>
+          <h1 className="mt-3 text-3xl font-bold">Text tools</h1>
+          <p className="mt-2 text-muted-foreground">
+            Count and transform plain text without uploading it to a server.
+          </p>
+        </header>
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button variant="outline" size="icon">
-                <Settings className="w-4 h-4" />
+            <Type className="h-5 w-5 text-primary" />
+            <CardTitle className="mt-2">Editor</CardTitle>
+            <CardDescription>
+              {counts.characters} characters · {counts.charactersNoSpaces} non-space · {counts.words} words · {counts.lines} lines
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={value}
+              onChange={event => setValue(event.target.value)}
+              className="min-h-[360px]"
+              placeholder="Paste or write text…"
+            />
+            <div className="flex flex-wrap gap-2">
+              {transforms.map(item => (
+                <Button
+                  key={item.mode}
+                  type="button"
+                  variant="outline"
+                  onClick={() => setValue(current => transformText(current, item.mode))}
+                >
+                  {item.label}
+                </Button>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigator.clipboard.writeText(value)}
+                disabled={!value}
+              >
+                <Clipboard className="mr-2 h-4 w-4" />
+                Copy
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setValue("")}>
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Clear
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No data available. Start by creating a new item.</p>
-              </div>
-            )}
           </CardContent>
         </Card>
+
+        <p className="text-xs text-muted-foreground">
+          Text is saved only to this browser&apos;s localStorage. No AI rewriting, translation provider, cloud sync, or server processing is performed.
+        </p>
       </div>
-    </div>
+    </main>
   );
 }
