@@ -9,6 +9,7 @@ import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
+import { evaluateBetaAdmission } from "./betaAdmission";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -18,6 +19,14 @@ function getQueryParam(req: Request, key: string): string | undefined {
 function isValidOAuthRedirectUri(value: string): boolean {
   try {
     const url = new URL(value);
+    if (url.pathname !== "/api/oauth/callback") return false;
+
+    if (process.env.NODE_ENV === "production") {
+      const configuredOrigin = process.env.BETA_PUBLIC_ORIGIN?.trim();
+      if (!configuredOrigin) return false;
+      return url.protocol === "https:" && url.origin === new URL(configuredOrigin).origin;
+    }
+
     return url.protocol === "https:" || url.protocol === "http:";
   } catch {
     return false;
@@ -65,6 +74,15 @@ export function registerOAuthRoutes(app: Express) {
 
       if (!userInfo.openId) {
         res.status(400).json({ error: "openId missing from user info" });
+        return;
+      }
+
+      const admission = evaluateBetaAdmission({
+        openId: userInfo.openId,
+        email: userInfo.email ?? null,
+      });
+      if (!admission.allowed) {
+        res.redirect(302, "/signin?reason=not-invited");
         return;
       }
 
