@@ -65,6 +65,7 @@ describe("invitation-only deployable beta boundary", () => {
     expect(platformWorkflow).toMatch(exactHead);
     expect(identityWorkflow).toMatch(exactHead);
     expect(platformWorkflow).toMatch(/audit-production-dependencies\.mjs/);
+    expect(identityWorkflow).toMatch(/audit-production-dependencies\.mjs/);
     expect(identityWorkflow).toMatch(/timeout-minutes: 15/);
   });
 
