@@ -1,75 +1,34 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { Braces, Copy, FileText } from "lucide-react";
+import { formatJsonSource, normalizePlainText } from "@/lib/betaUtilityLab";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Search, Settings } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function CodeFormatter() {
-  const { isAuthenticated } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<"json" | "text">("json");
+  const [source, setSource] = useState('{"beta":true,"routes":43}');
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>CodeFormatter</CardTitle>
-            <CardDescription>Sign in to access this feature</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full">Sign In</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const format = () => {
+    try {
+      setOutput(mode === "json" ? formatJsonSource(source, 2) : normalizePlainText(source));
+      setError("");
+    } catch {
+      setOutput("");
+      setError("Invalid JSON. Fix the source and try again.");
+    }
+  };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">CodeFormatter</h1>
-            <p className="text-muted-foreground mt-2">Code formatting</p>
-          </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button variant="outline" size="icon">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No data available. Start by creating a new item.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+  return <main className="min-h-screen bg-background p-4 md:p-8"><div className="mx-auto max-w-5xl space-y-6">
+    <header><Badge variant="outline">Local formatter</Badge><h1 className="mt-3 text-3xl font-bold">Code formatter</h1><p className="mt-2 text-muted-foreground">Format JSON or normalize plain text entirely in the browser.</p></header>
+    <div className="flex gap-2">{(["json","text"] as const).map(value=><Button key={value} type="button" variant={mode===value?"default":"outline"} onClick={()=>setMode(value)}>{value.toUpperCase()}</Button>)}</div>
+    <div className="grid gap-5 lg:grid-cols-2">
+      <Card><CardHeader><FileText className="h-5 w-5 text-primary"/><CardTitle className="mt-2">Source</CardTitle><CardDescription>No upload or remote formatter is used.</CardDescription></CardHeader><CardContent><Textarea className="min-h-[420px] font-mono" value={source} onChange={e=>setSource(e.target.value)}/><Button className="mt-4" onClick={format}>Format locally</Button>{error&&<p className="mt-3 text-sm text-destructive">{error}</p>}</CardContent></Card>
+      <Card><CardHeader><Braces className="h-5 w-5 text-primary"/><CardTitle className="mt-2">Output</CardTitle><CardDescription>Deterministic browser output.</CardDescription></CardHeader><CardContent><Textarea className="min-h-[420px] font-mono" readOnly value={output}/><Button className="mt-4" variant="outline" disabled={!output} onClick={()=>navigator.clipboard.writeText(output)}><Copy className="mr-2 h-4 w-4"/>Copy output</Button></CardContent></Card>
     </div>
-  );
+    <p className="text-xs text-muted-foreground">This is not a compiler, linter, transpiler, IDE, or server-backed code service.</p>
+  </div></main>;
 }
