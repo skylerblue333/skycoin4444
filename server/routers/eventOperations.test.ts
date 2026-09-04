@@ -1,8 +1,40 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDeadLetterReplayAuditDetails,
+  eventOperationsRouter,
   toDeadLetterSummary,
 } from "./eventOperations";
+
+describe("dead-letter operations authorization", () => {
+  it("rejects non-admin callers before querying dead letters", async () => {
+    const caller = eventOperationsRouter.createCaller({
+      req: {} as never,
+      res: {} as never,
+      requestId: "request-1",
+      user: {
+        id: "user-1",
+        role: "user",
+      } as never,
+    });
+
+    await expect(
+      caller.deadLetters({ limit: 1 })
+    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
+
+  it("rejects signed-out callers before querying dead letters", async () => {
+    const caller = eventOperationsRouter.createCaller({
+      req: {} as never,
+      res: {} as never,
+      requestId: "request-2",
+      user: null,
+    });
+
+    await expect(
+      caller.deadLetters({ limit: 1 })
+    ).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  });
+});
 
 describe("dead-letter operations redaction", () => {
   it("returns metadata only and cannot expose payload or raw errors", () => {
