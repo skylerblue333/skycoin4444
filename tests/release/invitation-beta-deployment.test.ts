@@ -8,6 +8,8 @@ const indexSource = fs.readFileSync("server/_core/index.ts", "utf8");
 const render = fs.readFileSync("render.yaml", "utf8");
 const bootstrap = fs.readFileSync("scripts/bootstrap-beta-db.mjs", "utf8");
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+const platformWorkflow = fs.readFileSync(".github/workflows/platform-vertical-ci.yml", "utf8");
+const identityWorkflow = fs.readFileSync(".github/workflows/skyidentity.yml", "utf8");
 
 describe("invitation-only deployable beta boundary", () => {
   it("removes the historical fake browser password sign-in", () => {
@@ -56,6 +58,14 @@ describe("invitation-only deployable beta boundary", () => {
     expect(bootstrap).toMatch(/refuses localhost/i);
     expect(bootstrap).toMatch(/drizzle-kit", "push", "--force/);
     expect(bootstrap).toMatch(/No seed users, balances, transactions, or provider data/);
+  });
+
+  it("keeps specialized platform and identity workflows on the exact PR head", () => {
+    const exactHead = /github\.event\.pull_request\.head\.sha/;
+    expect(platformWorkflow).toMatch(exactHead);
+    expect(identityWorkflow).toMatch(exactHead);
+    expect(platformWorkflow).toMatch(/audit-production-dependencies\.mjs/);
+    expect(identityWorkflow).toMatch(/timeout-minutes: 15/);
   });
 
   it("wires Render to readiness, OAuth, origin, and invitation configuration", () => {
