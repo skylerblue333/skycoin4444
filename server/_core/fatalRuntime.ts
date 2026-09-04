@@ -1,5 +1,5 @@
 import { writeSync } from "node:fs";
-import { sanitizeStartupError } from "./serverStartup";
+import { sanitizeOperationalError } from "./operationalError";
 
 export type FatalRuntimeOrigin =
   | "uncaughtException"
@@ -27,7 +27,7 @@ export function buildFatalRuntimeRecord(
   return Object.freeze({
     contract: "skycoin4444.runtime-fatal.v1" as const,
     origin,
-    summary: sanitizeStartupError(error),
+    summary: sanitizeOperationalError(error),
     timestamp: now().toISOString(),
     recoveryAttempted: false as const,
     defaultCrashBehaviorPreserved: true as const,
