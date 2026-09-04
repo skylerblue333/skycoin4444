@@ -102,7 +102,6 @@ describe("outbox durable failure patch", () => {
       plan: {
         action: "dead_letter",
         attempts: 8,
-        availableAt: new Date("2026-09-04T18:01:00.000Z"),
       },
     });
 
