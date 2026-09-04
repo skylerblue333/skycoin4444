@@ -24,6 +24,7 @@ function loadAssignments(): AssignmentItem[] {
 
 export default function AssignmentTracker() {
   const [items, setItems] = useState<AssignmentItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [title, setTitle] = useState("");
   const [course, setCourse] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -31,11 +32,15 @@ export default function AssignmentTracker() {
   const [search, setSearch] = useState("");
   const [showCompleted, setShowCompleted] = useState(true);
 
-  useEffect(() => setItems(loadAssignments()), []);
+  useEffect(() => {
+    setItems(loadAssignments());
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  }, [hydrated, items]);
 
   const visibleItems = useMemo(
     () =>
