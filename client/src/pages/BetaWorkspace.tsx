@@ -50,9 +50,9 @@ const sharedTools = [
     detail: "Inspect your own persisted product evidence.",
   },
   {
-    name: "Privacy settings",
-    route: "/profile",
-    detail: "Review account identity and privacy controls.",
+    name: "Privacy center",
+    route: "/privacy-settings",
+    detail: "Manage profile visibility, export integrated beta data, and record deletion requests.",
   },
   {
     name: "HopeAI lab",
