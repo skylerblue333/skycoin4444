@@ -12,6 +12,7 @@ import { SignJWT, jwtVerify } from "jose";
 import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
+import { evaluateBetaAdmission } from "./betaAdmission";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -317,6 +318,14 @@ class SDKServer {
 
     if (!user) {
       throw ForbiddenError("User not found");
+    }
+
+    const admission = evaluateBetaAdmission({
+      openId: session.openId,
+      email: user.email,
+    });
+    if (!admission.allowed) {
+      throw ForbiddenError("Account is not admitted to this invitation-only beta");
     }
 
     await db.upsertUser({
