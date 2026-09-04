@@ -50,9 +50,9 @@ const sharedTools = [
     detail: "Inspect your own persisted product evidence.",
   },
   {
-    name: "Privacy settings",
-    route: "/profile",
-    detail: "Review account identity and privacy controls.",
+    name: "Privacy center",
+    route: "/privacy-settings",
+    detail: "Manage profile visibility, export integrated beta data, and record deletion requests.",
   },
   {
     name: "HopeAI lab",
@@ -127,7 +127,7 @@ export default function BetaWorkspace() {
             href="/beta-catalog"
             className="hidden text-sm text-amber-200 hover:text-amber-100 sm:block"
           >
-            32 launchable routes →
+            35 launchable routes →
           </Link>
         </div>
       </header>

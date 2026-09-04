@@ -35,6 +35,24 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+
+// ============ BETA PRIVACY REQUESTS TABLE ============
+export const privacyRequests = mysqlTable("privacy_requests", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  action: varchar("action", { length: 32 }).notNull(), // delete
+  status: varchar("status", { length: 32 }).default("requested").notNull(), // requested | approved | rejected
+  reason: text("reason"),
+  operatorNote: text("operator_note"),
+  requestedAt: timestamp("requested_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userRequestedAtIndex: uniqueIndex("privacy_requests_user_requested_at_index").on(table.userId, table.requestedAt, table.id),
+}));
+
+export type PrivacyRequestRecord = typeof privacyRequests.$inferSelect;
+export type InsertPrivacyRequestRecord = typeof privacyRequests.$inferInsert;
+
 // ============ POSTS TABLE ============
 export const posts = mysqlTable("posts", {
   id: varchar("id", { length: 255 }).primaryKey(),

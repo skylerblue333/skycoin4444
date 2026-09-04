@@ -8,9 +8,9 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 | --- | ---: |
 | Registered routes | 1068 |
 | Lazy page modules | 1056 |
-| Launchable beta routes | 32 |
+| Launchable beta routes | 35 |
 | Controlled or unavailable routes | 64 |
-| Legacy unverified routes | 972 |
+| Legacy unverified routes | 969 |
 | Routes missing a lazy page source | 0 |
 
 ## Launchable beta routes
@@ -29,6 +29,8 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /course-catalog
 - /creator-analytics
 - /dating-profile-setup
+- /data-export
+- /delete-account
 - /event-planner
 - /file-converter
 - /help-center
@@ -45,6 +47,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /beta-feedback
 - /notification-preferences
 - /onboarding
+- /privacy-settings
 - /profile
 - /sign-up-flow
 
