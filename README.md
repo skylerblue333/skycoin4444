@@ -39,6 +39,8 @@ Production startup now binds the configured `PORT` exactly, marks readiness only
 
 Runtime-fatal exceptions are synchronously observed through Node's non-interfering `uncaughtExceptionMonitor` event. SKYCOIN4444 writes only a bounded credential-redacted fatal record and deliberately installs no `uncaughtException` or `unhandledRejection` recovery handler, preserving Node's default crash behavior.
 
+The Node HTTP listener now has explicit header-count and TCP-connection caps in addition to request/header/keepalive timeouts, per-socket request limits, and the process-local in-flight request bulkhead.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch

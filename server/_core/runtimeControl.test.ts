@@ -76,6 +76,8 @@ describe("runtime configuration", () => {
       HTTP_HEADERS_TIMEOUT_MS: "12000",
       HTTP_KEEP_ALIVE_TIMEOUT_MS: "6000",
       HTTP_MAX_REQUESTS_PER_SOCKET: "500",
+      HTTP_MAX_HEADERS_COUNT: "96",
+      HTTP_MAX_CONNECTIONS: "192",
       MAX_IN_FLIGHT_REQUESTS: "64",
       SHUTDOWN_GRACE_MS: "9000",
     } as NodeJS.ProcessEnv);
@@ -85,6 +87,8 @@ describe("runtime configuration", () => {
       headersTimeout: 0,
       keepAliveTimeout: 0,
       maxRequestsPerSocket: 0,
+      maxHeadersCount: 0,
+      maxConnections: 0,
     };
 
     configureHttpServer(server as never, options);
@@ -94,9 +98,27 @@ describe("runtime configuration", () => {
       headersTimeout: 12000,
       keepAliveTimeout: 6000,
       maxRequestsPerSocket: 500,
+      maxHeadersCount: 96,
+      maxConnections: 192,
     });
+    expect(options.maxHeadersCount).toBe(96);
+    expect(options.maxConnections).toBe(192);
     expect(options.maxInFlightRequests).toBe(64);
     expect(options.shutdownGraceMs).toBe(9000);
+  });
+
+  it("rejects zero or excessive header and connection limits", () => {
+    expect(() =>
+      runtimeOptionsFromEnv({
+        HTTP_MAX_HEADERS_COUNT: "0",
+      } as NodeJS.ProcessEnv)
+    ).toThrow();
+
+    expect(() =>
+      runtimeOptionsFromEnv({
+        HTTP_MAX_CONNECTIONS: "10001",
+      } as NodeJS.ProcessEnv)
+    ).toThrow();
   });
 
   it("fails fast on incoherent timeout settings", () => {
@@ -147,6 +169,60 @@ describe("graceful shutdown", () => {
   });
 });
 
+
+describe("runtime state diagnostics", () => {
+  it("reports configured HTTP limits in runtime state", () => {
+    const routes: Record<
+      string,
+      (req: unknown, res: Record<string, unknown>) => void
+    > = {};
+    const app = {
+      get(
+        path: string,
+        handler: (
+          req: unknown,
+          res: Record<string, unknown>
+        ) => void
+      ) {
+        routes[path] = handler;
+      },
+    };
+    const lifecycle = new RuntimeLifecycle(() => 1_000);
+    const gate = new ConcurrencyGate(64);
+    const options = runtimeOptionsFromEnv({
+      HTTP_MAX_HEADERS_COUNT: "96",
+      HTTP_MAX_CONNECTIONS: "192",
+      MAX_IN_FLIGHT_REQUESTS: "64",
+    } as NodeJS.ProcessEnv);
+    const body: { payload?: unknown } = {};
+    const response: Record<string, unknown> = {
+      set() {
+        return response;
+      },
+      json(payload: unknown) {
+        body.payload = payload;
+        return response;
+      },
+    };
+
+    registerRuntimeRoutes(
+      app as never,
+      lifecycle,
+      gate,
+      undefined,
+      options
+    );
+    routes["/api/runtime/state"]?.({}, response);
+
+    expect(body.payload).toMatchObject({
+      httpLimits: {
+        maxHeadersCount: 96,
+        maxConnections: 192,
+        maxInFlightRequests: 64,
+      },
+    });
+  });
+});
 
 describe("runtime dependency readiness route", () => {
   it("fails runtime readiness when required dependencies are not ready", async () => {

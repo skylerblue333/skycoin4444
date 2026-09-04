@@ -94,7 +94,8 @@ async function startServer() {
     app,
     lifecycle,
     concurrency,
-    dependencyReadiness
+    dependencyReadiness,
+    runtimeOptions
   );
   registerDatabasePoolRoutes(app);
   registerShutdownDiagnostics(app, applicationShutdown);

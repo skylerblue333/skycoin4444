@@ -30,6 +30,10 @@ services:
         value: "10000"
       - key: DB_KEEP_ALIVE_INITIAL_DELAY_MS
         value: "0"
+      - key: HTTP_MAX_HEADERS_COUNT
+        value: "128"
+      - key: HTTP_MAX_CONNECTIONS
+        value: "256"
       - key: JWT_SECRET
         sync: false
       - key: VITE_APP_ID
