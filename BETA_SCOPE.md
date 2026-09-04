@@ -8,15 +8,18 @@ This document governs the beta release surface. A repository, package, page, wor
 
 ## User promise
 
-> Mission Control lets an invited user sign in, understand which selected Skycoin capabilities are available, complete one supported non-financial journey, and submit feedback. Every capability is labeled by its verified availability.
+> Mission Control lets an invited user sign in, understand which selected Skycoin capabilities are available, complete a bounded non-financial activation journey backed by account-owned evidence, and submit feedback. Every capability is labeled by its verified availability.
 
 The initial supported journey is:
 
-1. The invited tester opens Mission Control and reviews the capability catalog.
-2. The tester signs in only when the deployed authentication/session configuration has passed release verification.
-3. The tester creates or reviews a profile only when the deployed persistence, consent, and privacy paths have passed release verification.
-4. The tester enters one release-approved, non-financial course or creator workflow.
-5. The tester submits product feedback or reports an issue through the release-approved support route.
+1. The invited tester opens Mission Control and reviews the capability catalog and explicit beta boundary.
+2. The tester signs in only when the deployed authentication/session and invitation configuration has passed release verification.
+3. The tester configures a profile only when deployed persistence, consent, privacy, and support/deletion paths have passed release verification.
+4. The tester completes one authored SkySchool lesson and records durable account-scoped progress.
+5. The tester publishes one bounded social post through the release-approved activity feed.
+6. The tester submits product feedback and can inspect the resulting account-owned activity evidence.
+
+The onboarding route measures these gates from persisted records; simply navigating through a tour does not count as activation.
 
 ## Capability-status vocabulary
 
@@ -35,7 +38,7 @@ A capability may be called **provider-backed** only after its actual production-
 | --------------------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Mission Control home and capability discovery       | Available in beta    | Route-level smoke test and truthful availability labels pass.                                                                                     |
 | Profile and account experience                      | Conditional          | Authentication, session handling, consent, privacy notice, persistence, and support/deletion route are verified in the deployed beta environment. |
-| One curated course or creator workflow              | Conditional          | A single end-to-end non-financial workflow is release-approved and has an assigned owner, test evidence, and feedback path.                       |
+| Durable activation journey                          | Conditional          | Profile, one authored lesson, one bounded social post, and feedback persist for the invited account and survive refresh/re-authentication.         |
 | Documentation, known issues, and capability catalog | Available in beta    | Public/internal links resolve and match the deployed release.                                                                                     |
 | Feedback and support intake                         | Available in beta    | The destination is monitored and an owner is assigned for triage.                                                                                 |
 
