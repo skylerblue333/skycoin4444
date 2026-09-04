@@ -2,6 +2,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import prettier from "prettier";
 
+const evidenceRegistry = JSON.parse(
+  await readFile(path.join(process.cwd(), "catalogs/beta-route-evidence.json"), "utf8")
+);
+
 const root = process.cwd();
 const appSource = await readFile(path.join(root, "client/src/App.tsx"), "utf8");
 const routeSource =
@@ -27,32 +31,31 @@ const protectedBetaPaths = new Set([
   "/profile",
   "/beta-feedback",
 ]);
-const launchablePaths = new Set([
-  "/arcade",
-  "/",
-  "/mission-control",
-  "/beta-catalog",
-  "/beta-journey",
-  "/course-catalog",
-  "/beta-commerce",
-  "/beta-web3",
-  "/beta-feedback",
-  "/community-hub",
-  "/activity-feed",
-  "/profile",
-  "/onboarding",
-  "/sign-up-flow",
-  "/a-i-tools-hub",
-  "/beta-workspace",
-  "/creator-analytics",
-  "/operational-readiness",
-  "/discovery-center",
-  "/notification-preferences",
-  "/activity-evidence",
-  "/live-streaming",
-  "/language-partner-discovery",
-  "/dating-profile-setup",
-]);
+const evidenceEntries = Array.isArray(evidenceRegistry.routes)
+  ? evidenceRegistry.routes
+  : [];
+const launchablePaths = new Set(
+  evidenceEntries.map(entry => {
+    if (
+      typeof entry?.route !== "string" ||
+      !entry.route.startsWith("/") ||
+      typeof entry?.capability !== "string" ||
+      entry.capability.trim().length < 10 ||
+      typeof entry?.boundary !== "string" ||
+      entry.boundary.trim().length < 20 ||
+      !Array.isArray(entry?.evidence) ||
+      entry.evidence.length === 0
+    ) {
+      throw new Error(
+        `Invalid beta route evidence entry: ${JSON.stringify(entry)}`
+      );
+    }
+    return entry.route;
+  })
+);
+if (launchablePaths.size !== evidenceEntries.length) {
+  throw new Error("Duplicate route detected in beta route evidence registry");
+}
 const controlledPattern =
   /(wallet|custody|checkout|payment|bank|trading|lending|staking|bridge|token|nft|blockchain|validator|yield|swap|ledger|financial|mining|governance|kyc|aml)/i;
 
@@ -77,6 +80,16 @@ for (const match of routeSource.matchAll(
       lazyPages.get(component) || directPages.get(component)
     ),
   });
+}
+
+const routePaths = new Set(routes.map(route => route.path));
+const unknownEvidenceRoutes = [...launchablePaths].filter(
+  routePath => !routePaths.has(routePath)
+);
+if (unknownEvidenceRoutes.length > 0) {
+  throw new Error(
+    `Beta route evidence references unknown routes: ${unknownEvidenceRoutes.join(", ")}`
+  );
 }
 
 const counts = routes.reduce((acc, route) => {
