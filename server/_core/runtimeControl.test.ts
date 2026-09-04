@@ -5,6 +5,7 @@ import {
   RuntimeTransitionError,
   configureHttpServer,
   createShutdownController,
+  registerRuntimeRoutes,
   runtimeOptionsFromEnv,
 } from "./runtimeControl";
 
@@ -143,5 +144,87 @@ describe("graceful shutdown", () => {
 
     expect(lifecycle.currentPhase()).toBe("stopped");
     expect(server.closeAllConnections).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("runtime dependency readiness route", () => {
+  it("fails runtime readiness when required dependencies are not ready", async () => {
+    const routes: Record<
+      string,
+      (req: unknown, res: Record<string, unknown>) => void | Promise<void>
+    > = {};
+    const app = {
+      get(
+        path: string,
+        handler: (
+          req: unknown,
+          res: Record<string, unknown>
+        ) => void | Promise<void>
+      ) {
+        routes[path] = handler;
+      },
+    };
+
+    const lifecycle = new RuntimeLifecycle(() => 1_000);
+    lifecycle.markReady();
+    const gate = new ConcurrencyGate(4);
+
+    registerRuntimeRoutes(
+      app as never,
+      lifecycle,
+      gate,
+      {
+        async assess() {
+          return {
+            contract: "skycoin4444.dependency-readiness.v1",
+            status: "not_ready",
+            degraded: false,
+            checkedAt: "2026-09-04T00:00:00.000Z",
+            configuration: {
+              status: "ok",
+              issueKeys: [],
+            },
+            database: { status: "unavailable" },
+            eventDispatcher: {
+              status: "disabled",
+              required: false,
+            },
+            productionCertification: false,
+          };
+        },
+      }
+    );
+
+    const body: {
+      statusCode?: number;
+      payload?: unknown;
+      headers: Record<string, string>;
+    } = { headers: {} };
+    const response: Record<string, unknown> = {
+      set(name: string, value: string) {
+        body.headers[name] = value;
+        return response;
+      },
+      status(code: number) {
+        body.statusCode = code;
+        return response;
+      },
+      json(payload: unknown) {
+        body.payload = payload;
+        return response;
+      },
+    };
+
+    await routes["/api/runtime/ready"]?.({}, response);
+
+    expect(body.statusCode).toBe(503);
+    expect(body.payload).toMatchObject({
+      status: "not_ready",
+      dependencies: {
+        status: "not_ready",
+        database: { status: "unavailable" },
+      },
+    });
   });
 });
