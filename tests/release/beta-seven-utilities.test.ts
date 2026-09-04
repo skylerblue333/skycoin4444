@@ -171,10 +171,10 @@ describe("beta seven utility pages", () => {
       inventory.routes.map(entry => [entry.path, entry])
     );
 
-    expect(registry.routes).toHaveLength(53);
+    expect(registry.routes).toHaveLength(59);
     expect(inventory.counts).toEqual({
-      launchable_beta: 53,
-      legacy_unverified: 951,
+      launchable_beta: 59,
+      legacy_unverified: 945,
       controlled_or_unavailable: 64,
     });
 
