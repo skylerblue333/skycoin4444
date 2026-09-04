@@ -108,7 +108,9 @@ async function startServer() {
   }
 
   server.listen(port, () => {
-    lifecycle.markReady();
+    if (lifecycle.currentPhase() === "starting") {
+      lifecycle.markReady();
+    }
     console.log(`Server running on http://localhost:${port}/`);
   });
 }
