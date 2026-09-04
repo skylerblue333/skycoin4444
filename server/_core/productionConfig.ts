@@ -1,5 +1,6 @@
 import { betaAdmissionSnapshot, betaAccessMode } from "./betaAdmission";
 import { sessionLifetimePolicyFromEnv } from "./sessionPolicy";
+import { sessionSigningKeysFromEnv } from "./sessionKeys";
 
 export type ProductionConfigIssue = {
   key: string;
@@ -61,11 +62,18 @@ export function inspectProductionBetaConfig(
 
   add("DATABASE_URL", databaseIssue(env.DATABASE_URL));
 
-  const jwtBytes = new TextEncoder().encode(env.JWT_SECRET ?? "").byteLength;
-  if (jwtBytes < 32) {
+  try {
+    sessionSigningKeysFromEnv(env);
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "JWT session signing key configuration is invalid";
     issues.push({
-      key: "JWT_SECRET",
-      message: "JWT_SECRET must contain at least 32 bytes",
+      key: message.startsWith("JWT_SECRET_PREVIOUS")
+        ? "JWT_SECRET_PREVIOUS"
+        : "JWT_SECRET",
+      message,
     });
   }
 
