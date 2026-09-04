@@ -81,6 +81,14 @@ A deployment platform's termination grace window must exceed the application's c
 
 Repository code cannot prove or configure every platform's termination policy. Record that external setting in release evidence.
 
+## Fatal exception distinction
+
+Coordinated SIGTERM/SIGINT shutdown is for expected process termination while application state is still considered valid enough to drain.
+
+Uncaught exceptions are intentionally not routed through this asynchronous graceful-shutdown coordinator. The runtime uses `uncaughtExceptionMonitor` only for synchronous redacted observation and leaves Node's default fatal termination intact. Attempting asynchronous recovery after an uncaught exception could continue from undefined application state.
+
+See `docs/FATAL_RUNTIME.md`.
+
 ## Limitations
 
 This coordination does not establish:
