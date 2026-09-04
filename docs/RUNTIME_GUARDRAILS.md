@@ -57,6 +57,14 @@ When the gate is full, new requests fail fast with HTTP 503 rather than creating
 
 This is deliberately a process-local bulkhead. It is not a distributed rate limiter and does not coordinate across replicas.
 
+## Database pool guardrails
+
+The canonical MySQL2 pool has explicit bounded connection, idle, queue, connect-timeout, and keepalive settings. A finite queue limit prevents connection-wait demand from growing without bound inside the process.
+
+The non-secret route `GET /api/runtime/database-pool` reports configured limits plus acquire/release/enqueue counters and the observed active high-water mark. These counters are process-local event telemetry, not a distributed database metric or managed-provider connection count.
+
+See `docs/DATABASE_POOL.md`.
+
 ## HTTP timeout controls
 
 The server explicitly configures request, header, keep-alive, and requests-per-socket limits. Values are bounded and validated at startup.

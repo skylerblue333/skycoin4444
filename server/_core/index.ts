@@ -17,6 +17,7 @@ import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
 import { createDependencyReadinessCoordinator } from "./readiness";
+import { registerDatabasePoolRoutes } from "./databasePoolRoutes";
 import {
   createOutboxDispatcherService,
   registerOutboxDispatcherRoutes,
@@ -105,6 +106,7 @@ async function startServer() {
     concurrency,
     dependencyReadiness
   );
+  registerDatabasePoolRoutes(app);
   registerShutdownDiagnostics(app, applicationShutdown);
   app.use(createDrainGuard(lifecycle));
   app.use(createConcurrencyMiddleware(concurrency));

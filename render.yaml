@@ -18,6 +18,18 @@ services:
         value: invite_only
       - key: DATABASE_URL
         sync: false
+      - key: DB_POOL_CONNECTION_LIMIT
+        value: "10"
+      - key: DB_POOL_MAX_IDLE
+        value: "10"
+      - key: DB_POOL_IDLE_TIMEOUT_MS
+        value: "60000"
+      - key: DB_POOL_QUEUE_LIMIT
+        value: "256"
+      - key: DB_CONNECT_TIMEOUT_MS
+        value: "10000"
+      - key: DB_KEEP_ALIVE_INITIAL_DELAY_MS
+        value: "0"
       - key: JWT_SECRET
         sync: false
       - key: VITE_APP_ID

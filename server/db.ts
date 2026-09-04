@@ -3,9 +3,30 @@ import mysql from 'mysql2/promise';
 import * as schema from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
+import {
+  DatabasePoolTelemetry,
+  databasePoolOptionsFromEnv,
+  toMysqlPoolOptions,
+} from './_core/databasePool';
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
-const poolConnection = databaseUrl ? mysql.createPool(databaseUrl) : null;
+const poolRuntimeOptions = databasePoolOptionsFromEnv();
+const poolTelemetry = new DatabasePoolTelemetry();
+const poolConnection = databaseUrl
+  ? mysql.createPool(
+      toMysqlPoolOptions(databaseUrl, poolRuntimeOptions)
+    )
+  : null;
+
+poolConnection?.on('acquire', () => {
+  poolTelemetry.recordAcquire();
+});
+poolConnection?.on('release', () => {
+  poolTelemetry.recordRelease();
+});
+poolConnection?.on('enqueue', () => {
+  poolTelemetry.recordEnqueue();
+});
 
 if (!databaseUrl) {
   console.warn('[Database] DATABASE_URL is not configured; database-backed features are unavailable.');
@@ -37,6 +58,18 @@ export function databasePoolSnapshot() {
   return Object.freeze({
     configured: Boolean(poolConnection),
     closed: poolClosed,
+    options: Object.freeze({
+      connectionLimit: poolRuntimeOptions.connectionLimit,
+      maxIdle: poolRuntimeOptions.maxIdle,
+      idleTimeoutMs: poolRuntimeOptions.idleTimeoutMs,
+      queueLimit: poolRuntimeOptions.queueLimit,
+      connectTimeoutMs: poolRuntimeOptions.connectTimeoutMs,
+      keepAlive: true as const,
+      keepAliveInitialDelayMs:
+        poolRuntimeOptions.keepAliveInitialDelayMs,
+    }),
+    telemetry: poolTelemetry.snapshot(),
+    productionDatabaseVerified: false as const,
   });
 }
 

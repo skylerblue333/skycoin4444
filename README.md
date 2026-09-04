@@ -33,6 +33,8 @@ The server now has a single coordinated shutdown owner: it marks draining first,
 
 Admin-only dead-letter recovery now exposes metadata-only inspection and single-event compare-and-set replay with atomic audit logging. Event payloads and raw stored errors are not returned, and operator reasons are hashed before audit storage.
 
+The canonical database client now uses a bounded MySQL2 pool with explicit connection, idle, queue, connect-timeout, and keepalive settings. Runtime diagnostics expose only non-secret pool options and pressure counters; the database host, credentials, and URL are never returned.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -82,6 +84,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
 - [`docs/SHUTDOWN.md`](docs/SHUTDOWN.md) — coordinated signal ownership, ordered resource drain, MySQL pool close, and timeout semantics.
 - [`docs/READINESS.md`](docs/READINESS.md) — shared configuration/database readiness, timeout/cache behavior, and optional dependency degradation.
+- [`docs/DATABASE_POOL.md`](docs/DATABASE_POOL.md) — MySQL pool sizing, bounded queue behavior, telemetry, shutdown, and deployment limits.
 - [`docs/EVENT_FABRIC.md`](docs/EVENT_FABRIC.md) — versioned events, transactional outbox, idempotency contracts, and delivery boundaries.
 - [`docs/OUTBOX_DISPATCHER.md`](docs/OUTBOX_DISPATCHER.md) — database leases, retry/dead-letter behavior, durable consumer receipts, and internal dispatch diagnostics.
 - [`docs/DEAD_LETTER_OPERATIONS.md`](docs/DEAD_LETTER_OPERATIONS.md) — admin-only metadata inspection, guarded replay, audit behavior, and recovery limits.

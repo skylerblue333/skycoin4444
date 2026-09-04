@@ -28,6 +28,28 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 
 At least one owner/open-ID/email invitation must be configured. Missing or invalid configuration stops the production server rather than exposing a partial beta.
 
+## Database pool guardrails
+
+The canonical MySQL2 client now uses explicit bounded pool settings instead of relying on driver defaults.
+
+Default engineering-beta values:
+
+- connection limit: 10;
+- maximum idle: 10;
+- idle timeout: 60 seconds;
+- connection-request queue limit: 256;
+- connect timeout: 10 seconds;
+- TCP keepalive: enabled;
+- keepalive initial delay: 0.
+
+All numeric values are bounded and validated during module startup. `DB_POOL_MAX_IDLE` cannot exceed `DB_POOL_CONNECTION_LIMIT`, and `DB_POOL_QUEUE_LIMIT=0` is rejected because the canonical beta does not permit an unbounded connection-wait queue.
+
+`GET /api/runtime/database-pool` exposes only non-secret configuration and event-based acquire/release/enqueue counters. It never returns the database URL, host, user, password, or database name.
+
+These application limits must still be sized against the managed database's actual connection quota and the number of application replicas. Source code cannot prove that external quota.
+
+See `docs/DATABASE_POOL.md`.
+
 ## First managed database bootstrap
 
 The historical SQL files predate the current runtime schema and must not be replayed blindly against a new managed beta database.
