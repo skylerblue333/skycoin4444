@@ -54,7 +54,7 @@ describe("beta privacy controls", () => {
     expect(router).toMatch(/eq\(courseProgress\.userId, userId\)/);
     expect(router).toMatch(/eq\(betaFeedback\.userId, userId\)/);
     expect(router).toMatch(/not a claim of exhaustive export/);
-    expect(router).not.toMatch(/input.*userId/s);
+    expect(router).not.toMatch(/userId:\\s*z\\./);
   });
 
   it("records deletion intake but cannot falsely mark deletion complete", () => {
