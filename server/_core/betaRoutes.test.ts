@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createBetaReadinessHandler, registerBetaRoutes } from "./betaRoutes";
+import {
+  createBetaReadinessHandler,
+  createCoordinatedBetaReadinessHandler,
+  registerBetaRoutes,
+} from "./betaRoutes";
 
 type Handler = (req: unknown, res: Record<string, unknown>) => void | Promise<void>;
 
@@ -93,6 +97,39 @@ describe("beta status routes", () => {
       database: "unknown",
       configuration: "invalid",
       configurationIssueKeys: ["JWT_SECRET"],
+      liveFinancialOrChainExecution: false,
+    });
+  });
+
+  it("uses the shared dependency assessor while preserving beta fields", async () => {
+    const { body, response } = createResponse();
+    const handler = createCoordinatedBetaReadinessHandler({
+      async assess() {
+        return {
+          contract: "skycoin4444.dependency-readiness.v1",
+          status: "ready",
+          degraded: true,
+          checkedAt: "2026-09-04T00:00:00.000Z",
+          configuration: { status: "ok", issueKeys: [] },
+          database: { status: "ok" },
+          eventDispatcher: { status: "degraded", required: false },
+          productionCertification: false,
+        };
+      },
+    });
+
+    await handler({}, response);
+
+    expect(body.statusCode).toBe(200);
+    expect(body.headers["Cache-Control"]).toBe("no-store");
+    expect(body.payload).toMatchObject({
+      status: "ready",
+      database: "ok",
+      configuration: "ok",
+      dependencyReadiness: {
+        status: "ready",
+        degraded: true,
+      },
       liveFinancialOrChainExecution: false,
     });
   });
