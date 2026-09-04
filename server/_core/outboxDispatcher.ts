@@ -26,6 +26,7 @@ import {
 } from "../../packages/event-fabric/src/dispatcher";
 import { db } from "../db";
 import { isMysqlDuplicateEntryFor } from "./dbErrors";
+import { sanitizeOperationalError } from "./operationalError";
 
 export const INTERNAL_EVENT_CONSUMER = "platform-event-observer";
 
@@ -440,7 +441,7 @@ export class OutboxDispatcherService {
       this.lastFailureAt = new Date();
       console.error(
         "[EventOutbox] dispatch cycle failed",
-        error instanceof Error ? error.message : String(error)
+        sanitizeOperationalError(error)
       );
     } finally {
       if (!this.running) return;
