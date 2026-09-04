@@ -6,7 +6,11 @@ import {
 import { parseCookieHeader } from "./cookieParser";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
-import { getSessionCookieOptions } from "./cookies";
+import {
+  getSessionCookieName,
+  getSessionCookieNamesToClear,
+  getSessionCookieOptions,
+} from "./cookies";
 import { sdk } from "./sdk";
 import { evaluateBetaAdmission } from "./betaAdmission";
 import { sanitizeOperationalError } from "./operationalError";
@@ -100,7 +104,15 @@ export function registerOAuthRoutes(app: Express) {
       });
 
       const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, {
+      const sessionCookieName = getSessionCookieName();
+      for (const cookieName of getSessionCookieNamesToClear()) {
+        if (cookieName === sessionCookieName) continue;
+        res.clearCookie(cookieName, {
+          ...cookieOptions,
+          maxAge: -1,
+        });
+      }
+      res.cookie(sessionCookieName, sessionToken, {
         ...cookieOptions,
         maxAge: sessionTtlMs,
       });
