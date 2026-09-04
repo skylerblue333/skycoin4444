@@ -181,13 +181,13 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/beta-catalog">
+              <Link href="/advanced-search">
                 <Button
                   size="lg"
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Browse all 32 beta routes
+                  Search all 32 beta routes
                 </Button>
               </Link>
             </div>
