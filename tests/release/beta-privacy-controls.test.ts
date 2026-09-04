@@ -100,9 +100,9 @@ describe("beta privacy controls", () => {
 
     expect(
       inventory.routes.filter(route => route.readiness === "launchable_beta")
-    ).toHaveLength(46);
+    ).toHaveLength(52);
     expect(
       inventory.routes.filter(route => route.readiness === "legacy_unverified")
-    ).toHaveLength(958);
+    ).toHaveLength(952);
   });
 });
