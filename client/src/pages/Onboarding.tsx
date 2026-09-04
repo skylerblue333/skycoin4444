@@ -1,263 +1,277 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Link } from "wouter";
+import {
+  Activity,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Circle,
+  Flag,
+  MessageSquare,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
+import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, ArrowRight, Zap, BookOpen, Gamepad2, Vote, TrendingUp, Heart, ShoppingCart, Users, Mic, Coins } from "lucide-react";
 
-// Token airdrop summary shown on welcome step
-const AIRDROP_TOKENS = [
-  { symbol: "SKY4444", amount: "1,000", icon: "⚡", color: "text-amber-400" },
-  { symbol: "DOGE", amount: "500", icon: "🐕", color: "text-yellow-400" },
-  { symbol: "TRUMP", amount: "100", icon: "🇺🇸", color: "text-red-400" },
-  { symbol: "CHARITY", amount: "25", icon: "❤️", color: "text-pink-400" },
-];
-
-const ONBOARDING_STEPS = [
+const activationSteps = [
   {
-    id: 1,
-    title: "Welcome to SKYCOIN4444",
-    description: "A comprehensive AI-powered digital ecosystem",
-    icon: Zap,
-    color: "from-cyan-500 to-blue-600",
-    details: "Learn, create, trade, and collaborate on one unified platform",
-    airdrop: true,
+    id: "account",
+    title: "Enter the invitation beta",
+    detail:
+      "Authenticate through the configured identity provider. Production access remains invite-only.",
+    route: "/signin",
+    action: "Sign in",
+    icon: ShieldCheck,
   },
   {
-    id: 2,
-    title: "HopeAI - Code Generation",
-    description: "AI-powered software engineer workspace",
+    id: "profile",
+    title: "Configure your profile",
+    detail:
+      "Save a display name, username, bio, and privacy choice against your authenticated account.",
+    route: "/profile",
+    action: "Open profile",
+    icon: UserRound,
+  },
+  {
+    id: "learning",
+    title: "Complete a SkySchool lesson",
+    detail:
+      "Answer one deterministic lesson question correctly and record the completion to durable course progress.",
+    route: "/course-catalog",
+    action: "Open SkySchool",
     icon: BookOpen,
-    color: "from-purple-500 to-pink-600",
-    details: "Generate, review, and optimize code with real LLM integration",
-    action: "/engineer",
   },
   {
-    id: 3,
-    title: "Sky School - Learning",
-    description: "Personalized AI learning paths",
-    icon: BookOpen,
-    color: "from-green-500 to-emerald-600",
-    details: "Take courses, track progress, earn certificates",
-    action: "/school",
+    id: "social",
+    title: "Publish one social post",
+    detail:
+      "Create one bounded social post so your account has a real persisted contribution in the beta.",
+    route: "/activity-feed",
+    action: "Open social feed",
+    icon: MessageSquare,
   },
   {
-    id: 4,
-    title: "Arcade - Gaming",
-    description: "Play games, earn rewards",
-    icon: Gamepad2,
-    color: "from-yellow-500 to-orange-600",
-    details: "5 playable games with real-time leaderboards",
-    action: "/arcade",
+    id: "feedback",
+    title: "Submit beta feedback",
+    detail:
+      "Record one actionable product observation so the beta produces evidence that can drive the next release.",
+    route: "/beta-feedback",
+    action: "Submit feedback",
+    icon: Flag,
   },
-  {
-    id: 5,
-    title: "Governance - Voting",
-    description: "DAO voting with DODGE & Trump Coin",
-    icon: Vote,
-    color: "from-red-500 to-rose-600",
-    details: "Vote on proposals, earn staking rewards",
-    action: "/governance",
-  },
-  {
-    id: 6,
-    title: "Analytics - Insights",
-    description: "Business intelligence dashboard",
-    icon: TrendingUp,
-    color: "from-indigo-500 to-purple-600",
-    details: "Real-time metrics, revenue trends, predictions",
-    action: "/analytics",
-  },
-  {
-    id: 7,
-    title: "Charity - Impact",
-    description: "Community fundraising campaigns",
-    icon: Heart,
-    color: "from-pink-500 to-rose-600",
-    details: "Support causes, track impact, earn badges",
-    action: "/charity",
-  },
-  {
-    id: 8,
-    title: "Marketplace - Commerce",
-    description: "Buy, sell, trade digital assets",
-    icon: ShoppingCart,
-    color: "from-cyan-500 to-teal-600",
-    details: "Multi-token payments (SKY444, DODGE, TRUMP)",
-    action: "/marketplace",
-  },
-];
+] as const;
 
 export default function Onboarding() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completed, setCompleted] = useState<number[]>([]);
-  const [, navigate] = useLocation();
+  const { isAuthenticated, loading } = useAuth();
+  const activation = trpc.activation.status.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
 
-  const step = ONBOARDING_STEPS[currentStep];
-  const Icon = step.icon;
-  const progress = ((currentStep + 1) / ONBOARDING_STEPS.length) * 100;
+  const persistedStatus = new Map(
+    activation.data?.steps.map(step => [step.id, step.complete]) ?? []
+  );
+  const isComplete = (id: (typeof activationSteps)[number]["id"]) =>
+    id === "account"
+      ? isAuthenticated
+      : Boolean(persistedStatus.get(id));
 
-  const handleNext = () => {
-    if (currentStep < ONBOARDING_STEPS.length - 1) {
-      setCompleted([...completed, currentStep]);
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  const completedCount =
+    activation.data?.completedCount ?? (isAuthenticated ? 1 : 0);
+  const percent =
+    activation.data?.percent ?? Math.round((completedCount / activationSteps.length) * 100);
+  const activated = activation.data?.activated ?? false;
 
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleNavigate = (action?: string) => {
-    // Mark current step as complete
-    if (!completed.includes(currentStep)) {
-      setCompleted([...completed, currentStep]);
-    }
-    // Move to next step
-    if (currentStep < ONBOARDING_STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleSkip = () => {
-    navigate("/dashboard");
-  };
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#050510] p-8 text-white">
+        Loading invitation status…
+      </main>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-3xl font-bold text-white">Getting Started</h1>
-            <Button variant="ghost" onClick={handleSkip} className="text-slate-400 hover:text-slate-200">
-              Skip Tour
-            </Button>
-          </div>
-          <Progress value={progress} className="h-2" />
-          <p className="text-sm text-slate-400 mt-2">
-            Step {currentStep + 1} of {ONBOARDING_STEPS.length}
-          </p>
-        </div>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          {/* Sidebar - Steps */}
-          <div className="space-y-2">
-            {ONBOARDING_STEPS.map((s, idx) => (
-              <button
-                key={s.id}
-                onClick={() => setCurrentStep(idx)}
-                className={`w-full text-left p-3 rounded-lg transition-all ${
-                  idx === currentStep
-                    ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/50"
-                    : completed.includes(idx)
-                    ? "bg-purple-600/10 border border-purple-500/30"
-                    : "bg-slate-800/50 border border-slate-700/50 hover:border-slate-600/50"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {completed.includes(idx) ? (
-                    <CheckCircle className="w-4 h-4 text-purple-400" />
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border border-slate-500" />
-                  )}
-                  <span className="text-sm font-medium text-slate-300">{s.title}</span>
-                </div>
-              </button>
-            ))}
+    <main className="min-h-screen bg-[#050510] text-white">
+      <div className="mx-auto max-w-6xl px-4 py-10">
+        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
+          <div>
+            <Badge
+              variant="outline"
+              className="border-emerald-400/40 text-emerald-200"
+            >
+              Durable activation journey
+            </Badge>
+            <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">
+              Turn an invited account into a real beta user.
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-white/55">
+              Progress here comes from account-owned database records, not from
+              clicking “next.” Configure your identity, finish a lesson, publish
+              a post, and submit feedback. Refresh the page and completed steps
+              should remain complete.
+            </p>
           </div>
 
-          {/* Main - Current Step */}
-          <div className="col-span-2">
-            {/* Genesis Vote #001 Banner */}
-            <div className="flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 w-fit">
-              <CheckCircle className="w-3.5 h-3.5 text-green-400" />
-              <span className="text-green-400 text-xs font-semibold">VOTE #1 PASSED — SKY4444 + DOGE + TRUMP now live</span>
-            </div>
-            <Card className={`bg-gradient-to-br ${step.color} bg-opacity-10 border-opacity-30 border p-8 mb-6`}>
-              <div className="flex items-start gap-6">
-                <div className={`p-4 bg-gradient-to-br ${step.color} rounded-lg`}>
-                  <Icon className="w-8 h-8 text-white" />
+          <Card className="border-emerald-400/25 bg-emerald-400/[0.05] text-white">
+            <CardHeader>
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <CardTitle>Activation evidence</CardTitle>
+                  <CardDescription className="text-white/50">
+                    {completedCount}/{activationSteps.length} persisted gates complete
+                  </CardDescription>
                 </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white mb-2">{step.title}</h2>
-                  <p className="text-slate-300 mb-4">{step.description}</p>
-                  <p className="text-sm text-slate-400">{step.details}</p>
-                  {(step as any).airdrop && (
-                    <div className="mt-4 p-3 rounded-xl bg-black/30 border border-amber-500/20">
-                      <p className="text-xs text-amber-400 font-bold mb-2"><Coins className="w-3 h-3 inline mr-1" />Free Airdrop on Sign-Up</p>
-                      <div className="flex flex-wrap gap-2">
-                        {AIRDROP_TOKENS.map(t => (
-                          <span key={t.symbol} className={`text-xs font-mono font-bold ${t.color}`}>{t.icon} {t.amount} {t.symbol}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <span className="text-3xl font-black text-emerald-200">
+                  {percent}%
+                </span>
               </div>
-            </Card>
-
-            {/* Features Grid */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {[
-                { icon: Zap, label: "AI-Powered", desc: "Real LLM integration" },
-                { icon: Users, label: "Community", desc: "Connect with millions" },
-                { icon: TrendingUp, label: "Analytics", desc: "Real-time insights" },
-                { icon: Mic, label: "Voice Commands", desc: "444+ commands" },
-              ].map((feature, idx) => (
-                <Card key={idx} className="bg-slate-800/50 border-slate-700/50 p-4">
-                  <div className="flex items-center gap-3">
-                    <feature.icon className="w-5 h-5 text-cyan-400" />
-                    <div>
-                      <p className="text-sm font-semibold text-white">{feature.label}</p>
-                      <p className="text-xs text-slate-400">{feature.desc}</p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3">
-              <Button
-                onClick={handlePrevious}
-                disabled={currentStep === 0}
-                variant="outline"
-                className="border-slate-700 hover:bg-slate-800"
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={() => handleNavigate()}
-                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
-              >
-                {currentStep === ONBOARDING_STEPS.length - 1 ? "Complete" : "Next"}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Completion Message */}
-        {currentStep === ONBOARDING_STEPS.length - 1 && (
-          <Card className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 border-purple-500/30 p-6">
-            <div className="flex items-center gap-4">
-              <CheckCircle className="w-8 h-8 text-purple-400" />
-              <div>
-                <h3 className="font-semibold text-white">Tour Complete!</h3>
-                <p className="text-sm text-slate-300">You're ready to explore SKYCOIN4444. Happy exploring!</p>
-              </div>
-              <Button onClick={handleSkip} className="ml-auto bg-purple-600 hover:bg-purple-600">
-                Go to Dashboard
-              </Button>
-            </div>
+            </CardHeader>
+            <CardContent>
+              <Progress value={percent} className="h-2" />
+              <p className="mt-4 text-xs leading-5 text-white/40">
+                {activated
+                  ? "All activation gates are backed by persisted account evidence."
+                  : isAuthenticated
+                    ? "Complete the remaining account-owned actions below."
+                    : "Sign in with an invited identity to begin writing durable beta evidence."}
+              </p>
+            </CardContent>
           </Card>
+        </header>
+
+        {!isAuthenticated && (
+          <section className="mt-8 rounded-2xl border border-amber-400/25 bg-amber-400/[0.05] p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-bold text-amber-100">
+                  Invitation admission is the first gate
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-white/55">
+                  The beta does not accept a SKYCOIN4444 password or fabricate a
+                  browser login. Admission is checked before a production session
+                  is issued.
+                </p>
+              </div>
+              <Button type="button" onClick={() => startLogin()}>
+                Sign in with provider
+              </Button>
+            </div>
+          </section>
         )}
+
+        <section className="mt-8 grid gap-4 lg:grid-cols-5">
+          {activationSteps.map((step, index) => {
+            const complete = isComplete(step.id);
+            const Icon = step.icon;
+            return (
+              <Card
+                key={step.id}
+                className={
+                  "h-full text-white " +
+                  (complete
+                    ? "border-emerald-400/25 bg-emerald-400/[0.04]"
+                    : "border-white/10 bg-white/[0.025]")
+                }
+              >
+                <CardHeader>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-bold tracking-[0.18em] text-white/35">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {complete ? (
+                      <CheckCircle2 className="h-5 w-5 text-emerald-300" />
+                    ) : (
+                      <Circle className="h-5 w-5 text-white/20" />
+                    )}
+                  </div>
+                  <span
+                    className={
+                      "mt-2 grid h-10 w-10 place-items-center rounded-xl " +
+                      (complete
+                        ? "bg-emerald-300/10 text-emerald-200"
+                        : "bg-white/[0.05] text-white/55")
+                    }
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <CardTitle className="mt-2 text-base">{step.title}</CardTitle>
+                  <CardDescription className="leading-6 text-white/45">
+                    {step.detail}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="mt-auto">
+                  {step.id === "account" && !isAuthenticated ? (
+                    <Button
+                      type="button"
+                      className="w-full"
+                      onClick={() => startLogin()}
+                    >
+                      {step.action}
+                    </Button>
+                  ) : (
+                    <Link href={step.route}>
+                      <Button
+                        type="button"
+                        variant={complete ? "ghost" : "outline"}
+                        className="w-full"
+                      >
+                        {complete ? "Review evidence" : step.action}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+
+        {activation.error && isAuthenticated && (
+          <section className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-400/[0.05] p-5 text-sm text-rose-100">
+            Activation evidence is unavailable: {activation.error.message}
+          </section>
+        )}
+
+        <section className="mt-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
+            <div className="flex items-start gap-3">
+              <Activity className="mt-0.5 h-5 w-5 shrink-0 text-sky-200" />
+              <div>
+                <h2 className="font-bold">Inspect the underlying records</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/50">
+                  Activity Evidence combines your persisted lesson completions,
+                  posts, feedback, discovery actions, and creator briefs. It is
+                  an evidence log—not a popularity, revenue, uptime, or blockchain
+                  analytics claim.
+                </p>
+              </div>
+            </div>
+          </div>
+          <Link href="/activity-evidence">
+            <Button type="button" variant="outline" className="w-full lg:w-auto">
+              Open activity evidence
+            </Button>
+          </Link>
+        </section>
+
+        <section className="mt-8 rounded-2xl border border-white/10 p-5 text-xs leading-6 text-white/40">
+          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
+          This activation path does not grant token rewards, airdrops,
+          certificates, staking rewards, payment capability, wallet custody,
+          provider-backed AI, livestream delivery, or blockchain execution.
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
