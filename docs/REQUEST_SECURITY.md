@@ -48,7 +48,13 @@ See `docs/SESSION_SECURITY.md`.
 
 ## Cookie transport
 
-Production session cookies are always marked `Secure`. Development still derives Secure from the request so HTTP localhost testing remains possible.
+Production session cookies use the `__Host-app_session_id` name. The `__Host-` prefix is compatible only with a Secure, host-only cookie using `Path=/` and no Domain attribute; the canonical production cookie options satisfy those requirements.
+
+The legacy `app_session_id` cookie name remains available only outside production so local HTTP development can continue. Production authentication and cookie-mutation origin detection do not trust that legacy name. Successful production login and logout clear the legacy cookie as migration cleanup.
+
+This migration can intentionally require re-authentication for a browser carrying only the old production cookie. The old cookie is not treated as a compatibility authentication path because doing so would preserve the cookie-tossing boundary this change removes.
+
+Production session cookies remain `HttpOnly`, `SameSite=None`, and `Secure`. Development still derives Secure from the request so HTTP localhost testing remains possible.
 
 ## Scope and limitations
 
