@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDeadLetterReplayAuditDetails,
+  buildDeadLetterReplayPatch,
   eventOperationsRouter,
   toDeadLetterSummary,
 } from "./eventOperations";
@@ -63,6 +64,20 @@ describe("dead-letter operations redaction", () => {
     });
     expect("payload" in summary).toBe(false);
     expect("lastError" in summary).toBe(false);
+  });
+
+  it("builds a fresh bounded retry state and clears stale lease/error state", () => {
+    const now = new Date("2026-09-04T15:00:00.000Z");
+
+    expect(buildDeadLetterReplayPatch(now)).toEqual({
+      state: "retry",
+      attempts: 0,
+      availableAt: now,
+      leasedUntil: null,
+      leaseOwner: null,
+      publishedAt: null,
+      lastError: null,
+    });
   });
 
   it("hashes the operator reason before durable audit storage", () => {
