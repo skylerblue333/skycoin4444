@@ -1,0 +1,147 @@
+import { describe, expect, it, vi } from "vitest";
+import {
+  ConcurrencyGate,
+  RuntimeLifecycle,
+  RuntimeTransitionError,
+  configureHttpServer,
+  createShutdownController,
+  runtimeOptionsFromEnv,
+} from "./runtimeControl";
+
+describe("runtime lifecycle", () => {
+  it("moves through ready, draining, and stopped states deterministically", () => {
+    let now = Date.parse("2026-09-04T00:00:00.000Z");
+    const lifecycle = new RuntimeLifecycle(() => now);
+
+    expect(lifecycle.snapshot().phase).toBe("starting");
+
+    now += 10;
+    lifecycle.markReady();
+    expect(lifecycle.isReady()).toBe(true);
+
+    now += 20;
+    expect(lifecycle.beginDrain("deploy")).toBe(true);
+    expect(lifecycle.beginDrain("duplicate")).toBe(false);
+    expect(lifecycle.isReady()).toBe(false);
+
+    now += 30;
+    lifecycle.markStopped();
+    const snapshot = lifecycle.snapshot();
+    expect(snapshot.phase).toBe("stopped");
+    expect(snapshot.drainReason).toBe("deploy");
+    expect(snapshot.uptimeMs).toBe(60);
+  });
+
+  it("rejects an invalid transition back to ready", () => {
+    const lifecycle = new RuntimeLifecycle(() => 1_000);
+    lifecycle.markReady();
+    lifecycle.beginDrain("test");
+    expect(() => lifecycle.markReady()).toThrow(RuntimeTransitionError);
+  });
+});
+
+describe("runtime overload gate", () => {
+  it("tracks active, rejected, and high-water requests", () => {
+    const gate = new ConcurrencyGate(2);
+    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).toBe(true);
+    expect(gate.tryAcquire()).toBe(false);
+    expect(gate.snapshot()).toEqual({
+      active: 2,
+      maxInFlight: 2,
+      rejected: 1,
+      highWaterMark: 2,
+    });
+
+    gate.release();
+    expect(gate.tryAcquire()).toBe(true);
+    gate.release();
+    gate.release();
+    expect(gate.snapshot().active).toBe(0);
+  });
+
+  it("refuses an unmatched release", () => {
+    const gate = new ConcurrencyGate(1);
+    expect(() => gate.release()).toThrow(
+      "ConcurrencyGate release called without an active lease"
+    );
+  });
+});
+
+describe("runtime configuration", () => {
+  it("applies bounded HTTP server options", () => {
+    const options = runtimeOptionsFromEnv({
+      HTTP_REQUEST_TIMEOUT_MS: "40000",
+      HTTP_HEADERS_TIMEOUT_MS: "12000",
+      HTTP_KEEP_ALIVE_TIMEOUT_MS: "6000",
+      HTTP_MAX_REQUESTS_PER_SOCKET: "500",
+      MAX_IN_FLIGHT_REQUESTS: "64",
+      SHUTDOWN_GRACE_MS: "9000",
+    } as NodeJS.ProcessEnv);
+
+    const server = {
+      requestTimeout: 0,
+      headersTimeout: 0,
+      keepAliveTimeout: 0,
+      maxRequestsPerSocket: 0,
+    };
+
+    configureHttpServer(server as never, options);
+
+    expect(server).toEqual({
+      requestTimeout: 40000,
+      headersTimeout: 12000,
+      keepAliveTimeout: 6000,
+      maxRequestsPerSocket: 500,
+    });
+    expect(options.maxInFlightRequests).toBe(64);
+    expect(options.shutdownGraceMs).toBe(9000);
+  });
+
+  it("fails fast on incoherent timeout settings", () => {
+    expect(() =>
+      runtimeOptionsFromEnv({
+        HTTP_REQUEST_TIMEOUT_MS: "5000",
+        HTTP_HEADERS_TIMEOUT_MS: "6000",
+      } as NodeJS.ProcessEnv)
+    ).toThrow(
+      "HTTP_HEADERS_TIMEOUT_MS cannot exceed HTTP_REQUEST_TIMEOUT_MS"
+    );
+  });
+});
+
+describe("graceful shutdown", () => {
+  it("drains once and resolves after the server closes", async () => {
+    const lifecycle = new RuntimeLifecycle(() => 1_000);
+    lifecycle.markReady();
+
+    let closeCallback: ((error?: Error) => void) | undefined;
+    const server = {
+      close: vi.fn((callback?: (error?: Error) => void) => {
+        closeCallback = callback;
+        return server;
+      }),
+      closeIdleConnections: vi.fn(),
+      closeAllConnections: vi.fn(),
+    };
+
+    const controller = createShutdownController(
+      server as never,
+      lifecycle,
+      10_000
+    );
+    const first = controller.shutdown("deploy");
+    const second = controller.shutdown("ignored");
+
+    expect(first).toBe(second);
+    expect(lifecycle.currentPhase()).toBe("draining");
+    expect(server.close).toHaveBeenCalledTimes(1);
+    expect(server.closeIdleConnections).toHaveBeenCalledTimes(1);
+
+    closeCallback?.();
+    await expect(first).resolves.toBeUndefined();
+
+    expect(lifecycle.currentPhase()).toBe("stopped");
+    expect(server.closeAllConnections).not.toHaveBeenCalled();
+  });
+});

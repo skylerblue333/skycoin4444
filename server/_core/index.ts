@@ -12,6 +12,17 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
+import {
+  ConcurrencyGate,
+  RuntimeLifecycle,
+  configureHttpServer,
+  createConcurrencyMiddleware,
+  createDrainGuard,
+  createShutdownController,
+  registerRuntimeRoutes,
+  registerShutdownSignals,
+  runtimeOptionsFromEnv,
+} from "./runtimeControl";
 
 const DEFAULT_BODY_LIMIT = "2mb";
 
@@ -36,8 +47,13 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 
 async function startServer() {
   assertProductionBetaConfig();
+  const runtimeOptions = runtimeOptionsFromEnv();
+  const lifecycle = new RuntimeLifecycle();
+  const concurrency = new ConcurrencyGate(runtimeOptions.maxInFlightRequests);
+
   const app = express();
   const server = createServer(app);
+  configureHttpServer(server, runtimeOptions);
 
   app.disable("x-powered-by");
   registerObservability(app);
@@ -51,6 +67,10 @@ async function startServer() {
     );
     next();
   });
+
+  registerRuntimeRoutes(app, lifecycle, concurrency);
+  app.use(createDrainGuard(lifecycle));
+  app.use(createConcurrencyMiddleware(concurrency));
 
   app.use(express.json({ limit: DEFAULT_BODY_LIMIT }));
   app.use(express.urlencoded({ limit: DEFAULT_BODY_LIMIT, extended: true }));
@@ -76,12 +96,21 @@ async function startServer() {
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
+  const shutdownController = createShutdownController(
+    server,
+    lifecycle,
+    runtimeOptions.shutdownGraceMs
+  );
+  registerShutdownSignals(shutdownController);
 
   if (port !== preferredPort) {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
   server.listen(port, () => {
+    if (lifecycle.currentPhase() === "starting") {
+      lifecycle.markReady();
+    }
     console.log(`Server running on http://localhost:${port}/`);
   });
 }
