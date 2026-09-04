@@ -14,6 +14,14 @@ const descriptors: readonly EventDescriptor[] = [
     classification: "sensitive",
   },
   {
+    eventType: "social.follow.created",
+    currentVersion: 1,
+    owner: "social",
+    description:
+      "A unique social follow edge, notification, and outbox event were persisted atomically.",
+    classification: "internal",
+  },
+  {
     eventType: "social.post.created",
     currentVersion: 1,
     owner: "social",
