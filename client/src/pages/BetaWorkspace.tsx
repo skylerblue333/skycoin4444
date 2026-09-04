@@ -127,7 +127,7 @@ export default function BetaWorkspace() {
             href="/beta-catalog"
             className="hidden text-sm text-amber-200 hover:text-amber-100 sm:block"
           >
-            43 launchable routes →
+            49 launchable routes →
           </Link>
         </div>
       </header>
