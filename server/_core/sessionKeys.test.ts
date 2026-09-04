@@ -1,8 +1,10 @@
 import { SignJWT } from "jose";
 import { describe, expect, it } from "vitest";
 import {
+  MAX_SESSION_JWT_CHARACTERS,
   sessionSigningKeysFromEnv,
   sessionSigningKeysFromSecrets,
+  validateCompactSessionJwt,
   verifySessionJwt,
 } from "./sessionKeys";
 
@@ -129,5 +131,49 @@ describe("session JWT rotation verification", () => {
         )
       )
     ).rejects.toBeDefined();
+  });
+});
+
+
+describe("session JWT input boundary", () => {
+  it("accepts a normal compact JWT shape", async () => {
+    const token = await tokenWith(activeSecret);
+
+    expect(validateCompactSessionJwt(token)).toBe(token);
+    expect(token.length).toBeLessThan(MAX_SESSION_JWT_CHARACTERS);
+  });
+
+  it("rejects empty, malformed, and non-base64url compact tokens", () => {
+    expect(() => validateCompactSessionJwt("")).toThrow(/length/);
+    expect(() => validateCompactSessionJwt("one.segment")).toThrow(
+      /compact/
+    );
+    expect(() =>
+      validateCompactSessionJwt("one.two.three.four")
+    ).toThrow(/compact/);
+    expect(() =>
+      validateCompactSessionJwt("one.two.invalid+segment")
+    ).toThrow(/compact/);
+    expect(() =>
+      validateCompactSessionJwt("one..three")
+    ).toThrow(/compact/);
+  });
+
+  it("rejects oversized tokens before cryptographic verification", async () => {
+    const oversized =
+      "a." +
+      "b".repeat(MAX_SESSION_JWT_CHARACTERS) +
+      ".c";
+
+    expect(() =>
+      validateCompactSessionJwt(oversized)
+    ).toThrow(/length/);
+
+    await expect(
+      verifySessionJwt(
+        oversized,
+        sessionSigningKeysFromSecrets(activeSecret)
+      )
+    ).rejects.toThrow(/length/);
   });
 });
