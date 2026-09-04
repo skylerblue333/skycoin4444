@@ -6,11 +6,19 @@ SKYCOIN4444 uses one canonical MySQL2 promise pool for the Drizzle-backed server
 
 The pool now has explicit engineering-beta limits instead of relying on implicit driver defaults. The goal is to bound connection creation and in-process connection waiting while keeping the existing `DATABASE_URL` URI contract intact.
 
+## Driver patch level
+
+The canonical dependency is pinned through the frozen lockfile to MySQL2 3.23.3.
+
+This patch is intentionally adopted because upstream 3.23.3 includes fixes relevant to the runtime pool boundary, including keeping `connectTimeout` active through the handshake, giving each pooled connection its own configuration copy, and propagating pool query-dispatch errors instead of throwing them outside the expected path.
+
+The dependency upgrade does not by itself prove database availability or performance; canonical exact-head CI and deployment-specific database verification remain required.
+
 ## URI preservation
 
 The pool is created with an options object containing `uri: DATABASE_URL` plus explicit pool overrides.
 
-MySQL2 v3.23.2 supports `uri` as a connection option and merges URI-derived connection settings into the object before applying explicit values. This preserves supported connection-string options while allowing SKYCOIN4444 to set pool-specific bounds.
+MySQL2 v3.23.3 supports `uri` as a connection option and merges URI-derived connection settings into the object before applying explicit values. This preserves supported connection-string options while allowing SKYCOIN4444 to set pool-specific bounds.
 
 No database credential is parsed into logs or diagnostics.
 
