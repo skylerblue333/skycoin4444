@@ -71,7 +71,7 @@ The handler:
 - sets process exit code to 1;
 - logs a bounded startup error summary;
 - redacts URI username/password credential segments;
-- redacts common password query parameters;
+- applies the shared operational redactor to URI credentials, password/secret/token parameters, Bearer values, and JWT-shaped values;
 - attempts to close the canonical MySQL pool;
 - preserves the failure exit code even when cleanup also fails.
 

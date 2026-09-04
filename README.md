@@ -41,6 +41,8 @@ Runtime-fatal exceptions are synchronously observed through Node's non-interferi
 
 The Node HTTP listener now has explicit header-count and TCP-connection caps in addition to request/header/keepalive timeouts, per-socket request limits, and the process-local in-flight request bulkhead.
 
+Canonical request correlation now uses a server-generated ID for every request. Caller-supplied `X-Request-ID` values are never promoted to the canonical ID; a strictly validated value may be retained only as separately labeled external correlation metadata. Operational auth/startup/fatal/outbox error summaries share one bounded secret-redaction layer, and outbox failure text is sanitized before durable persistence.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -97,6 +99,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/OUTBOX_DISPATCHER.md`](docs/OUTBOX_DISPATCHER.md) — database leases, retry/dead-letter behavior, durable consumer receipts, and internal dispatch diagnostics.
 - [`docs/DEAD_LETTER_OPERATIONS.md`](docs/DEAD_LETTER_OPERATIONS.md) — admin-only metadata inspection, guarded replay, audit behavior, and recovery limits.
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
+- [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — internal request IDs, untrusted external correlation, operational-error redaction, and logging limits.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
 - [`docs/BROWSER_SECURITY.md`](docs/BROWSER_SECURITY.md) — production CSP/HSTS, browser isolation headers, and analytics privacy boundary.

@@ -1,5 +1,6 @@
 import net from "node:net";
 import type { Server } from "node:http";
+import { sanitizeOperationalError } from "./operationalError";
 
 export type ServerStartupOptions = Readonly<{
   preferredPort: number;
@@ -145,23 +146,7 @@ export async function listenHttpServer(
 }
 
 export function sanitizeStartupError(error: unknown): string {
-  const raw =
-    error instanceof Error
-      ? error.name + ": " + error.message
-      : String(error);
-
-  return raw
-    .replace(
-      /([a-z][a-z0-9+.-]*:\/\/)([^\s/:@]+):([^\s/@]+)@/gi,
-      "$1[redacted]@"
-    )
-    .replace(
-      /([?&](?:password|passwd|pwd)=)[^&\s]+/gi,
-      "$1[redacted]"
-    )
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 2_000);
+  return sanitizeOperationalError(error);
 }
 
 export async function handleStartupFailure(

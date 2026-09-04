@@ -41,6 +41,16 @@ Development may use bounded fallback scanning through `DEV_PORT_FALLBACK_SPAN`. 
 
 See `docs/STARTUP.md`.
 
+## Observability trust boundary
+
+The deployed service must treat application-generated request IDs as canonical. Caller-provided `X-Request-ID` values are optional untrusted correlation metadata only and are accepted only under a restricted bounded syntax.
+
+Operational error summaries use the shared redactor before application logging. OAuth callback/auth synchronization failures and outbox dispatcher failures do not intentionally log raw provider/database error objects, and outbox failure text is sanitized before durable `last_error` persistence.
+
+This is targeted application-level redaction, not proof that hosting-platform, Node-generated, database-provider, or third-party logs can never contain sensitive information.
+
+See `docs/OBSERVABILITY.md`.
+
 ## Fatal runtime behavior
 
 The canonical server synchronously observes Node `uncaughtExceptionMonitor` events and emits one bounded credential-redacted record containing the fatal origin and summary.

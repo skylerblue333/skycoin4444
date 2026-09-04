@@ -13,6 +13,7 @@ import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
+import { sanitizeOperationalError } from "./operationalError";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -37,7 +38,10 @@ const MIN_SESSION_SECRET_BYTES = 32;
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.log("[OAuth] Initialized with baseURL:", ENV.oAuthServerUrl);
+    console.info(
+      "[OAuth] provider configuration",
+      ENV.oAuthServerUrl ? "configured" : "missing"
+    );
     if (!ENV.oAuthServerUrl) {
       console.error(
         "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
@@ -243,7 +247,10 @@ class SDKServer {
         name: typeof name === "string" ? name : "",
       };
     } catch (error) {
-      console.warn("[Auth] Session verification failed", String(error));
+      console.warn(
+        "[Auth] Session verification failed",
+        sanitizeOperationalError(error)
+      );
       return null;
     }
   }
@@ -311,7 +318,10 @@ class SDKServer {
         });
         user = await db.getUserByOpenId(userInfo.openId);
       } catch (error) {
-        console.error("[Auth] Failed to sync user from OAuth:", error);
+        console.error(
+          "[Auth] Failed to sync user from OAuth:",
+          sanitizeOperationalError(error)
+        );
         throw ForbiddenError("Failed to sync user info");
       }
     }

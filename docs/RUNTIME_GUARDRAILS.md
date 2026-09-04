@@ -23,6 +23,14 @@ Startup errors produce a nonzero process result and attempt database-pool cleanu
 
 See `docs/STARTUP.md`.
 
+## Request correlation boundary
+
+Every request receives a fresh server-generated canonical request ID. A caller-supplied `X-Request-ID` is treated as untrusted input: only a 1–64 character identifier matching the restricted correlation alphabet is retained, and it is stored/logged separately as `externalRequestId`.
+
+The response `X-Request-ID` always carries the internal canonical ID, so a remote caller cannot choose or collide with the identifier used by application traces.
+
+See `docs/OBSERVABILITY.md`.
+
 ## Health contracts
 
 The server exposes:
@@ -109,4 +117,4 @@ Invalid or incoherent values fail fast rather than silently weakening the runtim
 
 ## Verification
 
-Unit tests cover lifecycle transitions, overload accounting, HTTP header/connection bounds, configuration validation, HTTP-server option application, fatal-monitor redaction/non-interference, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.
+Unit tests cover lifecycle transitions, overload accounting, request-correlation trust boundaries, operational-error redaction, HTTP header/connection bounds, configuration validation, HTTP-server option application, fatal-monitor redaction/non-interference, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.

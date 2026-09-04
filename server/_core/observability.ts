@@ -5,14 +5,41 @@ import { runWithRequestContext } from "./requestContext";
 export type HttpRequestSignal = {
   event: "http_request";
   requestId: string;
+  externalRequestId: string | null;
   method: string;
   path: string;
   status: number;
   durationMs: number;
 };
 
+export function normalizeExternalRequestId(
+  value: string | undefined
+): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  if (trimmed.length > 64) return null;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:-]*$/.test(trimmed)) {
+    return null;
+  }
+  return trimmed;
+}
+
+export function createRequestIdentity(
+  supplied: string | undefined,
+  generate: () => string = randomUUID
+): Readonly<{
+  requestId: string;
+  externalRequestId: string | null;
+}> {
+  return Object.freeze({
+    requestId: generate(),
+    externalRequestId: normalizeExternalRequestId(supplied),
+  });
+}
+
 export function createHttpRequestSignal(
   requestId: string,
+  externalRequestId: string | null,
   request: Pick<Request, "method" | "path">,
   response: Pick<Response, "statusCode">,
   durationMs: number
@@ -20,6 +47,7 @@ export function createHttpRequestSignal(
   return {
     event: "http_request",
     requestId,
+    externalRequestId,
     method: request.method,
     path: request.path,
     status: response.statusCode,
@@ -29,11 +57,10 @@ export function createHttpRequestSignal(
 
 export function registerObservability(app: Express): void {
   app.use((req: Request, res: Response, next: NextFunction) => {
-    const suppliedRequestId = req.header("x-request-id")?.trim();
-    const requestId =
-      suppliedRequestId && suppliedRequestId.length <= 128
-        ? suppliedRequestId
-        : randomUUID();
+    const identity = createRequestIdentity(
+      req.header("x-request-id")
+    );
+    const { requestId, externalRequestId } = identity;
     const startedAt = Date.now();
 
     res.setHeader("X-Request-ID", requestId);
@@ -41,7 +68,13 @@ export function registerObservability(app: Express): void {
       if (req.path.startsWith("/api/")) {
         console.info(
           JSON.stringify(
-            createHttpRequestSignal(requestId, req, res, Date.now() - startedAt)
+            createHttpRequestSignal(
+              requestId,
+              externalRequestId,
+              req,
+              res,
+              Date.now() - startedAt
+            )
           )
         );
       }
@@ -50,6 +83,7 @@ export function registerObservability(app: Express): void {
     runWithRequestContext(
       {
         requestId,
+        externalRequestId,
         startedAt,
         method: req.method,
         path: req.path,

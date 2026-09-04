@@ -14,10 +14,9 @@ export type TrpcContext = {
 };
 
 function fallbackRequestId(
-  opts: CreateExpressContextOptions
+  _opts: CreateExpressContextOptions
 ): string {
-  const supplied = opts.req.header("x-request-id")?.trim();
-  return supplied && supplied.length <= 128 ? supplied : randomUUID();
+  return randomUUID();
 }
 
 export async function createContext(
