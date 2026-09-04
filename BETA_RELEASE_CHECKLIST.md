@@ -38,6 +38,8 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | Logs, error reporting, and an on-call or response owner are recorded.                                                                                   | Operations record.                                                | Beta operations owner           | [ ]      |
 | Both runtime and beta readiness endpoints report required dependencies ready on the exact deployed release.                                             | `/api/runtime/ready` and `/api/beta/readiness` records with matching release SHA/context. | Operations owner | [ ] |
 | Deployment termination grace period accommodates configured HTTP and resource shutdown bounds.                                                           | Platform configuration and controlled termination record. | Operations owner | [ ] |
+| Database pool connection limit × maximum application replicas fits safely within the managed database connection quota.                                    | Managed DB quota, replica ceiling, configured pool limit, and sizing calculation. | Data/operations owner | [ ] |
+| Database pool queue limit, connect timeout, idle timeout, and non-secret runtime diagnostics are reviewed on the deployed release.                         | Deployment config plus `/api/runtime/database-pool` record. | Operations owner | [ ] |
 | If the internal event dispatcher is enabled, the dead-letter queue is reviewed and any manual replay is tied to an administrator audit record.            | Metadata-only dead-letter review plus audit evidence for each replay, if applicable. | Operations owner | [ ] |
 
 ## 4. Route-level beta smoke test
