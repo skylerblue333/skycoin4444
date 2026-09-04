@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   OutboxDispatcherService,
+  buildOutboxFailurePatch,
   outboxDispatcherOptionsFromEnv,
   type OutboxDispatcherRuntimeOptions,
 } from "./outboxDispatcher";
@@ -87,6 +88,29 @@ describe("outbox dispatcher runtime options", () => {
         EVENT_OUTBOX_DISPATCHER_ENABLED: "yes",
       } as NodeJS.ProcessEnv)
     ).toThrow(/exactly/);
+  });
+});
+
+describe("outbox durable failure patch", () => {
+  it("sanitizes durable failure text before persistence", () => {
+    const patch = buildOutboxFailurePatch({
+      id: "event-1",
+      owner: "worker-1",
+      now: new Date("2026-09-04T18:00:00.000Z"),
+      error:
+        "connect mysql://admin:secret@db.example/sky?access_token=abc123",
+      plan: {
+        action: "dead_letter",
+        attempts: 8,
+        availableAt: new Date("2026-09-04T18:01:00.000Z"),
+      },
+    });
+
+    expect(patch.state).toBe("dead_letter");
+    expect(patch.attempts).toBe(8);
+    expect(patch.lastError).not.toContain("secret");
+    expect(patch.lastError).not.toContain("abc123");
+    expect(patch.lastError).toContain("[redacted]");
   });
 });
 
