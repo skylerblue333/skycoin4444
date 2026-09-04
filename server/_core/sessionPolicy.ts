@@ -33,6 +33,11 @@ export function sessionLifetimePolicyFromEnv(
   env: NodeJS.ProcessEnv = process.env
 ): SessionLifetimePolicy {
   const raw = env.SESSION_TTL_MS?.trim();
+  if (raw && !/^\d+$/.test(raw)) {
+    throw new RangeError(
+      "SESSION_TTL_MS must contain decimal digits only"
+    );
+  }
   const ttlMs = raw
     ? validateSessionTtlMs(Number(raw))
     : DEFAULT_SESSION_TTL_MS;
