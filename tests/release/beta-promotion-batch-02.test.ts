@@ -133,7 +133,7 @@ describe("beta promotion batch 02 pages", () => {
     expect(sources.markdown).toMatch(/raw HTML and JavaScript are never executed/i);
     expect(sources.survey).toMatch(/entries never leave this browser/i);
     expect(sources.theme).toMatch(/No account-level theme sync or cross-device preference service/i);
-    expect(sources.quiz).toMatch(/do not issue certificates, grades, credentials, or instructor analytics/i);
+    expect(sources.quiz).toMatch(/do not issue certificates,\s+grades,\s+credentials,\s+or instructor analytics/i);
   });
 
   it("records all eight promotions with synchronized evidence and inventory", () => {
