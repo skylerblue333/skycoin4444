@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 60,
-    "legacy_unverified": 944,
+    "launchable_beta": 67,
+    "legacy_unverified": 937,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -1544,7 +1544,7 @@
       "path": "/community-guidelines",
       "component": "CommunityGuidelines",
       "page": "CommunityGuidelines",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1768,7 +1768,7 @@
       "path": "/context-menu",
       "component": "ContextMenu",
       "page": "ContextMenu",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -2240,7 +2240,7 @@
       "path": "/date-input-form",
       "component": "DateInputForm",
       "page": "DateInputForm",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -2248,7 +2248,7 @@
       "path": "/date-picker-dialog",
       "component": "DatePickerDialog",
       "page": "DatePickerDialog",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -5200,7 +5200,7 @@
       "path": "/password-input-form",
       "component": "PasswordInputForm",
       "page": "PasswordInputForm",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -7464,7 +7464,7 @@
       "path": "/text-input-form",
       "component": "TextInputForm",
       "page": "TextInputForm",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -7480,7 +7480,7 @@
       "path": "/text-tools",
       "component": "TextTools",
       "page": "TextTools",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },

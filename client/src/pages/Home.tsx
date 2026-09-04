@@ -115,7 +115,7 @@ const experiences = [
 ] as const;
 
 const stats = [
-  { value: "60", label: "launchable beta routes" },
+  { value: "67", label: "launchable beta routes" },
   { value: "9", label: "headline journeys" },
   { value: "1", label: "unified workspace" },
   { value: "0", label: "missing routed source files" },
@@ -187,7 +187,7 @@ export default function Home() {
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Search all 60 beta routes
+                  Search all 67 beta routes
                 </Button>
               </Link>
             </div>
