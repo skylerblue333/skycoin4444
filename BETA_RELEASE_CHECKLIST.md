@@ -37,6 +37,7 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | Persistence, migrations, backups, consent, privacy notice, self-data export, and deletion-request/support behavior are verified before accepting user data. | Deployment and operational record; deletion requests must not be described as completed without verified purge evidence. | Data owner | [ ] |
 | Every enabled external provider is configured, least-privilege reviewed, tested for success/failure, and monitored; otherwise its route is unavailable. | Provider verification record.                                     | Integration owner               | [ ]      |
 | Logs, error reporting, and an on-call or response owner are recorded.                                                                                   | Operations record.                                                | Beta operations owner           | [ ]      |
+| Fatal runtime monitoring preserves default crash behavior and does not expose credentials in its bounded record.                                        | Controlled pre-release fatal-monitor test plus source/CI evidence. | Engineering/security owner      | [ ]      |
 | Both runtime and beta readiness endpoints report required dependencies ready on the exact deployed release.                                             | `/api/runtime/ready` and `/api/beta/readiness` records with matching release SHA/context. | Operations owner | [ ] |
 | Deployment termination grace period accommodates configured HTTP and resource shutdown bounds.                                                           | Platform configuration and controlled termination record. | Operations owner | [ ] |
 | Database pool connection limit × maximum application replicas fits safely within the managed database connection quota.                                    | Managed DB quota, replica ceiling, configured pool limit, and sizing calculation. | Data/operations owner | [ ] |
@@ -73,6 +74,7 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | The rollback action and responsible operator are documented.                                                                     | Runbook link.                               | Operations owner               | [ ]      |
 | High-severity authorization, privacy, data-loss, security, or provider incidents have a route-removal or service-disable action. | Incident/feature-flag or deployment action. | Security and operations owners | [ ]      |
 | The known-issues list is current at invitation time.                                                                             | Release note timestamp.                     | Beta operations owner          | [ ]      |
+| If crash restart is relied upon, the external supervisor/restart policy is configured and tested independently of application code. | Hosting-platform restart evidence.          | Operations owner               | [ ]      |
 
 ## Release decision
 
