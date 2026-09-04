@@ -84,7 +84,7 @@ describe("beta promotion batch 01", () => {
     expect(convertText("a,b\n1,2", "csv-to-tsv")).toBe("a\tb\n1\t2");
     expect(convertText("Sky", "lowercase")).toBe("sky");
     expect(pages.converter).toMatch(/new FileReader\(\)/);
-    expect(pages.converter).toMatch(/are not uploaded\\s+to a server/);
+    expect(pages.converter).toMatch(/are not uploaded\s+to a server/);
   });
 
   it("counts words and keeps blog drafts local", () => {
