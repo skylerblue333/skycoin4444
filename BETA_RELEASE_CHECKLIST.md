@@ -31,6 +31,7 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | Check                                                                                                                                                   | Required evidence                                                 | Owner                           | Complete |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------- | -------- |
 | The beta environment name, URL, deployment time, and release commit are recorded.                                                                       | Deployment record.                                                | Release owner                   | [ ]      |
+| The configured production listener port is valid and the service binds that exact port with no fallback.                                                | Deployment configuration plus startup/listener evidence.          | Operations owner                | [ ]      |
 | Configuration contains no development-only or fabricated-success settings.                                                                              | Configuration review; no secret values recorded in release notes. | Engineering and security owners | [ ]      |
 | Authentication/session behavior is verified, or the account/profile route remains unavailable.                                                          | Smoke-test record.                                                | Identity owner                  | [ ]      |
 | Persistence, migrations, backups, consent, privacy notice, self-data export, and deletion-request/support behavior are verified before accepting user data. | Deployment and operational record; deletion requests must not be described as completed without verified purge evidence. | Data owner | [ ] |
@@ -52,6 +53,7 @@ Use this checklist for every invitation-only engineering-beta release. A complet
 | Durable activation journey completes.               | Profile, one lesson, one social post, and feedback persist for the invited account and remain visible after refresh/re-authentication. | QA owner | [ ] |
 | Feedback destination works.                         | A submitted test item reaches the monitored triage destination.                                                   | Beta operations owner     | [ ]      |
 | Failure handling is truthful.                       | A simulated unavailable dependency is reported as unavailable, not as a successful service.                       | QA and engineering owners | [ ]      |
+| Startup failure is fail-closed.                      | A controlled invalid-port or bind-failure test exits nonzero and does not report readiness.                        | QA and engineering owners | [ ]      |
 
 ## 5. Tester operations and communications
 

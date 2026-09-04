@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
-import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerBetaRoutes } from "./betaRoutes";
@@ -18,6 +17,12 @@ import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
 import { createDependencyReadinessCoordinator } from "./readiness";
 import { registerDatabasePoolRoutes } from "./databasePoolRoutes";
+import {
+  handleStartupFailure,
+  listenHttpServer,
+  resolveStartupPort,
+  serverStartupOptionsFromEnv,
+} from "./serverStartup";
 import {
   createOutboxDispatcherService,
   registerOutboxDispatcherRoutes,
@@ -41,27 +46,9 @@ import {
 
 const DEFAULT_BODY_LIMIT = "2mb";
 
-function isPortAvailable(port: number): Promise<boolean> {
-  return new Promise(resolve => {
-    const server = net.createServer();
-    server.listen(port, () => {
-      server.close(() => resolve(true));
-    });
-    server.on("error", () => resolve(false));
-  });
-}
-
-async function findAvailablePort(startPort: number = 3000): Promise<number> {
-  for (let port = startPort; port < startPort + 20; port++) {
-    if (await isPortAvailable(port)) {
-      return port;
-    }
-  }
-  throw new Error(`No available port found starting from ${startPort}`);
-}
-
 async function startServer() {
   assertProductionBetaConfig();
+  const startupOptions = serverStartupOptionsFromEnv();
   const runtimeOptions = runtimeOptionsFromEnv();
   const lifecycle = new RuntimeLifecycle();
   const concurrency = new ConcurrencyGate(runtimeOptions.maxInFlightRequests);
@@ -135,21 +122,27 @@ async function startServer() {
     serveStatic(app);
   }
 
-  const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
+  const port = await resolveStartupPort(startupOptions);
   registerApplicationShutdownSignals(applicationShutdown);
 
-  if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+  if (port !== startupOptions.preferredPort) {
+    console.log(
+      `Development port ${startupOptions.preferredPort} is busy; using ${port}`
+    );
   }
 
-  server.listen(port, () => {
-    if (lifecycle.currentPhase() === "starting") {
-      lifecycle.markReady();
-    }
-    outboxDispatcher.start();
-    console.log(`Server running on http://localhost:${port}/`);
-  });
+  await listenHttpServer(server, port);
+
+  if (lifecycle.currentPhase() === "starting") {
+    lifecycle.markReady();
+  }
+  outboxDispatcher.start();
+  console.log(`Server running on http://localhost:${port}/`);
 }
 
-startServer().catch(console.error);
+startServer().catch(error =>
+  handleStartupFailure({
+    error,
+    cleanup: closeDatabasePool,
+  })
+);

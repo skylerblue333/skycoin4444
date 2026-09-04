@@ -35,6 +35,8 @@ Admin-only dead-letter recovery now exposes metadata-only inspection and single-
 
 The canonical database client now uses a bounded MySQL2 pool with explicit connection, idle, queue, connect-timeout, and keepalive settings. Runtime diagnostics expose only non-secret pool options and pressure counters; the database host, credentials, and URL are never returned.
 
+Production startup now binds the configured `PORT` exactly, marks readiness only after the HTTP server emits `listening`, and converts startup failures into a nonzero process result with database-pool cleanup. Port fallback remains development-only and explicitly bounded.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -82,6 +84,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — canonical component boundaries and control/data flow.
 - [`docs/PLATFORM_KERNEL.md`](docs/PLATFORM_KERNEL.md) — capability dependency graph, runtime diagnostics, request correlation, retry, and circuit-breaker contracts.
 - [`docs/RUNTIME_GUARDRAILS.md`](docs/RUNTIME_GUARDRAILS.md) — lifecycle state, liveness/readiness, overload bulkhead, HTTP timeouts, and graceful shutdown.
+- [`docs/STARTUP.md`](docs/STARTUP.md) — exact production port binding, listening readiness, startup failure cleanup, and development fallback.
 - [`docs/SHUTDOWN.md`](docs/SHUTDOWN.md) — coordinated signal ownership, ordered resource drain, MySQL pool close, and timeout semantics.
 - [`docs/READINESS.md`](docs/READINESS.md) — shared configuration/database readiness, timeout/cache behavior, and optional dependency degradation.
 - [`docs/DATABASE_POOL.md`](docs/DATABASE_POOL.md) — MySQL pool sizing, bounded queue behavior, telemetry, shutdown, and deployment limits.

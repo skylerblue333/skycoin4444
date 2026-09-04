@@ -13,6 +13,16 @@ The runtime has four explicit phases:
 
 The state machine rejects invalid transitions. Shutdown is idempotent: repeated shutdown requests share one in-flight promise instead of racing multiple server closes.
 
+## Startup boundary
+
+Production validates `PORT` and binds that exact port; it does not silently move to a nearby port. Development-only fallback is separately bounded.
+
+The HTTP listen operation resolves only after the server emits `listening`. Runtime readiness is never marked before that event.
+
+Startup errors produce a nonzero process result and attempt database-pool cleanup. Error summaries redact URI user/password credentials and common password query parameters.
+
+See `docs/STARTUP.md`.
+
 ## Health contracts
 
 The server exposes:
