@@ -2,9 +2,14 @@ import { TRPCError } from "@trpc/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { follows, notifications, users } from "../../drizzle/schema";
+import { eventOutbox, follows, notifications, users } from "../../drizzle/schema";
+import {
+  createDomainEvent,
+  toOutboxRow,
+} from "../../packages/event-fabric/src/index";
 import { db } from "../db";
 import { protectedProcedure, publicProcedure } from "../_core/trpc";
+import { isMysqlDuplicateEntryFor } from "../_core/dbErrors";
 
 const userIdSchema = z.union([z.string().min(1), z.number().int()]);
 const profileInput = z.object({ userId: userIdSchema.optional() }).optional();
@@ -169,19 +174,51 @@ export const userFollowProcedure = protectedProcedure
     });
     if (existing) return { following: true, created: false } as const;
 
-    await db.insert(follows).values({
-      id: randomUUID(),
-      followerId: ctx.user.id,
-      followingId: targetId,
+    const followId = randomUUID();
+    const event = createDomainEvent({
+      eventType: "social.follow.created",
+      schemaVersion: 1,
+      producer: "skycoin4444.social",
+      aggregate: { type: "social.follow", id: followId },
+      correlationId: ctx.requestId,
+      actorId: ctx.user.id,
+      payload: {
+        followId,
+        followerId: ctx.user.id,
+        followingId: targetId,
+      },
+      metadata: { source: "trpc" },
     });
 
-    await db.insert(notifications).values({
-      id: randomUUID(),
-      userId: targetId,
-      type: "follow",
-      content: `${ctx.user.name || ctx.user.username || "Someone"} followed you`,
-      read: false,
-    });
+    try {
+      await db.transaction(async tx => {
+        await tx.insert(follows).values({
+          id: followId,
+          followerId: ctx.user.id,
+          followingId: targetId,
+        });
+
+        await tx.insert(notifications).values({
+          id: randomUUID(),
+          userId: targetId,
+          type: "follow",
+          content: `${ctx.user.name || ctx.user.username || "Someone"} followed you`,
+          read: false,
+        });
+
+        await tx.insert(eventOutbox).values(toOutboxRow(event));
+      });
+    } catch (error) {
+      if (
+        isMysqlDuplicateEntryFor(
+          error,
+          "follows_follower_following_unique"
+        )
+      ) {
+        return { following: true, created: false } as const;
+      }
+      throw error;
+    }
 
     return { following: true, created: true } as const;
   });

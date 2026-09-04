@@ -15,6 +15,7 @@ import {
 } from "../../packages/event-fabric/src/index";
 import { db } from "../db";
 import { protectedProcedure, publicProcedure } from "../_core/trpc";
+import { isMysqlDuplicateEntryFor } from "../_core/dbErrors";
 
 const postIdInput = z.object({ postId: z.string().min(1).max(255) });
 
@@ -185,17 +186,24 @@ export const likePostProcedure = protectedProcedure
     });
     if (existing) return { liked: true, created: false } as const;
 
-    await db.transaction(async tx => {
-      await tx.insert(likes).values({
-        id: randomUUID(),
-        postId: input.postId,
-        userId: ctx.user.id,
+    try {
+      await db.transaction(async tx => {
+        await tx.insert(likes).values({
+          id: randomUUID(),
+          postId: input.postId,
+          userId: ctx.user.id,
+        });
+        await tx
+          .update(posts)
+          .set({ likes: sql`COALESCE(${posts.likes}, 0) + 1` })
+          .where(eq(posts.id, input.postId));
       });
-      await tx
-        .update(posts)
-        .set({ likes: sql`COALESCE(${posts.likes}, 0) + 1` })
-        .where(eq(posts.id, input.postId));
-    });
+    } catch (error) {
+      if (isMysqlDuplicateEntryFor(error, "likes_post_user_unique")) {
+        return { liked: true, created: false } as const;
+      }
+      throw error;
+    }
 
     return { liked: true, created: true } as const;
   });

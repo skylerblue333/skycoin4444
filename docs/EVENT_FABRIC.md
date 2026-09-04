@@ -15,6 +15,7 @@ It separates three concerns:
 The current registry contains:
 
 - `social.post.created` v1
+- `social.follow.created` v1
 - `beta.feedback.submitted` v1
 
 Registry definitions are normalized and SHA-256 fingerprinted. Reordering equivalent descriptors does not alter the fingerprint. This gives release tooling a stable contract identifier.
@@ -38,6 +39,7 @@ It intentionally reports:
 Selected mutations now write business state and the corresponding outbox event in one Drizzle transaction:
 
 - social post creation writes `posts` + `social.post.created`;
+- social follow creation writes the unique `follows` edge + notification + `social.follow.created`;
 - engineering-beta feedback writes `beta_feedback` + `audit_ledger` + `beta.feedback.submitted`.
 
 This removes a common dual-write failure mode: the mutation cannot successfully commit its business state while independently losing the event row in the same database transaction.

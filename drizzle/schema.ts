@@ -80,7 +80,12 @@ export const likes = mysqlTable("likes", {
   postId: varchar("post_id", { length: 255 }).references(() => posts.id),
   userId: varchar("user_id", { length: 255 }).references(() => users.id),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-});
+}, (table) => ({
+  postUserUnique: uniqueIndex("likes_post_user_unique").on(
+    table.postId,
+    table.userId
+  ),
+}));
 
 // ============ PRODUCTS TABLE ============
 export const products = mysqlTable("products", {
@@ -148,7 +153,12 @@ export const follows = mysqlTable("follows", {
   followerId: varchar("follower_id", { length: 255 }).references(() => users.id),
   followingId: varchar("following_id", { length: 255 }).references(() => users.id),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-});
+}, (table) => ({
+  followerFollowingUnique: uniqueIndex("follows_follower_following_unique").on(
+    table.followerId,
+    table.followingId
+  ),
+}));
 
 // ============ NOTIFICATIONS TABLE ============
 export const notifications = mysqlTable("notifications", {

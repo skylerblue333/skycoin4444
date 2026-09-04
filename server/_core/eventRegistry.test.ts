@@ -12,6 +12,7 @@ describe("event fabric server registry", () => {
     expect(snapshot.registryFingerprint).toBe(skycoinEventRegistry.fingerprint);
     expect(snapshot.descriptors.map(item => item.eventType)).toEqual([
       "beta.feedback.submitted",
+      "social.follow.created",
       "social.post.created",
     ]);
     expect(snapshot.durableOutboxSchema).toBe(true);
