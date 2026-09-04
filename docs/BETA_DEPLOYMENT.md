@@ -14,6 +14,7 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 
 | Variable | Requirement |
 | --- | --- |
+| `PORT` | Exact integer listener port from 1–65535. Production never scans for an alternate port. |
 | `DATABASE_URL` | Remote `mysql://` URL naming a dedicated beta database; localhost is rejected. |
 | `JWT_SECRET` | At least 32 bytes. |
 | `VITE_APP_ID` | Approved application identifier used by server and client session/OAuth flow. |
@@ -27,6 +28,18 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 | `LOCAL_TEST_MODE` | Must be false in production. |
 
 At least one owner/open-ID/email invitation must be configured. Missing or invalid configuration stops the production server rather than exposing a partial beta.
+
+## Startup and port binding
+
+Production startup treats `PORT` as an exact deployment contract. It validates the value as an integer from 1 through 65535 and does not probe or silently move to another port.
+
+The HTTP listener is wrapped in a Promise that resolves only after the server emits `listening`. Runtime readiness is marked only after that event. If bind fails, including `EADDRINUSE`, startup rejects instead of advertising a different port.
+
+Startup failures set process exit code 1, emit a bounded credential-redacted error summary, and attempt to close the canonical MySQL pool.
+
+Development may use bounded fallback scanning through `DEV_PORT_FALLBACK_SPAN`. That setting is ignored for production fallback behavior.
+
+See `docs/STARTUP.md`.
 
 ## Database pool guardrails
 
@@ -110,18 +123,19 @@ A candidate deployment is not beta-ready until all of these are recorded:
 1. exact merged `main` SHA;
 2. exact-head CI success;
 3. managed database bootstrap or reviewed forward migration evidence;
-4. Render/service deployment identifier and HTTPS URL;
-5. `/api/beta/health` returns `status=ok`;
-6. `/api/runtime/ready` returns HTTP 200 with required dependency status `ready`;
-7. `/api/beta/readiness` returns `status=ready`, `database=ok`, and `configuration=ok`;
-8. an invited account can complete OAuth and load a protected route;
-9. an uninvited account is denied without receiving a session;
-10. profile update survives refresh;
-11. one social or SkySchool action survives refresh;
-12. beta feedback reaches durable storage;
-13. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
-14. `/delete-account` records a durable request and does not claim deletion completion;
-15. rollback target, privacy-request owner, and response owner are recorded.
+4. Render/service deployment identifier, HTTPS URL, and exact configured listener `PORT`;
+5. deployment logs/evidence show the service bound that exact production port without fallback;
+6. `/api/beta/health` returns `status=ok`;
+7. `/api/runtime/ready` returns HTTP 200 with required dependency status `ready`;
+8. `/api/beta/readiness` returns `status=ready`, `database=ok`, and `configuration=ok`;
+9. an invited account can complete OAuth and load a protected route;
+10. an uninvited account is denied without receiving a session;
+11. profile update survives refresh;
+12. one social or SkySchool action survives refresh;
+13. beta feedback reaches durable storage;
+14. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
+15. `/delete-account` records a durable request and does not claim deletion completion;
+16. rollback target, privacy-request owner, and response owner are recorded.
 
 ## Privacy operations
 
