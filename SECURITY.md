@@ -37,11 +37,16 @@ The default CI pipeline currently enforces:
 - frozen-lockfile dependency installation;
 - root TypeScript validation;
 - package-workspace TypeScript validation;
-- automated tests;
+- canonical lint;
+- current-tree credential-pattern scanning;
+- engineering-beta marker auditing;
+- automated tests and integration tests;
 - production client/server build;
 - high-severity production dependency audit.
 
-These controls do not replace threat modeling, secret scanning, penetration testing, provider hardening, deployment controls, monitoring, incident response, backup/recovery exercises, or third-party security review.
+The canonical server also has a fail-closed same-origin boundary for cookie-authenticated unsafe browser requests. In production, POST/PUT/PATCH/DELETE requests carrying the session cookie must match the configured `BETA_PUBLIC_ORIGIN`, and browser requests marked `Sec-Fetch-Site: cross-site` are rejected. Production session cookies are always `Secure`. See `docs/REQUEST_SECURITY.md`.
+
+These controls do not replace threat modeling, dedicated historical secret scanning, penetration testing, provider hardening, deployment controls, monitoring, incident response, backup/recovery exercises, or third-party security review.
 
 ## Secrets and credentials
 
