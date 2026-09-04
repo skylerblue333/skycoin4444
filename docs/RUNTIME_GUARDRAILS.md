@@ -87,7 +87,11 @@ See `docs/DATABASE_POOL.md`.
 
 ## HTTP timeout controls
 
-The server explicitly configures request, header, keep-alive, and requests-per-socket limits. Values are bounded and validated at startup.
+The server explicitly configures request, header, keep-alive, requests-per-socket, maximum parsed-header count, and maximum concurrent connection limits. Values are bounded and validated at startup.
+
+`HTTP_MAX_HEADERS_COUNT` defaults to 128, reducing the Node HTTP server's much larger built-in header-count allowance. `HTTP_MAX_CONNECTIONS` defaults to 256; once the process reaches that connection threshold, Node stops accepting additional connections for this single-process server rather than allowing the listener connection count to grow without an application bound.
+
+`GET /api/runtime/state` reports these non-secret HTTP limits together with the existing process-local concurrency counters.
 
 Optional environment variables:
 
@@ -95,6 +99,8 @@ Optional environment variables:
 - HTTP_HEADERS_TIMEOUT_MS
 - HTTP_KEEP_ALIVE_TIMEOUT_MS
 - HTTP_MAX_REQUESTS_PER_SOCKET
+- HTTP_MAX_HEADERS_COUNT
+- HTTP_MAX_CONNECTIONS
 - MAX_IN_FLIGHT_REQUESTS
 - SHUTDOWN_GRACE_MS
 - SHUTDOWN_RESOURCE_TIMEOUT_MS
@@ -103,4 +109,4 @@ Invalid or incoherent values fail fast rather than silently weakening the runtim
 
 ## Verification
 
-Unit tests cover lifecycle transitions, overload accounting, configuration validation, HTTP-server option application, fatal-monitor redaction/non-interference, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.
+Unit tests cover lifecycle transitions, overload accounting, HTTP header/connection bounds, configuration validation, HTTP-server option application, fatal-monitor redaction/non-interference, and graceful shutdown idempotency. The canonical CI additionally runs the full repository typecheck, lint, test, integration, build, credential scan, marker audit, and dependency audit.
