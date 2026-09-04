@@ -44,12 +44,14 @@ Node may still print its own normal fatal stack trace as part of default crash h
 
 ## Redaction
 
-The application record reuses the bounded startup-error sanitizer.
+The application record reuses the shared bounded operational-error sanitizer.
 
 It redacts:
 
 - URI username/password credential segments;
-- common `password`, `passwd`, and `pwd` query values.
+- common password/secret/token query and key-value forms;
+- Bearer-token forms;
+- JWT-shaped values.
 
 The summary is flattened to one line and bounded in length.
 
