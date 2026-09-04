@@ -69,6 +69,18 @@ export function buildDeadLetterReplayAuditDetails(
   }).slice(0, 255);
 }
 
+export function buildDeadLetterReplayPatch(now: Date) {
+  return Object.freeze({
+    state: "retry" as const,
+    attempts: 0,
+    availableAt: now,
+    leasedUntil: null,
+    leaseOwner: null,
+    publishedAt: null,
+    lastError: null,
+  });
+}
+
 function affectedRows(result: unknown): number {
   if (Array.isArray(result)) {
     for (const value of result) {
@@ -171,15 +183,7 @@ export const eventOperationsRouter = router({
 
         const updateResult = await tx
           .update(eventOutbox)
-          .set({
-            state: "retry",
-            attempts: 0,
-            availableAt: now,
-            leasedUntil: null,
-            leaseOwner: null,
-            publishedAt: null,
-            lastError: null,
-          })
+          .set(buildDeadLetterReplayPatch(now))
           .where(
             and(
               eq(eventOutbox.id, input.id),
