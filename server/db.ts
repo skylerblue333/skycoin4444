@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
 
 const databaseUrl = process.env.DATABASE_URL?.trim();
 const poolConnection = databaseUrl ? mysql.createPool(databaseUrl) : null;
@@ -51,15 +52,47 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function upsertUser(data: any) {
+type UserIdentityUpsert = Pick<
+  schema.InsertUser,
+  'openId'
+> &
+  Partial<
+    Pick<
+      schema.InsertUser,
+      'id' | 'email' | 'name' | 'username' | 'bio' | 'avatar' | 'profileVisibility'
+    >
+  >;
+
+export async function upsertUser(data: UserIdentityUpsert) {
   try {
-    if (data.id) {
-      await db.update(schema.users).set(data).where(eq(schema.users.id, data.id));
-      return await db.query.users.findFirst({ where: eq(schema.users.id, data.id) });
+    const existing = data.id
+      ? await db.query.users.findFirst({ where: eq(schema.users.id, data.id) })
+      : await db.query.users.findFirst({ where: eq(schema.users.openId, data.openId) });
+
+    if (existing) {
+      const updates: Partial<schema.InsertUser> = {
+        updatedAt: new Date(),
+      };
+      if (data.email !== undefined) updates.email = data.email;
+      if (data.name !== undefined) updates.name = data.name;
+      if (data.username !== undefined) updates.username = data.username;
+      if (data.bio !== undefined) updates.bio = data.bio;
+      if (data.avatar !== undefined) updates.avatar = data.avatar;
+      if (data.profileVisibility !== undefined) {
+        updates.profileVisibility = data.profileVisibility;
+      }
+
+      await db.update(schema.users).set(updates).where(eq(schema.users.id, existing.id));
+      return await db.query.users.findFirst({ where: eq(schema.users.id, existing.id) });
     }
 
-    await db.insert(schema.users).values(data);
-    return data;
+    const id = data.id ?? randomUUID();
+    await db.insert(schema.users).values({
+      ...data,
+      id,
+      updatedAt: new Date(),
+    });
+    return await db.query.users.findFirst({ where: eq(schema.users.id, id) });
   } catch (error) {
     return databaseFailure('upsertUser', error);
   }
@@ -67,7 +100,7 @@ export async function upsertUser(data: any) {
 
 export async function getUserByOpenId(openId: string) {
   try {
-    return await db.query.users.findFirst({ where: eq(schema.users.email, openId) });
+    return await db.query.users.findFirst({ where: eq(schema.users.openId, openId) });
   } catch (error) {
     return databaseFailure('getUserByOpenId', error);
   }
