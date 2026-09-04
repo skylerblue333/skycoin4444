@@ -33,12 +33,14 @@ describe("session cookie transport", () => {
   it("always sets Secure in production", () => {
     process.env.NODE_ENV = "production";
 
-    expect(getSessionCookieOptions(request("http"))).toMatchObject({
+    const options = getSessionCookieOptions(request("http"));
+    expect(options).toMatchObject({
       httpOnly: true,
       path: "/",
       sameSite: "none",
       secure: true,
     });
+    expect(options.domain).toBeUndefined();
   });
 
   it("allows HTTP localhost-style development while honoring forwarded HTTPS", () => {
