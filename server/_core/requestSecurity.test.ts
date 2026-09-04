@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { COOKIE_NAME } from "@shared/const";
+import {
+  COOKIE_NAME,
+  PRODUCTION_COOKIE_NAME,
+} from "@shared/const";
 import { evaluateCookieMutationOrigin } from "./requestSecurity";
 
-const cookie = `${COOKIE_NAME}=session-value`;
+const productionCookie =
+  `${PRODUCTION_COOKIE_NAME}=session-value`;
+const developmentCookie =
+  `${COOKIE_NAME}=session-value`;
 
 describe("cookie mutation origin policy", () => {
   it("does not apply CSRF origin policy to safe methods", () => {
@@ -10,7 +16,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "GET",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "https://attacker.example",
         },
         { NODE_ENV: "production", BETA_PUBLIC_ORIGIN: "https://beta.example" } as NodeJS.ProcessEnv
@@ -33,12 +39,32 @@ describe("cookie mutation origin policy", () => {
     });
   });
 
+  it("ignores the legacy unprefixed cookie in production", () => {
+    expect(
+      evaluateCookieMutationOrigin(
+        {
+          method: "POST",
+          cookieHeader: developmentCookie,
+          originHeader: "https://evil.example",
+          secFetchSite: "cross-site",
+        },
+        {
+          NODE_ENV: "production",
+          BETA_PUBLIC_ORIGIN: "https://beta.example",
+        } as NodeJS.ProcessEnv
+      )
+    ).toEqual({
+      allowed: true,
+      reason: "not_ambient_cookie_mutation",
+    });
+  });
+
   it("accepts same-origin production cookie mutations", () => {
     expect(
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "https://beta.example",
           secFetchSite: "same-origin",
         },
@@ -52,7 +78,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "https://beta.example",
           secFetchSite: "cross-site",
         },
@@ -69,7 +95,7 @@ describe("cookie mutation origin policy", () => {
 
     expect(
       evaluateCookieMutationOrigin(
-        { method: "POST", cookieHeader: cookie },
+        { method: "POST", cookieHeader: productionCookie },
         env
       )
     ).toEqual({ allowed: false, reason: "missing_origin" });
@@ -78,7 +104,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "https://evil.example",
         },
         env
@@ -91,7 +117,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "https://beta.example",
         },
         { NODE_ENV: "production" } as NodeJS.ProcessEnv
@@ -104,7 +130,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: developmentCookie,
           requestOrigin: "http://localhost:3000",
         },
         { NODE_ENV: "development" } as NodeJS.ProcessEnv
@@ -117,7 +143,7 @@ describe("cookie mutation origin policy", () => {
       evaluateCookieMutationOrigin(
         {
           method: "POST",
-          cookieHeader: cookie,
+          cookieHeader: productionCookie,
           originHeader: "not a url",
         },
         {
