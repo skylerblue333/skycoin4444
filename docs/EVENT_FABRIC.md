@@ -138,9 +138,38 @@ Therefore:
 - no exactly-once external delivery is claimed;
 - no broker durability is claimed;
 - no cross-region delivery guarantee is claimed;
-- no automatic dead-letter replay UI or operator workflow is claimed.
+- no automatic dead-letter replay is claimed;
+- manual dead-letter operations are admin-only and API-based; no dedicated operator UI or bulk replay workflow is claimed.
 
 The pure dispatch engine, database repository, retry planner, and runtime diagnostics are reusable foundations for a future verified external transport.
+
+## Dead-letter operations
+
+The canonical tRPC surface now exposes an admin-only `eventOperations` router for bounded manual recovery.
+
+`eventOperations.deadLetters` lists only non-content metadata for rows currently in `dead_letter` state:
+
+- event identifier and event type;
+- schema version and producer;
+- aggregate type and identifier;
+- attempt count;
+- availability and creation timestamps.
+
+The query deliberately does **not** select or return the event payload, metadata JSON, or stored raw error text.
+
+`eventOperations.replayDeadLetter` requires an administrator, an exact event ID, and a bounded operator reason. One database transaction:
+
+1. selects the row only if it is still `dead_letter`;
+2. compare-and-sets the row to `retry`;
+3. resets attempts to zero to grant a fresh bounded retry budget;
+4. clears stale lease/publication/error fields and makes the event immediately eligible;
+5. inserts an `audit_ledger` record for the replay request.
+
+The operator reason is SHA-256 digested before durable audit storage. The raw reason is neither returned nor copied to the audit ledger.
+
+Concurrent replay attempts fail closed: only the update that still observes `dead_letter` may commit its audit record.
+
+This is a manual engineering-beta recovery API. It does not provide automatic replay, bulk replay, replay approval workflow, or a production operations console.
 
 ## Verification
 
@@ -156,6 +185,9 @@ Tests cover:
 - lease loss handling;
 - bounded dispatcher configuration;
 - internal-only transport diagnostics;
+- dead-letter metadata redaction;
+- admin-only dead-letter authorization;
+- replay audit-reason hashing;
 - truthful server registry boundaries.
 
 The canonical repository CI still provides the authoritative exact-head evidence for type checking, linting, credential scanning, marker auditing, tests, integration tests, production build, and production-dependency audit.
