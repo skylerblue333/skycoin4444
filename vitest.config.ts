@@ -20,6 +20,7 @@ export default defineConfig({
       "tests/release/**/*.test.ts",
       "tests/release/**/*.spec.ts",
       "packages/sky-audit/src/**/*.test.ts",
+      "packages/platform-kernel/src/**/*.test.ts",
     ],
   },
 });
