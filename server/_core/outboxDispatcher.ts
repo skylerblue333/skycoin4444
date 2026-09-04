@@ -290,7 +290,7 @@ export class DrizzleOutboxRepository
         availableAt: retry ? input.plan.availableAt : input.now,
         leasedUntil: null,
         leaseOwner: null,
-        lastError: input.error,
+        lastError: sanitizeOperationalError(input.error),
       })
       .where(
         and(
