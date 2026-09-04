@@ -71,7 +71,22 @@ Rows transition to:
 - `retry` while attempts remain;
 - `dead_letter` after the maximum attempt count.
 
-The dispatcher does not automatically replay dead-letter rows.
+The dispatcher does not automatically replay dead-letter rows. Administrators may schedule a single dead-letter row for retry through the bounded `eventOperations.replayDeadLetter` tRPC mutation.
+
+## Manual dead-letter operations
+
+The `eventOperations` tRPC router provides an admin-only recovery surface:
+
+- `deadLetters` returns bounded metadata only;
+- `replayDeadLetter` compare-and-sets one row from `dead_letter` to `retry` and records the action atomically in `audit_ledger`.
+
+Payload JSON, metadata JSON, and raw stored errors are not returned by the listing API. Replay reasons are hashed before audit storage.
+
+Replay resets the row's attempt count to zero and clears stale lease/publication/error fields so the normal dispatcher can apply a fresh bounded retry budget. Durable consumer receipts continue to protect the current internal observer from duplicate side effects if an already-processed event is replayed after an uncertain failure.
+
+There is no automatic replay, bulk replay endpoint, or dedicated operator UI.
+
+See `docs/DEAD_LETTER_OPERATIONS.md`.
 
 ## Runtime diagnostics
 
@@ -106,7 +121,7 @@ This feature does not establish:
 - exactly-once delivery;
 - cross-region delivery guarantees;
 - a production deployment;
-- operator tooling for dead letters;
+- a dedicated dead-letter operator UI or bulk replay workflow;
 - distributed leader election;
 - a migrated production database.
 

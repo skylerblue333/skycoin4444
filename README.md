@@ -31,6 +31,8 @@ Runtime and beta readiness now share one dependency-readiness assessor with boun
 
 The server now has a single coordinated shutdown owner: it marks draining first, stops background dispatch, drains HTTP, then closes the MySQL pool, with bounded cleanup hooks and non-secret shutdown diagnostics.
 
+Admin-only dead-letter recovery now exposes metadata-only inspection and single-event compare-and-set replay with atomic audit logging. Event payloads and raw stored errors are not returned, and operator reasons are hashed before audit storage.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -82,6 +84,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/READINESS.md`](docs/READINESS.md) — shared configuration/database readiness, timeout/cache behavior, and optional dependency degradation.
 - [`docs/EVENT_FABRIC.md`](docs/EVENT_FABRIC.md) — versioned events, transactional outbox, idempotency contracts, and delivery boundaries.
 - [`docs/OUTBOX_DISPATCHER.md`](docs/OUTBOX_DISPATCHER.md) — database leases, retry/dead-letter behavior, durable consumer receipts, and internal dispatch diagnostics.
+- [`docs/DEAD_LETTER_OPERATIONS.md`](docs/DEAD_LETTER_OPERATIONS.md) — admin-only metadata inspection, guarded replay, audit behavior, and recovery limits.
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
