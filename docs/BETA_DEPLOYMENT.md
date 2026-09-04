@@ -16,7 +16,8 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 | --- | --- |
 | `PORT` | Exact integer listener port from 1–65535. Production never scans for an alternate port. |
 | `DATABASE_URL` | Remote `mysql://` URL naming a dedicated beta database; localhost is rejected. |
-| `JWT_SECRET` | At least 32 bytes. |
+| `JWT_SECRET` | Active HS256 signing/verification secret; at least 32 bytes. |
+| `JWT_SECRET_PREVIOUS` | Optional verification-only previous secret during a controlled rotation; at least 32 bytes and different from `JWT_SECRET`. |
 | `SESSION_TTL_MS` | Absolute stateless session lifetime, 900000–2592000000 ms; default beta configuration is 604800000 ms (7 days). |
 | `VITE_APP_ID` | Approved application identifier used by server and client session/OAuth flow. |
 | `OAUTH_SERVER_URL` | HTTPS OAuth service URL. |
@@ -103,6 +104,30 @@ pnpm beta:db:bootstrap
 The bootstrap refuses localhost, refuses any non-empty database, synchronizes from canonical `drizzle/schema.ts`, and verifies core account/feedback/course/social/audit tables. It creates no seed users, balances, transactions, wallet state, or provider data.
 
 For any non-empty database, do **not** use this command. Prepare and review a forward migration against the exact existing schema instead.
+
+## Session signing-key rotation
+
+The canonical session verifier supports one bounded overlap key:
+
+- `JWT_SECRET` signs all newly issued sessions and verifies current sessions;
+- optional `JWT_SECRET_PREVIOUS` verifies sessions issued under the immediately previous key;
+- the previous key is never used for new signatures;
+- duplicate active/previous secrets and short secrets fail production configuration validation.
+
+A controlled rotation is:
+
+1. record the current active secret as key A in the deployment secret manager;
+2. generate a new independent key B;
+3. deploy B as `JWT_SECRET` and A as `JWT_SECRET_PREVIOUS`;
+4. verify new sessions are issued and old sessions behave according to the intended overlap policy;
+5. after the chosen compatibility window, remove `JWT_SECRET_PREVIOUS`;
+6. verify tokens signed only by A no longer authenticate.
+
+Removing the previous key intentionally invalidates any still-unexpired token signed by it. If uninterrupted compatibility for all old sessions is required, the overlap must cover the maximum remaining lifetime of those sessions. Older releases historically issued longer-lived sessions, so an operator must not assume the current seven-day default describes every token minted before the cutover.
+
+This repository does not automate rotation timing or secret-manager changes.
+
+See `docs/SESSION_KEY_ROTATION.md`.
 
 ## Session lifetime
 
