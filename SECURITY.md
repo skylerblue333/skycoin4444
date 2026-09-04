@@ -46,6 +46,8 @@ The default CI pipeline currently enforces:
 
 The canonical server also has a fail-closed same-origin boundary for cookie-authenticated unsafe browser requests. In production, POST/PUT/PATCH/DELETE requests carrying the session cookie must match the configured `BETA_PUBLIC_ORIGIN`, and browser requests marked `Sec-Fetch-Site: cross-site` are rejected. Production session cookies are always `Secure`. See `docs/REQUEST_SECURITY.md`.
 
+Production responses also receive HSTS and a production Content-Security-Policy with same-origin defaults, framing/plugin denial, inline event-handler denial, base/form restrictions, and no `unsafe-eval`. Baseline browser isolation headers apply in development too. The canonical HTML no longer loads an unverified analytics script by default. See `docs/BROWSER_SECURITY.md`.
+
 These controls do not replace threat modeling, dedicated historical secret scanning, penetration testing, provider hardening, deployment controls, monitoring, incident response, backup/recovery exercises, or third-party security review.
 
 ## Secrets and credentials
