@@ -43,6 +43,8 @@ The Node HTTP listener now has explicit header-count and TCP-connection caps in 
 
 Canonical request correlation now uses a server-generated ID for every request. Caller-supplied `X-Request-ID` values are never promoted to the canonical ID; a strictly validated value may be retained only as separately labeled external correlation metadata. Operational auth/startup/fatal/outbox error summaries share one bounded secret-redaction layer, and outbox failure text is sanitized before durable persistence.
 
+Session issuance now uses one bounded absolute TTL for both the signed JWT and browser cookie. The engineering-beta default is 7 days, the minimum is 15 minutes, and the hard maximum is 30 days; production startup rejects invalid values. This remains a stateless JWT session and does not claim server-side token revocation.
+
 This evidence does **not** establish production deployment, live banking or payment settlement, custody, blockchain execution, regulatory/compliance approval, external identity verification, live AI-provider connectivity, durable production persistence, TLS/DNS readiness, backup/restore readiness, or audited security.
 
 ## One-machine beta test launch
@@ -100,6 +102,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/DEAD_LETTER_OPERATIONS.md`](docs/DEAD_LETTER_OPERATIONS.md) — admin-only metadata inspection, guarded replay, audit behavior, and recovery limits.
 - [`docs/REQUEST_SECURITY.md`](docs/REQUEST_SECURITY.md) — cookie-authenticated mutation origin enforcement and session-cookie transport boundary.
 - [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) — internal request IDs, untrusted external correlation, operational-error redaction, and logging limits.
+- [`docs/SESSION_SECURITY.md`](docs/SESSION_SECURITY.md) — bounded JWT/cookie lifetime, validation, logout semantics, and revocation limitations.
 - [`docs/SOCIAL_CONSISTENCY.md`](docs/SOCIAL_CONSISTENCY.md) — database uniqueness, concurrent social mutation behavior, and follow atomicity.
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
 - [`docs/BROWSER_SECURITY.md`](docs/BROWSER_SECURITY.md) — production CSP/HSTS, browser isolation headers, and analytics privacy boundary.

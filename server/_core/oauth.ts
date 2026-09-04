@@ -1,6 +1,5 @@
 import {
   COOKIE_NAME,
-  ONE_YEAR_MS,
   OAUTH_STATE_COOKIE,
   decodeOAuthState,
 } from "@shared/const";
@@ -11,6 +10,7 @@ import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
 import { evaluateBetaAdmission } from "./betaAdmission";
 import { sanitizeOperationalError } from "./operationalError";
+import { sessionLifetimePolicyFromEnv } from "./sessionPolicy";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -93,15 +93,16 @@ export function registerOAuthRoutes(app: Express) {
         email: userInfo.email ?? null,
       });
 
+      const sessionTtlMs = sessionLifetimePolicyFromEnv().ttlMs;
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",
-        expiresInMs: ONE_YEAR_MS,
+        expiresInMs: sessionTtlMs,
       });
 
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, {
         ...cookieOptions,
-        maxAge: ONE_YEAR_MS,
+        maxAge: sessionTtlMs,
       });
 
       res.redirect(302, "/");

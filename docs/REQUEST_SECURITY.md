@@ -32,6 +32,14 @@ This relaxed local behavior is not used in production.
 
 Authorization, admission, CSRF/origin checks, and audit identity never rely on a caller-selected request ID.
 
+## Session lifetime and revocation
+
+The canonical browser cookie and signed JWT use the same bounded absolute lifetime from `SESSION_TTL_MS`. The beta default is 7 days and the hard maximum is 30 days.
+
+Logout clears the browser cookie. The current canonical JWT is stateless, so this does not prove immediate server-side revocation of a token copied before logout. Admission policy is re-checked on protected requests, providing separate invitation removal enforcement.
+
+See `docs/SESSION_SECURITY.md`.
+
 ## Cookie transport
 
 Production session cookies are always marked `Secure`. Development still derives Secure from the request so HTTP localhost testing remains possible.

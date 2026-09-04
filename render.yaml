@@ -36,6 +36,8 @@ services:
         value: "256"
       - key: JWT_SECRET
         sync: false
+      - key: SESSION_TTL_MS
+        value: "604800000"
       - key: VITE_APP_ID
         sync: false
       - key: OAUTH_SERVER_URL

@@ -1,0 +1,88 @@
+# Session Security
+
+## Purpose
+
+SKYCOIN4444's canonical invitation-beta authentication issues a signed JWT in an HttpOnly browser cookie.
+
+The session lifetime is now explicit, bounded, and shared between the JWT expiration and cookie lifetime so the two cannot silently drift.
+
+## Canonical lifetime
+
+`SESSION_TTL_MS`
+
+Default: 604800000 ms (7 days).
+
+Allowed range:
+
+- minimum: 900000 ms (15 minutes);
+- maximum: 2592000000 ms (30 days).
+
+The parser requires a safe integer inside that range. Malformed, fractional, too-short, and excessive values are rejected.
+
+Production configuration inspection includes this policy, so an invalid configured TTL prevents a production beta from passing startup configuration validation.
+
+## JWT and cookie alignment
+
+On an accepted OAuth callback:
+
+1. the canonical session policy resolves one `sessionTtlMs`;
+2. the SDK signs the JWT with expiration based on that exact value;
+3. the session cookie receives the same value as `Max-Age`.
+
+The SDK also applies the same hard bounds when another internal caller explicitly requests `expiresInMs`.
+
+This removes the previous one-year default from canonical session issuance.
+
+## OAuth state is separate
+
+The OAuth CSRF nonce/state cookie remains a separate short-lived login artifact with its existing 10-minute lifetime.
+
+Reducing or configuring authenticated-session lifetime does not change the OAuth callback nonce binding.
+
+## Logout and revocation boundary
+
+The canonical session is currently a stateless signed JWT.
+
+Logout clears the browser session cookie. That prevents the normal browser from continuing to send the cookie, but it does not create a server-side revocation record for a copied token.
+
+A valid copied JWT may remain cryptographically valid until:
+
+- its expiration time;
+- the signing secret changes;
+- or a future verified server-side session/revocation mechanism is integrated.
+
+Invitation admission is re-checked during protected authentication, so removing an account from the beta allowlist remains a separate fail-closed access control even while a JWT's signature is still valid.
+
+## SkySessions package boundary
+
+`packages/sky-sessions` contains a tested session domain core with absolute/idle TTL and revocation concepts.
+
+The canonical OAuth runtime does not currently use that package as a durable session store. Its existence must not be described as proof of server-side revocation for the current JWT cookie.
+
+## Verification
+
+Focused tests cover:
+
+- default 7-day lifetime;
+- 15-minute minimum;
+- 30-day maximum;
+- malformed and excessive-value rejection;
+- caller-requested JWT lifetime bounds.
+
+Canonical exact-head CI additionally covers the full typecheck, package tests, integration tests, build, scans, and production dependency audit.
+
+Deployment verification should additionally record an issued JWT expiration and cookie `Max-Age` from the exact candidate release without publishing the token itself.
+
+## Limitations
+
+This change does not establish:
+
+- server-side session revocation;
+- device/session inventory for canonical OAuth;
+- refresh-token rotation;
+- idle-session expiration;
+- concurrent-session caps;
+- token theft detection;
+- signing-key rotation automation;
+- external identity-provider assurance;
+- production security certification.

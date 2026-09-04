@@ -1,4 +1,5 @@
 import { betaAdmissionSnapshot, betaAccessMode } from "./betaAdmission";
+import { sessionLifetimePolicyFromEnv } from "./sessionPolicy";
 
 export type ProductionConfigIssue = {
   key: string;
@@ -87,6 +88,18 @@ export function inspectProductionBetaConfig(
   }
 
   add("BETA_PUBLIC_ORIGIN", publicOriginIssue(env.BETA_PUBLIC_ORIGIN));
+
+  try {
+    sessionLifetimePolicyFromEnv(env);
+  } catch (error) {
+    issues.push({
+      key: "SESSION_TTL_MS",
+      message:
+        error instanceof Error
+          ? error.message
+          : "SESSION_TTL_MS is invalid",
+    });
+  }
 
   if (betaAccessMode(env) !== "invite_only") {
     issues.push({

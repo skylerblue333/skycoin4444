@@ -17,6 +17,7 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 | `PORT` | Exact integer listener port from 1–65535. Production never scans for an alternate port. |
 | `DATABASE_URL` | Remote `mysql://` URL naming a dedicated beta database; localhost is rejected. |
 | `JWT_SECRET` | At least 32 bytes. |
+| `SESSION_TTL_MS` | Absolute stateless session lifetime, 900000–2592000000 ms; default beta configuration is 604800000 ms (7 days). |
 | `VITE_APP_ID` | Approved application identifier used by server and client session/OAuth flow. |
 | `OAUTH_SERVER_URL` | HTTPS OAuth service URL. |
 | `VITE_OAUTH_PORTAL_URL` | HTTPS browser login portal URL. |
@@ -102,6 +103,26 @@ pnpm beta:db:bootstrap
 The bootstrap refuses localhost, refuses any non-empty database, synchronizes from canonical `drizzle/schema.ts`, and verifies core account/feedback/course/social/audit tables. It creates no seed users, balances, transactions, wallet state, or provider data.
 
 For any non-empty database, do **not** use this command. Prepare and review a forward migration against the exact existing schema instead.
+
+## Session lifetime
+
+The canonical OAuth session uses one shared absolute lifetime for both the signed JWT expiration and the session-cookie `Max-Age`.
+
+`SESSION_TTL_MS`
+
+- default engineering-beta value: 604800000 ms (7 days);
+- minimum: 900000 ms (15 minutes);
+- maximum: 2592000000 ms (30 days).
+
+Invalid production values fail configuration validation before the server becomes ready.
+
+The SDK applies the same hard bounds to any caller-requested session expiration so another internal call site cannot silently issue a year-long token.
+
+These sessions are currently stateless signed JWTs. Logout clears the browser cookie, and invitation admission is re-checked on authenticated requests, but a copied valid JWT is not backed by a server-side revocation record and remains cryptographically valid until its expiration unless the signing secret is rotated.
+
+The separate `SkySessions` package is a domain core and is not claimed as the persistence/revocation backend for the canonical OAuth session.
+
+See `docs/SESSION_SECURITY.md`.
 
 ## Identity and admission behavior
 

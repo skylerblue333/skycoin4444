@@ -1,7 +1,6 @@
 import {
   AXIOS_TIMEOUT_MS,
   COOKIE_NAME,
-  ONE_YEAR_MS,
   decodeOAuthState,
 } from "@shared/const";
 import { ForbiddenError } from "@shared/_core/errors";
@@ -14,6 +13,7 @@ import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
 import { sanitizeOperationalError } from "./operationalError";
+import { resolveSessionTtlMs } from "./sessionPolicy";
 import type {
   ExchangeTokenRequest,
   ExchangeTokenResponse,
@@ -203,7 +203,7 @@ class SDKServer {
     }
 
     const issuedAt = Date.now();
-    const expiresInMs = options.expiresInMs ?? ONE_YEAR_MS;
+    const expiresInMs = resolveSessionTtlMs(options.expiresInMs);
     const expirationSeconds = Math.floor((issuedAt + expiresInMs) / 1000);
     const secretKey = this.getSessionSecret();
 
