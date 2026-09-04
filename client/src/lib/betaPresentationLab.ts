@@ -4,13 +4,33 @@ export type CalendarCell = {
   isoDate: string | null;
 };
 
-export function buildMonthCells(year: number, monthIndex: number): CalendarCell[] {
-  if (!Number.isInteger(year) || year < 1970 || year > 2100) {
+export const MIN_CALENDAR_YEAR = 1970;
+export const MAX_CALENDAR_YEAR = 2100;
+
+function assertSupportedMonth(year: number, monthIndex: number) {
+  if (!Number.isInteger(year) || year < MIN_CALENDAR_YEAR || year > MAX_CALENDAR_YEAR) {
     throw new Error("year must be between 1970 and 2100");
   }
   if (!Number.isInteger(monthIndex) || monthIndex < 0 || monthIndex > 11) {
     throw new Error("monthIndex must be between 0 and 11");
   }
+}
+
+export function shiftSupportedMonth(
+  year: number,
+  monthIndex: number,
+  delta: number
+): { year: number; monthIndex: number } | null {
+  assertSupportedMonth(year, monthIndex);
+  if (!Number.isInteger(delta)) throw new Error("delta must be an integer");
+  const next = new Date(Date.UTC(year, monthIndex + delta, 1));
+  const nextYear = next.getUTCFullYear();
+  if (nextYear < MIN_CALENDAR_YEAR || nextYear > MAX_CALENDAR_YEAR) return null;
+  return { year: nextYear, monthIndex: next.getUTCMonth() };
+}
+
+export function buildMonthCells(year: number, monthIndex: number): CalendarCell[] {
+  assertSupportedMonth(year, monthIndex);
   const first = new Date(Date.UTC(year, monthIndex, 1));
   const days = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
   const leading = first.getUTCDay();
@@ -130,7 +150,13 @@ export function buildBreadcrumbs(path: string): BreadcrumbItem[] {
   let current = "";
   for (const segment of segments) {
     current += `/${segment}`;
-    const label = decodeURIComponent(segment)
+    let decoded = segment;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      // Preserve malformed user input as text instead of crashing the preview.
+    }
+    const label = decoded
       .replace(/[-_]+/g, " ")
       .replace(/\b\w/g, character => character.toUpperCase());
     items.push({ label, path: current });
