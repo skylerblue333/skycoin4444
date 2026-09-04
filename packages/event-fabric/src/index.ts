@@ -2,8 +2,11 @@ import { createHash, randomUUID } from "node:crypto";
 import { computeBackoffDelay } from "../../platform-kernel/src/index";
 
 export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonObject | readonly JsonValue[];
-export type JsonObject = Readonly<Record<string, JsonValue>>;
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+export interface JsonObject {
+  readonly [key: string]: JsonValue;
+}
+export interface JsonArray extends ReadonlyArray<JsonValue> {}
 
 export type EventDataClassification =
   | "public"
