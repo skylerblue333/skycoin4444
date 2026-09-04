@@ -110,7 +110,7 @@ The canonical HTTP listener applies explicit process-local limits:
 - `HTTP_MAX_REQUESTS_PER_SOCKET=1000`;
 - `MAX_IN_FLIGHT_REQUESTS=128`.
 
-The header limit bounds parsed request-header cardinality. The connection limit bounds simultaneously accepted TCP connections for this single-process Node server. The in-flight request gate remains a separate application-level limit.
+The header limit bounds parsed request-header cardinality. The connection limit bounds simultaneously accepted TCP connections for this single-process Node server; connections arriving beyond that threshold are closed/dropped by Node rather than admitted into an unbounded listener set. The in-flight request gate remains a separate application-level limit.
 
 `GET /api/runtime/state` exposes these non-secret configured limits.
 
