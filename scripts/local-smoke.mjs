@@ -40,6 +40,9 @@ const checks = [
   ["community hub", "/community-hub"],
   ["activity feed", "/activity-feed"],
   ["profile", "/profile"],
+  ["privacy settings", "/privacy-settings"],
+  ["data export", "/data-export"],
+  ["deletion request", "/delete-account"],
   ["onboarding", "/onboarding"],
   ["sign-up flow", "/sign-up-flow"],
 ];
