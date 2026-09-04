@@ -29,6 +29,7 @@ function loadDraft(): LocalDraft {
 
 export default function DocumentEditor() {
   const [title, setTitle] = useState("");
+  const [hydrated, setHydrated] = useState(false);
   const [body, setBody] = useState("");
   const [updatedAt, setUpdatedAt] = useState("");
 
@@ -37,16 +38,18 @@ export default function DocumentEditor() {
     setTitle(saved.title);
     setBody(saved.body);
     setUpdatedAt(saved.updatedAt);
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
+    if (!hydrated) return;
     const nextUpdatedAt = new Date().toISOString();
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({ title, body, updatedAt: nextUpdatedAt }),
     );
     setUpdatedAt(nextUpdatedAt);
-  }, [title, body]);
+  }, [body, hydrated, title]);
 
   const resetDraft = () => {
     setTitle("");
