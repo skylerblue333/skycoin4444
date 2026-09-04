@@ -14,7 +14,7 @@ describe("unified competitive beta workspace", () => {
       expect(area.testGoal.length).toBeGreaterThan(20);
       expect(area.boundary.length).toBeGreaterThan(30);
     }
-    expect(source).toMatch(/52 launchable routes/);
+    expect(source).toMatch(/59 launchable routes/);
     expect(source).toMatch(
       /Social, creator, asset, commerce, language, dating, learning, and gaming/
     );
