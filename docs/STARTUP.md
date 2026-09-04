@@ -77,6 +77,14 @@ The handler:
 
 The handler does not claim that every possible third-party resource has been cleaned up. It covers the canonical database resource used by the production server startup path.
 
+## Runtime-fatal distinction
+
+A failure that is caught by the startup Promise uses the startup failure handler above.
+
+An uncaught exception after or outside that Promise is different. The canonical process observes it synchronously through `uncaughtExceptionMonitor` for bounded redacted diagnostics, but does not convert it into startup cleanup or attempt to keep the process alive.
+
+See `docs/FATAL_RUNTIME.md`.
+
 ## Shutdown distinction
 
 Startup failure and normal runtime shutdown are different paths.
