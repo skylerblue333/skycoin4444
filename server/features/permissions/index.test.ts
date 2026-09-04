@@ -64,11 +64,113 @@ describe("SkyPermissions", () => {
     expect(decision.allowed).toBe(true);
   });
 
+  it("matches authenticated subject attributes when context does not shadow them", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "tenant-reader",
+          resource: "reports/*",
+          action: "read",
+          effect: "allow",
+          conditions: { tenantId: "tenant-a" },
+        },
+      ],
+      {
+        subject: {
+          id: "user-2",
+          roles: ["analyst"],
+          attributes: { tenantId: "tenant-a" },
+        },
+        resource: "reports/monthly",
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(true);
+  });
+
+  it("fails closed when request context shadows a conditioned subject attribute", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "tenant-b-reader",
+          resource: "reports/*",
+          action: "read",
+          effect: "allow",
+          conditions: { tenantId: "tenant-b" },
+        },
+      ],
+      {
+        subject: {
+          id: "user-2",
+          roles: ["analyst"],
+          attributes: { tenantId: "tenant-a" },
+        },
+        resource: "reports/monthly",
+        action: "read",
+        context: { tenantId: "tenant-b" },
+      },
+    );
+
+    expect(decision).toEqual({
+      allowed: false,
+      matchedRuleIds: [],
+      reason: "default-deny",
+    });
+  });
+
+  it("handles adversarial multi-wildcard patterns without regex backtracking", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "adversarial-pattern",
+          resource: "*a*a*a*a*a*b",
+          action: "read",
+          effect: "allow",
+        },
+      ],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "a".repeat(100),
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(false);
+  });
+
+  it("fails closed on oversized request tokens", () => {
+    const decision = evaluatePermissions(
+      [{ id: "allow-all", resource: "*", action: "read", effect: "allow" }],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "a".repeat(257),
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(false);
+  });
+
   it("validates required rule fields", () => {
     expect(validatePermissionRule({ id: "", resource: "", action: "", effect: "allow" })).toEqual([
       "id is required",
       "resource is required",
       "action is required",
+    ]);
+  });
+
+  it("validates wildcard and token complexity limits", () => {
+    expect(
+      validatePermissionRule({
+        id: "too-complex",
+        resource: "*".repeat(17),
+        action: "a".repeat(257),
+        effect: "allow",
+      }),
+    ).toEqual([
+      "action must be <= 256 characters",
+      "resource must contain <= 16 wildcards",
     ]);
   });
 });
