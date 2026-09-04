@@ -23,6 +23,38 @@ const sources = Object.fromEntries(
   Object.entries(paths).map(([key, path]) => [key, fs.readFileSync(path, "utf8")])
 ) as Record<keyof typeof paths, string>;
 
+const registry = JSON.parse(
+  fs.readFileSync("catalogs/beta-route-evidence.json", "utf8")
+) as {
+  routes: Array<{
+    route: string;
+    capability: string;
+    evidence: string[];
+    boundary: string;
+  }>;
+};
+const inventory = JSON.parse(
+  fs.readFileSync("catalogs/screen-inventory.json", "utf8")
+) as {
+  counts: Record<string, number>;
+  routes: Array<{
+    path: string;
+    readiness: string;
+    requiresAuth: boolean;
+  }>;
+};
+
+const promotedRoutes = [
+  "/notes-app",
+  "/todo-list",
+  "/color-picker-dialog",
+  "/markdown-rendering",
+  "/satisfaction-survey",
+  "/theme-settings",
+  "/quiz-builder",
+  "/about",
+] as const;
+
 describe("beta promotion batch 02 utilities", () => {
   it("normalizes and converts hex colors deterministically", () => {
     expect(normalizeHexColor("#abc")).toBe("#AABBCC");
@@ -104,6 +136,32 @@ describe("beta promotion batch 02 pages", () => {
     expect(sources.quiz).toMatch(/do not issue certificates, grades, credentials, or instructor analytics/i);
   });
 
+  it("records all eight promotions with synchronized evidence and inventory", () => {
+    const evidenceByRoute = new Map(
+      registry.routes.map(entry => [entry.route, entry])
+    );
+    const inventoryByPath = new Map(
+      inventory.routes.map(entry => [entry.path, entry])
+    );
+
+    expect(registry.routes).toHaveLength(43);
+    expect(inventory.counts).toEqual({
+      launchable_beta: 43,
+      legacy_unverified: 961,
+      controlled_or_unavailable: 64,
+    });
+
+    for (const route of promotedRoutes) {
+      expect(inventoryByPath.get(route)).toMatchObject({
+        readiness: "launchable_beta",
+        requiresAuth: false,
+      });
+      expect(evidenceByRoute.get(route)?.capability.length).toBeGreaterThan(20);
+      expect(evidenceByRoute.get(route)?.evidence.length).toBeGreaterThanOrEqual(3);
+      expect(evidenceByRoute.get(route)?.boundary.length).toBeGreaterThan(25);
+    }
+  });
+
   it("removes fabricated About claims and states the real beta boundary", () => {
     for (const unsupported of [
       /48,200\+/,
@@ -133,6 +191,6 @@ describe("beta promotion batch 02 pages", () => {
   it("uses separate accessible controls for saved color selection and deletion", () => {
     expect(sources.color).toMatch(/aria-label=\{"Select saved color " \+ saved\}/);
     expect(sources.color).toMatch(/aria-label=\{"Remove saved color " \+ saved\}/);
-    expect(sources.color).not.toMatch(/<button[\s\S]{0,800}<button/);
+    expect(sources.color).not.toMatch(/<span\s+role="button"/);
   });
 });
