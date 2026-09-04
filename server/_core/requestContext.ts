@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 export type RequestContext = Readonly<{
   requestId: string;
+  externalRequestId?: string | null;
   startedAt: number;
   method: string;
   path: string;
