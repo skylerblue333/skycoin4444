@@ -5,6 +5,7 @@ const onboarding = fs.readFileSync("client/src/pages/Onboarding.tsx", "utf8");
 const journey = fs.readFileSync("client/src/pages/BetaJourney.tsx", "utf8");
 const activation = fs.readFileSync("server/routers/activation.ts", "utf8");
 const routers = fs.readFileSync("server/routers.ts", "utf8");
+const evidenceRegistry = JSON.parse(fs.readFileSync("catalogs/beta-route-evidence.json", "utf8"));
 
 describe("durable activation journey", () => {
   it("derives onboarding progress from protected persisted activation evidence", () => {
@@ -54,6 +55,24 @@ describe("durable activation journey", () => {
     ]) {
       expect(onboarding).not.toMatch(unsupported);
     }
+  });
+
+  it("records route-specific activation evidence in the launchable registry", () => {
+    const byRoute = new Map(
+      evidenceRegistry.routes.map((entry: { route: string }) => [entry.route, entry])
+    );
+    const onboardingEvidence = byRoute.get("/onboarding") as
+      | { capability?: string; evidence?: unknown[]; boundary?: string }
+      | undefined;
+    const journeyEvidence = byRoute.get("/beta-journey") as
+      | { capability?: string; evidence?: unknown[]; boundary?: string }
+      | undefined;
+
+    expect(onboardingEvidence?.capability).toMatch(/Durable invited-account activation/);
+    expect(onboardingEvidence?.evidence?.length).toBeGreaterThanOrEqual(5);
+    expect(onboardingEvidence?.boundary).toMatch(/No token airdrops/);
+    expect(journeyEvidence?.capability).toMatch(/Five-gate non-financial beta journey/);
+    expect(journeyEvidence?.evidence?.length).toBeGreaterThanOrEqual(5);
   });
 
   it("states the non-financial and non-provider boundary explicitly", () => {
