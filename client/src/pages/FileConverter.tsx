@@ -1,75 +1,166 @@
 import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Search, Settings } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  convertText,
+  type TextConversionMode,
+} from "@/lib/betaUtilities";
+import { Download, FileText, Upload } from "lucide-react";
+
+const modes: Array<{ value: TextConversionMode; label: string }> = [
+  { value: "json-pretty", label: "JSON → pretty JSON" },
+  { value: "json-minify", label: "JSON → minified JSON" },
+  { value: "csv-to-tsv", label: "CSV → TSV" },
+  { value: "tsv-to-csv", label: "TSV → CSV" },
+  { value: "uppercase", label: "Text → UPPERCASE" },
+  { value: "lowercase", label: "Text → lowercase" },
+];
 
 export default function FileConverter() {
-  const { isAuthenticated } = useAuth();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput] = useState('{"sky":"beta","routes":32}');
+  const [output, setOutput] = useState("");
+  const [mode, setMode] = useState<TextConversionMode>("json-pretty");
+  const [error, setError] = useState("");
+  const [filename, setFilename] = useState("converted.txt");
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>FileConverter</CardTitle>
-            <CardDescription>Sign in to access this feature</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full">Sign In</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const run = () => {
+    setError("");
+    try {
+      setOutput(convertText(input, mode));
+    } catch (cause) {
+      setOutput("");
+      setError(cause instanceof Error ? cause.message : "Conversion failed.");
+    }
+  };
+
+  const loadFile = (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > 1_000_000) {
+      setError("Choose a text file smaller than 1 MB for this browser-local beta.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setInput(typeof reader.result === "string" ? reader.result : "");
+      setFilename(file.name.replace(/\.[^.]+$/, "") + "-converted.txt");
+      setError("");
+    };
+    reader.onerror = () => setError("The browser could not read this file.");
+    reader.readAsText(file);
+  };
+
+  const download = () => {
+    const blob = new Blob([output], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">FileConverter</h1>
-            <p className="text-muted-foreground mt-2">File conversion</p>
-          </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New
-          </Button>
-        </div>
+    <main className="min-h-screen bg-background">
+      <div className="container mx-auto max-w-6xl px-4 py-10">
+        <header className="mb-8">
+          <Badge variant="outline" className="mb-3">
+            Launchable beta · browser-local conversion
+          </Badge>
+          <h1 className="flex items-center gap-3 text-4xl font-black">
+            <FileText className="h-8 w-8 text-primary" />
+            File Converter Lab
+          </h1>
+          <p className="mt-3 max-w-3xl text-muted-foreground">
+            Convert small text files locally between JSON formatting, CSV/TSV,
+            and letter case. Files are read by your browser and are not uploaded
+            to a server.
+          </p>
+        </header>
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
-              <Button variant="outline" size="icon">
-                <Settings className="w-4 h-4" />
-              </Button>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <CardTitle>Local conversion</CardTitle>
+                <CardDescription>
+                  Text only · 1 MB browser limit · no OCR or binary conversion
+                </CardDescription>
+              </div>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold">
+                <Upload className="h-4 w-4" />
+                Load text file
+                <input
+                  type="file"
+                  accept=".txt,.json,.csv,.tsv,text/plain,application/json,text/csv"
+                  className="sr-only"
+                  onChange={event => loadFile(event.target.files?.[0])}
+                />
+              </label>
             </div>
           </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>No data available. Start by creating a new item.</p>
-              </div>
+          <CardContent className="space-y-5">
+            <div className="flex flex-wrap gap-2">
+              {modes.map(item => (
+                <Button
+                  key={item.value}
+                  type="button"
+                  size="sm"
+                  variant={mode === item.value ? "default" : "outline"}
+                  onClick={() => setMode(item.value)}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-2">
+              <label className="space-y-2 text-sm font-medium">
+                Input
+                <Textarea
+                  value={input}
+                  onChange={event => setInput(event.target.value)}
+                  className="min-h-72 font-mono text-xs"
+                />
+              </label>
+              <label className="space-y-2 text-sm font-medium">
+                Output
+                <Textarea
+                  readOnly
+                  value={output}
+                  className="min-h-72 font-mono text-xs"
+                  placeholder="Run a conversion to see output."
+                />
+              </label>
+            </div>
+
+            {error && (
+              <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+                {error}
+              </p>
             )}
+
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={run}>Convert locally</Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={!output}
+                onClick={download}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download output
+              </Button>
+            </div>
           </CardContent>
         </Card>
+
+        <p className="mt-5 text-xs leading-5 text-muted-foreground">
+          Boundary: no cloud upload, malware scanning, image/video transcoding,
+          OCR, document preservation guarantee, or server-side persistence.
+        </p>
       </div>
-    </div>
+    </main>
   );
 }
