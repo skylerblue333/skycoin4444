@@ -26,6 +26,12 @@ Outside production, origin-less local scripts are allowed so local smoke tooling
 
 This relaxed local behavior is not used in production.
 
+## Correlation headers
+
+`X-Request-ID` is not an authentication or trust signal. The server always creates its own canonical request ID. A caller value is accepted only into a separately labeled external-correlation field when it matches the strict bounded syntax documented in `docs/OBSERVABILITY.md`.
+
+Authorization, admission, CSRF/origin checks, and audit identity never rely on a caller-selected request ID.
+
 ## Cookie transport
 
 Production session cookies are always marked `Secure`. Development still derives Secure from the request so HTTP localhost testing remains possible.
