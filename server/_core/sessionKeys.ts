@@ -1,6 +1,8 @@
 import { jwtVerify, type JWTPayload } from "jose";
 
 const MIN_SESSION_SECRET_BYTES = 32;
+export const MAX_SESSION_JWT_CHARACTERS = 4_096;
+const COMPACT_JWT_SEGMENT = /^[A-Za-z0-9_-]+$/;
 const encoder = new TextEncoder();
 
 export type SessionSigningKeys = Readonly<{
@@ -69,12 +71,33 @@ export function sessionSigningKeysFromEnv(
   );
 }
 
+export function validateCompactSessionJwt(token: string): string {
+  if (
+    typeof token !== "string" ||
+    token.length === 0 ||
+    token.length > MAX_SESSION_JWT_CHARACTERS
+  ) {
+    throw new RangeError("invalid session token length");
+  }
+
+  const segments = token.split(".");
+  if (
+    segments.length !== 3 ||
+    segments.some(segment => !COMPACT_JWT_SEGMENT.test(segment))
+  ) {
+    throw new RangeError("invalid compact session JWT");
+  }
+
+  return token;
+}
+
 export async function verifySessionJwt(
   token: string,
   keys: SessionSigningKeys
 ): Promise<SessionVerificationResult> {
+  const compactToken = validateCompactSessionJwt(token);
   try {
-    const { payload } = await jwtVerify(token, keys.active, {
+    const { payload } = await jwtVerify(compactToken, keys.active, {
       algorithms: ["HS256"],
     });
     return Object.freeze({
@@ -86,7 +109,7 @@ export async function verifySessionJwt(
 
     try {
       const { payload } = await jwtVerify(
-        token,
+        compactToken,
         keys.previous,
         {
           algorithms: ["HS256"],
