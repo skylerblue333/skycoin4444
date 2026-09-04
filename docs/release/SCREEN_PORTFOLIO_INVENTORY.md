@@ -8,48 +8,56 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 | --- | ---: |
 | Registered routes | 1068 |
 | Lazy page modules | 1056 |
-| Launchable beta routes | 35 |
+| Launchable beta routes | 43 |
 | Controlled or unavailable routes | 64 |
-| Legacy unverified routes | 969 |
+| Legacy unverified routes | 961 |
 | Routes missing a lazy page source | 0 |
 
 ## Launchable beta routes
 
 - /
 - /a-i-tools-hub
+- /about
 - /accessibility-settings
-- /activity-feed
 - /activity-evidence
+- /activity-feed
 - /advanced-search
 - /arcade
+- /beta-catalog
+- /beta-commerce
+- /beta-feedback
+- /beta-journey
+- /beta-web3
+- /beta-workspace
 - /blog-editor
 - /calculator
 - /calendar
+- /color-picker-dialog
 - /community-hub
 - /course-catalog
 - /creator-analytics
-- /dating-profile-setup
 - /data-export
+- /dating-profile-setup
 - /delete-account
+- /discovery-center
 - /event-planner
 - /file-converter
 - /help-center
 - /language-partner-discovery
 - /live-streaming
+- /markdown-rendering
 - /mission-control
-- /beta-workspace
-- /operational-readiness
-- /discovery-center
-- /beta-catalog
-- /beta-journey
-- /beta-commerce
-- /beta-web3
-- /beta-feedback
+- /notes-app
 - /notification-preferences
 - /onboarding
+- /operational-readiness
 - /privacy-settings
 - /profile
+- /quiz-builder
+- /satisfaction-survey
 - /sign-up-flow
+- /theme-settings
+- /todo-list
 
 ## Safety boundary
 
