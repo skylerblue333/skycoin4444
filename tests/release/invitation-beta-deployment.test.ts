@@ -6,6 +6,8 @@ const oauth = fs.readFileSync("server/_core/oauth.ts", "utf8");
 const sdk = fs.readFileSync("server/_core/sdk.ts", "utf8");
 const indexSource = fs.readFileSync("server/_core/index.ts", "utf8");
 const render = fs.readFileSync("render.yaml", "utf8");
+const bootstrap = fs.readFileSync("scripts/bootstrap-beta-db.mjs", "utf8");
+const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
 describe("invitation-only deployable beta boundary", () => {
   it("removes the historical fake browser password sign-in", () => {
@@ -41,6 +43,19 @@ describe("invitation-only deployable beta boundary", () => {
 
   it("fails startup on invalid production beta configuration", () => {
     expect(indexSource).toMatch(/assertProductionBetaConfig\(\)/);
+  });
+
+  it("guards the one-time managed beta database bootstrap", () => {
+    expect(packageJson.scripts["beta:db:bootstrap"]).toBe(
+      "node scripts/bootstrap-beta-db.mjs"
+    );
+    expect(bootstrap).toMatch(/BETA_DB_BOOTSTRAP_CONFIRM/);
+    expect(bootstrap).toMatch(/EMPTY_BETA_DATABASE/);
+    expect(bootstrap).toMatch(/SHOW TABLES/);
+    expect(bootstrap).toMatch(/is not empty/);
+    expect(bootstrap).toMatch(/refuses localhost/i);
+    expect(bootstrap).toMatch(/drizzle-kit", "push", "--force/);
+    expect(bootstrap).toMatch(/No seed users, balances, transactions, or provider data/);
   });
 
   it("wires Render to readiness, OAuth, origin, and invitation configuration", () => {
