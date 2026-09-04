@@ -134,10 +134,10 @@ describe("beta promotion batch 03 pages", () => {
     const evidenceByRoute = new Map(registry.routes.map(entry => [entry.route, entry]));
     const inventoryByPath = new Map(inventory.routes.map(entry => [entry.path, entry]));
 
-    expect(registry.routes).toHaveLength(46);
+    expect(registry.routes).toHaveLength(53);
     expect(inventory.counts).toEqual({
-      launchable_beta: 46,
-      legacy_unverified: 958,
+      launchable_beta: 53,
+      legacy_unverified: 951,
       controlled_or_unavailable: 64,
     });
 
