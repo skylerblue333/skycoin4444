@@ -479,6 +479,44 @@
         "release regression test"
       ],
       "boundary": "No public user-count, revenue, reward, provider, financial, blockchain, regulatory, or production-availability claims beyond verified repository evidence."
+    },
+    {
+      "route": "/assignment-tracker",
+      "capability": "Browser-local assignment tracker with course labels, due dates, priorities, search, completion, and deletion",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "validated assignment creation",
+        "deterministic sorting and search helpers",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No school SIS integration, grades, certificates, reminders, shared assignment, account sync, or server persistence."
+    },
+    {
+      "route": "/document-editor",
+      "capability": "Browser-local plain-text drafting workspace with autosave, word count, reset, and local text export",
+      "persistence": "Browser localStorage plus user-triggered local file download",
+      "evidence": [
+        "title and body editing",
+        "deterministic word count helper",
+        "browser-local autosave",
+        "plain-text export",
+        "release regression test"
+      ],
+      "boundary": "No account sync, cloud backup, real-time collaboration, publication workflow, version history service, or server persistence."
+    },
+    {
+      "route": "/project-board",
+      "capability": "Browser-local Kanban board with task creation, search, deletion, and deterministic movement across workflow columns",
+      "persistence": "Browser localStorage",
+      "evidence": [
+        "task create/delete flow",
+        "deterministic board movement helper",
+        "search across title/detail/status",
+        "localStorage persistence",
+        "release regression test"
+      ],
+      "boundary": "No account sync, shared assignment, team presence, notifications, approvals, external ticketing integration, or server persistence."
     }
   ]
 }
