@@ -82,6 +82,35 @@ The pure decision contract distinguishes:
 
 The schema and decision logic are foundations. Existing HTTP/tRPC mutations are **not** yet globally wrapped by this ledger, so the presence of the table must not be represented as universal idempotent request handling.
 
+## Mutation idempotency
+
+The durable `idempotency_records` table is now used by two canonical create-type mutations:
+
+- `social.post.create`;
+- `beta.feedback.submit`.
+
+Clients may send the standard `Idempotency-Key` header. `X-Idempotency-Key` is accepted as a compatibility alias; if both are sent they must be identical.
+
+Keys are validated as bounded URL-safe identifiers and scoped to a SHA-256-derived actor identity, so two different accounts may safely use the same client-generated key without sharing a replay record. The request hash is computed from the actor-scoped operation plus canonical JSON input.
+
+For an idempotent request, one database transaction contains:
+
+1. reservation of the unique `(scope, idempotency_key)` record;
+2. the business write;
+3. related audit/outbox writes;
+4. storage of the bounded successful response;
+5. transition of the idempotency record to `completed`.
+
+If a concurrent/retried request collides with the reservation:
+
+- the same key + same canonical request replays the stored completed response;
+- the same key + different request returns a conflict;
+- an in-progress or malformed persisted record fails closed rather than duplicating the write.
+
+The domain event receives a separate SHA-256 idempotency fingerprint derived from the actor scope + client key. This avoids global outbox collisions when different accounts choose the same raw key.
+
+Idempotency records currently have no automatic expiry/garbage-collection policy. The current beta therefore treats completed keys as durable replay records until an explicit retention policy is designed and tested. Failed/expired record reclamation is not claimed; callers should use a new key if a record cannot be safely replayed.
+
 ## Retry and dead-letter planning
 
 The event library can plan deterministic exponential retry delays and a final dead-letter state. It reuses the platform-kernel backoff primitive.

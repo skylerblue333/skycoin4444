@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   comments,
   eventOutbox,
+  idempotencyRecords,
   likes,
   posts,
   users,
@@ -13,6 +14,16 @@ import {
   createDomainEvent,
   toOutboxRow,
 } from "../../packages/event-fabric/src/index";
+import {
+  InvalidIdempotencyKeyError,
+  buildIdempotencyScope,
+  decidePersistedIdempotency,
+  decodeIdempotencyResponse,
+  encodeIdempotencyResponse,
+  eventIdempotencyFingerprint,
+  mutationRequestHash,
+  readIdempotencyKey,
+} from "../_core/idempotency";
 import { db } from "../db";
 import { protectedProcedure, publicProcedure } from "../_core/trpc";
 import { isMysqlDuplicateEntryFor } from "../_core/dbErrors";
@@ -27,7 +38,35 @@ export const createPostProcedure = protectedProcedure
     })
   )
   .mutation(async ({ ctx, input }) => {
+    let idempotencyKey: string | null;
+    try {
+      idempotencyKey = readIdempotencyKey(ctx.req);
+    } catch (error) {
+      if (error instanceof InvalidIdempotencyKeyError) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: error.message });
+      }
+      throw error;
+    }
+
+    const normalizedInput = {
+      content: input.content,
+      media: input.media ?? null,
+    };
+    const scope = idempotencyKey
+      ? buildIdempotencyScope("social.post.create", ctx.user.id)
+      : null;
+    const requestHash =
+      scope && idempotencyKey
+        ? mutationRequestHash(scope, normalizedInput)
+        : null;
+
     const id = randomUUID();
+    const response = {
+      id,
+      userId: ctx.user.id,
+      content: input.content,
+      media: input.media ?? null,
+    };
     const event = createDomainEvent({
       eventType: "social.post.created",
       schemaVersion: 1,
@@ -35,6 +74,10 @@ export const createPostProcedure = protectedProcedure
       aggregate: { type: "social.post", id },
       correlationId: ctx.requestId,
       actorId: ctx.user.id,
+      idempotencyKey:
+        scope && idempotencyKey
+          ? eventIdempotencyFingerprint(scope, idempotencyKey)
+          : null,
       payload: {
         postId: id,
         userId: ctx.user.id,
@@ -43,24 +86,105 @@ export const createPostProcedure = protectedProcedure
       metadata: { source: "trpc" },
     });
 
-    await db.transaction(async tx => {
-      await tx.insert(posts).values({
-        id,
-        userId: ctx.user.id,
-        content: input.content,
-        media: input.media ?? null,
-        likes: 0,
-        comments: 0,
-      });
-      await tx.insert(eventOutbox).values(toOutboxRow(event));
-    });
+    try {
+      await db.transaction(async tx => {
+        let idempotencyRecordId: string | null = null;
 
-    return {
-      id,
-      userId: ctx.user.id,
-      content: input.content,
-      media: input.media ?? null,
-    };
+        if (scope && idempotencyKey && requestHash) {
+          idempotencyRecordId = randomUUID();
+          await tx.insert(idempotencyRecords).values({
+            id: idempotencyRecordId,
+            scope,
+            idempotencyKey,
+            requestHash,
+            state: "in_progress",
+          });
+        }
+
+        await tx.insert(posts).values({
+          id,
+          userId: ctx.user.id,
+          content: input.content,
+          media: input.media ?? null,
+          likes: 0,
+          comments: 0,
+        });
+        await tx.insert(eventOutbox).values(toOutboxRow(event));
+
+        if (idempotencyRecordId) {
+          await tx
+            .update(idempotencyRecords)
+            .set({
+              state: "completed",
+              resourceId: id,
+              responseStatus: 200,
+              responseBody: encodeIdempotencyResponse(response),
+              updatedAt: new Date(),
+            })
+            .where(eq(idempotencyRecords.id, idempotencyRecordId));
+        }
+      });
+    } catch (error) {
+      if (
+        scope &&
+        idempotencyKey &&
+        requestHash &&
+        isMysqlDuplicateEntryFor(
+          error,
+          "idempotency_records_scope_key_unique"
+        )
+      ) {
+        const existing = await db.query.idempotencyRecords.findFirst({
+          where: and(
+            eq(idempotencyRecords.scope, scope),
+            eq(idempotencyRecords.idempotencyKey, idempotencyKey)
+          ),
+        });
+
+        if (!existing) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              "Idempotency key is reserved but its replay record is not visible",
+          });
+        }
+
+        const decision = decidePersistedIdempotency(requestHash, existing);
+        if (decision.action === "conflict") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message:
+              "Idempotency key was already used with a different post request",
+          });
+        }
+        if (decision.action === "in_progress") {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Idempotent post request is still in progress",
+          });
+        }
+        if (decision.action === "replay") {
+          const replay = z
+            .object({
+              id: z.string(),
+              userId: z.string(),
+              content: z.string(),
+              media: z.string().nullable(),
+            })
+            .parse(decodeIdempotencyResponse(decision.responseBody));
+          return replay;
+        }
+
+        throw new TRPCError({
+          code: "CONFLICT",
+          message:
+            "Idempotency record cannot be safely reused; submit a new key",
+        });
+      }
+      throw error;
+    }
+
+    return response;
   });
 
 export const deletePostProcedure = protectedProcedure

@@ -16,6 +16,12 @@ describe("event fabric server registry", () => {
       "social.post.created",
     ]);
     expect(snapshot.durableOutboxSchema).toBe(true);
+    expect(snapshot.idempotencyHeader).toBe("Idempotency-Key");
+    expect(snapshot.idempotentMutationScopes).toEqual([
+      "beta.feedback.submit",
+      "social.post.create",
+    ]);
+    expect(snapshot.idempotencyRecordExpiryConfigured).toBe(false);
     expect(snapshot.dispatcherConfigured).toBe(false);
     expect(snapshot.externalTransportConfigured).toBe(false);
     expect(snapshot.productionDeliveryClaim).toBe(false);
