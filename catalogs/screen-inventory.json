@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 35,
-    "legacy_unverified": 969,
+    "launchable_beta": 43,
+    "legacy_unverified": 961,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
@@ -304,7 +304,7 @@
       "path": "/about",
       "component": "About",
       "page": "About",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -1480,7 +1480,7 @@
       "path": "/color-picker-dialog",
       "component": "ColorPickerDialog",
       "page": "ColorPickerDialog",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -4352,7 +4352,7 @@
       "path": "/markdown-rendering",
       "component": "MarkdownRendering",
       "page": "MarkdownRendering",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -4992,7 +4992,7 @@
       "path": "/notes-app",
       "component": "NotesApp",
       "page": "NotesApp",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -5928,7 +5928,7 @@
       "path": "/quiz-builder",
       "component": "QuizBuilder",
       "page": "QuizBuilder",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -6456,7 +6456,7 @@
       "path": "/satisfaction-survey",
       "component": "SatisfactionSurvey",
       "page": "SatisfactionSurvey",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -7488,7 +7488,7 @@
       "path": "/theme-settings",
       "component": "ThemeSettings",
       "page": "ThemeSettings",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
@@ -7592,7 +7592,7 @@
       "path": "/todo-list",
       "component": "TodoList",
       "page": "TodoList",
-      "readiness": "legacy_unverified",
+      "readiness": "launchable_beta",
       "requiresAuth": false,
       "sourceExists": true
     },
