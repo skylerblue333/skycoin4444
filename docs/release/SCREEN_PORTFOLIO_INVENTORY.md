@@ -8,9 +8,9 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 | --- | ---: |
 | Registered routes | 1068 |
 | Lazy page modules | 1056 |
-| Launchable beta routes | 43 |
+| Launchable beta routes | 52 |
 | Controlled or unavailable routes | 64 |
-| Legacy unverified routes | 961 |
+| Legacy unverified routes | 952 |
 | Routes missing a lazy page source | 0 |
 
 ## Launchable beta routes
@@ -21,8 +21,10 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /accessibility-settings
 - /activity-evidence
 - /activity-feed
+- /address-book
 - /advanced-search
 - /arcade
+- /assignment-tracker
 - /beta-catalog
 - /beta-commerce
 - /beta-feedback
@@ -32,14 +34,20 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /blog-editor
 - /calculator
 - /calendar
+- /checkbox-group-form
+- /code-formatter
 - /color-picker-dialog
 - /community-hub
+- /component-showcase
+- /confirmation-dialog
+- /content-calendar
 - /course-catalog
 - /creator-analytics
 - /data-export
 - /dating-profile-setup
 - /delete-account
 - /discovery-center
+- /document-editor
 - /event-planner
 - /file-converter
 - /help-center
@@ -53,6 +61,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /operational-readiness
 - /privacy-settings
 - /profile
+- /project-board
 - /quiz-builder
 - /satisfaction-survey
 - /sign-up-flow
