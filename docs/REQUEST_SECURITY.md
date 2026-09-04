@@ -1,0 +1,43 @@
+# Request Security Boundary
+
+## Cookie-authenticated unsafe requests
+
+The canonical browser client sends tRPC requests with `credentials: "include"`. The session cookie currently uses `SameSite=None` because the authentication/runtime environment may require cross-site cookie availability.
+
+That combination requires an explicit cross-site request boundary for state-changing requests.
+
+The server now evaluates POST, PUT, PATCH, and DELETE requests that contain the SKYCOIN4444 session cookie. In production they are accepted only when:
+
+- `BETA_PUBLIC_ORIGIN` is configured as the canonical HTTPS origin;
+- the browser `Origin` header normalizes to exactly that origin;
+- `Sec-Fetch-Site`, when supplied, is not `cross-site`.
+
+Missing, malformed, or mismatched production origins fail closed with HTTP 403.
+
+## Bearer clients
+
+Requests without the ambient session cookie are not forced through this browser-origin check. This preserves non-browser Bearer-token integrations because an Authorization header is not an ambient browser credential.
+
+If both a session cookie and Bearer header are present, the cookie-origin rule still applies because the current authentication layer prioritizes the session cookie.
+
+## Development behavior
+
+Outside production, origin-less local scripts are allowed so local smoke tooling can continue to exercise the API. Browser requests that do provide an Origin are compared with the current request origin.
+
+This relaxed local behavior is not used in production.
+
+## Cookie transport
+
+Production session cookies are always marked `Secure`. Development still derives Secure from the request so HTTP localhost testing remains possible.
+
+## Scope and limitations
+
+This control is a CSRF/same-origin boundary for ambient cookie mutations. It is not:
+
+- a WAF;
+- bot detection;
+- distributed abuse prevention;
+- a replacement for authorization;
+- a claim of penetration testing or audited security.
+
+Authorization remains enforced separately by the tRPC procedure layer. Runtime overload controls and security headers remain separate controls.

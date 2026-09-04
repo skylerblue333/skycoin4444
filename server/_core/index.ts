@@ -13,6 +13,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
+import { registerRequestSecurity } from "./requestSecurity";
 import {
   ConcurrencyGate,
   RuntimeLifecycle,
@@ -69,6 +70,7 @@ async function startServer() {
     next();
   });
 
+  registerRequestSecurity(app);
   registerRuntimeRoutes(app, lifecycle, concurrency);
   app.use(createDrainGuard(lifecycle));
   app.use(createConcurrencyMiddleware(concurrency));
