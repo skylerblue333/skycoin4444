@@ -13,7 +13,7 @@ const guidelines = [
   },
   {
     title: "Protect privacy",
-    body: "Do not post another person&apos;s private contact details, credentials, financial data, intimate material, or identifying records without authorization.",
+    body: "Do not post another person's private contact details, credentials, financial data, intimate material, or identifying records without authorization.",
   },
   {
     title: "Keep sexual and dating interactions consensual",
