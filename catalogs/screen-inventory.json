@@ -4,8 +4,8 @@
   "totalLazyPages": 1056,
   "totalDirectPages": 10,
   "counts": {
-    "launchable_beta": 32,
-    "legacy_unverified": 972,
+    "launchable_beta": 35,
+    "legacy_unverified": 969,
     "controlled_or_unavailable": 64
   },
   "launchableBetaRoutes": [
