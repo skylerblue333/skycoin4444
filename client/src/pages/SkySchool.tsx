@@ -148,21 +148,21 @@ export default function SkySchool() {
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Authored courses", gapCourses.length, GraduationCap],
-            ["Authored lessons", lessonCount, BookOpen],
-            [
-              "Persisted lesson events",
-              isAuthenticated
+            { label: "Authored courses", value: gapCourses.length, icon: GraduationCap },
+            { label: "Authored lessons", value: lessonCount, icon: BookOpen },
+            {
+              label: "Persisted lesson events",
+              value: isAuthenticated
                 ? activity.isLoading
                   ? "…"
                   : completedLessonEvidence
                 : "Sign in",
-              CheckCircle2,
-            ],
-            ["Practice modes", practiceCards.length, Gamepad2],
-          ].map(([label, value, Icon]) => (
+              icon: CheckCircle2,
+            },
+            { label: "Practice modes", value: practiceCards.length, icon: Gamepad2 },
+          ].map(({ label, value, icon: Icon }) => (
             <Card
-              key={label as string}
+              key={label}
               className="border-white/10 bg-white/[0.035] text-white"
             >
               <CardContent className="p-5">
