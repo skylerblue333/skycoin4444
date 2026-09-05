@@ -145,7 +145,7 @@ export default function GameBlockBuilder() {
           <div className="text-center">
             <div className="text-7xl mb-6">🏗️</div>
             <h1 className="text-3xl font-bold mb-3">Block Builder</h1>
-            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Stack blockchain blocks as high as possible! Tap or press Space to drop each block. Perfect drops keep the full width. Each block = 1 SKY444 sparksEarned to Hunger Relief.</p>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Stack blockchain blocks as high as possible! Tap or press Space to drop each block. Perfect drops keep the full width. Perfect drops earn extra game-only Sparks and Study XP. No donation or token transfer occurs.</p>
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-xs mx-auto">
               {[{ label: "Perfect Drop", value: "+2 Sparks" }, { label: "Normal Drop", value: "+1 Spark" }, { label: "Miss", value: "Game Over" }].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
@@ -204,7 +204,7 @@ export default function GameBlockBuilder() {
               {[
                 { label: "Blocks", value: score.toString(), color: "text-purple-400" },
                 { label: "XP Earned", value: `+${xpEarned}`, color: "text-yellow-400" },
-                { label: "Donated", value: `${sparksEarned} Sparks`, color: "text-purple-400" },
+                { label: "Sparks", value: `${sparksEarned}`, color: "text-cyan-400" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
