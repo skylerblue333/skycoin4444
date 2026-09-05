@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Heart, Trophy, Zap, ArrowRight, RotateCcw, Droplets } from "lucide-react";
+import { ChevronLeft, Sparkles, Trophy, Zap, ArrowRight, RotateCcw } from "lucide-react";
 
 type Particle = { id: number; x: number; y: number; opacity: number; scale: number };
 
@@ -14,7 +14,7 @@ export default function GameTokenTap() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
-  const [donated, setDonated] = useState(0);
+  const [sparksEarned, setSparksEarned] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const particleId = useRef(0);
   const lastTapTime = useRef(0);
@@ -46,7 +46,7 @@ export default function GameTokenTap() {
 
     const multiplier = newCombo >= 10 ? 3 : newCombo >= 5 ? 2 : 1;
     setTaps(p => p + multiplier);
-    setDonated(p => p + multiplier);
+    setSparksEarned(p => p + multiplier);
     setXpEarned(p => p + multiplier * 10);
 
     const pid = ++particleId.current;
@@ -60,7 +60,7 @@ export default function GameTokenTap() {
     setTimeLeft(30);
     setCombo(0);
     setMaxCombo(0);
-    setDonated(0);
+    setSparksEarned(0);
     setXpEarned(0);
     setParticles([]);
   };
@@ -71,18 +71,18 @@ export default function GameTokenTap() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="sticky top-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
-        <Link href="/gaming-for-charity">
+        <Link href="/gaming">
           <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground"><ChevronLeft className="h-4 w-4" />Back</Button>
         </Link>
         <span className="text-lg">👆</span>
-        <span className="font-bold text-sm">Token Tap Frenzy</span>
+        <span className="font-bold text-sm">Spark Tap Frenzy</span>
         <Badge variant="outline" className="text-purple-400 border-purple-500/30 text-xs">Arcade</Badge>
         <div className="flex-1" />
         {gameState === "playing" && (
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-              <Droplets className="h-3.5 w-3.5 text-cyan-400" />
-              <span className="text-xs font-bold text-cyan-400">{donated} SKY444</span>
+              <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
+              <span className="text-xs font-bold text-cyan-400">{sparksEarned} Sparks</span>
             </div>
           </div>
         )}
@@ -92,8 +92,8 @@ export default function GameTokenTap() {
         {gameState === "idle" && (
           <div className="text-center">
             <div className="text-7xl mb-6">👆</div>
-            <h1 className="text-3xl font-bold mb-3">Token Tap Frenzy</h1>
-            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Tap as fast as you can for 30 seconds! Every tap donates SKY444 to the Clean Water Initiative. Build combos for multipliers!</p>
+            <h1 className="text-3xl font-bold mb-3">Spark Tap Frenzy</h1>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Tap as fast as you can for 30 seconds! Every tap earns game-only Sparks. Build quick combos for 2x and 3x score multipliers.</p>
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-xs mx-auto">
               {[{ label: "Duration", value: "30s" }, { label: "Combo 5x", value: "2x pts" }, { label: "Combo 10x", value: "3x pts" }].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
@@ -157,7 +157,7 @@ export default function GameTokenTap() {
               {[
                 { label: "Total Taps", value: taps.toString(), color: "text-purple-400" },
                 { label: "Max Combo", value: `${maxCombo}x`, color: "text-orange-400" },
-                { label: "Donated", value: `${donated} SKY444`, color: "text-cyan-400" },
+                { label: "Donated", value: `${sparksEarned} Sparks`, color: "text-cyan-400" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -166,13 +166,13 @@ export default function GameTokenTap() {
               ))}
             </div>
             <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-6">
-              <p className="text-sm font-semibold text-cyan-400 mb-1">💧 Clean Water Initiative</p>
-              <p className="text-xs text-muted-foreground">{donated} SKY444 donated to provide clean water!</p>
+              <p className="text-sm font-semibold text-cyan-300 mb-1">✨ Game-only Sparks</p>
+              <p className="text-xs text-muted-foreground">Sparks and XP exist only inside this arcade session. They have no cash, token, donation, or blockchain value.</p>
             </div>
             <div className="flex items-center justify-center gap-3">
               <Button onClick={startGame} variant="outline" className="gap-2"><RotateCcw className="h-4 w-4" />Play Again</Button>
-              <Link href="/gaming-for-charity">
-                <Button className="bg-primary text-primary-foreground gap-2">More Games <ArrowRight className="h-4 w-4" /></Button>
+              <Link href="/gaming">
+                <Button className="bg-primary text-primary-foreground gap-2">Games Center <ArrowRight className="h-4 w-4" /></Button>
               </Link>
             </div>
           </div>
