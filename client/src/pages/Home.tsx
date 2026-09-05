@@ -54,7 +54,7 @@ const experiences = [
     kicker: "Learning that is usable now",
     description:
       "Browse authored lessons, complete deterministic assessment work, and exercise the learning journey.",
-    href: "/course-catalog",
+    href: "/sky-school",
     status: "Working beta",
     icon: GraduationCap,
   },
@@ -63,7 +63,7 @@ const experiences = [
     kicker: "Deterministic arcade lab",
     description:
       "Play tested local game experiences without real-money wagering, token payouts, custody, or production multiplayer.",
-    href: "/arcade",
+    href: "/gaming",
     status: "Local test lab",
     icon: Gamepad2,
   },
@@ -108,7 +108,7 @@ const experiences = [
     kicker: "Safe local AI workspace",
     description:
       "Explore the verified AI sandbox while provider-backed actions remain explicitly separated from local behavior.",
-    href: "/a-i-tools-hub",
+    href: "/hope-a-i",
     status: "Controlled lab",
     icon: Bot,
   },
