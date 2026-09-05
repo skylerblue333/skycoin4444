@@ -15,8 +15,10 @@ import {
   posts,
   privacyRequests,
   searchHistory,
+  userBehaviorSignals,
   users,
 } from "../../drizzle/schema";
+import { BETA_GAME_SESSION_SIGNAL } from "../_core/betaGaming";
 import {
   createPrivacyRequest,
   transitionPrivacyRequest,
@@ -29,6 +31,7 @@ const exportCategory = z.enum([
   "profile",
   "social",
   "learning",
+  "gaming",
   "feedback",
   "discovery",
   "creator",
@@ -112,6 +115,28 @@ export const privacyRouter = router({
           .where(eq(courseProgress.userId, userId));
       }
 
+      if (requested.has("gaming")) {
+        output.gaming = await db
+          .select({
+            id: userBehaviorSignals.id,
+            signalType: userBehaviorSignals.signalType,
+            value: userBehaviorSignals.value,
+            metadata: userBehaviorSignals.metadata,
+            createdAt: userBehaviorSignals.createdAt,
+          })
+          .from(userBehaviorSignals)
+          .where(
+            and(
+              eq(userBehaviorSignals.userId, userId),
+              eq(
+                userBehaviorSignals.signalType,
+                BETA_GAME_SESSION_SIGNAL
+              )
+            )
+          )
+          .orderBy(desc(userBehaviorSignals.createdAt));
+      }
+
       if (requested.has("feedback")) {
         output.feedback = await db
           .select()
@@ -170,7 +195,7 @@ export const privacyRouter = router({
         subjectId: userId,
         categories,
         scope:
-          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, feedback, discovery, creator, notification, and privacy-request tables. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
+          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, saved-gaming, feedback, discovery, creator, notification, and privacy-request tables. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
         data: output,
       };
     }),
