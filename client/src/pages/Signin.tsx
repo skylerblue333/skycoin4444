@@ -278,8 +278,9 @@ export function Signin() {
               {accessKeyMode
                 ? "This access mode checks an allowlisted email plus a server-side invitation secret. It does not independently verify ownership of that email or a legal identity. The page does not store the access key in browser storage."
                 : "No local password is collected by the external-provider sign-in path."}
-              {" "}Financial settlement, wallet custody, token transfers, signing,
-              and live chain execution remain outside this beta.
+              {" "}This page never accepts a SKYCOIN4444 password. Financial
+              settlement, wallet custody, token transfers, signing, and live
+              chain execution remain outside this beta.
             </p>
 
             <div className="flex flex-wrap gap-3">
