@@ -1,10 +1,10 @@
 # SKYCOIN4444 Invitation Beta Deployment
 
-This document defines the first deployable engineering-beta contract. It does **not** claim that a public beta is currently deployed.
+This document defines the invitation-only engineering-beta deployment contract. Live deployment evidence is recorded separately in Issue #272; this document alone does not prove that any specific hosted revision is currently reachable.
 
 ## Release model
 
-The target is one invitation-only web service backed by a dedicated managed MySQL beta database. The deployment must fail closed when identity, database, session, public-origin, or invitation configuration is incomplete.
+The target is one invitation-only web service backed by a dedicated managed MySQL beta database. The deployment must fail closed when authentication mode, database, session, public-origin, or invitation configuration is incomplete. The supported beta authentication modes are external OAuth and a self-contained invitation access-key mode.
 
 The repository contains a Render web-service blueprint in `render.yaml`. That blueprint does not provision or certify a database, OAuth provider, DNS, TLS, backups, or monitoring by itself.
 
@@ -19,17 +19,19 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 | `JWT_SECRET` | Active HS256 signing/verification secret; at least 32 bytes. |
 | `JWT_SECRET_PREVIOUS` | Optional verification-only previous secret during a controlled rotation; at least 32 bytes and different from `JWT_SECRET`. |
 | `SESSION_TTL_MS` | Absolute stateless session lifetime, 900000–2592000000 ms; default beta configuration is 604800000 ms (7 days). |
-| `VITE_APP_ID` | Approved application identifier used by server and client session/OAuth flow. |
-| `OAUTH_SERVER_URL` | HTTPS OAuth service URL. |
-| `VITE_OAUTH_PORTAL_URL` | HTTPS browser login portal URL. |
+| `VITE_APP_ID` | Application identifier bound into canonical signed sessions. |
+| `VITE_BETA_AUTH_MODE` | `oauth` (default) or `access_key`. |
+| `BETA_ACCESS_KEY` | Required only in `access_key` mode; server-side invitation secret of at least 48 bytes. Do not commit or expose it to browser storage. |
+| `OAUTH_SERVER_URL` | Required only in `oauth` mode; HTTPS OAuth service URL. |
+| `VITE_OAUTH_PORTAL_URL` | Required only in `oauth` mode; HTTPS browser login portal URL. |
 | `BETA_PUBLIC_ORIGIN` | Exact HTTPS deployment origin, with no path or query. |
 | `BETA_ACCESS_MODE` | Must be `invite_only` in production. |
 | `OWNER_OPEN_ID` | Optional owner admission identity. |
-| `BETA_ALLOWED_EMAILS` | Optional comma-separated invited OAuth emails. |
+| `BETA_ALLOWED_EMAILS` | Optional comma-separated invited emails. Access-key mode requires the submitted email to match this/another configured invitation source. |
 | `BETA_ALLOWED_OPEN_IDS` | Optional comma-separated invited OAuth open IDs. |
 | `LOCAL_TEST_MODE` | Must be false in production. |
 
-At least one owner/open-ID/email invitation must be configured. Missing or invalid configuration stops the production server rather than exposing a partial beta.
+At least one owner/open-ID/email invitation must be configured. In `oauth` mode the verified provider URLs are mandatory. In `access_key` mode the provider URLs are not required, but `BETA_ACCESS_KEY` must meet the minimum length. Missing or invalid configuration stops the production server rather than exposing a partial beta.
 
 ## Startup and port binding
 
@@ -167,13 +169,17 @@ The separate `SkySessions` package is a domain core and is not claimed as the pe
 
 See `docs/SESSION_SECURITY.md`.
 
-## Identity and admission behavior
+## Authentication and admission behavior
 
-The browser sign-in route never accepts a SKYCOIN4444 password. Authentication starts only through the configured OAuth provider.
+The browser sign-in route never accepts a SKYCOIN4444 account password.
 
-After OAuth returns an identity, the server checks the invitation policy **before** persisting the user or issuing a session. Protected requests re-check the policy, so removal from the allowlist revokes subsequent authorized use even if an old cookie remains in the browser.
+In `oauth` mode, authentication starts through the configured external identity provider. After OAuth returns an identity, the server checks the invitation policy **before** persisting the user or issuing a session. Production OAuth callbacks are restricted to `/api/oauth/callback` on the configured `BETA_PUBLIC_ORIGIN`.
 
-Production OAuth callbacks are restricted to `/api/oauth/callback` on the configured `BETA_PUBLIC_ORIGIN`.
+In `access_key` mode, the server accepts an invited email plus the configured invitation access secret. The submitted email is normalized, checked against the invitation policy, and mapped to an opaque deterministic beta session identity before a canonical signed session cookie is issued. Invalid email/key combinations use one generic denial response. The access key is not stored in browser storage.
+
+Access-key mode does **not** independently verify ownership of the submitted email and does not claim legal identity verification. If a session refers to a user record that no longer exists, access-key mode fails closed locally; it does not fall back to the external OAuth user-info provider.
+
+Protected requests re-check the invitation policy in both modes, so removal from the allowlist revokes subsequent authorized use even if an old cookie remains in the browser.
 
 ## HTTP listener resource limits
 
@@ -227,8 +233,8 @@ A candidate deployment is not beta-ready until all of these are recorded:
 6. `/api/beta/health` returns `status=ok`;
 7. `/api/runtime/ready` returns HTTP 200 with required dependency status `ready`;
 8. `/api/beta/readiness` returns `status=ready`, `database=ok`, and `configuration=ok`;
-9. an invited account can complete OAuth and load a protected route;
-10. an uninvited account is denied without receiving a session;
+9. an invited account can complete the configured authentication mode and load a protected route;
+10. invalid or uninvited credentials are denied without receiving a session;
 11. profile update survives refresh;
 12. one social or SkySchool action survives refresh;
 13. beta feedback reaches durable storage;
