@@ -183,7 +183,7 @@ export default function GameCryptoQuiz() {
               {[
                 { label: "Score", value: `${score}/${QUESTIONS.length}`, color: "text-blue-400" },
                 { label: "XP Earned", value: `+${xpEarned}`, color: "text-yellow-400" },
-                { label: "Donated", value: `${sparksEarned} Sparks`, color: "text-purple-400" },
+                { label: "Sparks", value: `${sparksEarned}`, color: "text-cyan-400" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
