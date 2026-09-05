@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import GameRunSave from "@/components/GameRunSave";
 import {
   emptyRushScore,
   resolveRushTick,
@@ -80,6 +81,8 @@ export default function GameSkyRush() {
     "Choose a mode, then dodge red gates and collect Sparks."
   );
   const [bestScore, setBestScore] = useState(0);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
+  const [finishedDurationMs, setFinishedDurationMs] = useState(0);
 
   const config = MODES[mode];
   const frame = useMemo(() => rushFrame(seed, tick), [seed, tick]);
@@ -139,6 +142,11 @@ export default function GameSkyRush() {
 
   useEffect(() => {
     if (gameState !== "finished") return;
+    if (startedAt !== null && finishedDurationMs === 0) {
+      setFinishedDurationMs(
+        Math.max(1000, Math.min(3_600_000, Date.now() - startedAt))
+      );
+    }
     if (typeof window === "undefined") return;
     if (score.score > bestScore) {
       window.localStorage.setItem(
@@ -147,7 +155,7 @@ export default function GameSkyRush() {
       );
       setBestScore(score.score);
     }
-  }, [bestScore, gameState, mode, score.score]);
+  }, [bestScore, finishedDurationMs, gameState, mode, score.score, startedAt]);
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
@@ -181,6 +189,8 @@ export default function GameSkyRush() {
     setScore(emptyRushScore());
     setShields(selected.shields);
     setMessage("Run started — dodge red, collect cyan.");
+    setStartedAt(Date.now());
+    setFinishedDurationMs(0);
     setGameState("playing");
   }
 
@@ -499,9 +509,18 @@ export default function GameSkyRush() {
                   {score.score.toLocaleString()} points · {score.sparks} Sparks
                   · {score.bestCombo}x best combo.
                 </p>
+                <GameRunSave
+                  gameId="sky-rush"
+                  mode={mode}
+                  score={score.score}
+                  sparks={score.sparks}
+                  combo={score.bestCombo}
+                  durationMs={finishedDurationMs}
+                  className="mt-4"
+                />
                 <Button
                   type="button"
-                  className="mt-4 w-full"
+                  className="mt-3 w-full"
                   onClick={() => start()}
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
