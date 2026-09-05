@@ -9,6 +9,9 @@ import {
   verifyBetaAccessKey,
 } from "./betaAccessAuth";
 import {
+  consumeBetaAccessAttempt,
+} from "./betaAccessRateLimit";
+import {
   getSessionCookieName,
   getSessionCookieNamesToClear,
   getSessionCookieOptions,
@@ -65,6 +68,16 @@ export function registerBetaAccessAuthRoutes(app: Express) {
 
     if (!email || !accessKey) {
       res.status(400).json({ error: "email and access key are required" });
+      return;
+    }
+
+    const rateLimit = consumeBetaAccessAttempt(req, email);
+    if (!rateLimit.allowed) {
+      res.set("Retry-After", String(rateLimit.retryAfterSeconds));
+      res.status(429).json({
+        error: "too many beta sign-in attempts",
+        retryAfterSeconds: rateLimit.retryAfterSeconds,
+      });
       return;
     }
 
