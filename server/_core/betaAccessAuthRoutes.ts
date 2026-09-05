@@ -9,6 +9,8 @@ import {
   verifyBetaAccessKey,
 } from "./betaAccessAuth";
 import {
+  betaAccessRateLimitIssues,
+  betaAccessRateLimitPolicyFromEnv,
   consumeBetaAccessAttempt,
 } from "./betaAccessRateLimit";
 import {
@@ -22,7 +24,11 @@ import { sessionLifetimePolicyFromEnv } from "./sessionPolicy";
 const NO_STORE = "no-store";
 
 function accessAuthConfigured() {
-  return betaAuthMode() === "access_key" && !betaAccessKeyIssue();
+  return (
+    betaAuthMode() === "access_key" &&
+    !betaAccessKeyIssue() &&
+    betaAccessRateLimitIssues().length === 0
+  );
 }
 
 function clearSessionCookies(req: Request, res: Response) {
@@ -39,6 +45,10 @@ export function registerBetaAccessAuthRoutes(app: Express) {
   app.get("/api/beta/auth", (_req, res) => {
     res.set("Cache-Control", NO_STORE);
     const mode = betaAuthMode();
+    const rateLimitPolicy =
+      mode === "access_key"
+        ? betaAccessRateLimitPolicyFromEnv()
+        : null;
     res.json({
       mode,
       configured:
@@ -51,6 +61,13 @@ export function registerBetaAccessAuthRoutes(app: Express) {
             ),
       identityVerification: false,
       invitationRequired: true,
+      rateLimit: rateLimitPolicy
+        ? {
+            windowMs: rateLimitPolicy.windowMs,
+            maxAttempts: rateLimitPolicy.maxAttempts,
+            scope: rateLimitPolicy.scope,
+          }
+        : null,
     });
   });
 
