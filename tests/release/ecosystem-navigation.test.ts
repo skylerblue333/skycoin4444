@@ -17,14 +17,14 @@ describe("ecosystem navigation and visual foundation", () => {
     for (const route of [
       "/beta-workspace",
       "/activity-feed",
-      "/course-catalog",
-      "/arcade",
+      "/sky-school",
+      "/gaming",
       "/live-streaming",
       "/beta-commerce",
       "/language-partner-discovery",
       "/dating-profile-setup",
       "/beta-web3",
-      "/a-i-tools-hub",
+      "/hope-a-i",
       "/beta-feedback",
     ]) {
       expect(nav).toContain(route);
@@ -35,13 +35,13 @@ describe("ecosystem navigation and visual foundation", () => {
     for (const route of [
       "/activity-feed",
       "/live-streaming",
-      "/course-catalog",
-      "/arcade",
+      "/sky-school",
+      "/gaming",
       "/beta-commerce",
       "/language-partner-discovery",
       "/dating-profile-setup",
       "/beta-web3",
-      "/a-i-tools-hub",
+      "/hope-a-i",
     ]) {
       expect(home).toContain(route);
     }
