@@ -91,7 +91,11 @@ export function toMysqlPoolOptions(
     throw new Error("databaseUrl is required");
   }
 
-  return Object.freeze({
+  // mysql2's ConnectionConfig expands URI-derived fields (host, port, user,
+  // database, etc.) onto the options object during pool construction.
+  // Keep this adapter object mutable even though our validated runtime policy
+  // remains immutable; freezing it causes mysql2 to throw before startup.
+  return {
     uri: databaseUrl,
     waitForConnections: true as const,
     connectionLimit: options.connectionLimit,
@@ -101,7 +105,7 @@ export function toMysqlPoolOptions(
     connectTimeout: options.connectTimeoutMs,
     enableKeepAlive: true as const,
     keepAliveInitialDelay: options.keepAliveInitialDelayMs,
-  });
+  };
 }
 
 export type DatabasePoolTelemetrySnapshot = Readonly<{

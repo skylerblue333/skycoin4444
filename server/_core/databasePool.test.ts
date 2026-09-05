@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import mysql from "mysql2/promise";
 import {
   DatabasePoolTelemetry,
   databasePoolOptionsFromEnv,
@@ -45,6 +46,21 @@ describe("database pool configuration", () => {
       enableKeepAlive: true,
       keepAliveInitialDelay: 1_000,
     });
+  });
+
+  it("returns mysql2-compatible mutable URI options", async () => {
+    const runtime = databasePoolOptionsFromEnv({} as NodeJS.ProcessEnv);
+    const options = toMysqlPoolOptions(
+      "mysql://user:pass@db.example:3306/sky",
+      runtime
+    );
+
+    expect(Object.isExtensible(options)).toBe(true);
+
+    // mysql2 expands URI fields onto this object synchronously. Constructing
+    // the pool is therefore the regression check for the hosted startup crash.
+    const pool = mysql.createPool(options);
+    await pool.end();
   });
 
   it("rejects unbounded or incoherent pool settings", () => {
