@@ -22,6 +22,10 @@ Before starting `pnpm start` with `NODE_ENV=production`, configure:
 | `VITE_APP_ID` | Application identifier bound into canonical signed sessions. |
 | `VITE_BETA_AUTH_MODE` | `oauth` (default) or `access_key`. |
 | `BETA_ACCESS_KEY` | Required only in `access_key` mode; server-side invitation secret of at least 48 bytes. Do not commit or expose it to browser storage. |
+| `BETA_ACCESS_RATE_LIMIT_WINDOW_MS` | Access-key login limiter window; default 300000 ms, bounded in production. |
+| `BETA_ACCESS_RATE_LIMIT_MAX_ATTEMPTS` | Attempts per client/email digest per window; default 12, bounded in production. |
+| `BETA_ACCESS_RATE_LIMIT_MAX_KEYS` | Maximum in-process tracked limiter keys; default 4096, bounded in production. |
+| `BETA_TRUSTED_CLIENT_IP_HEADER` | Optional trusted client-IP header. Currently only `x-real-ip` is accepted; leave blank unless the deployment edge is verified to control it. |
 | `OAUTH_SERVER_URL` | Required only in `oauth` mode; HTTPS OAuth service URL. |
 | `VITE_OAUTH_PORTAL_URL` | Required only in `oauth` mode; HTTPS browser login portal URL. |
 | `BETA_PUBLIC_ORIGIN` | Exact HTTPS deployment origin, with no path or query. |
@@ -180,6 +184,8 @@ In `access_key` mode, the server accepts an invited email plus the configured in
 Access-key mode does **not** independently verify ownership of the submitted email and does not claim legal identity verification. If a session refers to a user record that no longer exists, access-key mode fails closed locally; it does not fall back to the external OAuth user-info provider.
 
 Protected requests re-check the invitation policy in both modes, so removal from the allowlist revokes subsequent authorized use even if an old cookie remains in the browser.
+
+Access-key login attempts are additionally protected by a bounded process-local limiter. The default is 12 attempts per resolved client/email digest per five-minute window with at most 4096 tracked keys. The limiter state resets on process restart and is not shared across replicas; it must not be described as distributed abuse protection. See `docs/BETA_ACCESS_RATE_LIMIT.md`.
 
 ## HTTP listener resource limits
 
