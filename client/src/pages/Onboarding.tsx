@@ -11,7 +11,6 @@ import {
   UserRound,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ const activationSteps = [
     id: "account",
     title: "Enter the invitation beta",
     detail:
-      "Authenticate through the configured identity provider. Production access remains invite-only.",
+      "Enter through the configured invitation sign-in mode. Production access remains invite-only.",
     route: "/signin",
     action: "Sign in",
     icon: ShieldCheck,
@@ -144,7 +143,7 @@ export default function Onboarding() {
                   ? "All activation gates are backed by persisted account evidence."
                   : isAuthenticated
                     ? "Complete the remaining account-owned actions below."
-                    : "Sign in with an invited identity to begin writing durable beta evidence."}
+                    : "Use the configured invitation sign-in mode to begin writing durable beta evidence."}
               </p>
             </CardContent>
           </Card>
@@ -158,14 +157,18 @@ export default function Onboarding() {
                   Invitation admission is the first gate
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-white/55">
-                  The beta does not accept a SKYCOIN4444 password or fabricate a
-                  browser login. Admission is checked before a production session
-                  is issued.
+                  The beta does not accept a SKYCOIN4444 account password.
+                  Admission is checked before a production session is issued,
+                  whether this environment uses access-key or external-provider
+                  authentication.
                 </p>
               </div>
-              <Button type="button" onClick={() => startLogin()}>
-                Sign in with provider
-              </Button>
+              <Link href="/signin">
+                <Button type="button">
+                  Open invitation sign in
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </section>
         )}
@@ -212,13 +215,12 @@ export default function Onboarding() {
                 </CardHeader>
                 <CardContent className="mt-auto">
                   {step.id === "account" && !isAuthenticated ? (
-                    <Button
-                      type="button"
-                      className="w-full"
-                      onClick={() => startLogin()}
-                    >
-                      {step.action}
-                    </Button>
+                    <Link href="/signin">
+                      <Button type="button" className="w-full">
+                        {step.action}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
                   ) : (
                     <Link href={step.route}>
                       <Button

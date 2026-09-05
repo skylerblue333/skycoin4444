@@ -8,11 +8,14 @@ import {
   Home,
   Languages,
   LayoutDashboard,
+  LogIn,
   MessageSquare,
   Radio,
+  UserRound,
   ShoppingBag,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const links = [
   { label: "Home", route: "/", icon: Home },
@@ -34,6 +37,7 @@ function isActive(location: string, route: string) {
 
 export default function BetaNavigation() {
   const [location] = useLocation();
+  const { isAuthenticated, loading } = useAuth();
 
   return (
     <nav
@@ -80,13 +84,41 @@ export default function BetaNavigation() {
           })}
         </div>
 
-        <Link
-          href="/beta-feedback"
-          className="ml-auto inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
-        >
-          <MessageSquare className="h-4 w-4" />
-          <span className="hidden sm:inline">Feedback</span>
-        </Link>
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <Link
+            href="/beta-feedback"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span className="hidden md:inline">Feedback</span>
+          </Link>
+
+          <Link
+            href={isAuthenticated ? "/dashboard" : "/signin"}
+            aria-label={
+              loading
+                ? "Checking beta account"
+                : isAuthenticated
+                  ? "Open account dashboard"
+                  : "Open invitation sign in"
+            }
+            className={
+              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 " +
+              (isAuthenticated
+                ? "border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-100 hover:bg-emerald-300/[0.13]"
+                : "bg-white text-[#050510] hover:bg-white/90")
+            }
+          >
+            {isAuthenticated ? (
+              <UserRound className="h-4 w-4" />
+            ) : (
+              <LogIn className="h-4 w-4" />
+            )}
+            <span className="hidden sm:inline">
+              {loading ? "Account" : isAuthenticated ? "Dashboard" : "Sign in"}
+            </span>
+          </Link>
+        </div>
       </div>
 
       <div className="border-t border-white/[0.06] xl:hidden">
