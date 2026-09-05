@@ -4,8 +4,10 @@ import {
   ArrowRight,
   BookOpen,
   Brain,
+  CheckCircle2,
   Crown,
   Gamepad2,
+  LockKeyhole,
   Play,
   Shield,
   Sparkles,
@@ -14,6 +16,7 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
 type GameCategory =
   | "all"
@@ -37,14 +41,13 @@ const games = [
     id: "sky-rush",
     name: "Sky Rush",
     detail:
-      "Three-lane reflex runner with escalating speed, combo chains, shields, and no-value Sparks.",
+      "Three-lane reflex runner with escalating speed, combo chains, shields, saved runs, and no-value Sparks.",
     icon: Zap,
     href: "/game-sky-rush",
     category: "arcade" as const,
     duration: "3–6 min",
-    featured: true,
     gradient: "from-violet-600 via-fuchsia-600 to-sky-600",
-    tag: "NEW",
+    tag: "SAVE RUNS",
   },
   {
     id: "arcade-lab",
@@ -55,7 +58,6 @@ const games = [
     href: "/arcade",
     category: "arcade" as const,
     duration: "Pick a game",
-    featured: true,
     gradient: "from-sky-600 via-blue-700 to-indigo-800",
     tag: "13 MODES",
   },
@@ -63,25 +65,23 @@ const games = [
     id: "crypto-quiz",
     name: "Crypto Quiz Blitz",
     detail:
-      "Timed blockchain recall with Study XP, streaks, and no token payout.",
+      "Timed blockchain recall with Study XP, streaks, saved runs, and no token payout.",
     icon: Brain,
     href: "/game-crypto-quiz",
     category: "knowledge" as const,
     duration: "~4 min",
-    featured: true,
     gradient: "from-cyan-600 via-blue-700 to-violet-700",
     tag: "LEARN + PLAY",
   },
   {
-    id: "token-tap",
+    id: "spark-tap",
     name: "Spark Tap",
     detail:
-      "Thirty-second speed/combo challenge using game-only Sparks instead of fake token donations.",
+      "Thirty-second speed/combo challenge with saved personal runs and game-only Sparks.",
     icon: Sparkles,
     href: "/game-token-tap",
     category: "arcade" as const,
     duration: "30 sec",
-    featured: false,
     gradient: "from-emerald-600 via-teal-700 to-cyan-800",
     tag: "COMBO",
   },
@@ -89,12 +89,11 @@ const games = [
     id: "block-builder",
     name: "Block Builder",
     detail:
-      "Stacking and timing challenge presented as deterministic local play.",
+      "Stacking and timing challenge with saveable account runs and game-only progress.",
     icon: Target,
     href: "/game-block-builder",
     category: "strategy" as const,
     duration: "Short run",
-    featured: false,
     gradient: "from-amber-600 via-orange-700 to-rose-800",
     tag: "PUZZLE",
   },
@@ -107,7 +106,6 @@ const games = [
     href: "/game-blackjack",
     category: "simulation" as const,
     duration: "Practice",
-    featured: false,
     gradient: "from-emerald-700 via-green-800 to-slate-900",
     tag: "SIMULATION",
   },
@@ -120,7 +118,6 @@ const games = [
     href: "/game-crash",
     category: "simulation" as const,
     duration: "Practice",
-    featured: false,
     gradient: "from-fuchsia-700 via-violet-800 to-slate-950",
     tag: "SIMULATION",
   },
@@ -134,28 +131,27 @@ const filters: Array<{ id: GameCategory; label: string }> = [
   { id: "simulation", label: "Simulations" },
 ];
 
-function dailyPickIndex() {
+function localDailyPickIndex() {
   const now = new Date();
   const day =
     Math.floor(
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) /
         86_400_000
     ) || 0;
-  return Math.abs(day) % games.length;
+  return Math.abs(day) % 5;
+}
+
+function gameHref(gameId: string) {
+  return games.find(game => game.id === gameId)?.href ?? "/gaming";
 }
 
 export default function Gaming() {
+  const { isAuthenticated } = useAuth();
   const [filter, setFilter] = useState<GameCategory>("all");
-  const tournamentsQuery = trpc.gamefi.tournaments.useQuery(undefined, {
+  const gaming = trpc.betaGaming.dashboard.useQuery(undefined, {
+    enabled: isAuthenticated,
     retry: false,
   });
-  const questsQuery = trpc.gamefi.quests.useQuery(undefined, {
-    retry: false,
-  });
-  const leaderboardQuery = trpc.gamefi.leaderboard.useQuery(
-    { type: "global", limit: 5 },
-    { retry: false }
-  );
 
   const visibleGames = useMemo(
     () =>
@@ -164,10 +160,13 @@ export default function Gaming() {
         : games.filter(game => game.category === filter),
     [filter]
   );
-  const dailyGame = games[dailyPickIndex()];
-  const tournaments = (tournamentsQuery.data ?? []) as any[];
-  const quests = (questsQuery.data ?? []) as any[];
-  const leaderboard = (leaderboardQuery.data ?? []) as any[];
+
+  const summary = gaming.data?.summary;
+  const fallbackDailyGame = games[localDailyPickIndex()];
+  const dailyGame =
+    games.find(
+      game => game.id === summary?.dailyChallenge.gameId
+    ) ?? fallbackDailyGame;
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
@@ -193,12 +192,13 @@ export default function Gaming() {
                 </Badge>
               </div>
               <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                Learn. Play. Chase a better run.
+                Play. Save a run. Beat yourself.
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-7 text-white/65">
-                Replayable deterministic games, knowledge challenges, and
-                backend quest/tournament records in one place. Game-only
-                Sparks, XP, ranks, and scores have no monetary value.
+                Replayable games now connect to an opt-in, account-owned gaming
+                record. Save selected runs to build personal bests,
+                achievements, and daily challenge progress without pretending a
+                token economy or global competition service exists.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/game-sky-rush">
@@ -226,19 +226,28 @@ export default function Gaming() {
             <Card className="border-white/15 bg-black/20 text-white backdrop-blur">
               <CardHeader>
                 <CardDescription className="text-white/45">
-                  Daily deterministic pick
+                  Daily challenge
                 </CardDescription>
                 <CardTitle className="text-2xl text-white">
-                  {dailyGame.name}
+                  {summary?.dailyChallenge.gameLabel ?? dailyGame.name}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm leading-6 text-white/55">
-                  {dailyGame.detail}
+                  {isAuthenticated
+                    ? summary?.dailyChallenge.requirement ??
+                      "Load your account challenge."
+                    : "Sign in, play today's game, and explicitly save one non-zero run to complete the challenge."}
                 </p>
+                {summary?.dailyChallenge.completed ? (
+                  <div className="mt-3 flex items-center gap-2 text-sm font-semibold text-emerald-200">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Completed today
+                  </div>
+                ) : null}
                 <Link href={dailyGame.href}>
                   <Button className="mt-4 w-full">
-                    Start today's pick
+                    Play today's game
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -249,21 +258,37 @@ export default function Gaming() {
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            { label: "Playable routes", value: games.length, icon: Gamepad2 },
             {
-              label: "Quest records",
-              value: questsQuery.isLoading ? "…" : quests.length,
-              icon: Target,
+              label: "Playable routes",
+              value: games.length,
+              icon: Gamepad2,
             },
             {
-              label: "Tournament records",
-              value: tournamentsQuery.isLoading ? "…" : tournaments.length,
+              label: "Saved runs",
+              value: isAuthenticated
+                ? gaming.isLoading
+                  ? "…"
+                  : summary?.totalRuns ?? 0
+                : "Sign in",
               icon: Trophy,
             },
             {
-              label: "Leaderboard records",
-              value: leaderboardQuery.isLoading ? "…" : leaderboard.length,
+              label: "Personal best",
+              value: isAuthenticated
+                ? gaming.isLoading
+                  ? "…"
+                  : (summary?.bestScore ?? 0).toLocaleString()
+                : "Local only",
               icon: Crown,
+            },
+            {
+              label: "Achievements",
+              value: isAuthenticated
+                ? gaming.isLoading
+                  ? "…"
+                  : `${summary?.unlockedAchievements ?? 0}/5`
+                : "Sign in",
+              icon: Target,
             },
           ].map(({ label, value, icon: Icon }) => (
             <Card
@@ -280,6 +305,40 @@ export default function Gaming() {
             </Card>
           ))}
         </section>
+
+        {!isAuthenticated ? (
+          <Card className="border-amber-300/20 bg-amber-300/[0.04] text-white">
+            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+                <div>
+                  <p className="font-semibold text-amber-100">
+                    Playing stays local until you choose to save
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-white/45">
+                    Anonymous play does not write game records. Sign in, finish a
+                    supported game, then choose Save run if you want it in your
+                    account history.
+                  </p>
+                </div>
+              </div>
+              <Link href="/signin">
+                <Button className="shrink-0">
+                  Open invitation sign in
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : gaming.error ? (
+          <div
+            className="rounded-2xl border border-rose-300/20 bg-rose-300/[0.05] p-4 text-sm text-rose-100"
+            role="alert"
+          >
+            Saved gaming progress is temporarily unavailable. Local game play
+            still works; do not assume a run was saved unless its Save run
+            control confirms success.
+          </div>
+        ) : null}
 
         <section>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -357,153 +416,137 @@ export default function Gaming() {
           </div>
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-3">
-          <Card className="border-white/10 bg-white/[0.03] text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Target className="h-5 w-5 text-emerald-200" />
-                Quest records
-              </CardTitle>
-              <CardDescription className="text-white/45">
-                Current records returned by the existing GameFi service.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {questsQuery.isLoading ? (
-                <p className="text-sm text-white/35">Loading quests…</p>
-              ) : questsQuery.error ? (
-                <p className="text-sm text-rose-200">
-                  Quest records are unavailable.
-                </p>
-              ) : quests.length === 0 ? (
-                <p className="text-sm text-white/35">
-                  No quest records are currently available.
-                </p>
-              ) : (
-                quests.slice(0, 4).map((quest: any, index: number) => (
-                  <div
-                    key={quest.id ?? index}
-                    className="rounded-2xl border border-white/[0.08] bg-black/20 p-3"
-                  >
-                    <p className="font-semibold text-white">
-                      {quest.name ?? `Quest ${index + 1}`}
-                    </p>
-                    <p className="mt-1 line-clamp-2 text-xs leading-5 text-white/35">
-                      {quest.description ?? quest.type ?? "Quest details"}
-                    </p>
-                    {quest.rewardXp ? (
-                      <p className="mt-2 text-xs font-semibold text-emerald-200">
-                        {quest.rewardXp} service XP
-                      </p>
-                    ) : null}
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/10 bg-white/[0.03] text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Trophy className="h-5 w-5 text-amber-200" />
-                Tournaments
-              </CardTitle>
-              <CardDescription className="text-white/45">
-                Backend records only; no invented prize pools or active-player
-                counts.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {tournamentsQuery.isLoading ? (
-                <p className="text-sm text-white/35">
-                  Loading tournaments…
-                </p>
-              ) : tournamentsQuery.error ? (
-                <p className="text-sm text-rose-200">
-                  Tournament records are unavailable.
-                </p>
-              ) : tournaments.length === 0 ? (
-                <p className="text-sm text-white/35">
-                  No tournament records are currently available.
-                </p>
-              ) : (
-                tournaments.slice(0, 4).map((item: any, index: number) => (
-                  <div
-                    key={item.id ?? index}
-                    className="rounded-2xl border border-white/[0.08] bg-black/20 p-3"
-                  >
-                    <p className="font-semibold">
-                      {item.name ?? `Tournament ${index + 1}`}
-                    </p>
-                    <p className="mt-1 text-xs text-white/35">
-                      {item.status ?? "Record available"}
-                    </p>
-                  </div>
-                ))
-              )}
-              <Link href="/tournaments">
-                <Button
-                  variant="outline"
-                  className="w-full border-white/15 bg-white/[0.03] text-white"
-                >
-                  Open tournament hub
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/10 bg-white/[0.03] text-white">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Crown className="h-5 w-5 text-yellow-200" />
-                Leaderboard records
-              </CardTitle>
-              <CardDescription className="text-white/45">
-                Only rows returned by the current backend query.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {leaderboardQuery.isLoading ? (
-                <p className="text-sm text-white/35">
-                  Loading leaderboard…
-                </p>
-              ) : leaderboardQuery.error ? (
-                <p className="text-sm text-rose-200">
-                  Leaderboard records are unavailable.
-                </p>
-              ) : leaderboard.length === 0 ? (
-                <p className="text-sm text-white/35">
-                  No leaderboard records are currently available.
-                </p>
-              ) : (
-                leaderboard.map((entry: any, index: number) => (
-                  <div
-                    key={entry.id ?? entry.userId ?? index}
-                    className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-black/20 p-3"
-                  >
-                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/[0.06] text-xs font-black">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">
-                        {entry.username ??
-                          entry.name ??
-                          `Player ${index + 1}`}
-                      </p>
-                      <p className="text-xs text-white/30">
-                        {entry.score ??
-                          entry.xp ??
-                          entry.points ??
-                          0}{" "}
-                        points
-                      </p>
+        {isAuthenticated ? (
+          <section className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Trophy className="h-5 w-5 text-amber-200" />
+                  Personal achievements
+                </CardTitle>
+                <CardDescription className="text-white/45">
+                  Derived only from up to the latest{" "}
+                  {gaming.data?.historyLimit ?? 500} explicitly saved runs.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {gaming.isLoading ? (
+                  <p className="text-sm text-white/35">
+                    Loading saved progress…
+                  </p>
+                ) : (
+                  summary?.achievements.map(item => (
+                    <div
+                      key={item.id}
+                      className={
+                        "rounded-2xl border p-4 " +
+                        (item.unlocked
+                          ? "border-emerald-300/20 bg-emerald-300/[0.04]"
+                          : "border-white/[0.08] bg-black/20")
+                      }
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={
+                            "grid h-9 w-9 shrink-0 place-items-center rounded-xl " +
+                            (item.unlocked
+                              ? "bg-emerald-300/10 text-emerald-200"
+                              : "bg-white/[0.05] text-white/25")
+                          }
+                        >
+                          {item.unlocked ? (
+                            <CheckCircle2 className="h-4 w-4" />
+                          ) : (
+                            <Target className="h-4 w-4" />
+                          )}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-semibold">{item.title}</p>
+                            <span className="text-xs text-white/30">
+                              {item.progress}/{item.target}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-xs leading-5 text-white/35">
+                            {item.detail}
+                          </p>
+                          <Progress
+                            value={(item.progress / item.target) * 100}
+                            className="mt-3 h-1.5"
+                          />
+                        </div>
+                      </div>
                     </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <CardTitle className="flex items-center gap-2 text-white">
+                      <Sparkles className="h-5 w-5 text-cyan-200" />
+                      Recent saved runs
+                    </CardTitle>
+                    <CardDescription className="mt-1 text-white/45">
+                      Account-owned game records. Saving is explicit.
+                    </CardDescription>
                   </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        </section>
+                  <Link
+                    href="/activity-evidence"
+                    className="text-xs font-semibold text-sky-200"
+                  >
+                    Activity Evidence
+                  </Link>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {gaming.isLoading ? (
+                  <p className="text-sm text-white/35">
+                    Loading saved runs…
+                  </p>
+                ) : !gaming.data?.recent.length ? (
+                  <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center">
+                    <Gamepad2 className="mx-auto h-6 w-6 text-white/20" />
+                    <p className="mt-3 text-sm text-white/45">
+                      No saved runs yet.
+                    </p>
+                    <p className="mt-1 text-xs text-white/30">
+                      Finish Sky Rush, Spark Tap, Crypto Quiz, or Block Builder
+                      and choose Save run.
+                    </p>
+                  </div>
+                ) : (
+                  gaming.data.recent.map(run => (
+                    <div
+                      key={run.id}
+                      className="flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-black/20 p-4"
+                    >
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-violet-300/10 text-violet-100">
+                        <Gamepad2 className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold">
+                          {games.find(game => game.id === run.gameId)?.name ??
+                            run.gameId}
+                        </p>
+                        <p className="mt-0.5 text-xs text-white/35">
+                          {run.score.toLocaleString()} points · {run.sparks}{" "}
+                          Sparks · {run.combo}x combo
+                        </p>
+                      </div>
+                      <time className="hidden text-xs text-white/25 sm:block">
+                        {new Date(run.createdAt).toLocaleDateString()}
+                      </time>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        ) : null}
 
         <section className="grid gap-4 md:grid-cols-3">
           <Link
@@ -530,10 +573,11 @@ export default function Gaming() {
           </Link>
           <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.04] p-5">
             <Shield className="h-5 w-5 text-emerald-200" />
-            <h2 className="mt-3 font-bold">Responsible beta boundary</h2>
+            <h2 className="mt-3 font-bold">Competition boundary</h2>
             <p className="mt-2 text-sm leading-6 text-white/40">
-              No real-money wagering, custody, prize settlement, token payout,
-              or production blockchain execution is performed by this hub.
+              Global tournaments, cross-user rankings, prize settlement, and
+              GameFi economy services are not activated in this beta. Personal
+              saved runs are not a public leaderboard.
             </p>
           </div>
         </section>
