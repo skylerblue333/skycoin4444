@@ -5,6 +5,7 @@ import {
   betaAuthMode,
   betaAuthModeIssue,
   normalizeBetaEmail,
+  oauthProviderRuntimeEnabled,
   verifyBetaAccessKey,
 } from "./betaAccessAuth";
 
@@ -18,6 +19,20 @@ describe("beta access-key authentication policy", () => {
         VITE_BETA_AUTH_MODE: "access_key",
       } as NodeJS.ProcessEnv)
     ).toBe("access_key");
+  });
+
+  it("enables the external OAuth runtime only in oauth mode", () => {
+    expect(oauthProviderRuntimeEnabled({} as NodeJS.ProcessEnv)).toBe(true);
+    expect(
+      oauthProviderRuntimeEnabled({
+        VITE_BETA_AUTH_MODE: "oauth",
+      } as NodeJS.ProcessEnv)
+    ).toBe(true);
+    expect(
+      oauthProviderRuntimeEnabled({
+        VITE_BETA_AUTH_MODE: "access_key",
+      } as NodeJS.ProcessEnv)
+    ).toBe(false);
   });
 
   it("rejects unknown auth modes", () => {
