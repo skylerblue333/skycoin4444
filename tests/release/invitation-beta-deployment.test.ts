@@ -25,7 +25,10 @@ describe("invitation-only deployable beta boundary", () => {
     expect(signin).toMatch(/approved identity provider/);
     expect(signin).toMatch(/Invitation access key/);
     expect(signin).toMatch(/never accepts a SKYCOIN4444 password/);
-    expect(signin).toMatch(/type="password"/);
+    expect(signin).toMatch(/type=\{showAccessKey \? "text" : "password"\}/);
+    expect(signin).toMatch(/Show access key/);
+    expect(signin).toMatch(/Hide access key/);
+    expect(signin).toMatch(/autoComplete="off"/);
     expect(signin).not.toMatch(/auth_token/);
     expect(signin).not.toMatch(/demo@skycoin\.com/);
     expect(signin).not.toMatch(/demo1234/);
