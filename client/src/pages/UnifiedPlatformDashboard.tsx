@@ -31,6 +31,7 @@ import {
   Activity,
   Download,
 } from "lucide-react";
+import { buildPlatformReportCsv, platformReportFilename, type PlatformReportRow } from "@/lib/platformReport";
 
 interface DashboardStats {
   totalUsers: number;
@@ -81,6 +82,12 @@ const ACTIVITY_DATA = [
   { date: "Sun", sessions: 389, translations: 2000, users: 645 },
 ];
 
+const ACTIVITY_DATA_BY_RANGE = {
+  day: ACTIVITY_DATA.slice(-1),
+  week: ACTIVITY_DATA,
+  month: ACTIVITY_DATA.map((item, index) => ({ ...item, date: `W${index + 1}` })),
+};
+
 const LANGUAGE_DISTRIBUTION = [
   { name: "Chinese", value: 2345, color: "#8b5cf6" },
   { name: "Spanish", value: 3456, color: "#3b82f6" },
@@ -92,6 +99,44 @@ const LANGUAGE_DISTRIBUTION = [
 export function UnifiedPlatformDashboard() {
   const [dateRange, setDateRange] = useState("week");
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
+  const [exportStatus, setExportStatus] = useState("");
+  const rangeLabel = dateRange === "day" ? "Today" : dateRange === "month" ? "This month" : "This week";
+  const visibleLanguageStats = selectedLanguage
+    ? LANGUAGE_STATS.filter((language) => language.language === selectedLanguage)
+    : LANGUAGE_STATS;
+  const visibleLanguageDistribution = selectedLanguage
+    ? LANGUAGE_DISTRIBUTION.filter((language) => language.name === selectedLanguage)
+    : LANGUAGE_DISTRIBUTION;
+  const visibleActivityData = ACTIVITY_DATA_BY_RANGE[dateRange as keyof typeof ACTIVITY_DATA_BY_RANGE];
+  const scopeLabel = selectedLanguage ? `${rangeLabel} · ${selectedLanguage}` : rangeLabel;
+
+  const exportReport = () => {
+    const rows: PlatformReportRow[] = [
+      ["Metric", "Value"],
+      ["Report range", dateRange],
+      ["Selected language", selectedLanguage ?? "All languages"],
+      ["Total users", MOCK_STATS.totalUsers],
+      ["Active users", MOCK_STATS.activeUsers],
+      ["Total sessions", MOCK_STATS.totalSessions],
+      ["Total hours", MOCK_STATS.totalHours],
+      ["Total translations", MOCK_STATS.totalTranslations],
+      ["Average rating", MOCK_STATS.averageRating],
+      ["Languages supported", MOCK_STATS.languagesSupported],
+      ["Translation accuracy", `${MOCK_STATS.translationAccuracy}%`],
+      ["Generated at", new Date().toISOString()],
+    ];
+    const csv = buildPlatformReportCsv(rows);
+    const url = URL.createObjectURL(new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = platformReportFilename(dateRange, selectedLanguage);
+    link.setAttribute("aria-hidden", "true");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    setExportStatus(`Report downloaded for ${rangeLabel}${selectedLanguage ? ` · ${selectedLanguage}` : ""}.`);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
@@ -107,11 +152,29 @@ export function UnifiedPlatformDashboard() {
               Global language exchange platform analytics and insights
             </p>
           </div>
-          <Button className="bg-purple-600 hover:bg-purple-700 gap-2">
+          <Button type="button" onClick={exportReport} aria-label={`Export ${rangeLabel.toLowerCase()} platform report`} className="bg-purple-600 hover:bg-purple-700 gap-2">
             <Download className="w-4 h-4" />
             Export Report
           </Button>
         </div>
+
+        <div className="mb-8 flex flex-col gap-3 rounded-lg border border-slate-700 bg-slate-800/50 p-4 sm:flex-row sm:items-center sm:justify-between" aria-label="Report filters" aria-describedby="report-scope-help">
+          <div><p className="text-sm font-semibold text-white">Report scope</p><p id="report-scope-help" className="text-xs text-gray-400">Choose the context used in exports and dashboard labels. Current scope: {scopeLabel}.</p></div>
+          <div className="flex flex-wrap gap-2">
+            <label className="sr-only" htmlFor="dashboard-range">Date range</label>
+            <select id="dashboard-range" value={dateRange} onChange={(event) => setDateRange(event.target.value)} className="h-9 rounded-md border border-slate-600 bg-slate-900 px-3 text-sm text-white">
+              <option value="day">Today</option><option value="week">This week</option><option value="month">This month</option>
+            </select>
+            <label className="sr-only" htmlFor="dashboard-language">Language</label>
+            <select id="dashboard-language" value={selectedLanguage ?? "all"} onChange={(event) => setSelectedLanguage(event.target.value === "all" ? null : event.target.value)} className="h-9 rounded-md border border-slate-600 bg-slate-900 px-3 text-sm text-white">
+              <option value="all">All languages</option>{LANGUAGE_STATS.map((language) => <option key={language.language} value={language.language}>{language.language}</option>)}
+            </select>
+            <Button type="button" variant="ghost" size="sm" disabled={dateRange === "week" && selectedLanguage === null} onClick={() => { setDateRange("week"); setSelectedLanguage(null); }}>
+              Clear filters
+            </Button>
+          </div>
+        </div>
+        <p className="sr-only" aria-live="polite">{exportStatus}</p>
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -186,10 +249,10 @@ export function UnifiedPlatformDashboard() {
 
           {/* Activity Tab */}
           <TabsContent value="activity" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700 p-6">
-              <h3 className="font-bold text-white mb-4">Weekly Activity</h3>
+              <Card className="bg-slate-800/50 border-slate-700 p-6">
+              <h3 className="font-bold text-white mb-4">{scopeLabel} Activity</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ACTIVITY_DATA}>
+                <BarChart data={visibleActivityData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="date" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
@@ -209,7 +272,7 @@ export function UnifiedPlatformDashboard() {
             <Card className="bg-slate-800/50 border-slate-700 p-6">
               <h3 className="font-bold text-white mb-4">User Growth</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={ACTIVITY_DATA}>
+                <LineChart data={visibleActivityData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis dataKey="date" stroke="#9ca3af" />
                   <YAxis stroke="#9ca3af" />
@@ -236,11 +299,11 @@ export function UnifiedPlatformDashboard() {
           <TabsContent value="languages" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-slate-800/50 border-slate-700 p-6">
-                <h3 className="font-bold text-white mb-4">Language Distribution</h3>
+                <h3 className="font-bold text-white mb-4">Language Distribution{selectedLanguage ? ` · ${selectedLanguage}` : ""}</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={LANGUAGE_DISTRIBUTION}
+                      data={visibleLanguageDistribution}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -249,7 +312,7 @@ export function UnifiedPlatformDashboard() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {LANGUAGE_DISTRIBUTION.map((entry, index) => (
+                      {visibleLanguageDistribution.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -266,8 +329,8 @@ export function UnifiedPlatformDashboard() {
               <Card className="bg-slate-800/50 border-slate-700 p-6">
                 <h3 className="font-bold text-white mb-4">Language Rankings</h3>
                 <div className="space-y-4">
-                  {LANGUAGE_STATS.map((lang, idx) => (
-                    <div key={idx}>
+                  {visibleLanguageStats.map((lang) => (
+                    <div key={lang.language}>
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-bold text-white">{lang.language}</span>
                         <Badge className="bg-purple-500/20 text-purple-300">
