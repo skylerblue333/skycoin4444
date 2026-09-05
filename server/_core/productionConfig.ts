@@ -1,6 +1,11 @@
 import { betaAdmissionSnapshot, betaAccessMode } from "./betaAdmission";
 import { sessionLifetimePolicyFromEnv } from "./sessionPolicy";
 import { sessionSigningKeysFromEnv } from "./sessionKeys";
+import {
+  betaAccessKeyIssue,
+  betaAuthMode,
+  betaAuthModeIssue,
+} from "./betaAccessAuth";
 
 export type ProductionConfigIssue = {
   key: string;
@@ -81,18 +86,23 @@ export function inspectProductionBetaConfig(
     issues.push({ key: "VITE_APP_ID", message: "VITE_APP_ID is required" });
   }
 
-  if (!isHttpsUrl(env.OAUTH_SERVER_URL)) {
-    issues.push({
-      key: "OAUTH_SERVER_URL",
-      message: "OAUTH_SERVER_URL must be a valid HTTPS URL",
-    });
-  }
+  add("VITE_BETA_AUTH_MODE", betaAuthModeIssue(env));
+  if (betaAuthMode(env) === "oauth") {
+    if (!isHttpsUrl(env.OAUTH_SERVER_URL)) {
+      issues.push({
+        key: "OAUTH_SERVER_URL",
+        message: "OAUTH_SERVER_URL must be a valid HTTPS URL",
+      });
+    }
 
-  if (!isHttpsUrl(env.VITE_OAUTH_PORTAL_URL)) {
-    issues.push({
-      key: "VITE_OAUTH_PORTAL_URL",
-      message: "VITE_OAUTH_PORTAL_URL must be a valid HTTPS URL",
-    });
+    if (!isHttpsUrl(env.VITE_OAUTH_PORTAL_URL)) {
+      issues.push({
+        key: "VITE_OAUTH_PORTAL_URL",
+        message: "VITE_OAUTH_PORTAL_URL must be a valid HTTPS URL",
+      });
+    }
+  } else {
+    add("BETA_ACCESS_KEY", betaAccessKeyIssue(env));
   }
 
   add("BETA_PUBLIC_ORIGIN", publicOriginIssue(env.BETA_PUBLIC_ORIGIN));

@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerBetaRoutes } from "./betaRoutes";
+import { registerBetaAccessAuthRoutes } from "./betaAccessAuthRoutes";
 import { registerPlatformKernelRoutes } from "./platformKernel";
 import { registerEventFabricRoutes } from "./eventRegistry";
 import { registerStorageProxy } from "./storageProxy";
@@ -107,6 +108,7 @@ async function startServer() {
 
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  registerBetaAccessAuthRoutes(app);
   registerBetaRoutes(app, dependencyReadiness);
   registerPlatformKernelRoutes(app);
   registerEventFabricRoutes(app);

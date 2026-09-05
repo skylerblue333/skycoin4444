@@ -12,6 +12,7 @@ import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
+import { betaAuthMode } from "./betaAccessAuth";
 import { sanitizeOperationalError } from "./operationalError";
 import { resolveSessionTtlMs } from "./sessionPolicy";
 import {
@@ -45,7 +46,7 @@ class OAuthService {
       "[OAuth] provider configuration",
       ENV.oAuthServerUrl ? "configured" : "missing"
     );
-    if (!ENV.oAuthServerUrl) {
+    if (!ENV.oAuthServerUrl && betaAuthMode() === "oauth") {
       console.error(
         "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
       );
