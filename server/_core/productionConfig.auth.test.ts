@@ -28,6 +28,34 @@ describe("production beta authentication mode", () => {
     expect(issues).toEqual([]);
   });
 
+  it("accepts the explicit Railway client-IP header for access-key limiting", () => {
+    const issues = inspectProductionBetaConfig({
+      ...baseEnv,
+      VITE_BETA_AUTH_MODE: "access_key",
+      BETA_ACCESS_KEY: "A".repeat(48),
+      BETA_TRUSTED_CLIENT_IP_HEADER: "x-real-ip",
+    });
+
+    expect(issues).toEqual([]);
+  });
+
+  it("fails closed on an untrusted client-IP header name", () => {
+    const issues = inspectProductionBetaConfig({
+      ...baseEnv,
+      VITE_BETA_AUTH_MODE: "access_key",
+      BETA_ACCESS_KEY: "A".repeat(48),
+      BETA_TRUSTED_CLIENT_IP_HEADER: "x-forwarded-for",
+    });
+
+    expect(
+      issues.find(
+        issue => issue.key === "BETA_TRUSTED_CLIENT_IP_HEADER"
+      )
+    ).toMatchObject({
+      key: "BETA_TRUSTED_CLIENT_IP_HEADER",
+    });
+  });
+
   it("fails closed on a weak access key", () => {
     const issues = inspectProductionBetaConfig({
       ...baseEnv,

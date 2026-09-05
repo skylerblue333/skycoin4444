@@ -102,6 +102,18 @@ function requirePublicContracts(readiness, auth, runtimeReady, health) {
   ) {
     throw new Error("Beta authentication contract is not satisfied");
   }
+
+  if (
+    auth.mode === "access_key" &&
+    (!auth.rateLimit ||
+      auth.rateLimit.scope !== "process_local" ||
+      !Number.isInteger(auth.rateLimit.windowMs) ||
+      auth.rateLimit.windowMs < 10_000 ||
+      !Number.isInteger(auth.rateLimit.maxAttempts) ||
+      auth.rateLimit.maxAttempts < 3)
+  ) {
+    throw new Error("Beta access-key rate-limit contract is not satisfied");
+  }
 }
 
 function credentialPair() {

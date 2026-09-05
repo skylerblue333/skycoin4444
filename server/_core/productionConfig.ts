@@ -6,6 +6,7 @@ import {
   betaAuthMode,
   betaAuthModeIssue,
 } from "./betaAccessAuth";
+import { betaAccessRateLimitIssues } from "./betaAccessRateLimit";
 
 export type ProductionConfigIssue = {
   key: string;
@@ -103,6 +104,7 @@ export function inspectProductionBetaConfig(
     }
   } else {
     add("BETA_ACCESS_KEY", betaAccessKeyIssue(env));
+    issues.push(...betaAccessRateLimitIssues(env));
   }
 
   add("BETA_PUBLIC_ORIGIN", publicOriginIssue(env.BETA_PUBLIC_ORIGIN));
