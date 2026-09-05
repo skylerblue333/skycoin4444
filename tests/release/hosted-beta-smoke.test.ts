@@ -79,6 +79,11 @@ async function createMockHost(options?: {
         configured: true,
         identityVerification: false,
         invitationRequired: true,
+        rateLimit: {
+          windowMs: 300000,
+          maxAttempts: 12,
+          scope: "process_local",
+        },
       });
       return;
     }
