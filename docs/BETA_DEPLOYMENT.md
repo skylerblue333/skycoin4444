@@ -272,6 +272,12 @@ HOSTED_BETA_ORIGIN=https://beta.example.com pnpm beta:smoke:hosted
 
 Credentialed verification should be run only where the environment can inject the secret values without exposing them.
 
+## Rollback control
+
+Application rollback follows `docs/BETA_ROLLBACK.md`. A rollback target must be a previously exact-head-CI-green and hosted-`SUCCESS` application revision. Application rollback does not imply database rollback; any incompatible schema/data recovery requires a separate reviewed plan.
+
+The active rollback target and its contemporaneous deployment evidence belong in Issue #272.
+
 ## Privacy operations
 
 The engineering beta provides an authenticated self-export over currently integrated account/profile, social, learning, feedback, discovery, creator, notification, and privacy-request tables. The export explicitly does not claim exhaustive coverage of unintegrated legacy or external-provider systems.
