@@ -12,6 +12,12 @@ export function betaAuthMode(
     : "oauth";
 }
 
+export function oauthProviderRuntimeEnabled(
+  env: NodeJS.ProcessEnv = process.env
+): boolean {
+  return betaAuthMode(env) === "oauth";
+}
+
 export function betaAuthModeIssue(
   env: NodeJS.ProcessEnv = process.env
 ): string | null {
