@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { Download, Lock, Trash2, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  Download,
+  Lock,
+  ShieldCheck,
+  Trash2,
+  UserRound,
+} from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,7 +27,7 @@ export default function PrivacySettings() {
   const utils = trpc.useUtils();
   const profile = trpc.user.profile.useQuery(
     user ? { userId: user.id } : undefined,
-    { enabled: Boolean(user) }
+    { enabled: Boolean(user), retry: false }
   );
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: async () => {
@@ -37,131 +43,283 @@ export default function PrivacySettings() {
   }, [profile.data?.profileVisibility]);
 
   if (loading) {
-    return <main className="min-h-screen p-8">Loading account state…</main>;
+    return (
+      <main className="min-h-screen bg-[#050510] p-8 text-white">
+        <div className="mx-auto max-w-4xl">
+          <div className="h-8 w-44 animate-pulse rounded-lg bg-white/10" />
+          <div className="mt-6 h-64 animate-pulse rounded-3xl border border-white/10 bg-white/[0.03]" />
+        </div>
+      </main>
+    );
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-6">
-        <Card className="w-full max-w-lg">
+      <main className="min-h-screen bg-[#050510] px-4 py-14 text-white">
+        <Card className="mx-auto w-full max-w-lg border-white/10 bg-white/[0.035] text-white">
           <CardHeader>
-            <CardTitle>Privacy center</CardTitle>
-            <CardDescription>
-              Sign in to manage account privacy, export beta data, and request
-              deletion review.
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-200">
+              <Lock className="h-6 w-6" />
+            </div>
+            <CardTitle className="mt-4 text-3xl">Privacy center</CardTitle>
+            <CardDescription className="text-white/50">
+              Sign in through the canonical invitation flow to manage account
+              privacy, export integrated beta data, and request deletion review.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button className="w-full" onClick={() => startLogin()}>
-              Sign in
-            </Button>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <Link href="/signin">
+              <Button className="w-full">
+                Open invitation sign in
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/beta-workspace">
+              <Button
+                variant="outline"
+                className="w-full border-white/15 bg-white/[0.03] text-white"
+              >
+                Browse public labs
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </main>
     );
   }
 
+  const persistedVisibility =
+    (profile.data?.profileVisibility as Visibility | undefined) ?? "public";
+  const hasChange = visibility !== persistedVisibility;
+
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="mx-auto max-w-4xl space-y-6">
-        <header>
-          <Badge variant="outline">Engineering beta privacy</Badge>
-          <h1 className="mt-3 text-3xl font-bold">Privacy center</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Manage the privacy controls that are actually integrated into your
-            authenticated beta account.
-          </p>
+    <main className="min-h-screen bg-[#050510] text-white">
+      <div className="mx-auto max-w-4xl space-y-6 px-4 py-10">
+        <header className="flex flex-col gap-5 border-b border-white/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge
+                variant="outline"
+                className="border-emerald-300/25 bg-emerald-300/[0.04] text-emerald-100"
+              >
+                Engineering beta privacy
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-white/10 text-white/45"
+              >
+                Account-scoped controls
+              </Badge>
+            </div>
+            <h1 className="mt-4 text-4xl font-black tracking-tight">
+              Privacy center
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/50">
+              Manage the privacy controls that are actually integrated into
+              this authenticated beta account. Unintegrated legacy and external
+              systems remain outside this surface.
+            </p>
+          </div>
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              className="border-white/15 bg-white/[0.03] text-white"
+            >
+              Back to dashboard
+            </Button>
+          </Link>
         </header>
 
-        <Card>
+        {profile.error ? (
+          <div
+            className="rounded-2xl border border-rose-300/20 bg-rose-300/[0.05] p-4 text-sm text-rose-100"
+            role="alert"
+          >
+            Current profile privacy could not be loaded. Refresh before making a
+            visibility change.
+          </div>
+        ) : null}
+
+        {updateProfile.error ? (
+          <div
+            className="rounded-2xl border border-rose-300/20 bg-rose-300/[0.05] p-4 text-sm text-rose-100"
+            role="alert"
+          >
+            Visibility could not be saved: {updateProfile.error.message}
+          </div>
+        ) : null}
+
+        <Card className="border-white/10 bg-white/[0.03] text-white">
           <CardHeader>
-            <Lock className="h-6 w-6 text-primary" />
-            <CardTitle className="mt-2">Profile visibility</CardTitle>
-            <CardDescription>
-              This setting is stored against your account and controls profile
-              redaction behavior in the current beta.
+            <Lock className="h-6 w-6 text-emerald-200" />
+            <CardTitle className="mt-2 text-white">
+              Profile visibility
+            </CardTitle>
+            <CardDescription className="text-white/45">
+              This value is stored against your account and controls the current
+              beta's profile-redaction behavior.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <select
-              value={visibility}
-              onChange={event =>
-                setVisibility(event.target.value as Visibility)
-              }
-              className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm"
-            >
-              <option value="public">Public</option>
-              <option value="members">Members</option>
-              <option value="private">Private</option>
-            </select>
-            <Button
-              type="button"
-              disabled={updateProfile.isPending}
-              onClick={() =>
-                updateProfile.mutate({ profileVisibility: visibility })
-              }
-            >
-              {updateProfile.isPending ? "Saving…" : "Save visibility"}
-            </Button>
-            {updateProfile.isSuccess && (
-              <p className="text-sm text-emerald-600">
-                Visibility setting saved.
+          <CardContent className="space-y-5">
+            {profile.isLoading ? (
+              <p className="text-sm text-white/40">
+                Loading persisted visibility…
               </p>
+            ) : (
+              <>
+                <label className="block space-y-2 text-sm font-medium">
+                  <span>Who can see profile fields?</span>
+                  <select
+                    value={visibility}
+                    onChange={event =>
+                      setVisibility(event.target.value as Visibility)
+                    }
+                    className="h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-white outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40"
+                  >
+                    <option value="public">
+                      Public — expose allowed profile fields
+                    </option>
+                    <option value="members">
+                      Members — authenticated-member policy
+                    </option>
+                    <option value="private">
+                      Private — redact profile identity fields for others
+                    </option>
+                  </select>
+                </label>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    ["public", "Public", "Uses the current public-profile policy."],
+                    ["members", "Members", "Reserved for authenticated-member visibility."],
+                    ["private", "Private", "Redacts profile identity fields for other viewers."],
+                  ].map(([value, title, detail]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setVisibility(value as Visibility)}
+                      aria-pressed={visibility === value}
+                      className={
+                        "rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 " +
+                        (visibility === value
+                          ? "border-emerald-300/30 bg-emerald-300/[0.06]"
+                          : "border-white/10 bg-black/20 hover:border-white/20")
+                      }
+                    >
+                      <strong className="text-sm text-white">{title}</strong>
+                      <p className="mt-1 text-xs leading-5 text-white/35">
+                        {detail}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-col gap-3 border-t border-white/[0.07] pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs leading-5 text-white/35">
+                    Current saved setting:{" "}
+                    <span className="font-semibold text-white/55">
+                      {persistedVisibility}
+                    </span>
+                  </p>
+                  <Button
+                    type="button"
+                    disabled={
+                      updateProfile.isPending ||
+                      profile.isLoading ||
+                      !hasChange
+                    }
+                    onClick={() =>
+                      updateProfile.mutate({
+                        profileVisibility: visibility,
+                      })
+                    }
+                  >
+                    {updateProfile.isPending
+                      ? "Saving…"
+                      : hasChange
+                        ? "Save visibility"
+                        : "Visibility saved"}
+                  </Button>
+                </div>
+
+                {updateProfile.isSuccess ? (
+                  <p
+                    className="text-sm text-emerald-200"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    Visibility setting persisted to this account.
+                  </p>
+                ) : null}
+              </>
             )}
           </CardContent>
         </Card>
 
         <section className="grid gap-4 md:grid-cols-3">
-          <Card>
+          <Card className="border-white/10 bg-white/[0.03] text-white">
             <CardHeader>
-              <UserRound className="h-5 w-5 text-primary" />
-              <CardTitle className="mt-2 text-base">Review profile</CardTitle>
-              <CardDescription>
+              <UserRound className="h-5 w-5 text-sky-200" />
+              <CardTitle className="mt-2 text-base text-white">
+                Review profile
+              </CardTitle>
+              <CardDescription className="text-white/45">
                 Inspect and update the identity fields stored for your beta
                 account.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/profile">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 bg-white/[0.03] text-white"
+                >
                   Open profile
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-white/10 bg-white/[0.03] text-white">
             <CardHeader>
-              <Download className="h-5 w-5 text-primary" />
-              <CardTitle className="mt-2 text-base">Export beta data</CardTitle>
-              <CardDescription>
-                Create a self-only JSON snapshot from currently integrated
-                beta tables.
+              <Download className="h-5 w-5 text-violet-200" />
+              <CardTitle className="mt-2 text-base text-white">
+                Export beta data
+              </CardTitle>
+              <CardDescription className="text-white/45">
+                Generate a self-only JSON snapshot from currently integrated
+                beta records.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/data-export">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 bg-white/[0.03] text-white"
+                >
                   Open export
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          <Card className="border-destructive/25">
+          <Card className="border-rose-300/20 bg-rose-300/[0.035] text-white">
             <CardHeader>
-              <Trash2 className="h-5 w-5 text-destructive" />
-              <CardTitle className="mt-2 text-base">
+              <Trash2 className="h-5 w-5 text-rose-200" />
+              <CardTitle className="mt-2 text-base text-white">
                 Request deletion review
               </CardTitle>
-              <CardDescription>
-                Record a durable account deletion request. Automated verified
+              <CardDescription className="text-white/45">
+                Record a durable deletion request. Automated verified full
                 purge is not yet implemented.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/delete-account">
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full border-rose-300/20 bg-rose-300/[0.03] text-white"
+                >
                   Open deletion request
                 </Button>
               </Link>
@@ -169,10 +327,12 @@ export default function PrivacySettings() {
           </Card>
         </section>
 
-        <section className="rounded-xl border p-4 text-sm leading-6 text-muted-foreground">
-          These controls do not claim regulatory certification or exhaustive
-          provider-wide data coverage. Unintegrated legacy and external systems
-          remain outside this beta privacy surface.
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
+          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
+          These controls do not claim regulatory certification, exhaustive
+          provider-wide data coverage, completed erasure, or independent
+          identity verification. They describe only the beta records and
+          workflows currently integrated in this application.
         </section>
       </div>
     </main>
