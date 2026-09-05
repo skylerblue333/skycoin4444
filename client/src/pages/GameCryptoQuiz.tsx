@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import GameRunSave from "@/components/GameRunSave";
 import { ChevronLeft, Clock, Sparkles, Trophy, Zap, CheckCircle2, XCircle, ArrowRight, RotateCcw } from "lucide-react";
 
 const QUESTIONS = [
@@ -197,6 +198,15 @@ export default function GameCryptoQuiz() {
               <p className="text-xs text-muted-foreground">Study XP and Sparks are local game values only. No token payout, donation, staking, or blockchain transaction occurs.</p>
             </div>
 
+            <GameRunSave
+              gameId="crypto-quiz"
+              mode="knowledge"
+              score={xpEarned}
+              sparks={sparksEarned}
+              combo={streak}
+              durationMs={0}
+              className="mb-4"
+            />
             <div className="flex items-center justify-center gap-3">
               <Button onClick={startGame} variant="outline" className="gap-2"><RotateCcw className="h-4 w-4" />Play Again</Button>
               <Link href="/gaming">
