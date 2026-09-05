@@ -22,7 +22,7 @@ describe("activity evidence", () => {
   it("does not expose inferred metrics or financial/chain activity", () => {
     expect(page).toMatch(/not an analytics|not a performance dashboard/i);
     expect(page).toMatch(/No wallet, payment, settlement, or chain events/);
-    expect(page).toMatch(/does not authorize or report payments/);
+    expect(page).toMatch(/does not\s+authorize or report payments/);
     expect(router).not.toMatch(/followers|engagement|revenue|balance|transaction|mainnet|wallet/);
   });
 });
