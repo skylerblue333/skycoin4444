@@ -9,7 +9,8 @@ describe('learning and gaming UI gap integration', () => {
   it('replaces the empty CourseCatalog placeholder with authored curriculum', () => {
     const source = read('client/src/pages/CourseCatalog.tsx');
     expect(source).toContain('gapCourses');
-    expect(source).toContain('Mark lesson complete');
+    expect(source).toContain('Record lesson completion');
+    expect(source).toContain('durable progress requires an invited account');
     expect(source).not.toContain('No data available. Start by creating a new item.');
   });
 
