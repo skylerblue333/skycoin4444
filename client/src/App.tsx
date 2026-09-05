@@ -441,6 +441,7 @@ const GameRoom = lazy(() => import('./pages/GameRoom'));
 const GameSettings = lazy(() => import('./pages/GameSettings'));
 const GameSlots = lazy(() => import('./pages/GameSlots'));
 const GameTokenTap = lazy(() => import('./pages/GameTokenTap'));
+const GameSkyRush = lazy(() => import('./pages/GameSkyRush'));
 const Gaming = lazy(() => import('./pages/Gaming'));
 const GamingForCharity = lazy(() => import('./pages/GamingForCharity'));
 const GanttChart = lazy(() => import('./pages/GanttChart'));
@@ -1505,6 +1506,7 @@ function Router() {
         <Route path="/game-settings" component={GameSettings} />
         <Route path="/game-slots" component={GameSlots} />
         <Route path="/game-token-tap" component={GameTokenTap} />
+        <Route path="/game-sky-rush" component={GameSkyRush} />
         <Route path="/gaming" component={Gaming} />
         <Route path="/gaming-for-charity" component={GamingForCharity} />
         <Route path="/gantt-chart" component={GanttChart} />

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Zap, ArrowRight, RotateCcw, Heart } from "lucide-react";
+import { ChevronLeft, Zap, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 
 const BLOCK_COLORS = [
   "bg-blue-500", "bg-purple-500", "bg-purple-600", "bg-yellow-500",
@@ -21,7 +21,7 @@ export default function GameBlockBuilder() {
   const [position, setPosition] = useState(0);
   const [direction, setDirection] = useState(1);
   const [score, setScore] = useState(0);
-  const [donated, setDonated] = useState(0);
+  const [sparksEarned, setSparksEarned] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
   const [speed, setSpeed] = useState(2);
   const [perfectStreak, setPerfectStreak] = useState(0);
@@ -56,7 +56,7 @@ export default function GameBlockBuilder() {
     setPosition(0);
     setDirection(1);
     setScore(0);
-    setDonated(0);
+    setSparksEarned(0);
     setXpEarned(0);
     setSpeed(2);
     setPerfectStreak(0);
@@ -97,7 +97,7 @@ export default function GameBlockBuilder() {
     const newStack = [...stack, newBlock];
     setStack(newStack);
     setScore(p => p + 1);
-    setDonated(p => p + (isPerfect ? 2 : 1));
+    setSparksEarned(p => p + (isPerfect ? 2 : 1));
     setXpEarned(p => p + (isPerfect ? 150 : 100));
 
     const newSpeed = Math.min(6, 2 + newStack.length * 0.15);
@@ -122,7 +122,7 @@ export default function GameBlockBuilder() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <div className="sticky top-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
-        <Link href="/gaming-for-charity">
+        <Link href="/gaming">
           <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground"><ChevronLeft className="h-4 w-4" />Back</Button>
         </Link>
         <span className="text-lg">🏗️</span>
@@ -133,8 +133,8 @@ export default function GameBlockBuilder() {
           <div className="flex items-center gap-2">
             {perfectStreak >= 2 && <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">✨ {perfectStreak} perfect!</Badge>}
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/10 border border-purple-500/20">
-              <Heart className="h-3.5 w-3.5 text-purple-400" />
-              <span className="text-xs font-bold text-purple-400">{donated} SKY444</span>
+              <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
+              <span className="text-xs font-bold text-purple-400">{sparksEarned} Sparks</span>
             </div>
           </div>
         )}
@@ -145,9 +145,9 @@ export default function GameBlockBuilder() {
           <div className="text-center">
             <div className="text-7xl mb-6">🏗️</div>
             <h1 className="text-3xl font-bold mb-3">Block Builder</h1>
-            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Stack blockchain blocks as high as possible! Tap or press Space to drop each block. Perfect drops keep the full width. Each block = 1 SKY444 donated to Hunger Relief.</p>
+            <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Stack blockchain blocks as high as possible! Tap or press Space to drop each block. Perfect drops keep the full width. Perfect drops earn extra game-only Sparks and Study XP. No donation or token transfer occurs.</p>
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-xs mx-auto">
-              {[{ label: "Perfect Drop", value: "+2 SKY444" }, { label: "Normal Drop", value: "+1 SKY444" }, { label: "Miss", value: "Game Over" }].map(s => (
+              {[{ label: "Perfect Drop", value: "+2 Sparks" }, { label: "Normal Drop", value: "+1 Spark" }, { label: "Miss", value: "Game Over" }].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className="text-sm font-bold text-purple-400">{s.value}</p>
                   <p className="text-xs text-muted-foreground">{s.label}</p>
@@ -165,7 +165,7 @@ export default function GameBlockBuilder() {
             <div className="flex items-center justify-between w-full max-w-xs mb-4">
               <div className="text-center"><p className="text-2xl font-bold text-purple-400">{score}</p><p className="text-xs text-muted-foreground">Blocks</p></div>
               <div className="text-center"><p className="text-2xl font-bold text-yellow-400">{xpEarned}</p><p className="text-xs text-muted-foreground">XP</p></div>
-              <div className="text-center"><p className="text-2xl font-bold text-purple-400">{donated}</p><p className="text-xs text-muted-foreground">Donated</p></div>
+              <div className="text-center"><p className="text-2xl font-bold text-purple-400">{sparksEarned}</p><p className="text-xs text-muted-foreground">Sparks</p></div>
             </div>
 
             {/* Game Area */}
@@ -204,7 +204,7 @@ export default function GameBlockBuilder() {
               {[
                 { label: "Blocks", value: score.toString(), color: "text-purple-400" },
                 { label: "XP Earned", value: `+${xpEarned}`, color: "text-yellow-400" },
-                { label: "Donated", value: `${donated} SKY444`, color: "text-purple-400" },
+                { label: "Sparks", value: `${sparksEarned}`, color: "text-cyan-400" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -212,14 +212,14 @@ export default function GameBlockBuilder() {
                 </div>
               ))}
             </div>
-            <div className="rounded-xl border border-purple-500/30 bg-purple-600/5 p-4 mb-6">
-              <p className="text-sm font-semibold text-purple-400 mb-1">🍎 Hunger Relief</p>
-              <p className="text-xs text-muted-foreground">{donated} SKY444 donated to fight hunger!</p>
+            <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-6">
+              <p className="text-sm font-semibold text-cyan-300 mb-1">✨ Game-only progress</p>
+              <p className="text-xs text-muted-foreground">Sparks and XP are local game values only. No donation, token transfer, wallet, or blockchain execution occurs.</p>
             </div>
             <div className="flex items-center justify-center gap-3">
               <Button onClick={startGame} variant="outline" className="gap-2"><RotateCcw className="h-4 w-4" />Play Again</Button>
-              <Link href="/gaming-for-charity">
-                <Button className="bg-primary text-primary-foreground gap-2">More Games <ArrowRight className="h-4 w-4" /></Button>
+              <Link href="/gaming">
+                <Button className="bg-primary text-primary-foreground gap-2">Games Center <ArrowRight className="h-4 w-4" /></Button>
               </Link>
             </div>
           </div>

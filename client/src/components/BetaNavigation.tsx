@@ -21,14 +21,14 @@ const links = [
   { label: "Home", route: "/", icon: Home },
   { label: "Workspace", route: "/beta-workspace", icon: LayoutDashboard },
   { label: "Social", route: "/activity-feed", icon: Activity },
-  { label: "Learn", route: "/course-catalog", icon: GraduationCap },
-  { label: "Gaming", route: "/arcade", icon: Gamepad2 },
+  { label: "Learn", route: "/sky-school", icon: GraduationCap },
+  { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "Live", route: "/live-streaming", icon: Radio },
   { label: "Shop", route: "/beta-commerce", icon: ShoppingBag },
   { label: "Language", route: "/language-partner-discovery", icon: Languages },
   { label: "Dating", route: "/dating-profile-setup", icon: Heart },
   { label: "Web3", route: "/beta-web3", icon: Boxes },
-  { label: "HopeAI", route: "/a-i-tools-hub", icon: Bot },
+  { label: "HopeAI", route: "/hope-a-i", icon: Bot },
 ] as const;
 
 function isActive(location: string, route: string) {
