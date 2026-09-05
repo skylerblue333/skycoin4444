@@ -28,7 +28,8 @@
     "check:secrets": "node scripts/check-credential-patterns.mjs",
     "audit:markers": "node scripts/audit-beta-markers.mjs",
     "audit:screens": "node scripts/audit-screen-portfolio.mjs",
-    "beta:db:bootstrap": "node scripts/bootstrap-beta-db.mjs"
+    "beta:db:bootstrap": "node scripts/bootstrap-beta-db.mjs",
+    "beta:smoke:hosted": "node scripts/hosted-beta-smoke.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1103.0",
