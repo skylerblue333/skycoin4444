@@ -4,6 +4,14 @@ import { describe, expect, it } from "vitest";
 const signin = fs.readFileSync("client/src/pages/Signin.tsx", "utf8");
 const oauth = fs.readFileSync("server/_core/oauth.ts", "utf8");
 const sdk = fs.readFileSync("server/_core/sdk.ts", "utf8");
+const betaAccessAuth = fs.readFileSync(
+  "server/_core/betaAccessAuth.ts",
+  "utf8"
+);
+const betaAccessRoutes = fs.readFileSync(
+  "server/_core/betaAccessAuthRoutes.ts",
+  "utf8"
+);
 const indexSource = fs.readFileSync("server/_core/index.ts", "utf8");
 const render = fs.readFileSync("render.yaml", "utf8");
 const bootstrap = fs.readFileSync("scripts/bootstrap-beta-db.mjs", "utf8");
@@ -12,15 +20,21 @@ const platformWorkflow = fs.readFileSync(".github/workflows/platform-vertical-ci
 const identityWorkflow = fs.readFileSync(".github/workflows/skyidentity.yml", "utf8");
 
 describe("invitation-only deployable beta boundary", () => {
-  it("removes the historical fake browser password sign-in", () => {
+  it("removes the historical fake account password while allowing a guarded invitation secret", () => {
     expect(signin).toMatch(/Invitation-only engineering beta/);
     expect(signin).toMatch(/approved identity provider/);
+    expect(signin).toMatch(/Invitation access key/);
     expect(signin).toMatch(/never accepts a SKYCOIN4444 password/);
+    expect(signin).toMatch(/type="password"/);
     expect(signin).not.toMatch(/auth_token/);
     expect(signin).not.toMatch(/demo@skycoin\.com/);
     expect(signin).not.toMatch(/demo1234/);
     expect(signin).not.toMatch(/btoa\(/);
-    expect(signin).not.toMatch(/type="password"/);
+
+    expect(betaAccessAuth).toMatch(/ACCESS_KEY_MIN_BYTES = 48/);
+    expect(betaAccessAuth).toMatch(/timingSafeEqual/);
+    expect(betaAccessRoutes).toMatch(/invalid invitation credentials/);
+    expect(betaAccessRoutes).not.toMatch(/localStorage/);
   });
 
   it("checks admission before OAuth session issuance and on later requests", () => {
