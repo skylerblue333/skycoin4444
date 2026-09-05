@@ -3,7 +3,7 @@ services:
     name: skycoin4444-beta
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm run build
+    buildCommand: pnpm install --frozen-lockfile && pnpm run build
     startCommand: pnpm start
     healthCheckPath: /api/beta/readiness
     autoDeploy: false
