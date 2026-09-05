@@ -32,7 +32,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(school).toMatch(/gapCourses/);
     expect(school).toMatch(/activityEvidence\.list\.useQuery/);
     expect(school).toMatch(/event\.type === "lesson_completed"/);
-    expect(school).toMatch(/href="\/game-sky-rush"/);
+    expect(school).toMatch(/href: "\/game-sky-rush"/);
     expect(school).toMatch(/href="\/hope-a-i"/);
     expect(school).toMatch(/Practice XP\/Sparks have no cash or token value/);
     expect(school).not.toMatch(/students:/);
