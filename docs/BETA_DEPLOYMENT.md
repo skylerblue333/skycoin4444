@@ -151,7 +151,7 @@ See `docs/SESSION_KEY_ROTATION.md`.
 
 ## Session lifetime
 
-The canonical OAuth session uses one shared absolute lifetime for both the signed JWT expiration and the session-cookie `Max-Age`.
+The canonical browser session uses one shared absolute lifetime for both the signed JWT expiration and the session-cookie `Max-Age`, regardless of whether the session was issued through `oauth` or `access_key` mode.
 
 `SESSION_TTL_MS`
 
@@ -165,7 +165,7 @@ The SDK applies the same hard bounds to any caller-requested session expiration 
 
 These sessions are currently stateless signed JWTs. Logout clears the browser cookie, and invitation admission is re-checked on authenticated requests, but a copied valid JWT is not backed by a server-side revocation record and remains cryptographically valid until its expiration unless the signing secret is rotated.
 
-The separate `SkySessions` package is a domain core and is not claimed as the persistence/revocation backend for the canonical OAuth session.
+The separate `SkySessions` package is a domain core and is not claimed as the persistence/revocation backend for the canonical browser session.
 
 See `docs/SESSION_SECURITY.md`.
 
@@ -241,6 +241,36 @@ A candidate deployment is not beta-ready until all of these are recorded:
 14. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
 15. `/delete-account` records a durable request and does not claim deletion completion;
 16. rollback target, privacy-request owner, and response owner are recorded.
+
+## Hosted smoke verifier
+
+The repository includes `pnpm beta:smoke:hosted` for repeatable non-destructive hosted verification.
+
+Public-only mode requires an exact hosted origin through `HOSTED_BETA_ORIGIN` or `BETA_PUBLIC_ORIGIN`. It checks:
+- the home and sign-in pages;
+- `/api/beta/health`;
+- `/api/beta/readiness`;
+- `/api/runtime/ready`;
+- `/api/beta/auth`;
+- database/configuration readiness and the explicit no-live-financial-or-chain-execution boundary.
+
+For a controlled access-key verification, an operator may additionally provide `BETA_SMOKE_EMAIL` and `BETA_ACCESS_KEY` together in a private execution environment. The verifier then:
+- performs the access-key login;
+- requires issuance of the canonical `__Host-app_session_id` production cookie;
+- sends that cookie only in-memory to `/api/trpc/auth.me`;
+- requires a non-null authenticated user result without printing user fields;
+- verifies a deliberately wrong key receives the generic 403 denial;
+- logs out.
+
+The verifier never intentionally prints the smoke email, access key, session cookie, or JWT. Its release test asserts those values are absent from stdout/stderr. Secrets must still be supplied only through an operator-controlled secret environment; do not paste them into issues, CI logs, shell history, or documentation.
+
+Example public-only verification:
+
+```bash
+HOSTED_BETA_ORIGIN=https://beta.example.com pnpm beta:smoke:hosted
+```
+
+Credentialed verification should be run only where the environment can inject the secret values without exposing them.
 
 ## Privacy operations
 
