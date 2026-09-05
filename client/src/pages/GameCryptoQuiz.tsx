@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, Clock, Heart, Trophy, Zap, CheckCircle2, XCircle, ArrowRight, RotateCcw } from "lucide-react";
+import { ChevronLeft, Clock, Sparkles, Trophy, Zap, CheckCircle2, XCircle, ArrowRight, RotateCcw } from "lucide-react";
 
 const QUESTIONS = [
   { q: "What does 'DeFi' stand for?", options: ["Decentralized Finance", "Digital Finance", "Defined Finance", "Distributed Finance"], answer: 0, xp: 100 },
@@ -26,7 +26,7 @@ export default function GameCryptoQuiz() {
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [xpEarned, setXpEarned] = useState(0);
-  const [donated, setDonated] = useState(0);
+  const [sparksEarned, setSparksEarned] = useState(0);
   const [timeLeft, setTimeLeft] = useState(20);
   const [streak, setStreak] = useState(0);
   const [results, setResults] = useState<boolean[]>([]);
@@ -52,7 +52,7 @@ export default function GameCryptoQuiz() {
       const xp = Math.round(question.xp * bonus);
       setScore(p => p + 1);
       setXpEarned(p => p + xp);
-      setDonated(p => p + Math.round(xp * 0.1));
+      setSparksEarned(p => p + Math.round(xp * 0.1));
       setStreak(p => p + 1);
     } else {
       setStreak(0);
@@ -75,7 +75,7 @@ export default function GameCryptoQuiz() {
     setSelected(null);
     setScore(0);
     setXpEarned(0);
-    setDonated(0);
+    setSparksEarned(0);
     setTimeLeft(20);
     setStreak(0);
     setResults([]);
@@ -87,7 +87,7 @@ export default function GameCryptoQuiz() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="sticky top-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
-        <Link href="/gaming-for-charity">
+        <Link href="/gaming">
           <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground"><ChevronLeft className="h-4 w-4" />Back</Button>
         </Link>
         <span className="text-lg">🧠</span>
@@ -98,8 +98,8 @@ export default function GameCryptoQuiz() {
           <div className="flex items-center gap-3">
             {streak >= 2 && <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs">🔥 {streak}x streak</Badge>}
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/10 border border-purple-500/20">
-              <Heart className="h-3.5 w-3.5 text-purple-400" />
-              <span className="text-xs font-bold text-purple-400">{donated} SKY444</span>
+              <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
+              <span className="text-xs font-bold text-purple-400">{sparksEarned} Sparks</span>
             </div>
           </div>
         )}
@@ -110,7 +110,7 @@ export default function GameCryptoQuiz() {
           <div className="text-center">
             <div className="text-7xl mb-6">🧠</div>
             <h1 className="text-3xl font-bold mb-3">Crypto Quiz Blitz</h1>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">Answer 10 blockchain questions. Every correct answer donates SKY444 to the Education Fund. You have 20 seconds per question.</p>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">Answer 10 blockchain questions. Answer 10 blockchain questions to earn Study XP and game-only Sparks. You have 20 seconds per question.</p>
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-sm mx-auto">
               {[
                 { label: "Questions", value: "10" },
@@ -183,7 +183,7 @@ export default function GameCryptoQuiz() {
               {[
                 { label: "Score", value: `${score}/${QUESTIONS.length}`, color: "text-blue-400" },
                 { label: "XP Earned", value: `+${xpEarned}`, color: "text-yellow-400" },
-                { label: "Donated", value: `${donated} SKY444`, color: "text-purple-400" },
+                { label: "Donated", value: `${sparksEarned} Sparks`, color: "text-purple-400" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl border border-border/50 bg-card/30 p-3 text-center">
                   <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -192,15 +192,15 @@ export default function GameCryptoQuiz() {
               ))}
             </div>
 
-            <div className="rounded-xl border border-purple-500/30 bg-purple-600/5 p-4 mb-6 max-w-sm mx-auto">
-              <p className="text-sm font-semibold text-purple-400 mb-1">📚 Education Fund</p>
-              <p className="text-xs text-muted-foreground">{donated} SKY444 has been donated on your behalf!</p>
+            <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-6 max-w-sm mx-auto">
+              <p className="text-sm font-semibold text-cyan-300 mb-1">📚 Study session</p>
+              <p className="text-xs text-muted-foreground">Study XP and Sparks are local game values only. No token payout, donation, staking, or blockchain transaction occurs.</p>
             </div>
 
             <div className="flex items-center justify-center gap-3">
               <Button onClick={startGame} variant="outline" className="gap-2"><RotateCcw className="h-4 w-4" />Play Again</Button>
-              <Link href="/gaming-for-charity">
-                <Button className="bg-primary text-primary-foreground gap-2">More Games <ArrowRight className="h-4 w-4" /></Button>
+              <Link href="/gaming">
+                <Button className="bg-primary text-primary-foreground gap-2">Games Center <ArrowRight className="h-4 w-4" /></Button>
               </Link>
             </div>
           </div>
