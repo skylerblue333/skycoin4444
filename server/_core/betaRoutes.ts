@@ -2,6 +2,7 @@ import type { Express, RequestHandler } from "express";
 import { skycoinBetaAreas } from "../../packages/area-registry/src/index";
 import { db } from "../db";
 import { betaAdmissionSnapshot } from "./betaAdmission";
+import { betaAccessKeyIssue, betaAuthMode } from "./betaAccessAuth";
 import { inspectProductionBetaConfig } from "./productionConfig";
 import type {
   DependencyReadinessSnapshot,
@@ -15,15 +16,25 @@ type ConfigProbe = () => ReturnType<typeof inspectProductionBetaConfig>;
 
 function runtimeSnapshot() {
   const admission = betaAdmissionSnapshot();
+  const authMode = betaAuthMode();
+  const oauthConfigured = Boolean(
+    process.env.VITE_APP_ID?.trim() &&
+      process.env.OAUTH_SERVER_URL?.trim() &&
+      process.env.VITE_OAUTH_PORTAL_URL?.trim()
+  );
+  const authConfigured =
+    authMode === "access_key"
+      ? !betaAccessKeyIssue()
+      : oauthConfigured;
+
   return {
     releaseChannel: RELEASE_CHANNEL,
     admissionMode: admission.mode,
     admissionConfigured: admission.configured,
-    oauthConfigured: Boolean(
-      process.env.VITE_APP_ID?.trim() &&
-        process.env.OAUTH_SERVER_URL?.trim() &&
-        process.env.VITE_OAUTH_PORTAL_URL?.trim()
-    ),
+    authMode,
+    authConfigured,
+    oauthConfigured,
+    identityVerification: false,
     publicOriginConfigured: Boolean(process.env.BETA_PUBLIC_ORIGIN?.trim()),
     liveFinancialOrChainExecution: false,
   };
