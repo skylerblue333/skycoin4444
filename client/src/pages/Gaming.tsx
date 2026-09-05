@@ -249,25 +249,25 @@ export default function Gaming() {
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Playable routes", games.length, Gamepad2],
-            [
-              "Quest records",
-              questsQuery.isLoading ? "…" : quests.length,
-              Target,
-            ],
-            [
-              "Tournament records",
-              tournamentsQuery.isLoading ? "…" : tournaments.length,
-              Trophy,
-            ],
-            [
-              "Leaderboard records",
-              leaderboardQuery.isLoading ? "…" : leaderboard.length,
-              Crown,
-            ],
-          ].map(([label, value, Icon]) => (
+            { label: "Playable routes", value: games.length, icon: Gamepad2 },
+            {
+              label: "Quest records",
+              value: questsQuery.isLoading ? "…" : quests.length,
+              icon: Target,
+            },
+            {
+              label: "Tournament records",
+              value: tournamentsQuery.isLoading ? "…" : tournaments.length,
+              icon: Trophy,
+            },
+            {
+              label: "Leaderboard records",
+              value: leaderboardQuery.isLoading ? "…" : leaderboard.length,
+              icon: Crown,
+            },
+          ].map(({ label, value, icon: Icon }) => (
             <Card
-              key={label as string}
+              key={label}
               className="border-white/10 bg-white/[0.035] text-white"
             >
               <CardContent className="p-5">
