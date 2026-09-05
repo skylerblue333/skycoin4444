@@ -12,7 +12,7 @@ import type { User } from "../../drizzle/schema";
 import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
-import { betaAuthMode } from "./betaAccessAuth";
+import { oauthProviderRuntimeEnabled } from "./betaAccessAuth";
 import { sanitizeOperationalError } from "./operationalError";
 import { resolveSessionTtlMs } from "./sessionPolicy";
 import {
@@ -42,14 +42,16 @@ const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserI
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
-    console.info(
-      "[OAuth] provider configuration",
-      ENV.oAuthServerUrl ? "configured" : "missing"
-    );
-    if (!ENV.oAuthServerUrl && betaAuthMode() === "oauth") {
-      console.error(
-        "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
+    if (oauthProviderRuntimeEnabled()) {
+      console.info(
+        "[OAuth] provider configuration",
+        ENV.oAuthServerUrl ? "configured" : "missing"
       );
+      if (!ENV.oAuthServerUrl) {
+        console.error(
+          "[OAuth] ERROR: OAUTH_SERVER_URL is not configured! Set OAUTH_SERVER_URL environment variable."
+        );
+      }
     }
   }
 
@@ -310,6 +312,10 @@ class SDKServer {
     let user = await db.getUserByOpenId(sessionUserId);
 
     if (!user) {
+      if (!oauthProviderRuntimeEnabled()) {
+        throw ForbiddenError("User not found");
+      }
+
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
         await db.upsertUser({

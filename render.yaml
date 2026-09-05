@@ -42,6 +42,10 @@ services:
         value: "604800000"
       - key: VITE_APP_ID
         sync: false
+      - key: VITE_BETA_AUTH_MODE
+        value: oauth
+      - key: BETA_ACCESS_KEY
+        sync: false
       - key: OAUTH_SERVER_URL
         sync: false
       - key: VITE_OAUTH_PORTAL_URL

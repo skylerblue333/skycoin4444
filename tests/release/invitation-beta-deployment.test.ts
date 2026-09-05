@@ -37,7 +37,12 @@ describe("invitation-only deployable beta boundary", () => {
     expect(betaAccessRoutes).not.toMatch(/localStorage/);
   });
 
-  it("checks admission before OAuth session issuance and on later requests", () => {
+  it("keeps access-key sessions provider-independent and checks admission on later requests", () => {
+    expect(sdk).toMatch(/oauthProviderRuntimeEnabled/);
+    expect(sdk).toMatch(/if \(!oauthProviderRuntimeEnabled\(\)\)/);
+    expect(sdk).toMatch(/throw ForbiddenError\("User not found"\)/);
+
+
     const admissionPosition = oauth.indexOf("evaluateBetaAdmission");
     const upsertPosition = oauth.indexOf("await db.upsertUser");
     const sessionPosition = oauth.indexOf("createSessionToken");
@@ -83,13 +88,15 @@ describe("invitation-only deployable beta boundary", () => {
     expect(identityWorkflow).toMatch(/timeout-minutes: 15/);
   });
 
-  it("wires Render to readiness, OAuth, origin, and invitation configuration", () => {
+  it("wires Render to readiness, selectable auth, origin, and invitation configuration", () => {
     expect(render).toMatch(/healthCheckPath: \/api\/beta\/readiness/);
     for (const key of [
       "BETA_ACCESS_MODE",
       "BETA_PUBLIC_ORIGIN",
       "BETA_ALLOWED_EMAILS",
       "BETA_ALLOWED_OPEN_IDS",
+      "VITE_BETA_AUTH_MODE",
+      "BETA_ACCESS_KEY",
       "VITE_OAUTH_PORTAL_URL",
       "JWT_SECRET",
       "DATABASE_URL",
@@ -97,6 +104,8 @@ describe("invitation-only deployable beta boundary", () => {
       expect(render).toContain(`key: ${key}`);
     }
     expect(render).toMatch(/key: BETA_ACCESS_MODE\s+value: invite_only/);
+    expect(render).toMatch(/key: VITE_BETA_AUTH_MODE\s+value: oauth/);
+    expect(render).toMatch(/key: BETA_ACCESS_KEY\s+sync: false/);
     expect(render).toMatch(/key: LOCAL_TEST_MODE\s+value: "false"/);
   });
 });
