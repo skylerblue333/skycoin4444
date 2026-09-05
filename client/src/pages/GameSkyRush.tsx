@@ -253,13 +253,13 @@ export default function GameSkyRush() {
 
         <section className="grid gap-4 sm:grid-cols-4">
           {[
-            ["Score", score.score.toLocaleString(), Trophy],
-            ["Sparks", score.sparks.toString(), Sparkles],
-            ["Combo", `${score.combo}x`, Zap],
-            ["Best", bestScore.toLocaleString(), Bolt],
-          ].map(([label, value, Icon]) => (
+            { label: "Score", value: score.score.toLocaleString(), icon: Trophy },
+            { label: "Sparks", value: score.sparks.toString(), icon: Sparkles },
+            { label: "Combo", value: `${score.combo}x`, icon: Zap },
+            { label: "Best", value: bestScore.toLocaleString(), icon: Bolt },
+          ].map(({ label, value, icon: Icon }) => (
             <div
-              key={label as string}
+              key={label}
               className="rounded-2xl border border-white/10 bg-white/[0.035] p-4"
             >
               <Icon className="h-4 w-4 text-sky-200" />
