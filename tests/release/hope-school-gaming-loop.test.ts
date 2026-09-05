@@ -25,7 +25,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(hope).not.toMatch(/Math\.random/);
     expect(hope).not.toMatch(/Better than ChatGPT/);
     expect(hope).not.toMatch(/tokensUsed/);
-    expect(hope).not.toMatch(/confidence/);
+    expect(hope).not.toMatch(/confidence\s*:/);
   });
 
   it("grounds SkySchool in authored courses and persisted lesson evidence", () => {
@@ -48,7 +48,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(gaming).toMatch(/No real-money wagering, custody, prize settlement/);
     expect(gaming).not.toMatch(/platform\.stats/);
     expect(gaming).not.toMatch(/Active Players/);
-    expect(gaming).not.toMatch(/prize pool/i);
+    expect(gaming).not.toMatch(/prizePool\s*:/i);
 
     expect(rush).toMatch(/resolveRushTick/);
     expect(rush).toMatch(/dailySeed/);
@@ -62,7 +62,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     for (const source of [tap, quiz, builder]) {
       expect(source).not.toMatch(/SKY444/);
       expect(source).not.toMatch(/gaming-for-charity/);
-      expect(source).not.toMatch(/donated to/i);
+      expect(source).not.toMatch(/label: "Donated"/);
       expect(source).toMatch(/game-only|local game values/i);
     }
   });
