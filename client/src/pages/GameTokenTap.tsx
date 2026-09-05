@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import GameRunSave from "@/components/GameRunSave";
 import { ChevronLeft, Sparkles, Trophy, Zap, ArrowRight, RotateCcw } from "lucide-react";
 
 type Particle = { id: number; x: number; y: number; opacity: number; scale: number };
@@ -169,6 +170,15 @@ export default function GameTokenTap() {
               <p className="text-sm font-semibold text-cyan-300 mb-1">✨ Game-only Sparks</p>
               <p className="text-xs text-muted-foreground">Sparks and XP exist only inside this arcade session. They have no cash, token, donation, or blockchain value.</p>
             </div>
+            <GameRunSave
+              gameId="spark-tap"
+              mode="speed"
+              score={taps}
+              sparks={sparksEarned}
+              combo={maxCombo}
+              durationMs={30000}
+              className="mb-4"
+            />
             <div className="flex items-center justify-center gap-3">
               <Button onClick={startGame} variant="outline" className="gap-2"><RotateCcw className="h-4 w-4" />Play Again</Button>
               <Link href="/gaming">
