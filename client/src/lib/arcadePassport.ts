@@ -202,6 +202,34 @@ export function saveArcadePassport(
   storage.setItem(ARCADE_PASSPORT_STORAGE_KEY, JSON.stringify(passport));
 }
 
+export function recordArcadeRunToStorage(
+  run: ArcadeRun,
+  storage:
+    | Pick<Storage, "getItem" | "setItem">
+    | null
+    | undefined =
+    typeof window !== "undefined" ? window.localStorage : undefined
+): ArcadePassport {
+  const current = loadArcadePassport(storage);
+  const next = recordArcadeRun(current, run);
+  saveArcadePassport(next, storage);
+  return next;
+}
+
+export function toggleArcadeFavoriteInStorage(
+  gameId: ArcadeGameId,
+  storage:
+    | Pick<Storage, "getItem" | "setItem">
+    | null
+    | undefined =
+    typeof window !== "undefined" ? window.localStorage : undefined
+): ArcadePassport {
+  const current = loadArcadePassport(storage);
+  const next = toggleArcadeFavorite(current, gameId);
+  saveArcadePassport(next, storage);
+  return next;
+}
+
 function clampRunValue(value: number | undefined, max: number): number {
   if (!Number.isFinite(value) || (value ?? 0) <= 0) return 0;
   return Math.min(max, Math.floor(value ?? 0));
