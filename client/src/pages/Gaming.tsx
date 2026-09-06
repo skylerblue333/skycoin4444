@@ -17,11 +17,10 @@ import {
   arcadePassportBadges,
   arcadePassportLevel,
   dailyArcadeGameIds,
-  loadArcadePassport,
-  toggleArcadeFavoriteInStorage,
   type ArcadeGameId,
   type ArcadePassport,
 } from "@/lib/arcadePassport";
+import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -174,7 +173,12 @@ function latestPlayed(passport: ArcadePassport): ArcadeGameId | null {
 
 export default function Gaming() {
   const [filter, setFilter] = useState<GameCategory>("all");
-  const [passport, setPassport] = useState(() => loadArcadePassport());
+  const {
+    passport,
+    syncStatus,
+    refresh: refreshPassport,
+    toggleFavorite,
+  } = useArcadePassportSync();
 
   const visibleGames = useMemo(
     () =>
@@ -196,14 +200,6 @@ export default function Gaming() {
     gameId => passport.games[gameId].plays > 0
   ).length;
 
-  function toggleFavorite(gameId: ArcadeGameId) {
-    setPassport(toggleArcadeFavoriteInStorage(gameId));
-  }
-
-  function refreshPassport() {
-    setPassport(loadArcadePassport());
-  }
-
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none fixed inset-0">
@@ -223,6 +219,18 @@ export default function Gaming() {
                   className="border-white/20 text-white/70"
                 >
                   Arcade Passport · no real-money play
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="border-white/20 text-white/60"
+                >
+                  {syncStatus === "synced"
+                    ? "Account progress synced"
+                    : syncStatus === "syncing"
+                      ? "Syncing account progress"
+                      : syncStatus === "error"
+                        ? "Local progress · sync unavailable"
+                        : "Device-local progress"}
                 </Badge>
               </div>
               <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
