@@ -15,6 +15,7 @@ Search the repository for these exact phrases:
 - `Dad's Field Guide`
 - `Dad's Pocket Toolkit`
 - `Dad's Game Night`
+- `Dad's Adventure Deck`
 - `Dad's ridiculous coin vault`
 - `You found the Four Fours.`
 - `Sky Mark`
@@ -26,6 +27,7 @@ The main family components live under:
 - `client/src/components/DadsFieldGuide.tsx`
 - `client/src/components/DadsToolkit.tsx`
 - `client/src/components/DadsGameNight.tsx`
+- `client/src/components/DadsAdventureDeck.tsx`
 
 The family Easter egg is mounted from the canonical home screen.
 
@@ -51,7 +53,8 @@ That letter includes:
 - Dad for Later;
 - Dad's Field Guide;
 - Dad's Pocket Toolkit;
-- Dad's Game Night.
+- Dad's Game Night;
+- Dad's Adventure Deck.
 
 ## Dad for Later
 
@@ -140,6 +143,22 @@ This is the playful local-only layer. It includes:
 - a house rule that nobody has to win to have a good night.
 
 The component intentionally does not save scores, choices, pocket opens, or button presses.
+
+## Dad's Adventure Deck
+
+`client/src/components/DadsAdventureDeck.tsx`
+
+This is a second playful local-only layer for returning visits. It includes:
+
+- a build-your-own ridiculous story generator;
+- fixed "Ask Dad" notes that are explicitly prewritten rather than AI or a live Dad simulation;
+- rotating real-world family missions;
+- simple substitution codebreakers;
+- a three-sister constellation relay for Luna, Summer, and Alexis;
+- no winner ranking between the sisters;
+- encouragement to improve the games and eventually create their own traditions.
+
+The component does not save answers, missions, story combinations, relay state, or other activity.
 
 ## Four Fours
 
