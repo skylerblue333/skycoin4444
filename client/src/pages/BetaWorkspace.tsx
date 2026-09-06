@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Link } from "wouter";
+import SkyMarkEasterEgg from "@/components/SkyMarkEasterEgg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -328,6 +329,11 @@ export default function BetaWorkspace() {
             </div>
           </div>
         </section>
+        <SkyMarkEasterEgg
+          index={1}
+          word="BUILD"
+          message="A big vision becomes trustworthy one tested piece at a time. Build the piece in front of you, then make it better."
+        />
       </div>
     </main>
   );
