@@ -20,6 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link } from "wouter";
+import ThreeLightsEasterEgg from "@/components/ThreeLightsEasterEgg";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -393,6 +394,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ThreeLightsEasterEgg />
     </main>
   );
 }
