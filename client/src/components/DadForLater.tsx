@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Heart, MessageCircleQuestion, Sparkles } from "lucide-react";
+import DadsFieldGuide from "@/components/DadsFieldGuide";
 
 const moments = [
   {
@@ -132,6 +133,8 @@ export default function DadForLater() {
               ))}
             </div>
           </div>
+
+          <DadsFieldGuide />
 
           <div className="rounded-2xl border border-sky-300/10 bg-sky-300/[0.02] p-5">
             <div className="flex items-center gap-2">
