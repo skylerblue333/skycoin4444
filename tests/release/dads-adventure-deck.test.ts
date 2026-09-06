@@ -44,7 +44,7 @@ describe("Dad's Adventure Deck family Easter egg", () => {
   it("keeps the sister relay cooperative", () => {
     expect(deck).toContain('const sisterNames = ["Luna", "Summer", "Alexis"]');
     expect(deck).toContain("There is no fastest sister and no best sister");
-    expect(deck).toContain("The only win condition is everybody being here");
+    expect(deck).toMatch(/The\s+only win condition is everybody being here/);
     expect(deck).toContain("Three different lights, one sky");
   });
 
