@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
+import SkyMarkEasterEgg from "@/components/SkyMarkEasterEgg";
 import {
   ArrowRight,
   CheckCircle2,
@@ -337,6 +338,11 @@ export default function BetaFeedback() {
             </div>
           </CardContent>
         </Card>
+        <SkyMarkEasterEgg
+          index={4}
+          word="LISTEN"
+          message="The person who points out a crack may be helping you build the stronger thing. Listen before you defend."
+        />
       </div>
     </main>
   );
