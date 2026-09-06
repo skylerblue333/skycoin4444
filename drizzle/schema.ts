@@ -265,6 +265,32 @@ export const courseProgress = mysqlTable("course_progress", {
 export type CourseProgress = typeof courseProgress.$inferSelect;
 export type InsertCourseProgress = typeof courseProgress.$inferInsert;
 
+// ============ ARCADE GAME PROGRESS TABLE ============
+export const arcadeGameProgress = mysqlTable("arcade_game_progress", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  gameId: varchar("game_id", { length: 64 }).notNull(),
+  plays: int("plays").default(0).notNull(),
+  bestScore: int("best_score").default(0).notNull(),
+  bestCombo: int("best_combo").default(0).notNull(),
+  totalSparks: int("total_sparks").default(0).notNull(),
+  totalXp: int("total_xp").default(0).notNull(),
+  lastPlayedAt: timestamp("last_played_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userGameUnique: uniqueIndex("arcade_game_progress_user_game_unique").on(
+    table.userId,
+    table.gameId
+  ),
+  userUpdatedIndex: index("arcade_game_progress_user_updated_idx").on(
+    table.userId,
+    table.updatedAt
+  ),
+}));
+
+export type ArcadeGameProgress = typeof arcadeGameProgress.$inferSelect;
+export type InsertArcadeGameProgress = typeof arcadeGameProgress.$inferInsert;
+
 // ============ DISCOVERY PERSISTENCE TABLES ============
 export const discoveryBookmarks = mysqlTable("discovery_bookmarks", {
   id: varchar("id", { length: 255 }).primaryKey(),
