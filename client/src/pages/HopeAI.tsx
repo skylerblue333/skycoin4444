@@ -23,10 +23,8 @@ import {
   type HopeFocus,
   type HopePlan,
 } from "@/lib/hopeCoach";
-import {
-  arcadePassportLevel,
-  loadArcadePassport,
-} from "@/lib/arcadePassport";
+import { arcadePassportLevel } from "@/lib/arcadePassport";
+import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -93,7 +91,8 @@ export default function HopeAI() {
     () => summarizeHopeActivity(activity.data ?? []),
     [activity.data]
   );
-  const passport = useMemo(() => loadArcadePassport(), []);
+  const { passport, syncStatus: arcadeSyncStatus } =
+    useArcadePassportSync();
 
   if (loading) {
     return (
@@ -468,8 +467,10 @@ export default function HopeAI() {
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
           HopeAI Coach currently performs deterministic local planning only.
-          Arcade Passport totals shown here are read from this browser's local
-          storage and are not model memory or server-side profile data. It
+          Arcade Passport totals shown here are device-local for anonymous
+          visitors and may merge authenticated account progress when signed in.
+          They are not model memory, financial balances, or public rankings.
+          Current sync state: {arcadeSyncStatus}. It
           does not send prompts to an external model, create autonomous agents,
           infer mental state, claim hidden memory, or present synthetic model
           metrics/confidence.
