@@ -36,6 +36,36 @@ const lights = [
   },
 ] as const;
 
+const olderNotes = [
+  {
+    title: "When you doubt yourself",
+    message:
+      "You never had to earn my love. Your worth is not a grade, a job, a relationship, a mistake, or anyone else's opinion. Be patient with yourself and keep becoming who you choose to be.",
+  },
+  {
+    title: "When life gets hard",
+    message:
+      "Ask for help early. Stay close to people who are kind, honest, and safe. Leave places that keep hurting you. Rest when you need to, start again when you can, and never confuse struggling with failing.",
+  },
+  {
+    title: "When life is beautiful",
+    message:
+      "Enjoy it without guilt. Laugh loudly, take the picture, celebrate the ordinary days, travel if you want, build things, learn things, love people well, and let happiness be enough.",
+  },
+  {
+    title: "When you think about Dad",
+    message:
+      "Remember the love more than the hard parts. You were never responsible for adult problems, and you never owed me a certain path. I wanted you to have lives that belong fully to you.",
+  },
+] as const;
+
+const dadPrinciples = [
+  "Be kind without letting people walk over you.",
+  "Tell the truth, especially to yourself.",
+  "Ask for help when the weight gets too heavy.",
+  "Keep some wonder, humor, and curiosity no matter how old you get.",
+] as const;
+
 export default function ThreeLightsEasterEgg() {
   const [revealed, setRevealed] = useState<LightId[]>([]);
   const [letterOpen, setLetterOpen] = useState(false);
@@ -200,6 +230,18 @@ export default function ThreeLightsEasterEgg() {
                     lives that are completely your own. Wherever life takes
                     you, I will always carry love for you.
                   </p>
+                  <p>
+                    Please never carry adult problems as if they were yours to
+                    fix. You never had to rescue me, choose sides for me, or
+                    become a certain person to make me proud. I was proud to be
+                    your dad because you were you.
+                  </p>
+                  <p>
+                    Do not make your lives smaller out of loyalty to me. Grow,
+                    change, travel, learn, fall in love, build families or
+                    careers or adventures of your own, and choose the people
+                    who treat you with kindness and respect.
+                  </p>
                   <p className="font-semibold text-white/70">Love, Dad</p>
                 </div>
 
@@ -233,6 +275,51 @@ export default function ThreeLightsEasterEgg() {
                       I pray you keep imagining big things and always know that
                       your voice, ideas, and dreams matter.
                     </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 rounded-3xl border border-white/[0.08] bg-black/15 p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-sky-100/45">
+                    Open when you're older
+                  </p>
+                  <p className="mt-2 max-w-2xl text-xs leading-5 text-white/35">
+                    Four little notes for different days. No lesson has to be
+                    perfect; take what helps and make the rest your own.
+                  </p>
+
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {olderNotes.map(note => (
+                      <details
+                        key={note.title}
+                        className="group rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 open:bg-white/[0.04]"
+                      >
+                        <summary className="cursor-pointer list-none text-sm font-bold text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/50">
+                          {note.title}
+                        </summary>
+                        <p className="mt-3 text-xs leading-6 text-white/45">
+                          {note.message}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 border-t border-white/[0.07] pt-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-violet-100/40">
+                      Dad's 4:44 principles
+                    </p>
+                    <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {dadPrinciples.map((principle, index) => (
+                        <li
+                          key={principle}
+                          className="flex gap-3 rounded-xl bg-white/[0.025] p-3 text-xs leading-5 text-white/45"
+                        >
+                          <span className="font-black text-violet-200/70">
+                            {index + 1}
+                          </span>
+                          <span>{principle}</span>
+                        </li>
+                      ))}
+                    </ol>
                   </div>
                 </div>
 
