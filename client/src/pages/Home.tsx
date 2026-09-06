@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import ThreeLightsEasterEgg from "@/components/ThreeLightsEasterEgg";
+import KayleeQuietStar from "@/components/KayleeQuietStar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -396,6 +397,7 @@ export default function Home() {
       </section>
 
       <ThreeLightsEasterEgg />
+      <KayleeQuietStar />
     </main>
   );
 }
