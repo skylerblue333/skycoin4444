@@ -190,6 +190,17 @@ export default function DadForLater() {
             </p>
           </div>
 
+          <div className="rounded-2xl border border-white/[0.06] bg-black/15 p-4 text-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/25">
+              If the website ever changes
+            </p>
+            <p className="mt-2 text-xs leading-5 text-white/35">
+              The writing also lives as plain source text. Search the repository
+              for FAMILY-TIME-CAPSULE-INDEX or Love, Dad and follow the map from
+              there.
+            </p>
+          </div>
+
           <p className="text-center text-[10px] leading-5 text-white/20">
             Dad for Later is decorative, in-memory content only. It does not
             store answers, track opens, create profiles, or send data anywhere.
