@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import {
   ArrowLeft,
   Brain,
-  CheckCircle2,
   RotateCcw,
   ShieldCheck,
   Sparkles,
