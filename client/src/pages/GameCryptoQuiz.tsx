@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Clock, Sparkles, Trophy, Zap, CheckCircle2, XCircle, ArrowRight, RotateCcw } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 
 const QUESTIONS = [
   { q: "What does 'DeFi' stand for?", options: ["Decentralized Finance", "Digital Finance", "Defined Finance", "Distributed Finance"], answer: 0, xp: 100 },
@@ -22,6 +22,7 @@ const QUESTIONS = [
 type GameState = "idle" | "playing" | "answered" | "finished";
 
 export default function GameCryptoQuiz() {
+  const { recordRun } = useArcadeRunRecorder();
   const [gameState, setGameState] = useState<GameState>("idle");
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -73,7 +74,7 @@ export default function GameCryptoQuiz() {
 
   useEffect(() => {
     if (gameState !== "finished" || recordedRun.current) return;
-    recordArcadeRunToStorage({
+    recordRun({
       gameId: "crypto-quiz",
       score: score * 100,
       sparks: sparksEarned,
