@@ -5,7 +5,6 @@ import {
   Brain,
   RotateCcw,
   ShieldCheck,
-  Sparkles,
   Trophy,
 } from "lucide-react";
 import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
@@ -88,8 +87,15 @@ function handValue(hand: readonly PlayingCard[]): number {
 }
 
 function hasSoftAce(hand: readonly PlayingCard[]): boolean {
-  const raw = hand.reduce((sum, card) => sum + cardValue(card.rank), 0);
-  return hand.some(card => card.rank === "A") && raw !== handValue(hand);
+  let total = hand.reduce((sum, card) => sum + cardValue(card.rank), 0);
+  let acesCountedAsEleven = hand.filter(card => card.rank === "A").length;
+
+  while (total > 21 && acesCountedAsEleven > 0) {
+    total -= 10;
+    acesCountedAsEleven -= 1;
+  }
+
+  return acesCountedAsEleven > 0;
 }
 
 function recommendedDecision(
