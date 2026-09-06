@@ -31,6 +31,17 @@ describe("Three Lights family Easter egg", () => {
     expect(egg).toContain("For Alexis");
     expect(egg).toContain("4:44 wish");
     expect(egg).toContain("Make one wish for yourself. Dad already made three.");
+    expect(egg).toContain("Open when you're older");
+    expect(egg).toContain("When you doubt yourself");
+    expect(egg).toContain("When life gets hard");
+    expect(egg).toContain("When life is beautiful");
+    expect(egg).toContain("When you think about Dad");
+    expect(egg).toContain("You never had to earn my love");
+    expect(egg).toContain("You were never responsible for adult problems");
+    expect(egg).toContain("I was proud to be");
+    expect(egg).toContain("Do not make your lives smaller out of loyalty to me");
+    expect(egg).toContain("Dad's 4:44 principles");
+    expect(egg).toContain("Ask for help when the weight gets too heavy");
   });
 
   it("keeps the Easter egg decorative and privacy-local", () => {
