@@ -94,6 +94,22 @@ try {
     }
   }
 
+  const [foreignKeys] = await connection.query(
+    `SELECT CONSTRAINT_NAME
+       FROM information_schema.KEY_COLUMN_USAGE
+      WHERE TABLE_SCHEMA = ?
+        AND TABLE_NAME = 'arcade_game_progress'
+        AND COLUMN_NAME = 'user_id'
+        AND REFERENCED_TABLE_NAME = 'users'
+        AND REFERENCED_COLUMN_NAME = 'id'`,
+    [database]
+  );
+  if (!Array.isArray(foreignKeys) || foreignKeys.length < 1) {
+    throw new Error(
+      "arcade_game_progress verification failed: user_id foreign key is missing"
+    );
+  }
+
   console.log(
     `Arcade progress migration verified for ${parsed.hostname}/${database}. Existing users and application data were not modified.`
   );
