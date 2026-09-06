@@ -66,9 +66,18 @@ const dadPrinciples = [
   "Keep some wonder, humor, and curiosity no matter how old you get.",
 ] as const;
 
+const coinVault = [
+  "Why did Dad hide a coin in the code? Because putting it under the couch was too easy.",
+  "If you found this, congratulations: you mined one whole Dad joke. Market value: absolutely questionable.",
+  "Never trust a coin that says it is going to the moon. Ask whether it packed snacks first.",
+  "The rarest SKYCOIN4444 asset was never a token. It was getting all three kids to agree on what to watch.",
+] as const;
+
 export default function ThreeLightsEasterEgg() {
   const [revealed, setRevealed] = useState<LightId[]>([]);
   const [letterOpen, setLetterOpen] = useState(false);
+  const [, setWishTaps] = useState(0);
+  const [coinVaultOpen, setCoinVaultOpen] = useState(false);
 
   const complete = revealed.length === lights.length;
   const revealedSet = useMemo(() => new Set(revealed), [revealed]);
@@ -77,6 +86,17 @@ export default function ThreeLightsEasterEgg() {
     setRevealed(current =>
       current.includes(id) ? current : [...current, id]
     );
+  }
+
+  function recordWishTap() {
+    setWishTaps(current => {
+      const next = current + 1;
+      if (next >= 4) {
+        setCoinVaultOpen(true);
+        return 0;
+      }
+      return next;
+    });
   }
 
   return (
@@ -323,14 +343,51 @@ export default function ThreeLightsEasterEgg() {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center">
+                <button
+                  type="button"
+                  onClick={recordWishTap}
+                  aria-label="4:44 wish"
+                  aria-expanded={coinVaultOpen}
+                  className="mt-6 w-full rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center transition hover:border-white/10 hover:bg-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/50"
+                >
                   <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/25">
                     4:44 wish
                   </p>
                   <p className="mt-2 text-sm font-semibold text-white/55">
                     Make one wish for yourself. Dad already made three.
                   </p>
-                </div>
+                </button>
+
+                {coinVaultOpen ? (
+                  <div
+                    className="mt-4 rounded-3xl border border-amber-300/15 bg-amber-300/[0.035] p-5"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/45">
+                      Dad's ridiculous coin vault
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-white/35">
+                      Four taps, four jokes. No token, no payout, no utility.
+                      Extremely questionable comedy only.
+                    </p>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {coinVault.map((joke, index) => (
+                        <div
+                          key={joke}
+                          className="rounded-2xl border border-white/[0.07] bg-black/15 p-4"
+                        >
+                          <span className="text-[10px] font-black text-amber-100/35">
+                            COIN {index + 1}/4
+                          </span>
+                          <p className="mt-2 text-xs leading-6 text-white/45">
+                            {joke}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </div>

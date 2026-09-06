@@ -42,6 +42,12 @@ describe("Three Lights family Easter egg", () => {
     expect(egg).toContain("Do not make your lives smaller out of loyalty to me");
     expect(egg).toContain("Dad's 4:44 principles");
     expect(egg).toContain("Ask for help when the weight gets too heavy");
+    expect(egg).toContain("Dad's ridiculous coin vault");
+    expect(egg).toContain("Four taps, four jokes.");
+    expect(egg).toContain("you mined one whole Dad joke");
+    expect(egg).toContain("getting all three kids to agree on what to watch");
+    expect(egg).toMatch(/onClick=\{recordWishTap\}/);
+    expect(egg).toMatch(/aria-expanded=\{coinVaultOpen\}/);
   });
 
   it("keeps the Easter egg decorative and privacy-local", () => {
