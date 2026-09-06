@@ -23,7 +23,7 @@ describe("Three Lights family Easter egg", () => {
     expect(egg).toContain("I love you.");
     expect(egg).toContain("I am sorry for the time I missed");
     expect(egg).toContain("I wish I had gotten more time");
-    expect(egg).toContain("I only wanted to leave love somewhere you could find it.");
+    expect(egg).toMatch(/I only\s+wanted to leave love somewhere you could find it\./);
     expect(egg).toContain("I pray that you are safe, deeply loved");
     expect(egg).toContain("Love, Dad");
     expect(egg).toContain("For Luna");
