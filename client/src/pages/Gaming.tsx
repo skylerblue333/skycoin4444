@@ -16,6 +16,7 @@ import {
 import {
   arcadePassportBadges,
   arcadePassportLevel,
+  dailyArcadeGameIds,
   loadArcadePassport,
   toggleArcadeFavoriteInStorage,
   type ArcadeGameId,
@@ -191,8 +192,8 @@ export default function Gaming() {
   const unlockedBadges = arcadePassportBadges(passport).filter(
     badge => badge.unlocked
   ).length;
-  const uniqueGamesPlayed = games.filter(
-    game => passport.games[game.id].plays > 0
+  const uniqueGamesPlayed = dailyArcadeGameIds.filter(
+    gameId => passport.games[gameId].plays > 0
   ).length;
 
   function toggleFavorite(gameId: ArcadeGameId) {
@@ -287,11 +288,13 @@ export default function Gaming() {
                   <div className="flex items-center justify-between text-xs text-white/35">
                     <span>Games sampled</span>
                     <span>
-                      {uniqueGamesPlayed}/{games.length}
+                      {uniqueGamesPlayed}/{dailyArcadeGameIds.length}
                     </span>
                   </div>
                   <Progress
-                    value={(uniqueGamesPlayed / games.length) * 100}
+                    value={
+                      (uniqueGamesPlayed / dailyArcadeGameIds.length) * 100
+                    }
                     className="mt-2 h-1.5"
                   />
                 </div>
