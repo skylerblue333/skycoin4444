@@ -56,6 +56,16 @@ export type ArcadeRun = Readonly<{
   completedAt?: Date;
 }>;
 
+export type ArcadeProgressSyncRow = Readonly<{
+  gameId: string;
+  plays: number;
+  bestScore: number;
+  bestCombo: number;
+  totalSparks: number;
+  totalXp: number;
+  lastPlayedAt: Date | string | null;
+}>;
+
 function emptyProgress(): ArcadeGameProgress {
   return Object.freeze({
     plays: 0,
@@ -253,6 +263,18 @@ function clampRunValue(value: number | undefined, max: number): number {
   return Math.min(max, Math.floor(value ?? 0));
 }
 
+export function normalizeArcadeRun(run: ArcadeRun): Required<
+  Pick<ArcadeRun, "gameId" | "score" | "sparks" | "xp" | "combo">
+> {
+  return Object.freeze({
+    gameId: run.gameId,
+    score: clampRunValue(run.score, 10_000_000),
+    sparks: clampRunValue(run.sparks, 100_000),
+    xp: clampRunValue(run.xp, 1_000_000),
+    combo: clampRunValue(run.combo, 100_000),
+  });
+}
+
 export function recordArcadeRun(
   passport: ArcadePassport,
   run: ArcadeRun
@@ -262,10 +284,11 @@ export function recordArcadeRun(
     run.completedAt ?? new Date()
   );
   const previous = current.games[run.gameId];
-  const score = clampRunValue(run.score, 10_000_000);
-  const sparks = clampRunValue(run.sparks, 100_000);
-  const xp = clampRunValue(run.xp, 1_000_000);
-  const combo = clampRunValue(run.combo, 100_000);
+  const normalizedRun = normalizeArcadeRun(run);
+  const score = normalizedRun.score;
+  const sparks = normalizedRun.sparks;
+  const xp = normalizedRun.xp;
+  const combo = normalizedRun.combo;
   const completedAt = (run.completedAt ?? new Date()).toISOString();
 
   const games = {
@@ -306,6 +329,83 @@ export function toggleArcadeFavorite(
   return Object.freeze({
     ...current,
     favorites,
+  });
+}
+
+function normalizeSyncDate(value: Date | string | null): string | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
+export function mergeArcadeProgress(
+  passport: ArcadePassport,
+  rows: readonly ArcadeProgressSyncRow[],
+  date = new Date()
+): ArcadePassport {
+  const current = normalizeArcadePassport(passport, date);
+  const games = { ...current.games };
+
+  for (const row of rows) {
+    if (!validGameId(row.gameId)) continue;
+    const previous = games[row.gameId];
+    const serverPlayedAt = normalizeSyncDate(row.lastPlayedAt);
+    const previousPlayedAt = normalizeSyncDate(previous.lastPlayedAt);
+    const latestPlayedAt =
+      serverPlayedAt &&
+      (!previousPlayedAt || serverPlayedAt > previousPlayedAt)
+        ? serverPlayedAt
+        : previousPlayedAt;
+
+    games[row.gameId] = Object.freeze({
+      plays: Math.max(previous.plays, finiteNonNegativeInteger(row.plays)),
+      bestScore: Math.max(
+        previous.bestScore,
+        finiteNonNegativeInteger(row.bestScore)
+      ),
+      bestCombo: Math.max(
+        previous.bestCombo,
+        finiteNonNegativeInteger(row.bestCombo)
+      ),
+      totalSparks: Math.max(
+        previous.totalSparks,
+        finiteNonNegativeInteger(row.totalSparks)
+      ),
+      totalXp: Math.max(
+        previous.totalXp,
+        finiteNonNegativeInteger(row.totalXp)
+      ),
+      lastPlayedAt: latestPlayedAt,
+    });
+  }
+
+  const totalPlays = arcadeGameIds.reduce(
+    (sum, gameId) => sum + games[gameId].plays,
+    0
+  );
+  const totalSparks = arcadeGameIds.reduce(
+    (sum, gameId) => sum + games[gameId].totalSparks,
+    0
+  );
+  const totalXp = arcadeGameIds.reduce(
+    (sum, gameId) => sum + games[gameId].totalXp,
+    0
+  );
+  const dailyPlayedAt = games[current.daily.gameId].lastPlayedAt;
+  const serverClearedDaily =
+    typeof dailyPlayedAt === "string" &&
+    dailyPlayedAt.slice(0, 10) === current.daily.dayKey;
+
+  return Object.freeze({
+    ...current,
+    totalPlays,
+    totalSparks,
+    totalXp,
+    games,
+    daily: Object.freeze({
+      ...current.daily,
+      completed: current.daily.completed || serverClearedDaily,
+    }),
   });
 }
 
