@@ -5,6 +5,7 @@ import {
   arcadePassportLevel,
   dailyArcadeGame,
   emptyArcadePassport,
+  mergeArcadeProgress,
   normalizeArcadePassport,
   parseArcadePassport,
   recordArcadeRun,
@@ -113,6 +114,78 @@ describe("arcade passport", () => {
     expect(result.games["sky-rush"].plays).toBe(3);
     expect(result.daily.dayKey).toBe("2026-09-05");
     expect(result.daily.completed).toBe(false);
+  });
+
+  it("merges authenticated progress without double-counting local totals", () => {
+    let local = emptyArcadePassport(date);
+    local = recordArcadeRun(local, {
+      gameId: "sky-rush",
+      score: 1200,
+      sparks: 10,
+      xp: 300,
+      combo: 6,
+      completedAt: date,
+    });
+
+    const merged = mergeArcadeProgress(
+      local,
+      [
+        {
+          gameId: "sky-rush",
+          plays: 3,
+          bestScore: 1500,
+          bestCombo: 8,
+          totalSparks: 30,
+          totalXp: 900,
+          lastPlayedAt: "2026-09-05T13:00:00.000Z",
+        },
+        {
+          gameId: "crypto-quiz",
+          plays: 2,
+          bestScore: 800,
+          bestCombo: 0,
+          totalSparks: 20,
+          totalXp: 500,
+          lastPlayedAt: "2026-09-04T13:00:00.000Z",
+        },
+      ],
+      date
+    );
+
+    expect(merged.games["sky-rush"]).toMatchObject({
+      plays: 3,
+      bestScore: 1500,
+      bestCombo: 8,
+      totalSparks: 30,
+      totalXp: 900,
+    });
+    expect(merged.totalPlays).toBe(5);
+    expect(merged.totalSparks).toBe(50);
+    expect(merged.totalXp).toBe(1400);
+    expect(merged.daily.completed).toBe(
+      merged.daily.gameId === "sky-rush"
+    );
+  });
+
+  it("ignores unknown server game ids during merge", () => {
+    const merged = mergeArcadeProgress(
+      emptyArcadePassport(date),
+      [
+        {
+          gameId: "not-a-real-game",
+          plays: 999,
+          bestScore: 999,
+          bestCombo: 999,
+          totalSparks: 999,
+          totalXp: 999,
+          lastPlayedAt: "2026-09-05T13:00:00.000Z",
+        },
+      ],
+      date
+    );
+
+    expect(merged.totalPlays).toBe(0);
+    expect(merged.totalXp).toBe(0);
   });
 
   it("recovers from invalid JSON", () => {
