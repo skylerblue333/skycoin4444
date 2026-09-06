@@ -32,7 +32,7 @@ describe("Kaylee quiet-star Easter egg", () => {
     expect(star).toContain("This is not asking you to come back");
     expect(star).toContain("answer me");
     expect(star).toContain("forgive me");
-    expect(star).toContain("take care of me");
+    expect(star).toMatch(/take\s+care of me/);
     expect(star).toMatch(/carry anything for\s+me/);
   });
 
