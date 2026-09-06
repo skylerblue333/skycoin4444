@@ -43,6 +43,8 @@ describe("authenticated arcade progress sync", () => {
     expect(runner).toMatch(/refuses localhost/i);
     expect(runner).toMatch(/SHOW COLUMNS FROM arcade_game_progress/);
     expect(runner).toMatch(/SHOW INDEX FROM arcade_game_progress/);
+    expect(runner).toMatch(/information_schema\.KEY_COLUMN_USAGE/);
+    expect(runner).toMatch(/REFERENCED_TABLE_NAME = 'users'/);
     expect(runner).not.toMatch(/DROP TABLE|TRUNCATE TABLE|DELETE FROM|UPDATE /i);
   });
 
