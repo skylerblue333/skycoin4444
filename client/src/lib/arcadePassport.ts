@@ -24,6 +24,10 @@ export const dailyArcadeGameIds = [
   "pattern-lab",
 ] as const satisfies readonly ArcadeGameId[];
 
+export type RecordableArcadeGameId = (typeof dailyArcadeGameIds)[number];
+export type RecordableArcadeRun = Omit<ArcadeRun, "gameId"> &
+  Readonly<{ gameId: RecordableArcadeGameId }>;
+
 export type ArcadeGameProgress = Readonly<{
   plays: number;
   bestScore: number;
