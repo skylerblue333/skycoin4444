@@ -75,6 +75,8 @@ It also contains:
 
 - **Questions Dad would ask**
 - **Permission slips from Dad**
+- **What I was trying to build** — an explanation that Dad worked hard on ideas, software, businesses, learning, writing, and SKYCOIN4444 because he wanted more choices and opportunities for the family;
+- an explicit statement that the girls do **not** owe SKYCOIN4444 their careers, time, money, identities, or futures;
 - the line: `You do not have to become a monument to my life. Build yours.`
 
 ## Dad's Field Guide
