@@ -23,7 +23,7 @@ describe("Kaylee quiet-star Easter egg", () => {
     expect(star).toContain("You were important to me");
     expect(star).toContain("I am grateful for the good memories");
     expect(star).toContain("I am also sorry");
-    expect(star).toContain("You do not owe me a place in your life");
+    expect(star).toMatch(/You do not owe me a place\s+in your life/);
     expect(star).toContain("I hope life is kind to you");
     expect(star).toMatch(/if I am around and you ever actually want to say\s+hi/);
   });
@@ -33,7 +33,7 @@ describe("Kaylee quiet-star Easter egg", () => {
     expect(star).toContain("answer me");
     expect(star).toContain("forgive me");
     expect(star).toContain("take care of me");
-    expect(star).toContain("carry anything for me");
+    expect(star).toMatch(/carry anything for\s+me/);
   });
 
   it("includes small interactive personal touches", () => {
