@@ -5,7 +5,6 @@ import {
   Crosshair,
   RotateCcw,
   ShieldCheck,
-  Sparkles,
   Target,
   TimerReset,
   Trophy,
