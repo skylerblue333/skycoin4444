@@ -59,8 +59,8 @@ describe("Dad's Field Guide Easter egg", () => {
     expect(guide).toContain(
       "I hope being sisters becomes something that gives you more support"
     );
-    expect(guide).toContain(
-      "if I am lucky enough to be there when you need any of this"
+    expect(guide).toMatch(
+      /if I am lucky enough to be\s+there when you need any of this/
     );
     expect(dadForLater).toContain("What I was trying to build");
     expect(dadForLater).toContain("I wanted more possibilities for your future");
