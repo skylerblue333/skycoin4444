@@ -22,6 +22,10 @@ import {
   type HopeFocus,
   type HopePlan,
 } from "@/lib/hopeCoach";
+import {
+  arcadePassportLevel,
+  loadArcadePassport,
+} from "@/lib/arcadePassport";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -70,6 +74,7 @@ const quickGoals = [
   "Learn blockchain basics and test myself",
   "Improve the social beta without fake metrics",
   "Ship one visible beta improvement today",
+  "Clear today's Arcade Passport challenge",
 ] as const;
 
 export default function HopeAI() {
@@ -87,6 +92,7 @@ export default function HopeAI() {
     () => summarizeHopeActivity(activity.data ?? []),
     [activity.data]
   );
+  const passport = useMemo(() => loadArcadePassport(), []);
 
   if (loading) {
     return (
@@ -208,6 +214,15 @@ export default function HopeAI() {
                 SkySchool
               </Button>
             </Link>
+            <Link href="/game-fi-quest-board">
+              <Button
+                variant="outline"
+                className="border-white/15 bg-white/[0.03] text-white"
+              >
+                <Target className="mr-2 h-4 w-4" />
+                Arcade Passport
+              </Button>
+            </Link>
             <Link href="/gaming">
               <Button
                 variant="outline"
@@ -220,12 +235,13 @@ export default function HopeAI() {
           </div>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {[
             ["Lessons", summary.lessons],
             ["Posts", summary.posts],
             ["Feedback", summary.feedback],
             ["Other evidence", summary.other],
+            ["Arcade level", arcadePassportLevel(passport)],
           ].map(([label, value]) => (
             <div
               key={label as string}
@@ -450,7 +466,9 @@ export default function HopeAI() {
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          HopeAI Coach currently performs deterministic local planning only. It
+          HopeAI Coach currently performs deterministic local planning only.
+          Arcade Passport totals shown here are read from this browser's local
+          storage and are not model memory or server-side profile data. It
           does not send prompts to an external model, create autonomous agents,
           infer mental state, claim hidden memory, or present synthetic model
           metrics/confidence.
