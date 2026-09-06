@@ -12,7 +12,7 @@ import {
   Trophy,
   XCircle,
 } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,6 +76,7 @@ function createPatternRound(seed: number, round: number): PatternRound {
 }
 
 export default function GameSlots() {
+  const { recordRun } = useArcadeRunRecorder();
   const [seed, setSeed] = useState(501);
   const [sessionStarted, setSessionStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -129,7 +130,7 @@ export default function GameSlots() {
     if (round >= SESSION_ROUNDS) {
       setFinished(true);
       if (!recorded.current) {
-        recordArcadeRunToStorage({
+        recordRun({
           gameId: "pattern-lab",
           score,
           sparks,
