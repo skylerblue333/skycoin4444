@@ -197,10 +197,14 @@ export function loadArcadePassport(
   date = new Date()
 ): ArcadePassport {
   if (!storage) return emptyArcadePassport(date);
-  return parseArcadePassport(
-    storage.getItem(ARCADE_PASSPORT_STORAGE_KEY),
-    date
-  );
+  try {
+    return parseArcadePassport(
+      storage.getItem(ARCADE_PASSPORT_STORAGE_KEY),
+      date
+    );
+  } catch {
+    return emptyArcadePassport(date);
+  }
 }
 
 export function saveArcadePassport(
@@ -209,7 +213,11 @@ export function saveArcadePassport(
     typeof window !== "undefined" ? window.localStorage : undefined
 ): void {
   if (!storage) return;
-  storage.setItem(ARCADE_PASSPORT_STORAGE_KEY, JSON.stringify(passport));
+  try {
+    storage.setItem(ARCADE_PASSPORT_STORAGE_KEY, JSON.stringify(passport));
+  } catch {
+    // Device-local progression is best-effort and must never break gameplay.
+  }
 }
 
 export function recordArcadeRunToStorage(
