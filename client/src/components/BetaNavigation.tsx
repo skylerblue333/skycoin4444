@@ -77,7 +77,7 @@ export default function BetaNavigation() {
   const [location] = useLocation();
   const { isAuthenticated, loading } = useAuth();
   const [fourFoursOpen, setFourFoursOpen] = useState(false);
-  const [markTaps, setMarkTaps] = useState(0);
+  const [, setMarkTaps] = useState(0);
   const keyRun = useRef(0);
 
   function recordMarkTap() {
