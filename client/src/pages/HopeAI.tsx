@@ -12,6 +12,7 @@ import {
   RotateCcw,
   ShieldCheck,
   Sparkles,
+  Target,
   WandSparkles,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
