@@ -14,6 +14,16 @@ export const arcadeGameIds = [
 
 export type ArcadeGameId = (typeof arcadeGameIds)[number];
 
+export const dailyArcadeGameIds = [
+  "sky-rush",
+  "crypto-quiz",
+  "spark-tap",
+  "block-builder",
+  "blackjack-lab",
+  "crash-lab",
+  "pattern-lab",
+] as const satisfies readonly ArcadeGameId[];
+
 export type ArcadeGameProgress = Readonly<{
   plays: number;
   bestScore: number;
@@ -69,7 +79,7 @@ export function arcadeDayKey(date = new Date()): string {
 
 export function dailyArcadeGame(
   date = new Date(),
-  pool: readonly ArcadeGameId[] = arcadeGameIds
+  pool: readonly ArcadeGameId[] = dailyArcadeGameIds
 ): ArcadeGameId {
   const usable = pool.length ? pool : arcadeGameIds;
   const dayNumber = Math.floor(
