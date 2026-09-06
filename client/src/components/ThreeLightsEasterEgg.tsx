@@ -38,6 +38,7 @@ const lights = [
 
 export default function ThreeLightsEasterEgg() {
   const [revealed, setRevealed] = useState<LightId[]>([]);
+  const [letterOpen, setLetterOpen] = useState(false);
 
   const complete = revealed.length === lights.length;
   const revealedSet = useMemo(() => new Set(revealed), [revealed]);
@@ -132,21 +133,119 @@ export default function ThreeLightsEasterEgg() {
         ) : null}
 
         {complete ? (
-          <div
-            className="mt-5 flex items-start gap-3 rounded-2xl border border-violet-300/15 bg-violet-300/[0.035] p-4"
-            role="status"
-            aria-live="polite"
-          >
-            <Heart className="mt-0.5 h-4 w-4 shrink-0 text-violet-200" />
-            <div>
-              <p className="text-sm font-bold text-violet-100">
-                Three lights found.
-              </p>
-              <p className="mt-1 text-xs leading-5 text-white/35">
-                Luna Avigail · Summer Skye · Alexis Isabella-Jane — three names
-                hidden in the SKYCOIN4444 constellation, built with love.
-              </p>
+          <div className="mt-5 space-y-4">
+            <div
+              className="flex items-start gap-3 rounded-2xl border border-violet-300/15 bg-violet-300/[0.035] p-4"
+              role="status"
+              aria-live="polite"
+            >
+              <Heart className="mt-0.5 h-4 w-4 shrink-0 text-violet-200" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-violet-100">
+                  Three lights found.
+                </p>
+                <p className="mt-1 text-xs leading-5 text-white/35">
+                  Luna Avigail · Summer Skye · Alexis Isabella-Jane — three
+                  names hidden in the SKYCOIN4444 constellation, built with
+                  love.
+                </p>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3 px-0 text-violet-100 hover:bg-transparent hover:text-white"
+                  aria-expanded={letterOpen}
+                  onClick={() => setLetterOpen(open => !open)}
+                >
+                  <Heart className="mr-2 h-4 w-4" />
+                  {letterOpen
+                    ? "Fold Dad's letter"
+                    : "There is a letter behind the stars"}
+                </Button>
+              </div>
             </div>
+
+            {letterOpen ? (
+              <div
+                className="rounded-3xl border border-sky-300/15 bg-gradient-to-br from-sky-300/[0.055] via-white/[0.025] to-violet-300/[0.055] p-5 sm:p-7"
+                aria-label="Dad's Letter in the Stars"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-sky-100/45">
+                  Dad's Letter in the Stars
+                </p>
+                <h2 className="mt-3 text-xl font-black text-white">
+                  Luna, Summer, and Alexis
+                </h2>
+
+                <div className="mt-4 space-y-4 text-sm leading-7 text-white/55">
+                  <p>
+                    If you ever find this, I want you to know something simple:
+                    I love you.
+                  </p>
+                  <p>
+                    I am sorry for the time I missed and for the moments I wish
+                    I could have had with you. I wish I had gotten more time to
+                    know the people you are becoming — what makes you laugh,
+                    what you dream about, what you love, and all the little
+                    things that make each of you yourselves.
+                  </p>
+                  <p>
+                    I do not want this message to make you carry sadness. I only
+                    wanted to leave love somewhere you could find it.
+                  </p>
+                  <p>
+                    I pray that you are safe, deeply loved, brave enough to be
+                    yourselves, surrounded by kind people, and free to build
+                    lives that are completely your own. Wherever life takes
+                    you, I will always carry love for you.
+                  </p>
+                  <p className="font-semibold text-white/70">Love, Dad</p>
+                </div>
+
+                <div className="mt-6 grid gap-3 md:grid-cols-3">
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/15 p-4">
+                    <Moon className="h-4 w-4 text-sky-200" />
+                    <p className="mt-2 text-sm font-bold text-white">
+                      For Luna
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-white/40">
+                      I pray you keep your curiosity and never become afraid to
+                      ask the next question.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/15 p-4">
+                    <Sun className="h-4 w-4 text-amber-200" />
+                    <p className="mt-2 text-sm font-bold text-white">
+                      For Summer
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-white/40">
+                      I pray your life keeps room for warmth, laughter, and the
+                      freedom to become exactly yourself.
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/[0.08] bg-black/15 p-4">
+                    <Sparkles className="h-4 w-4 text-violet-200" />
+                    <p className="mt-2 text-sm font-bold text-white">
+                      For Alexis
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-white/40">
+                      I pray you keep imagining big things and always know that
+                      your voice, ideas, and dreams matter.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/25">
+                    4:44 wish
+                  </p>
+                  <p className="mt-2 text-sm font-semibold text-white/55">
+                    Make one wish for yourself. Dad already made three.
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : null}
 
