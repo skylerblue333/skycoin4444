@@ -14,6 +14,7 @@ Search the repository for these exact phrases:
 - `Dad for Later`
 - `Dad's Field Guide`
 - `Dad's Pocket Toolkit`
+- `Dad's Game Night`
 - `Dad's ridiculous coin vault`
 - `You found the Four Fours.`
 - `Sky Mark`
@@ -24,6 +25,7 @@ The main family components live under:
 - `client/src/components/DadForLater.tsx`
 - `client/src/components/DadsFieldGuide.tsx`
 - `client/src/components/DadsToolkit.tsx`
+- `client/src/components/DadsGameNight.tsx`
 
 The family Easter egg is mounted from the canonical home screen.
 
@@ -48,7 +50,8 @@ That letter includes:
 - the hidden 4:44 coin-joke vault;
 - Dad for Later;
 - Dad's Field Guide;
-- Dad's Pocket Toolkit.
+- Dad's Pocket Toolkit;
+- Dad's Game Night.
 
 ## Dad for Later
 
@@ -120,6 +123,23 @@ It includes:
 - questions to ask before a big decision;
 - things Dad hopes the girls never believe about their worth;
 - a tiny reset for terrible days.
+
+## Dad's Game Night
+
+`client/src/components/DadsGameNight.tsx`
+
+This is the playful local-only layer. It includes:
+
+- a rotating Dad-joke dispenser;
+- rotating "Dad says" prompts;
+- ridiculous family challenges;
+- would-you-rather questions;
+- Dad-vs-kids rock/paper/scissors with an in-memory scoreboard;
+- a 4:44 round bonus;
+- four hidden Dad pockets with silly reveals;
+- a house rule that nobody has to win to have a good night.
+
+The component intentionally does not save scores, choices, pocket opens, or button presses.
 
 ## Four Fours
 
