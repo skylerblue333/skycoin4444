@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Heart, MessageCircleQuestion, Sparkles } from "lucide-react";
+import DadsFieldGuide from "@/components/DadsFieldGuide";
+import DadsToolkit from "@/components/DadsToolkit";
 
 const moments = [
   {
@@ -133,6 +135,49 @@ export default function DadForLater() {
             </div>
           </div>
 
+          <div className="rounded-3xl border border-amber-300/15 bg-amber-300/[0.025] p-5 sm:p-6">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-amber-100/45">
+              What I was trying to build
+            </p>
+            <h3 className="mt-2 text-lg font-black text-white/85">
+              I wanted more possibilities for your future
+            </h3>
+            <div className="mt-4 space-y-4 text-xs leading-6 text-white/45">
+              <p>
+                I worked very hard on ideas, software, businesses, learning,
+                writing, and SKYCOIN4444 because I wanted to build something
+                useful and create more possibilities for our family. A lot of
+                that work came from wanting your future to have more choices,
+                more opportunity, and more room to dream.
+              </p>
+              <p>
+                I did not always get everything right, and hard work by itself
+                does not make somebody a perfect dad. If there were moments
+                when work, stress, distance, or adult problems took too much
+                space, I am sorry. None of that ever meant you mattered less.
+              </p>
+              <p>
+                The most important thing I was ever trying to build was not a
+                company, a coin, an app, or a reputation. It was a future where
+                you could grow up knowing you were loved and had choices.
+              </p>
+              <p>
+                If something I built helps you someday, I will be happy. If you
+                want nothing to do with any of it, that is completely okay too.
+                You do not owe SKYCOIN4444 your career, your time, your money,
+                your identity, or your future.
+              </p>
+              <p>
+                I would rather see you build lives that fit who you become than
+                spend your lives trying to finish mine. I hope I get to keep
+                showing you that in person, not only leave it hidden in code.
+              </p>
+            </div>
+          </div>
+
+          <DadsFieldGuide />
+          <DadsToolkit />
+
           <div className="rounded-2xl border border-sky-300/10 bg-sky-300/[0.02] p-5">
             <div className="flex items-center gap-2">
               <MessageCircleQuestion className="h-4 w-4 text-sky-200/60" />
@@ -182,6 +227,17 @@ export default function DadForLater() {
             <p className="mt-2 text-xs leading-5 text-white/30">
               I would rather imagine you laughing on an ordinary day than
               carrying my story like a weight.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.06] bg-black/15 p-4 text-center">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/25">
+              If the website ever changes
+            </p>
+            <p className="mt-2 text-xs leading-5 text-white/35">
+              The writing also lives as plain source text. Search the repository
+              for FAMILY-TIME-CAPSULE-INDEX or Love, Dad and follow the map from
+              there.
             </p>
           </div>
 
