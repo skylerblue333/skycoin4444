@@ -10,7 +10,7 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +46,7 @@ function scoreLock(value: number, target: number): number {
 }
 
 export default function GameCrash() {
+  const { recordRun } = useArcadeRunRecorder();
   const [state, setState] = useState<RoundState>("idle");
   const [seed, setSeed] = useState(9124);
   const [round, setRound] = useState(1);
@@ -125,7 +126,7 @@ export default function GameCrash() {
     if (round >= SESSION_ROUNDS) {
       setState("finished");
       if (!recorded.current) {
-        recordArcadeRunToStorage({
+        recordRun({
           gameId: "crash-lab",
           score: sessionScore,
           xp: Math.floor(sessionScore / 2),
