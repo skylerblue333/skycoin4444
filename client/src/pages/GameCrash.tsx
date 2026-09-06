@@ -1,298 +1,361 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
+import {
+  ArrowLeft,
+  Crosshair,
+  RotateCcw,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  TimerReset,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { TrendingUp, Zap, Users, Trophy, History, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 
-type GameState = "waiting" | "running" | "crashed";
+type RoundState = "idle" | "running" | "resolved" | "finished";
 
-const HISTORY_MOCK = [8.42, 1.23, 24.7, 2.01, 1.05, 15.3, 3.88, 1.01, 6.72, 1.44, 2.99, 11.2, 1.08, 4.55, 1.77];
+const SESSION_ROUNDS = 5;
 
-function MultiplierDisplay({ value, state }: { value: number; state: GameState }) {
-  const color = state === "crashed" ? "text-red-400" : value >= 2 ? "text-green-400" : "text-yellow-400";
-  return (
-    <div className={`text-7xl font-black tabular-nums transition-colors duration-200 ${color}`}>
-      {value.toFixed(2)}x
-    </div>
-  );
+function seededUnit(seed: number): number {
+  const x = Math.sin(seed * 91.73 + 0.417) * 10_000;
+  return x - Math.floor(x);
+}
+
+function roundConfig(seed: number, round: number) {
+  const base = seed + round * 137;
+  const target = 1.4 + seededUnit(base) * 2.6;
+  const breakPoint = target + 0.35 + seededUnit(base + 9) * 1.6;
+  return {
+    target: Number(target.toFixed(2)),
+    breakPoint: Number(breakPoint.toFixed(2)),
+  };
+}
+
+function scoreLock(value: number, target: number): number {
+  const distance = Math.abs(value - target);
+  return Math.max(0, Math.round(1000 - distance * 500));
 }
 
 export default function GameCrash() {
-  const { isAuthenticated } = useAuth();
-  const [gameState, setGameState] = useState<GameState>("waiting");
-  const [multiplier, setMultiplier] = useState(1.00);
-  const [betAmount, setBetAmount] = useState("10");
-  const [autoCashout, setAutoCashout] = useState("2.00");
-  const [hasBet, setHasBet] = useState(false);
-  const [cashedOut, setCashedOut] = useState(false);
-  const [cashedOutAt, setCashedOutAt] = useState(0);
-  const [countdown, setCountdown] = useState(5);
-  const [history, setHistory] = useState(HISTORY_MOCK);
-  const [balance, setBalance] = useState(1000);
-  const [players, setPlayers] = useState([
-    { name: "SkyWhale", bet: 500, cashedAt: null as number | null },
-    { name: "CryptoFox", bet: 100, cashedAt: null as number | null },
-    { name: "DeFiKing", bet: 250, cashedAt: null as number | null },
-    { name: "MoonRider", bet: 75, cashedAt: null as number | null },
-  ]);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const crashPointRef = useRef(1.0);
+  const [state, setState] = useState<RoundState>("idle");
+  const [seed, setSeed] = useState(9124);
+  const [round, setRound] = useState(1);
+  const [multiplier, setMultiplier] = useState(1);
+  const [lockedAt, setLockedAt] = useState<number | null>(null);
+  const [roundScore, setRoundScore] = useState(0);
+  const [sessionScore, setSessionScore] = useState(0);
+  const [bestRound, setBestRound] = useState(0);
+  const [message, setMessage] = useState(
+    "Track the rising curve and lock as close to the target band as you can."
+  );
+  const recorded = useRef(false);
 
-  const generateCrashPoint = () => {
-    // Provably fair: house edge ~4%, crash point between 1.00 and ~100x
-    const r = Math.random();
-    if (r < 0.04) return 1.00; // instant crash 4% of time
-    return Math.max(1.00, 0.99 / (1 - r));
-  };
-
-  const startGame = useCallback(() => {
-    crashPointRef.current = generateCrashPoint();
-    setMultiplier(1.00);
-    setGameState("running");
-    setCashedOut(false);
-    let current = 1.00;
-    const startTime = Date.now();
-    intervalRef.current = setInterval(() => {
-      const elapsed = (Date.now() - startTime) / 1000;
-      current = Math.pow(Math.E, elapsed * 0.15);
-      setMultiplier(parseFloat(current.toFixed(2)));
-      // Auto-cashout
-      const autoVal = parseFloat(autoCashout);
-      if (hasBet && !cashedOut && autoVal > 0 && current >= autoVal) {
-        handleCashout(current);
-      }
-      // Simulate other players cashing out
-      setPlayers(prev => prev.map(p => {
-        if (!p.cashedAt && Math.random() < 0.01 * current) {
-          return { ...p, cashedAt: parseFloat(current.toFixed(2)) };
-        }
-        return p;
-      }));
-      if (current >= crashPointRef.current) {
-        clearInterval(intervalRef.current!);
-        setGameState("crashed");
-        setHistory(prev => [parseFloat(crashPointRef.current.toFixed(2)), ...prev.slice(0, 14)]);
-        setTimeout(() => {
-          setGameState("waiting");
-          setHasBet(false);
-          setCashedOut(false);
-          setCountdown(5);
-          setPlayers(prev => prev.map(p => ({ ...p, cashedAt: null })));
-          let c = 5;
-          const cdInterval = setInterval(() => {
-            c--;
-            setCountdown(c);
-            if (c <= 0) { clearInterval(cdInterval); startGame(); }
-          }, 1000);
-        }, 2000);
-      }
-    }, 50);
-  }, [hasBet, cashedOut, autoCashout]);
+  const config = roundConfig(seed, round);
+  const targetLow = Math.max(1, config.target - 0.12);
+  const targetHigh = config.target + 0.12;
 
   useEffect(() => {
-    let c = countdown;
-    const cdInterval = setInterval(() => {
-      c--;
-      setCountdown(c);
-      if (c <= 0) { clearInterval(cdInterval); startGame(); }
-    }, 1000);
-    return () => { clearInterval(cdInterval); if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
+    if (state !== "running") return;
 
-  const handleBet = () => {
-    const amt = parseFloat(betAmount);
-    if (isNaN(amt) || amt <= 0) { toast.error("Invalid bet amount"); return; }
-    if (amt > balance) { toast.error("Insufficient balance"); return; }
-    if (gameState !== "waiting") { toast.error("Wait for next round"); return; }
-    setBalance(b => b - amt);
-    setHasBet(true);
-    toast.success(`Bet placed: ${amt} SKY444`);
-  };
+    const timer = window.setInterval(() => {
+      setMultiplier(current => {
+        const step = 0.018 + Math.min(0.045, (current - 1) * 0.0025);
+        const next = Number((current + step).toFixed(3));
+        if (next >= config.breakPoint) {
+          window.clearInterval(timer);
+          setRoundScore(0);
+          setLockedAt(null);
+          setMessage(
+            "The curve broke before you locked it. Read the next target and try again."
+          );
+          setState("resolved");
+          return config.breakPoint;
+        }
+        return next;
+      });
+    }, 45);
 
-  const handleCashout = (currentMult?: number) => {
-    const mult = currentMult || multiplier;
-    if (!hasBet || cashedOut || gameState !== "running") return;
-    const amt = parseFloat(betAmount);
-    const winnings = amt * mult;
-    setBalance(b => b + winnings);
-    setCashedOut(true);
-    setCashedOutAt(mult);
-    toast.success(`Cashed out at ${mult.toFixed(2)}x! +${winnings.toFixed(2)} SKY444`);
-  };
+    return () => window.clearInterval(timer);
+  }, [config.breakPoint, state]);
 
-  const getHistoryColor = (val: number) => {
-    if (val < 1.5) return "bg-red-500/20 text-red-400 border-red-500/30";
-    if (val < 3) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    return "bg-green-500/20 text-green-400 border-green-500/30";
-  };
+  function startSession() {
+    const nextSeed = seed + 1;
+    setSeed(nextSeed);
+    setRound(1);
+    setMultiplier(1);
+    setLockedAt(null);
+    setRoundScore(0);
+    setSessionScore(0);
+    setBestRound(0);
+    setMessage("Round one started. Lock inside the highlighted target band.");
+    recorded.current = false;
+    setState("running");
+  }
+
+  function lock() {
+    if (state !== "running") return;
+    const score = scoreLock(multiplier, config.target);
+    setLockedAt(multiplier);
+    setRoundScore(score);
+    setSessionScore(value => value + score);
+    setBestRound(value => Math.max(value, score));
+
+    if (multiplier >= targetLow && multiplier <= targetHigh) {
+      setMessage("Precision lock! You landed inside the target band.");
+    } else if (score >= 700) {
+      setMessage("Close lock. Tighten the timing on the next round.");
+    } else {
+      setMessage("Safe lock, but far from target. Track the band more closely.");
+    }
+    setState("resolved");
+  }
+
+  function nextRound() {
+    if (state !== "resolved") return;
+
+    if (round >= SESSION_ROUNDS) {
+      setState("finished");
+      if (!recorded.current) {
+        recordArcadeRunToStorage({
+          gameId: "crash-lab",
+          score: sessionScore,
+          xp: Math.floor(sessionScore / 2),
+          sparks: Math.floor(sessionScore / 250),
+          combo: bestRound >= 900 ? 1 : 0,
+        });
+        recorded.current = true;
+      }
+      return;
+    }
+
+    setRound(value => value + 1);
+    setMultiplier(1);
+    setLockedAt(null);
+    setRoundScore(0);
+    setMessage("New target. Lock when the curve reaches the band.");
+    setState("running");
+  }
+
+  const bandPosition = Math.min(100, (config.target / config.breakPoint) * 100);
+  const cursorPosition = Math.min(
+    100,
+    (multiplier / config.breakPoint) * 100
+  );
+  const average =
+    round > 0 ? Math.round(sessionScore / Math.max(1, round - (state === "running" ? 1 : 0))) : 0;
 
   return (
-    <div className="min-h-screen bg-[#07050f] text-white p-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+    <main className="min-h-screen bg-[#050510] text-white">
+      <div className="mx-auto max-w-5xl space-y-7 px-4 py-8">
+        <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-black bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">CRASH</h1>
-            <p className="text-slate-500 text-sm">Provably fair · Cash out before it crashes</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-2">
-              <p className="text-xs text-slate-500">Balance</p>
-              <p className="text-yellow-400 font-bold">{balance.toFixed(2)} SKY444</p>
+            <Link
+              href="/gaming"
+              className="mb-3 inline-flex items-center gap-2 text-sm text-white/45 hover:text-white"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Games Center
+            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-fuchsia-500/15 text-fuchsia-100">
+                Reflex lab
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-white/10 text-white/45"
+              >
+                Score only · no wager · no cashout
+              </Badge>
             </div>
+            <h1 className="mt-4 text-4xl font-black sm:text-5xl">
+              Multiplier Reflex Lab
+            </h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">
+              Track a deterministic rising curve and lock as close as possible
+              to the highlighted target. The multiplier is only a visual timing
+              scale; it has no financial or payout meaning.
+            </p>
           </div>
-        </div>
 
-        {/* History */}
-        <div className="flex gap-1.5 mb-4 overflow-x-auto pb-2">
-          {history.map((val, i) => (
-            <Badge key={i} className={`shrink-0 text-xs font-bold ${getHistoryColor(val)}`}>{val.toFixed(2)}x</Badge>
+          <Link href="/game-fi-quest-board">
+            <Button
+              variant="outline"
+              className="border-white/15 bg-white/[0.03] text-white"
+            >
+              Arcade Passport
+            </Button>
+          </Link>
+        </header>
+
+        <section className="grid gap-4 sm:grid-cols-4">
+          {[
+            ["Round", state === "idle" ? "—" : round + "/" + SESSION_ROUNDS],
+            ["Session score", sessionScore],
+            ["Best round", bestRound],
+            ["Average", average || "—"],
+          ].map(([label, value]) => (
+            <Card
+              key={label}
+              className="border-white/10 bg-white/[0.03] text-white"
+            >
+              <CardContent className="p-4">
+                <p className="text-2xl font-black">{value}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.12em] text-white/30">
+                  {label}
+                </p>
+              </CardContent>
+            </Card>
           ))}
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Main game area */}
-          <div className="lg:col-span-2">
-            <div className="relative bg-[#0e0a1a] border border-white/5 rounded-2xl overflow-hidden" style={{ height: "400px" }}>
-              {/* Graph background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 to-transparent" />
-              {/* Grid lines */}
-              <svg className="absolute inset-0 w-full h-full opacity-10">
-                {[1,2,3,4].map(i => <line key={i} x1="0" y1={`${i*25}%`} x2="100%" y2={`${i*25}%`} stroke="#ffffff" strokeWidth="0.5" />)}
-                {[1,2,3,4].map(i => <line key={i} x1={`${i*25}%`} y1="0" x2={`${i*25}%`} y2="100%" stroke="#ffffff" strokeWidth="0.5" />)}
-              </svg>
-              {/* Multiplier display */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                {gameState === "waiting" ? (
-                  <div className="text-center">
-                    <p className="text-slate-500 text-sm mb-2">Next round in</p>
-                    <div className="text-6xl font-black text-white">{countdown}s</div>
-                    <p className="text-slate-600 text-xs mt-2">Place your bets!</p>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <MultiplierDisplay value={multiplier} state={gameState} />
-                    {gameState === "crashed" && <p className="text-red-400 font-bold text-xl mt-2">CRASHED!</p>}
-                    {cashedOut && <p className="text-green-400 font-semibold mt-2">Cashed out at {cashedOutAt.toFixed(2)}x ✓</p>}
-                  </div>
-                )}
+        {state === "idle" ? (
+          <Card className="border-fuchsia-300/20 bg-fuchsia-300/[0.04] text-white">
+            <CardContent className="grid min-h-96 place-items-center p-8 text-center">
+              <div>
+                <Crosshair className="mx-auto h-12 w-12 text-fuchsia-200" />
+                <h2 className="mt-4 text-3xl font-black">
+                  Five rounds. Five targets.
+                </h2>
+                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/45">
+                  Each round has a deterministic target and break point. Lock
+                  early enough to stay alive, but close enough to the target to
+                  score well.
+                </p>
+                <Button size="lg" className="mt-6" onClick={startSession}>
+                  <Zap className="mr-2 h-5 w-5" />
+                  Start reflex session
+                </Button>
               </div>
-              {/* Rocket */}
-              {gameState === "running" && (
-                <div className="absolute bottom-8 left-8 text-4xl" style={{ transform: `translateY(-${Math.min(80, (multiplier - 1) * 20)}%)`, transition: "transform 0.1s linear" }}>
-                  🚀
+            </CardContent>
+          </Card>
+        ) : state === "finished" ? (
+          <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
+            <CardContent className="grid min-h-96 place-items-center p-8 text-center">
+              <div>
+                <Trophy className="mx-auto h-12 w-12 text-amber-200" />
+                <h2 className="mt-4 text-3xl font-black">Session complete</h2>
+                <p className="mt-2 text-white/45">
+                  {sessionScore} total timing points · {bestRound} best round.
+                </p>
+                <div className="mt-6 flex flex-wrap justify-center gap-3">
+                  <Button onClick={startSession}>
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Run again
+                  </Button>
+                  <Link href="/game-fi-quest-board">
+                    <Button
+                      variant="outline"
+                      className="border-white/15 bg-white/[0.03] text-white"
+                    >
+                      View passport
+                    </Button>
+                  </Link>
                 </div>
-              )}
-              {gameState === "crashed" && <div className="absolute bottom-8 left-8 text-4xl">💥</div>}
-            </div>
-
-            {/* Bet controls */}
-            <div className="mt-4 bg-[#0e0a1a] border border-white/5 rounded-2xl p-4">
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="overflow-hidden border-fuchsia-300/20 bg-gradient-to-br from-fuchsia-950/50 via-slate-950 to-violet-950/50 text-white">
+            <CardHeader>
+              <div className="flex items-start justify-between gap-4">
                 <div>
-                  <label className="text-xs text-slate-500 mb-1 block">Bet Amount (SKY444)</label>
-                  <div className="flex gap-2">
-                    <Input value={betAmount} onChange={e => setBetAmount(e.target.value)} className="bg-white/5 border-white/10 text-white" placeholder="10" />
-                    <Button size="sm" variant="outline" className="shrink-0 border-white/10 text-slate-400" onClick={() => setBetAmount(v => String(parseFloat(v)*2))}>2x</Button>
-                    <Button size="sm" variant="outline" className="shrink-0 border-white/10 text-slate-400" onClick={() => setBetAmount(v => String(Math.floor(parseFloat(v)/2)))}>½</Button>
-                  </div>
+                  <CardDescription className="text-fuchsia-100/50">
+                    Round {round} of {SESSION_ROUNDS}
+                  </CardDescription>
+                  <CardTitle className="mt-1 text-white">
+                    Target {config.target.toFixed(2)}x
+                  </CardTitle>
                 </div>
-                <div>
-                  <label className="text-xs text-slate-500 mb-1 block">Auto Cashout At</label>
-                  <Input value={autoCashout} onChange={e => setAutoCashout(e.target.value)} className="bg-white/5 border-white/10 text-white" placeholder="2.00" />
-                </div>
+                <Badge
+                  variant="outline"
+                  className="border-fuchsia-300/20 text-fuchsia-100"
+                >
+                  Break point hidden during play
+                </Badge>
               </div>
-              <div className="flex gap-3">
-                {gameState === "waiting" && !hasBet && (
-                  <Button className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold" onClick={handleBet}>
-                    <Zap className="w-4 h-4 mr-2" />Place Bet
-                  </Button>
-                )}
-                {gameState === "waiting" && hasBet && (
-                  <Button className="flex-1 bg-green-500/20 text-green-400 border border-green-500/30" disabled>
-                    ✓ Bet Placed — Waiting for round...
-                  </Button>
-                )}
-                {gameState === "running" && hasBet && !cashedOut && (
-                  <Button className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-black font-bold text-lg" onClick={() => handleCashout()}>
-                    CASH OUT {(parseFloat(betAmount) * multiplier).toFixed(2)} SKY444
-                  </Button>
-                )}
-                {gameState === "running" && (!hasBet || cashedOut) && (
-                  <Button className="flex-1 bg-white/5 text-slate-500 border border-white/5" disabled>
-                    {cashedOut ? `Cashed out at ${cashedOutAt.toFixed(2)}x` : "Round in progress..."}
-                  </Button>
-                )}
-                {gameState === "crashed" && (
-                  <Button className="flex-1 bg-red-500/20 text-red-400 border border-red-500/30" disabled>
-                    Crashed at {history[0]?.toFixed(2)}x
-                  </Button>
-                )}
-              </div>
-              <div className="flex gap-2 mt-2">
-                {[10, 25, 50, 100, 500].map(amt => (
-                  <Button key={amt} size="sm" variant="outline" className="flex-1 border-white/10 text-slate-400 text-xs" onClick={() => setBetAmount(String(amt))}>{amt}</Button>
-                ))}
-              </div>
-            </div>
-          </div>
+            </CardHeader>
 
-          {/* Players sidebar */}
-          <div className="bg-[#0e0a1a] border border-white/5 rounded-2xl p-4">
-            <h3 className="text-sm font-semibold text-slate-400 mb-3 flex items-center gap-2"><Users className="w-4 h-4" />Players This Round</h3>
-            <div className="space-y-2">
-              {players.map((p, i) => (
-                <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300">{p.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-500">{p.bet} SKY</span>
-                    {p.cashedAt ? (
-                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">{p.cashedAt}x</Badge>
-                    ) : gameState === "crashed" ? (
-                      <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px]">Bust</Badge>
-                    ) : (
-                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[10px]">Playing</Badge>
-                    )}
+            <CardContent className="space-y-7">
+              <div className="rounded-3xl border border-white/10 bg-black/25 p-6">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.14em] text-white/30">
+                      Current scale
+                    </p>
+                    <p className="mt-1 text-6xl font-black tracking-tight">
+                      {multiplier.toFixed(2)}x
+                    </p>
                   </div>
+                  <Target className="h-10 w-10 text-fuchsia-200" />
                 </div>
-              ))}
-              {hasBet && (
-                <div className="flex items-center justify-between text-xs border-t border-white/5 pt-2 mt-2">
-                  <span className="text-purple-300 font-semibold">You</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-slate-500">{betAmount} SKY</span>
-                    {cashedOut ? (
-                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">{cashedOutAt.toFixed(2)}x</Badge>
-                    ) : (
-                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-[10px]">Playing</Badge>
-                    )}
-                  </div>
+
+                <div className="relative mt-8 h-8 overflow-hidden rounded-full border border-white/10 bg-white/[0.04]">
+                  <div
+                    className="absolute inset-y-0 w-12 -translate-x-1/2 bg-emerald-300/25"
+                    style={{ left: bandPosition + "%" }}
+                  />
+                  <div
+                    className="absolute inset-y-0 w-1 bg-white shadow-[0_0_16px_rgba(255,255,255,.85)]"
+                    style={{ left: cursorPosition + "%" }}
+                  />
                 </div>
+
+                <div className="mt-2 flex items-center justify-between text-xs text-white/25">
+                  <span>1.00x</span>
+                  <span>target band</span>
+                  <span>unknown break</span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                <p className="font-semibold">{message}</p>
+                {state === "resolved" ? (
+                  <p className="mt-2 text-sm text-white/40">
+                    Round score: {roundScore}
+                    {lockedAt !== null
+                      ? " · locked at " + lockedAt.toFixed(2) + "x"
+                      : " · curve broke before lock"}
+                    {" · hidden break point "}
+                    {config.breakPoint.toFixed(2)}x
+                  </p>
+                ) : null}
+              </div>
+
+              {state === "running" ? (
+                <Button size="lg" className="w-full" onClick={lock}>
+                  <TimerReset className="mr-2 h-5 w-5" />
+                  Lock timing
+                </Button>
+              ) : (
+                <Button size="lg" className="w-full" onClick={nextRound}>
+                  {round >= SESSION_ROUNDS
+                    ? "Finish session"
+                    : "Start next round"}
+                </Button>
               )}
-            </div>
-            <div className="mt-4 pt-4 border-t border-white/5">
-              <h4 className="text-xs text-slate-500 mb-2 flex items-center gap-1"><History className="w-3 h-3" />Recent Crashes</h4>
-              <div className="space-y-1">
-                {history.slice(0,8).map((val, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-600">Round -{i+1}</span>
-                    <span className={val < 1.5 ? "text-red-400" : val < 3 ? "text-yellow-400" : "text-green-400"}>{val.toFixed(2)}x</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-yellow-600">Provably fair game. House edge 4%. Play responsibly. SKY444 is a platform token, not real currency.</p>
-              </div>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
+          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
+          This route is a timing/reflex simulation. It has no bet, balance,
+          cashout, payout, house edge, fake players, wallet, token transfer,
+          wagering recommendation, or real-money execution. The rising
+          multiplier is only a visual timing scale.
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
