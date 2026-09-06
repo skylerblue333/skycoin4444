@@ -76,7 +76,7 @@ const coinVault = [
 export default function ThreeLightsEasterEgg() {
   const [revealed, setRevealed] = useState<LightId[]>([]);
   const [letterOpen, setLetterOpen] = useState(false);
-  const [wishTaps, setWishTaps] = useState(0);
+  const [, setWishTaps] = useState(0);
   const [coinVaultOpen, setCoinVaultOpen] = useState(false);
 
   const complete = revealed.length === lights.length;
