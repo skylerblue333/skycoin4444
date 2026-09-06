@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Heart, Moon, Sparkles, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import DadForLater from "@/components/DadForLater";
 
 type LightId = "luna" | "summer" | "alexis";
 
@@ -342,6 +343,8 @@ export default function ThreeLightsEasterEgg() {
                     </ol>
                   </div>
                 </div>
+
+                <DadForLater />
 
                 <button
                   type="button"

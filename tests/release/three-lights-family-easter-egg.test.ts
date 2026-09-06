@@ -6,6 +6,10 @@ const egg = fs.readFileSync(
   "client/src/components/ThreeLightsEasterEgg.tsx",
   "utf8"
 );
+const dadForLater = fs.readFileSync(
+  "client/src/components/DadForLater.tsx",
+  "utf8"
+);
 
 describe("Three Lights family Easter egg", () => {
   it("embeds the three requested family tributes", () => {
@@ -48,6 +52,38 @@ describe("Three Lights family Easter egg", () => {
     expect(egg).toContain("getting all three kids to agree on what to watch");
     expect(egg).toMatch(/onClick=\{recordWishTap\}/);
     expect(egg).toMatch(/aria-expanded=\{coinVaultOpen\}/);
+  });
+
+  it("keeps Dad for Later meaningful and future-facing", () => {
+    expect(egg).toContain("DadForLater");
+    expect(dadForLater).toContain("Dad for Later");
+    expect(dadForLater).toContain("Not one goodbye. A bunch of check-ins");
+    expect(dadForLater).toContain("When your heart gets broken");
+    expect(dadForLater).toContain("When you mess up badly");
+    expect(dadForLater).toContain("When you succeed");
+    expect(dadForLater).toContain("When you feel alone");
+    expect(dadForLater).toContain("When somebody treats you badly");
+    expect(dadForLater).toContain("When you have to start over");
+    expect(dadForLater).toContain("When you fall in love");
+    expect(dadForLater).toContain("When you choose your work");
+    expect(dadForLater).toContain("When you become responsible for someone else");
+    expect(dadForLater).toContain("When your sisters need you");
+    expect(dadForLater).toContain("When you are older than Dad was writing this");
+    expect(dadForLater).toContain("On a completely ordinary Tuesday");
+    expect(dadForLater).toContain("Questions Dad would ask");
+    expect(dadForLater).toContain("Permission slips from Dad");
+    expect(dadForLater).toContain("You do not have to become a monument to my life");
+    expect(dadForLater).toContain("Build yours.");
+  });
+
+  it("keeps Dad for Later private and local", () => {
+    expect(dadForLater).toContain("does not");
+    expect(dadForLater).not.toMatch(/fetch\(/);
+    expect(dadForLater).not.toMatch(/trpc\./);
+    expect(dadForLater).not.toMatch(/localStorage/);
+    expect(dadForLater).not.toMatch(/sessionStorage/);
+    expect(dadForLater).not.toMatch(/document\.cookie/);
+    expect(dadForLater).not.toMatch(/navigator\./);
   });
 
   it("keeps the Easter egg decorative and privacy-local", () => {
