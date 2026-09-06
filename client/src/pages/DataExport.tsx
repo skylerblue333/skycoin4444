@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Download, FileJson, ShieldCheck } from "lucide-react";
+import { ArrowRight, Download, FileJson, ShieldCheck } from "lucide-react";
+import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,9 +59,12 @@ export default function DataExport() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" onClick={() => startLogin()}>
-              Sign in
-            </Button>
+            <Link href="/signin">
+              <Button className="w-full">
+                Open invitation sign in
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </main>
@@ -85,9 +88,9 @@ export default function DataExport() {
             <FileJson className="h-6 w-6 text-primary" />
             <CardTitle className="mt-2">Included beta categories</CardTitle>
             <CardDescription>
-              Profile, social activity, SkySchool progress, beta feedback,
-              discovery records, creator drafts, notifications/preferences, and
-              privacy requests.
+              Profile, social activity, SkySchool progress, authenticated
+              arcade-progress summaries, beta feedback, discovery records,
+              creator drafts, notifications/preferences, and privacy requests.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
