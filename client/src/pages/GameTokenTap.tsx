@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Sparkles, Trophy, Zap, ArrowRight, RotateCcw } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 
 type Particle = { id: number; x: number; y: number; opacity: number; scale: number };
 
 export default function GameTokenTap() {
+  const { recordRun } = useArcadeRunRecorder();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
   const [taps, setTaps] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
@@ -58,7 +59,7 @@ export default function GameTokenTap() {
 
   useEffect(() => {
     if (gameState !== "finished" || recordedRun.current) return;
-    recordArcadeRunToStorage({
+    recordRun({
       gameId: "spark-tap",
       score: taps,
       sparks: sparksEarned,
