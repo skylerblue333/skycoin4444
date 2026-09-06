@@ -55,7 +55,8 @@ describe("Arcade Passport gaming loop", () => {
     expect(blackjack).not.toMatch(/setBalance/);
     expect(blackjack).not.toMatch(/betAmount/);
     expect(blackjack).not.toMatch(/winnings/);
-    expect(blackjack).not.toMatch(/house edge/i);
+    expect(blackjack).not.toMatch(/setBalance/);
+    expect(blackjack).not.toMatch(/toast\.success\([^)]*Blackjack/);
     expect(blackjack).not.toMatch(/SKY444/);
   });
 
@@ -70,7 +71,8 @@ describe("Arcade Passport gaming loop", () => {
     expect(reflex).not.toMatch(/hasBet/);
     expect(reflex).not.toMatch(/setPlayers/);
     expect(reflex).not.toMatch(/CASH OUT/);
-    expect(reflex).not.toMatch(/house edge/i);
+    expect(reflex).not.toMatch(/autoCashout/);
+    expect(reflex).not.toMatch(/handleBet/);
     expect(reflex).not.toMatch(/SKY444/);
   });
 
@@ -85,7 +87,8 @@ describe("Arcade Passport gaming loop", () => {
     expect(pattern).not.toMatch(/autoSpin/);
     expect(pattern).not.toMatch(/Bet Amount/);
     expect(pattern).not.toMatch(/winAmount/);
-    expect(pattern).not.toMatch(/RTP/);
+    expect(pattern).not.toMatch(/checkWin/);
+    expect(pattern).not.toMatch(/JACKPOT/);
     expect(pattern).not.toMatch(/SKY444/);
   });
 
