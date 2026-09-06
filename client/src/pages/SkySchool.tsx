@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { gapCourses } from "@/data/gapCourses";
+import { loadArcadePassport } from "@/lib/arcadePassport";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,6 +53,14 @@ const practiceCards = [
     icon: Sparkles,
     accent: "border-emerald-300/20 bg-emerald-300/[0.04]",
   },
+  {
+    title: "Arcade Passport",
+    detail:
+      "Review device-local Study XP, daily challenge progress, and game milestones.",
+    href: "/game-fi-quest-board",
+    icon: Target,
+    accent: "border-amber-300/20 bg-amber-300/[0.04]",
+  },
 ] as const;
 
 export default function SkySchool() {
@@ -69,6 +78,8 @@ export default function SkySchool() {
       ),
     []
   );
+  const passport = useMemo(() => loadArcadePassport(), []);
+
   const completedLessonEvidence = useMemo(
     () =>
       (activity.data ?? []).filter(
@@ -146,7 +157,7 @@ export default function SkySchool() {
           </div>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {[
             { label: "Authored courses", value: gapCourses.length, icon: GraduationCap },
             { label: "Authored lessons", value: lessonCount, icon: BookOpen },
@@ -160,6 +171,7 @@ export default function SkySchool() {
               icon: CheckCircle2,
             },
             { label: "Practice modes", value: practiceCards.length, icon: Gamepad2 },
+            { label: "Device Study XP", value: passport.totalXp, icon: Sparkles },
           ].map(({ label, value, icon: Icon }) => (
             <Card
               key={label}
@@ -383,6 +395,8 @@ export default function SkySchool() {
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
           SkySchool does not issue an accredited credential in this beta.
+          Arcade Passport Study XP and Sparks are device-local practice labels,
+          not server-backed credentials or rewards.
           Practice XP/Sparks have no cash or token value. Course pages may teach
           blockchain concepts, but completing lessons does not perform staking,
           mining, signing, transfers, or other live chain activity.

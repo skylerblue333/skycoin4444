@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Clock, Sparkles, Trophy, Zap, CheckCircle2, XCircle, ArrowRight, RotateCcw } from "lucide-react";
+import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
 
 const QUESTIONS = [
   { q: "What does 'DeFi' stand for?", options: ["Decentralized Finance", "Digital Finance", "Defined Finance", "Distributed Finance"], answer: 0, xp: 100 },
@@ -30,6 +31,7 @@ export default function GameCryptoQuiz() {
   const [timeLeft, setTimeLeft] = useState(20);
   const [streak, setStreak] = useState(0);
   const [results, setResults] = useState<boolean[]>([]);
+  const recordedRun = useRef(false);
 
   const question = QUESTIONS[currentQ];
 
@@ -69,7 +71,19 @@ export default function GameCryptoQuiz() {
     }, 1200);
   }, [gameState, question, currentQ, results, streak]);
 
+  useEffect(() => {
+    if (gameState !== "finished" || recordedRun.current) return;
+    recordArcadeRunToStorage({
+      gameId: "crypto-quiz",
+      score: score * 100,
+      sparks: sparksEarned,
+      xp: xpEarned,
+    });
+    recordedRun.current = true;
+  }, [gameState, score, sparksEarned, xpEarned]);
+
   const startGame = () => {
+    recordedRun.current = false;
     setGameState("playing");
     setCurrentQ(0);
     setSelected(null);

@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Zap, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
+import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
 
 const BLOCK_COLORS = [
   "bg-blue-500", "bg-purple-500", "bg-purple-600", "bg-yellow-500",
@@ -25,6 +26,7 @@ export default function GameBlockBuilder() {
   const [xpEarned, setXpEarned] = useState(0);
   const [speed, setSpeed] = useState(2);
   const [perfectStreak, setPerfectStreak] = useState(0);
+  const recordedRun = useRef(false);
 
   const PLATFORM_WIDTH = 280;
   const MOVE_RANGE = 240;
@@ -50,6 +52,7 @@ export default function GameBlockBuilder() {
   }, []);
 
   const startGame = () => {
+    recordedRun.current = false;
     const firstBlock = generateBlock(PLATFORM_WIDTH);
     setStack([{ ...firstBlock, offset: 0, perfect: true }]);
     setCurrentBlock(generateBlock(PLATFORM_WIDTH));
@@ -108,6 +111,18 @@ export default function GameBlockBuilder() {
     setPosition(0);
     setDirection(1);
   }, [gameState, currentBlock, stack, position, generateBlock]);
+
+  useEffect(() => {
+    if (gameState !== "finished" || recordedRun.current) return;
+    recordArcadeRunToStorage({
+      gameId: "block-builder",
+      score,
+      sparks: sparksEarned,
+      xp: xpEarned,
+      combo: perfectStreak,
+    });
+    recordedRun.current = true;
+  }, [gameState, perfectStreak, score, sparksEarned, xpEarned]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
