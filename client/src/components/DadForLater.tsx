@@ -3,6 +3,7 @@ import { Heart, MessageCircleQuestion, Sparkles } from "lucide-react";
 import DadsFieldGuide from "@/components/DadsFieldGuide";
 import DadsToolkit from "@/components/DadsToolkit";
 import DadsGameNight from "@/components/DadsGameNight";
+import DadsAdventureDeck from "@/components/DadsAdventureDeck";
 
 const moments = [
   {
@@ -177,6 +178,7 @@ export default function DadForLater() {
           </div>
 
           <DadsGameNight />
+          <DadsAdventureDeck />
           <DadsFieldGuide />
           <DadsToolkit />
 
