@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, Zap, ArrowRight, RotateCcw, Sparkles } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 
 const BLOCK_COLORS = [
   "bg-blue-500", "bg-purple-500", "bg-purple-600", "bg-yellow-500",
@@ -16,6 +16,7 @@ type Block = { id: number; color: string; label: string; width: number };
 type StackedBlock = Block & { offset: number; perfect: boolean };
 
 export default function GameBlockBuilder() {
+  const { recordRun } = useArcadeRunRecorder();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
   const [stack, setStack] = useState<StackedBlock[]>([]);
   const [currentBlock, setCurrentBlock] = useState<Block | null>(null);
@@ -114,7 +115,7 @@ export default function GameBlockBuilder() {
 
   useEffect(() => {
     if (gameState !== "finished" || recordedRun.current) return;
-    recordArcadeRunToStorage({
+    recordRun({
       gameId: "block-builder",
       score,
       sparks: sparksEarned,
