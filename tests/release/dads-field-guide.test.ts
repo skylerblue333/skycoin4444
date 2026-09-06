@@ -67,7 +67,7 @@ describe("Dad's Field Guide Easter egg", () => {
     expect(dadForLater).toContain("I worked very hard on ideas, software, businesses");
     expect(dadForLater).toContain("you could grow up knowing you were loved and had choices");
     expect(dadForLater).toContain("You do not owe SKYCOIN4444");
-    expect(dadForLater).toContain("I hope I get to keep showing you that in person");
+    expect(dadForLater).toMatch(/I hope I get to keep\s+showing you that in person/);
   });
 
   it("keeps the guide static and privacy-local", () => {
