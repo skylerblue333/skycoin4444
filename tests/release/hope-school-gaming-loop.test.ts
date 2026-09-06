@@ -44,8 +44,10 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
   it("promotes a replayable no-value game loop without fake platform stats", () => {
     expect(gaming).toMatch(/Sky Rush/);
     expect(gaming).toMatch(/href: "\/game-sky-rush"/);
-    expect(gaming).toMatch(/Game-only\s+Sparks, XP, ranks, and scores have no monetary value/);
-    expect(gaming).toMatch(/No real-money wagering, custody, prize settlement/);
+    expect(gaming).toMatch(/Sparks, Study\s+XP, scores, badges, favorites, and daily challenges have no\s+monetary or token value/);
+    expect(gaming).toMatch(/no real-money play/i);
+    expect(gaming).toMatch(/no streak penalty, wager,\s+balance pressure, auto-spin, payout, or notification pressure/i);
+    expect(gaming).toMatch(/not\s+transferable assets, wallet balances, prizes, server-backed rankings,\s+financial rewards, or blockchain records/);
     expect(gaming).not.toMatch(/platform\.stats/);
     expect(gaming).not.toMatch(/Active Players/);
     expect(gaming).not.toMatch(/prizePool\s*:/i);
