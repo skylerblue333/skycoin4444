@@ -16,6 +16,7 @@ Search the repository for these exact phrases:
 - `Dad's Pocket Toolkit`
 - `Dad's Game Night`
 - `Dad's Adventure Deck`
+- `Dad's No-Value Coin Jar`
 - `Dad's ridiculous coin vault`
 - `You found the Four Fours.`
 - `Sky Mark`
@@ -28,6 +29,7 @@ The main family components live under:
 - `client/src/components/DadsToolkit.tsx`
 - `client/src/components/DadsGameNight.tsx`
 - `client/src/components/DadsAdventureDeck.tsx`
+- `client/src/components/DadsCoinJar.tsx`
 
 The family Easter egg is mounted from the canonical home screen.
 
@@ -54,7 +56,8 @@ That letter includes:
 - Dad's Field Guide;
 - Dad's Pocket Toolkit;
 - Dad's Game Night;
-- Dad's Adventure Deck.
+- Dad's Adventure Deck;
+- Dad's No-Value Coin Jar.
 
 ## Dad for Later
 
@@ -159,6 +162,21 @@ This is a second playful local-only layer for returning visits. It includes:
 - encouragement to improve the games and eventually create their own traditions.
 
 The component does not save answers, missions, story combinations, relay state, or other activity.
+
+## Dad's No-Value Coin Jar
+
+`client/src/components/DadsCoinJar.tsx`
+
+A deliberately non-financial collectible-style joke layer with six local-only Dad coins:
+
+- Courage Coin;
+- Kindness Coin;
+- Curiosity Coin;
+- Try-Again Coin;
+- Sister Coin;
+- Ordinary-Day Coin.
+
+Each coin reveals a short Dad note when tapped. The component explicitly states that the coins are not cryptocurrency, assets, rewards, inheritance, prizes, wallets, balances, or anything with financial value.
 
 ## Four Fours
 
