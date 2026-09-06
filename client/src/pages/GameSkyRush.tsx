@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
   type RushLane,
   type RushScore,
 } from "@/lib/skyRush";
+import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
 
 type GameState = "idle" | "playing" | "paused" | "finished";
 type RushMode = "sprint" | "rush" | "endurance";
@@ -80,6 +81,7 @@ export default function GameSkyRush() {
     "Choose a mode, then dodge red gates and collect Sparks."
   );
   const [bestScore, setBestScore] = useState(0);
+  const recordedRun = useRef(false);
 
   const config = MODES[mode];
   const frame = useMemo(() => rushFrame(seed, tick), [seed, tick]);
@@ -140,6 +142,18 @@ export default function GameSkyRush() {
   useEffect(() => {
     if (gameState !== "finished") return;
     if (typeof window === "undefined") return;
+
+    if (!recordedRun.current) {
+      recordArcadeRunToStorage({
+        gameId: "sky-rush",
+        score: score.score,
+        sparks: score.sparks,
+        xp: Math.floor(score.score / 5),
+        combo: score.bestCombo,
+      });
+      recordedRun.current = true;
+    }
+
     if (score.score > bestScore) {
       window.localStorage.setItem(
         bestScoreKey(mode),
@@ -181,6 +195,7 @@ export default function GameSkyRush() {
     setScore(emptyRushScore());
     setShields(selected.shields);
     setMessage("Run started — dodge red, collect cyan.");
+    recordedRun.current = false;
     setGameState("playing");
   }
 
