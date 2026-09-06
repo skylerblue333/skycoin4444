@@ -4,6 +4,7 @@ import DadsFieldGuide from "@/components/DadsFieldGuide";
 import DadsToolkit from "@/components/DadsToolkit";
 import DadsGameNight from "@/components/DadsGameNight";
 import DadsAdventureDeck from "@/components/DadsAdventureDeck";
+import DadsCoinJar from "@/components/DadsCoinJar";
 
 const moments = [
   {
@@ -179,6 +180,7 @@ export default function DadForLater() {
 
           <DadsGameNight />
           <DadsAdventureDeck />
+          <DadsCoinJar />
           <DadsFieldGuide />
           <DadsToolkit />
 
