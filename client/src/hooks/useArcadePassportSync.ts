@@ -10,7 +10,7 @@ import {
   toggleArcadeFavoriteInStorage,
   type ArcadeGameId,
   type ArcadePassport,
-  type ArcadeRun,
+  type RecordableArcadeRun,
 } from "@/lib/arcadePassport";
 
 export function useArcadePassportSync() {
@@ -73,7 +73,7 @@ export function useArcadeRunRecorder() {
   });
 
   const recordRun = useCallback(
-    (run: ArcadeRun) => {
+    (run: RecordableArcadeRun) => {
       const normalized = normalizeArcadeRun(run);
       const passport = recordArcadeRunToStorage({
         ...normalized,
@@ -81,7 +81,10 @@ export function useArcadeRunRecorder() {
       });
 
       if (isAuthenticated) {
-        mutation.mutate(normalized);
+        mutation.mutate({
+          ...normalized,
+          gameId: run.gameId,
+        });
       }
 
       return passport;
