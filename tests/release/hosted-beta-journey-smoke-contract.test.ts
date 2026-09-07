@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import { createTRPCUntypedClient } from "@trpc/client";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const script = fs.readFileSync(
@@ -10,6 +12,12 @@ const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
 const docs = fs.readFileSync("docs/BETA_DEPLOYMENT.md", "utf8");
 
 describe("hosted beta full journey verifier contract", () => {
+  it("parses as executable Node ESM", () => {
+    expect(() =>
+      execFileSync(process.execPath, ["--check", path.resolve("scripts/hosted-beta-journey-smoke.mjs")])
+    ).not.toThrow();
+  });
+
   it("uses the installed untyped tRPC client instead of hand-rolling protocol envelopes", () => {
     expect(typeof createTRPCUntypedClient).toBe("function");
     expect(script).toContain("createTRPCUntypedClient");
