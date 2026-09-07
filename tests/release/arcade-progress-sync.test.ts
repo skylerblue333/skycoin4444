@@ -62,7 +62,7 @@ describe("authenticated arcade progress sync", () => {
   it("always keeps local play available and syncs only authenticated runs", () => {
     expect(hook).toMatch(/recordArcadeRunToStorage/);
     expect(hook).toMatch(/if \(isAuthenticated\)/);
-    expect(hook).toMatch(/mutation\.mutate\(normalized\)/);
+    expect(hook).toMatch(/mutation\.mutate\(\{[\s\S]*\.\.\.normalized[\s\S]*gameId: run\.gameId/);
     expect(hook).toMatch(/mergeArcadeProgress/);
     expect(gaming).toMatch(/Account progress synced/);
     expect(quest).toMatch(/anti-cheat\s+ranking, or public leaderboard/);
