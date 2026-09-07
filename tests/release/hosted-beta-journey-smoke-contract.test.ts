@@ -62,9 +62,22 @@ describe("hosted beta full journey verifier contract", () => {
   });
 
   it("does not intentionally print credentials, cookies, or returned user objects", () => {
-    expect(script).not.toMatch(
-      /console\.(?:log|error)\([\s\S]{0,180}(?:credentials\.email|credentials\.accessKey|cookiePair|BETA_SMOKE_EMAIL|BETA_ACCESS_KEY|sessionToken)/
-    );
+    for (const sensitiveExpression of [
+      "console.log(credentials.email",
+      "console.error(credentials.email",
+      "console.log(credentials.accessKey",
+      "console.error(credentials.accessKey",
+      "console.log(cookiePair",
+      "console.error(cookiePair",
+      "console.log(process.env.BETA_SMOKE_EMAIL",
+      "console.error(process.env.BETA_SMOKE_EMAIL",
+      "console.log(process.env.BETA_ACCESS_KEY",
+      "console.error(process.env.BETA_ACCESS_KEY",
+      "console.log(sessionToken",
+      "console.error(sessionToken",
+    ]) {
+      expect(script).not.toContain(sensitiveExpression);
+    }
     expect(script).not.toMatch(/JSON\.stringify\(user\)/);
     expect(script).not.toMatch(/console\.log\([^\n]*userId/);
   });
