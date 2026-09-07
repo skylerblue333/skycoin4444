@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -18,10 +18,10 @@ import {
   arcadeGameIds,
   arcadePassportBadges,
   arcadePassportLevel,
-  loadArcadePassport,
   type ArcadeGameId,
   type ArcadePassport,
 } from "@/lib/arcadePassport";
+import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -148,15 +148,15 @@ function quests(passport: ArcadePassport): Quest[] {
 }
 
 export default function GameFiQuestBoard() {
-  const [passport, setPassport] = useState(() => loadArcadePassport());
+  const {
+    passport,
+    syncStatus,
+    refresh,
+  } = useArcadePassportSync();
   const milestoneList = useMemo(() => quests(passport), [passport]);
   const badges = arcadePassportBadges(passport);
   const completeCount = milestoneList.filter(item => item.complete).length;
   const dailyMeta = gameMeta[passport.daily.gameId];
-
-  function refresh() {
-    setPassport(loadArcadePassport());
-  }
 
   return (
     <main className="min-h-screen bg-[#050510] text-white">
@@ -178,7 +178,11 @@ export default function GameFiQuestBoard() {
                 variant="outline"
                 className="border-white/10 text-white/45"
               >
-                Device-local progression
+                {syncStatus === "synced"
+                  ? "Account + device progression"
+                  : syncStatus === "syncing"
+                    ? "Syncing account progression"
+                    : "Device-local progression"}
               </Badge>
             </div>
             <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
@@ -193,7 +197,7 @@ export default function GameFiQuestBoard() {
           <Button
             type="button"
             variant="outline"
-            onClick={refresh}
+            onClick={() => void refresh()}
             className="border-white/15 bg-white/[0.03] text-white"
           >
             <RefreshCcw className="mr-2 h-4 w-4" />
@@ -356,10 +360,11 @@ export default function GameFiQuestBoard() {
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          Arcade Passport data lives only in this browser's local storage. It is
-          not a blockchain record, credential, wallet balance, transferable
-          asset, prize, or server-backed leaderboard. Clearing browser storage
-          removes it.
+          Anonymous Arcade Passport data lives only in this browser. Signed-in
+          game summaries may also sync to the authenticated account so progress
+          can rehydrate across devices. Neither form is a blockchain record,
+          credential, wallet balance, transferable asset, prize, anti-cheat
+          ranking, or public leaderboard.
         </section>
       </div>
     </main>

@@ -111,6 +111,28 @@ The bootstrap refuses localhost, refuses any non-empty database, synchronizes fr
 
 For any non-empty database, do **not** use this command. Prepare and review a forward migration against the exact existing schema instead.
 
+## Additive arcade-progress migration
+
+Authenticated Arcade Passport sync uses one additive table: `arcade_game_progress`. This table stores only per-user/per-game run counts, best score/combo, aggregate no-value Sparks/Study XP, and last-played timestamps. It does not store wallet balances, wagers, payouts, prizes, token amounts, or blockchain state.
+
+For an existing managed beta database, deploy the reviewed forward migration with:
+
+```bash
+BETA_DB_MIGRATION_CONFIRM=ARCADE_PROGRESS_V1 \
+  pnpm beta:db:migrate:arcade-progress
+```
+
+The migration runner:
+- requires a remote `mysql://` database;
+- refuses localhost;
+- creates only `arcade_game_progress` with `CREATE TABLE IF NOT EXISTS`;
+- verifies required columns, primary/unique/query indexes, and the `user_id → users.id` foreign key;
+- contains no drop, truncate, delete, update, seed, wallet, token, payment, or chain operation.
+
+The application treats this sync as account-continuity convenience, not an anti-cheat or authoritative leaderboard system. Client-reported numeric values are bounded, but the server does not independently replay/verify game physics.
+
+Rollback boundary: older application revisions ignore this additive table, so an application rollback does not require dropping it. Do not automatically reverse the table during application rollback.
+
 ## Production session cookie migration
 
 Production browser authentication uses `__Host-app_session_id` rather than the legacy unprefixed `app_session_id`.
@@ -243,10 +265,11 @@ A candidate deployment is not beta-ready until all of these are recorded:
 10. invalid or uninvited credentials are denied without receiving a session;
 11. profile update survives refresh;
 12. one social or SkySchool action survives refresh;
-13. beta feedback reaches durable storage;
-14. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
-15. `/delete-account` records a durable request and does not claim deletion completion;
-16. rollback target, privacy-request owner, and response owner are recorded.
+13. when arcade sync is enabled, a signed-in game run persists to `arcade_game_progress` and rehydrates without being presented as authoritative ranking or financial value;
+14. beta feedback reaches durable storage;
+15. `/data-export` returns only the authenticated tester's integrated beta data and states its coverage boundary;
+16. `/delete-account` records a durable request and does not claim deletion completion;
+17. rollback target, privacy-request owner, and response owner are recorded.
 
 ## Hosted smoke verifier
 
@@ -286,7 +309,7 @@ The active rollback target and its contemporaneous deployment evidence belong in
 
 ## Privacy operations
 
-The engineering beta provides an authenticated self-export over currently integrated account/profile, social, learning, feedback, discovery, creator, notification, and privacy-request tables. The export explicitly does not claim exhaustive coverage of unintegrated legacy or external-provider systems.
+The engineering beta provides an authenticated self-export over currently integrated account/profile, social, learning, authenticated arcade-progress, feedback, discovery, creator, notification, and privacy-request tables. The export explicitly does not claim exhaustive coverage of unintegrated legacy or external-provider systems.
 
 Account deletion is currently a **request-and-review workflow**. A tester can record a durable request and see its status. Administrators can approve or reject the request with an operator note. The application intentionally has no API action that marks a request completed, because an automated verified purge across all account-related tables has not yet been implemented. A beta operator must not tell a tester that deletion is complete without separate purge evidence.
 

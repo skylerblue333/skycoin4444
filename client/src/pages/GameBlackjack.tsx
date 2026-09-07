@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   Trophy,
 } from "lucide-react";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -161,6 +161,7 @@ function CardFace({ card, hidden = false }: { card: PlayingCard; hidden?: boolea
 }
 
 export default function GameBlackjack() {
+  const { recordRun } = useArcadeRunRecorder();
   const [sessionState, setSessionState] = useState<SessionState>("idle");
   const [round, setRound] = useState(0);
   const [seed, setSeed] = useState(4401);
@@ -275,7 +276,7 @@ export default function GameBlackjack() {
     if (round >= SESSION_ROUNDS) {
       setSessionState("finished");
       if (!recorded.current) {
-        recordArcadeRunToStorage({
+        recordRun({
           gameId: "blackjack-lab",
           score: decisionScore,
           xp: decisionScore,

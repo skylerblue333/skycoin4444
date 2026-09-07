@@ -3,6 +3,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import {
+  arcadeGameProgress,
   betaFeedback,
   comments,
   courseProgress,
@@ -29,6 +30,7 @@ const exportCategory = z.enum([
   "profile",
   "social",
   "learning",
+  "gaming",
   "feedback",
   "discovery",
   "creator",
@@ -112,6 +114,13 @@ export const privacyRouter = router({
           .where(eq(courseProgress.userId, userId));
       }
 
+      if (requested.has("gaming")) {
+        output.gaming = await db
+          .select()
+          .from(arcadeGameProgress)
+          .where(eq(arcadeGameProgress.userId, userId));
+      }
+
       if (requested.has("feedback")) {
         output.feedback = await db
           .select()
@@ -170,7 +179,7 @@ export const privacyRouter = router({
         subjectId: userId,
         categories,
         scope:
-          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, feedback, discovery, creator, notification, and privacy-request tables. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
+          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, gaming-progress, feedback, discovery, creator, notification, and privacy-request tables. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
         data: output,
       };
     }),

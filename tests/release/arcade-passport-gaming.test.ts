@@ -19,15 +19,15 @@ const passport = fs.readFileSync(
 
 describe("Arcade Passport gaming loop", () => {
   it("uses real device-local progress instead of the unavailable GameFi stub", () => {
-    expect(gaming).toMatch(/loadArcadePassport/);
-    expect(gaming).toMatch(/toggleArcadeFavoriteInStorage/);
+    expect(gaming).toMatch(/useArcadePassportSync/);
+    expect(gaming).toMatch(/toggleFavorite/);
     expect(gaming).toMatch(/Play today's challenge/);
     expect(gaming).toMatch(/Open Quest Board/);
     expect(gaming).not.toMatch(/trpc\.gamefi/);
     expect(gaming).not.toMatch(/Tournament records/);
     expect(gaming).not.toMatch(/Leaderboard records/);
 
-    expect(questBoard).toMatch(/loadArcadePassport/);
+    expect(questBoard).toMatch(/useArcadePassportSync/);
     expect(questBoard).toMatch(/Device-local progression/);
     expect(questBoard).toMatch(/No wallet, payout, staking, token reward/);
     expect(questBoard).not.toMatch(/rewardToken/);
@@ -100,7 +100,8 @@ describe("Arcade Passport gaming loop", () => {
       "client/src/pages/GameBlockBuilder.tsx",
     ]) {
       const source = fs.readFileSync(file, "utf8");
-      expect(source).toMatch(/recordArcadeRunToStorage/);
+      expect(source).toMatch(/useArcadeRunRecorder/);
+      expect(source).toMatch(/recordRun\(\{/);
     }
   });
 });

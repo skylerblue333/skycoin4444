@@ -25,7 +25,7 @@ import {
   type RushLane,
   type RushScore,
 } from "@/lib/skyRush";
-import { recordArcadeRunToStorage } from "@/lib/arcadePassport";
+import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 
 type GameState = "idle" | "playing" | "paused" | "finished";
 type RushMode = "sprint" | "rush" | "endurance";
@@ -70,6 +70,7 @@ function bestScoreKey(mode: RushMode) {
 }
 
 export default function GameSkyRush() {
+  const { recordRun } = useArcadeRunRecorder();
   const [mode, setMode] = useState<RushMode>("rush");
   const [gameState, setGameState] = useState<GameState>("idle");
   const [lane, setLane] = useState<RushLane>(1);
@@ -144,7 +145,7 @@ export default function GameSkyRush() {
     if (typeof window === "undefined") return;
 
     if (!recordedRun.current) {
-      recordArcadeRunToStorage({
+      recordRun({
         gameId: "sky-rush",
         score: score.score,
         sparks: score.sparks,

@@ -16,7 +16,7 @@ import {
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { gapCourses } from "@/data/gapCourses";
-import { loadArcadePassport } from "@/lib/arcadePassport";
+import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +78,8 @@ export default function SkySchool() {
       ),
     []
   );
-  const passport = useMemo(() => loadArcadePassport(), []);
+  const { passport, syncStatus: arcadeSyncStatus } =
+    useArcadePassportSync();
 
   const completedLessonEvidence = useMemo(
     () =>
@@ -395,8 +396,10 @@ export default function SkySchool() {
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
           SkySchool does not issue an accredited credential in this beta.
-          Arcade Passport Study XP and Sparks are device-local practice labels,
-          not server-backed credentials or rewards.
+          Arcade Passport Study XP and Sparks are practice labels. Anonymous
+          progress is device-local; signed-in summaries may sync to the account
+          for continuity. They are not credentials, financial rewards, or
+          public rankings. Current sync state: {arcadeSyncStatus}.
           Practice XP/Sparks have no cash or token value. Course pages may teach
           blockchain concepts, but completing lessons does not perform staking,
           mining, signing, transfers, or other live chain activity.

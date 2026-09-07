@@ -52,6 +52,8 @@ describe("beta privacy controls", () => {
     expect(router).toMatch(/const userId = ctx\.user\.id/);
     expect(router).toMatch(/eq\(posts\.userId, userId\)/);
     expect(router).toMatch(/eq\(courseProgress\.userId, userId\)/);
+    expect(router).toMatch(/eq\(arcadeGameProgress\.userId, userId\)/);
+    expect(router).toMatch(/"gaming"/);
     expect(router).toMatch(/eq\(betaFeedback\.userId, userId\)/);
     expect(router).toMatch(/not a claim of exhaustive export/);
     expect(router).not.toMatch(/userId:\\s*z\\./);
@@ -70,6 +72,9 @@ describe("beta privacy controls", () => {
   it("replaces generated privacy shells with authenticated real procedures", () => {
     expect(dataExport).toMatch(/trpc\.privacy\.exportData\.useQuery/);
     expect(dataExport).toMatch(/Create JSON export/);
+    expect(dataExport).toMatch(/authenticated\s+arcade-progress summaries/);
+    expect(dataExport).toMatch(/href="\/signin"/);
+    expect(dataExport).not.toMatch(/startLogin/);
     expect(deleteAccount).toMatch(/trpc\.privacy\.requestDeletion\.useMutation/);
     expect(deleteAccount).toMatch(/trpc\.privacy\.myRequests\.useQuery/);
     expect(privacySettings).toMatch(/trpc\.user\.updateProfile\.useMutation/);
