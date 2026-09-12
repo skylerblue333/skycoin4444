@@ -1,3 +1,4 @@
+import { scryptSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
   betaAccessKeyIssue,
@@ -67,6 +68,23 @@ describe("beta access-key authentication policy", () => {
 
     expect(verifyBetaAccessKey(strongKey, env)).toBe(true);
     expect(verifyBetaAccessKey("B".repeat(48), env)).toBe(false);
+  });
+
+  it("verifies a beta password against a server-side scrypt credential", () => {
+    const salt = Buffer.from("00112233445566778899aabbccddeeff", "hex");
+    const password = "short-beta-password";
+    const passwordCredential =
+      salt.toString("hex") +
+      ":" +
+      scryptSync(password, salt, 32).toString("hex");
+    const env = {
+      VITE_BETA_AUTH_MODE: "access_key",
+      BETA_ACCESS_PASSWORD_SCRYPT: passwordCredential,
+    } as NodeJS.ProcessEnv;
+
+    expect(betaAccessKeyIssue(env)).toBeNull();
+    expect(verifyBetaAccessKey(password, env)).toBe(true);
+    expect(verifyBetaAccessKey("wrong-password", env)).toBe(false);
   });
 
   it("normalizes invited emails and derives a stable opaque session identity", () => {
