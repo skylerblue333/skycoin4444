@@ -14,7 +14,7 @@ import {
 } from "../../client/src/lib/competitiveLabs";
 
 const liveSource = fs.readFileSync(
-  "client/src/pages/LiveStreaming.tsx",
+  "client/src/pages/Live.tsx",
   "utf8"
 );
 const languageSource = fs.readFileSync(
@@ -68,13 +68,17 @@ describe("competitive ecosystem beta", () => {
     expect(getEcosystemProgressPercent(next)).toBe(25);
   });
 
-  it("replaces fake live claims with a real local device preview", () => {
-    expect(liveSource).toMatch(/navigator\.mediaDevices\.getUserMedia/);
+  it("validates the promoted authenticated WebRTC small-room beta", () => {
+    expect(liveSource).toMatch(/navigator\\.mediaDevices\\.getUserMedia/);
+    expect(liveSource).toMatch(/new RTCPeerConnection/);
     expect(liveSource).toMatch(
-      /getTracks\(\)\.forEach\(track => track\.stop\(\)\)/
+      /getTracks\\(\\)\\.forEach\\(track => track\\.stop\\(\\)\\)/
     );
-    expect(liveSource).toMatch(/does not upload, broadcast, record/);
-    expect(liveSource).not.toMatch(/802K\+|2\.4M|99\.9%|45ms/);
+    expect(liveSource).toMatch(
+      /server coordinates authenticated room\/signaling state/
+    );
+    expect(liveSource).toMatch(/no server media ingest/);
+    expect(liveSource).not.toMatch(/802K\\+|2\\.4M|99\\.9%|45ms/);
   });
 
   it("builds a balanced language plan without fake partners", () => {
