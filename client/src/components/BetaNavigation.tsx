@@ -11,6 +11,8 @@ import {
   LayoutDashboard,
   LogIn,
   MessageSquare,
+  Mic,
+  MicOff,
   Radio,
   Sparkles,
   UserRound,
@@ -74,11 +76,50 @@ function isActive(location: string, route: string) {
 }
 
 export default function BetaNavigation() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
   const [fourFoursOpen, setFourFoursOpen] = useState(false);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const [voiceMessage, setVoiceMessage] = useState("");
+  const voiceRecognition = useRef<any>(null);
   const [, setMarkTaps] = useState(0);
   const keyRun = useRef(0);
+
+  function startVoiceNavigation() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceMessage("Voice navigation is not supported in this browser.");
+      return;
+    }
+    if (voiceListening) {
+      voiceRecognition.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceListening(true);
+      setVoiceMessage("Listening… say Home, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, HopeAI, or Workspace.");
+    };
+    recognition.onresult = (event: any) => {
+      const spoken = String(event.results?.[0]?.[0]?.transcript ?? "").toLowerCase().trim();
+      const command = links.find(item => spoken === item.label.toLowerCase() || spoken.includes(item.label.toLowerCase()));
+      setVoiceMessage(command ? `Opening ${command.label}.` : `I heard “${spoken}”. Try a main navigation name.`);
+      if (command) setLocation(command.route);
+    };
+    recognition.onerror = () => {
+      setVoiceListening(false);
+      setVoiceMessage("Voice input was unavailable. You can use the navigation links instead.");
+    };
+    recognition.onend = () => setVoiceListening(false);
+    voiceRecognition.current = recognition;
+    recognition.start();
+  }
+
+  useEffect(() => () => voiceRecognition.current?.stop(), []);
 
   function recordMarkTap() {
     setMarkTaps(current => {
@@ -166,6 +207,16 @@ export default function BetaNavigation() {
         </div>
 
         <div className="ml-auto flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={startVoiceNavigation}
+            aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
+            title={voiceMessage || "Voice navigation"}
+            className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition " + (voiceListening ? "border-rose-300/35 bg-rose-300/10 text-rose-100" : "border-white/10 bg-white/[0.05] text-white/70 hover:border-sky-300/30 hover:bg-white/10 hover:text-white")}
+          >
+            {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            <span className="hidden md:inline">{voiceListening ? "Stop" : "Voice"}</span>
+          </button>
           <Link
             href={`/beta-feedback?route=${encodeURIComponent(location)}`}
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
@@ -204,6 +255,15 @@ export default function BetaNavigation() {
 
       <div className="border-t border-white/[0.06] xl:hidden">
         <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button
+            type="button"
+            onClick={startVoiceNavigation}
+            aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
+            className={"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold " + (voiceListening ? "bg-rose-300/15 text-rose-100" : "bg-sky-400/10 text-sky-100")}
+          >
+            {voiceListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+            Voice
+          </button>
           {links.map(({ label, route, icon: Icon }) => {
             const active = isActive(location, route);
             return (
