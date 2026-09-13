@@ -39,15 +39,19 @@ describe("canonical entry-flow UI", () => {
     expect(onboarding).not.toMatch(/Sign in with provider/);
   });
 
-  it("shows bounded rate-limit feedback on the access-key sign-in surface", () => {
+  it("shows bounded rate-limit feedback on the normal beta sign-in surface", () => {
     expect(signin).toMatch(/rateLimit:/);
     expect(signin).toMatch(/response\.status === 429/);
     expect(signin).toMatch(/Retry-After/);
     expect(signin).toMatch(/retrySeconds/);
     expect(signin).toMatch(/aria-live="polite"/);
-    expect(signin).toMatch(/Show access key/);
-    expect(signin).toMatch(/Hide access key/);
+    expect(signin).toMatch(/Beta password/);
+    expect(signin).toMatch(/Show password/);
+    expect(signin).toMatch(/Hide password/);
+    expect(signin).toMatch(/autoComplete="current-password"/);
+    expect(signin).toMatch(/body: JSON\.stringify\(\{ email, accessKey \}\)/);
     expect(signin).toMatch(/payload\.redirect \|\| "\/dashboard"/);
+    expect(signin).toMatch(/"Sign in"/);
   });
 
   it("makes account entry discoverable from the persistent beta navigation", () => {
