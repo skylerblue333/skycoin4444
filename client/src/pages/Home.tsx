@@ -172,11 +172,15 @@ const dailyMissions = [
 export default function Home() {
   const [completedMissions, setCompletedMissions] = useState<string[]>([]);
   const [showReset, setShowReset] = useState(false);
+  const [missionDate, setMissionDate] = useState("");
 
   useEffect(() => {
     try {
+      const today = new Date().toISOString().slice(0, 10);
       const saved = localStorage.getItem("sky4444.daily-missions");
-      if (saved) setCompletedMissions(JSON.parse(saved) as string[]);
+      const savedDate = localStorage.getItem("sky4444.daily-missions-date");
+      setMissionDate(today);
+      if (saved && savedDate === today) setCompletedMissions(JSON.parse(saved) as string[]);
     } catch {
       setCompletedMissions([]);
     }
@@ -184,12 +188,14 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem("sky4444.daily-missions", JSON.stringify(completedMissions));
-  }, [completedMissions]);
+    if (missionDate) localStorage.setItem("sky4444.daily-missions-date", missionDate);
+  }, [completedMissions, missionDate]);
 
   const completion = Math.round((completedMissions.length / dailyMissions.length) * 100);
   const dayLabel = useMemo(() => new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(new Date()), []);
   const toggleMission = (id: string) => setCompletedMissions(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
   const resetMissions = () => { setCompletedMissions([]); setShowReset(false); };
+  const nextMission = dailyMissions.find(mission => !completedMissions.includes(mission.id)) ?? dailyMissions[0];
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
@@ -383,7 +389,7 @@ export default function Home() {
               <p className="mt-4 text-sm leading-7 text-white/50">A small four-step run turns the ecosystem from a menu into a habit. Check off what you complete; this progress stays on this device and makes no activity or audience claim.</p>
               <div className="mt-6 flex items-end gap-4"><div className="text-5xl font-black text-white">{completion}%</div><div className="pb-1 text-sm text-white/40">{dayLabel}<br />{completedMissions.length} of {dailyMissions.length} complete</div></div>
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-sky-300 transition-all" style={{ width: `${completion}%` }} /></div>
-              <div className="mt-5 flex gap-2"><Button variant="outline" onClick={() => setShowReset(current => !current)} className="border-white/15 bg-white/[0.03] text-white"><RotateCcw className="mr-2 h-4 w-4" />Reset run</Button>{showReset ? <Button variant="ghost" onClick={resetMissions} className="text-rose-200 hover:bg-rose-300/10 hover:text-rose-100">Confirm reset</Button> : null}</div>
+              <div className="mt-5 flex flex-wrap gap-2"><Link href={nextMission.href}><Button className="bg-white text-[#050510] hover:bg-white/90">{completedMissions.length === dailyMissions.length ? "Replay today's run" : "Continue next mission"}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link><Button variant="outline" onClick={() => setShowReset(current => !current)} className="border-white/15 bg-white/[0.03] text-white"><RotateCcw className="mr-2 h-4 w-4" />Reset run</Button>{showReset ? <Button variant="ghost" onClick={resetMissions} className="text-rose-200 hover:bg-rose-300/10 hover:text-rose-100">Confirm reset</Button> : null}</div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {dailyMissions.map(({ id, label, detail, href }, index) => {
