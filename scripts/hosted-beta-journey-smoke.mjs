@@ -82,6 +82,7 @@ async function login(origin, credentials) {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
+      origin,
     },
     body: JSON.stringify({
       email: credentials.email,
@@ -109,6 +110,7 @@ async function logout(origin, cookiePair) {
     headers: {
       accept: "application/json",
       cookie: cookiePair,
+      origin,
     },
   });
   if (!response.ok) {
@@ -126,6 +128,7 @@ function trpcClient(origin, cookiePair) {
           const headers = new Headers(init?.headers);
           headers.set("cookie", cookiePair);
           headers.set("accept", "application/json");
+          headers.set("origin", origin);
           return fetch(input, {
             ...(init ?? {}),
             headers,
