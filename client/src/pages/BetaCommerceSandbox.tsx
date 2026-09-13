@@ -52,6 +52,11 @@ export default function BetaCommerceSandbox() {
     });
   };
 
+  const clearCart = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCart({});
+  };
+
   const visibleItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return commerceSandboxItems.filter(
@@ -111,11 +116,16 @@ export default function BetaCommerceSandbox() {
               Browse, search, cart, and quote.
             </h2>
             <p className="mt-4 max-w-3xl leading-7 text-white/60">
-              All three products are fictional test fixtures. This sandbox never
+              All {commerceSandboxItems.length} products are fictional test fixtures. This sandbox never
               creates a real listing, seller, stock record, order, payment,
               shipment, review, or commission—and it does not enable prohibited
               or illicit trade.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-xs text-white/45">
+              <Badge variant="outline" className="border-white/10 text-white/55">{commerceSandboxItems.length} fixtures</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/55">{categories.length - 1} categories</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/55">Local cart only</Badge>
+            </div>
           </div>
           <Card className="border-amber-400/30 bg-amber-400/[0.05]">
             <CardContent className="flex items-start gap-3 p-5">
@@ -306,6 +316,11 @@ export default function BetaCommerceSandbox() {
               <Button type="button" className="w-full" disabled>
                 Payment unavailable in beta
               </Button>
+              {itemCount > 0 ? (
+                <Button type="button" variant="ghost" className="w-full text-white/45 hover:text-white" onClick={clearCart}>
+                  Clear test cart
+                </Button>
+              ) : null}
             </CardContent>
           </Card>
         </section>

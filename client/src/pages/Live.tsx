@@ -430,6 +430,23 @@ export default function Live() {
     }
   };
 
+  const shareRoom = async (room: LiveRoomSummary) => {
+    const url = `${window.location.origin}/live?room=${encodeURIComponent(room.id)}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: room.title, text: `Join ${room.title} on SkyLive`, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Live room link copied.");
+      } else {
+        toast(url);
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      toast.error("Room link could not be shared.");
+    }
+  };
+
   const moderateMessage = async (message: LiveChatMessage) => {
     if (!session || session.role !== "host") return;
     try {
@@ -526,7 +543,7 @@ export default function Live() {
                       <div className="flex items-center justify-between"><span className="rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">Live beta</span><span className="flex items-center gap-1 rounded-full bg-black/25 px-2.5 py-1 text-xs"><Eye className="h-3.5 w-3.5" /> {room.viewerCount}</span></div>
                       <div className="flex h-[calc(100%-2rem)] items-end"><div><div className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">{room.category}</div><h3 className="mt-1 text-xl font-black">{room.title}</h3></div></div>
                     </div>
-                    <div className="flex items-center justify-between gap-3 p-4"><div className="text-xs text-slate-500">Direct browser peer media</div><Button onClick={() => void joinRoom(room)} disabled={busy} className="rounded-xl bg-indigo-600 hover:bg-indigo-700"><Wifi className="mr-2 h-4 w-4" /> Join</Button></div>
+                    <div className="flex items-center justify-between gap-3 p-4"><div className="text-xs text-slate-500">Direct browser peer media</div><div className="flex gap-2"><Button variant="outline" onClick={() => void shareRoom(room)} className="rounded-xl border-slate-200">Share</Button><Button onClick={() => void joinRoom(room)} disabled={busy} className="rounded-xl bg-indigo-600 hover:bg-indigo-700"><Wifi className="mr-2 h-4 w-4" /> Join</Button></div></div>
                   </SurfaceCard>
                 ))}
               </div>
