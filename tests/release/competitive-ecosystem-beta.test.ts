@@ -69,16 +69,18 @@ describe("competitive ecosystem beta", () => {
   });
 
   it("validates the promoted authenticated WebRTC small-room beta", () => {
-    expect(liveSource).toMatch(/navigator\\.mediaDevices\\.getUserMedia/);
-    expect(liveSource).toMatch(/new RTCPeerConnection/);
-    expect(liveSource).toMatch(
-      /getTracks\\(\\)\\.forEach\\(track => track\\.stop\\(\\)\\)/
+    expect(liveSource).toContain("navigator.mediaDevices.getUserMedia");
+    expect(liveSource).toContain("new RTCPeerConnection");
+    expect(liveSource).toContain(
+      "getTracks().forEach(track => track.stop())"
     );
-    expect(liveSource).toMatch(
-      /server coordinates authenticated room\/signaling state/
+    expect(liveSource).toContain(
+      "server coordinates authenticated room/signaling state"
     );
-    expect(liveSource).toMatch(/no server media ingest/);
-    expect(liveSource).not.toMatch(/802K\\+|2\\.4M|99\\.9%|45ms/);
+    expect(liveSource).toContain("no server media ingest");
+    for (const fakeClaim of ["802K+", "2.4M", "99.9%", "45ms"]) {
+      expect(liveSource).not.toContain(fakeClaim);
+    }
   });
 
   it("builds a balanced language plan without fake partners", () => {
