@@ -9,6 +9,8 @@ import {
   Gamepad2,
   GraduationCap,
   Lightbulb,
+  Mic,
+  MicOff,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -87,6 +89,9 @@ export default function HopeAI() {
   const [plan, setPlan] = useState<HopePlan | null>(null);
   const [copied, setCopied] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const [voiceMessage, setVoiceMessage] = useState("");
+  const speechRecognition = useState<{ current: any }>({ current: null })[0];
 
   useEffect(() => {
     try {
@@ -184,6 +189,38 @@ export default function HopeAI() {
     setCompletedSteps([]);
     setGoal("");
   }
+
+  function toggleSpeechInput() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceMessage("Speech-to-text is not supported in this browser. Type your goal instead.");
+      return;
+    }
+    if (voiceListening) {
+      speechRecognition.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceListening(true);
+      setVoiceMessage("Listening for your goal…");
+    };
+    recognition.onresult = (event: any) => {
+      const transcript = String(event.results?.[0]?.[0]?.transcript ?? "").trim();
+      if (transcript) setGoal(current => current ? `${current} ${transcript}`.slice(0, 500) : transcript.slice(0, 500));
+      setVoiceMessage(transcript ? "Goal captured. Review it before building your sprint." : "No speech was captured.");
+    };
+    recognition.onerror = () => setVoiceMessage("Speech input was unavailable. You can type your goal instead.");
+    recognition.onend = () => setVoiceListening(false);
+    speechRecognition.current = recognition;
+    recognition.start();
+  }
+
+  useEffect(() => () => speechRecognition.current?.stop(), [speechRecognition]);
 
   async function copyPlan() {
     if (!plan) return;
@@ -311,13 +348,19 @@ export default function HopeAI() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              <Textarea
-                value={goal}
-                maxLength={500}
-                onChange={event => setGoal(event.target.value)}
-                placeholder="Example: make the gaming hub more fun and give me a useful next step"
-                className="min-h-32 border-white/10 bg-black/25 text-white placeholder:text-white/25"
-              />
+              <div className="relative">
+                <Textarea
+                  value={goal}
+                  maxLength={500}
+                  onChange={event => setGoal(event.target.value)}
+                  placeholder="Example: make the gaming hub more fun and give me a useful next step"
+                  className="min-h-32 border-white/10 bg-black/25 pr-14 text-white placeholder:text-white/25"
+                />
+                <button type="button" onClick={toggleSpeechInput} aria-label={voiceListening ? "Stop speech-to-text" : "Start speech-to-text"} title="Speak your goal" className={"absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-xl border " + (voiceListening ? "border-rose-300/40 bg-rose-300/15 text-rose-100" : "border-white/10 bg-white/[0.06] text-white/60 hover:text-white")}>
+                  {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              </div>
+              {voiceMessage ? <p className="text-xs text-sky-200/70" role="status" aria-live="polite">{voiceMessage}</p> : null}
               <div className="flex items-center justify-between text-xs text-white/30">
                 <span>{goal.length}/500</span>
                 <button
