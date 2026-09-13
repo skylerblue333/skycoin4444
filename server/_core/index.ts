@@ -8,6 +8,7 @@ import { registerBetaAccessAuthRoutes } from "./betaAccessAuthRoutes";
 import { registerPlatformKernelRoutes } from "./platformKernel";
 import { registerEventFabricRoutes } from "./eventRegistry";
 import { registerStorageProxy } from "./storageProxy";
+import { registerLiveRoomRoutes } from "./liveRoomRoutes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { closeDatabasePool } from "../db";
@@ -113,6 +114,7 @@ async function startServer() {
   registerPlatformKernelRoutes(app);
   registerEventFabricRoutes(app);
   registerOutboxDispatcherRoutes(app, outboxDispatcher);
+  registerLiveRoomRoutes(app);
 
   app.use(
     "/api/trpc",
