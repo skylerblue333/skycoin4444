@@ -123,6 +123,41 @@ const stats = [
   { value: "0", label: "missing routed source files" },
 ] as const;
 
+const coreLoops = [
+  {
+    number: "01",
+    title: "Connect",
+    description: "Publish, reply, react, and build a real account-owned community identity.",
+    href: "/activity-feed",
+    accent: "from-sky-400/25 to-blue-500/10",
+    icon: Users,
+  },
+  {
+    number: "02",
+    title: "Learn",
+    description: "Complete lessons, keep your progress, and turn curiosity into a repeatable habit.",
+    href: "/course-catalog",
+    accent: "from-emerald-400/25 to-cyan-500/10",
+    icon: GraduationCap,
+  },
+  {
+    number: "03",
+    title: "Play",
+    description: "Build skill and streaks in deterministic games designed for short, replayable sessions.",
+    href: "/gaming",
+    accent: "from-violet-400/25 to-fuchsia-500/10",
+    icon: Gamepad2,
+  },
+  {
+    number: "04",
+    title: "Create",
+    description: "Open a small-room creator broadcast with real peer media, presence, and live chat.",
+    href: "/live",
+    accent: "from-amber-400/25 to-rose-500/10",
+    icon: Radio,
+  },
+] as const;
+
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
@@ -157,20 +192,20 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-white/60 sm:text-lg">
-              Move through social, live creator tools, learning, gaming, commerce,
-              language exchange, dating, digital-asset evidence, and HopeAI
-              without getting lost in the wider historical screen inventory.
-              Every promoted journey is labeled by what it actually proves.
+              SKYCOIN4444 is a social learning arcade with creator rooms: connect
+              with people, learn something useful, play a short session, and make
+              something worth returning to. The wider ecosystem is available as
+              clearly labeled labs—not inflated promises.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/beta-workspace">
+              <Link href="/onboarding">
                 <Button
                   size="lg"
                   className="bg-white text-[#050510] hover:bg-white/90"
                 >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Open ecosystem workspace
+                  Start the beta journey
                 </Button>
               </Link>
               <Link href="/activity-feed">
@@ -179,7 +214,7 @@ export default function Home() {
                   variant="outline"
                   className="border-white/15 bg-white/[0.04] text-white hover:bg-white/10"
                 >
-                  Start with social
+                  See the core loop
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -189,7 +224,7 @@ export default function Home() {
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Search all 67 beta routes
+                  Browse wider labs · 67 beta routes
                 </Button>
               </Link>
             </div>
@@ -260,6 +295,53 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="relative border-b border-white/[0.07] bg-gradient-to-b from-white/[0.025] to-transparent">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/65">
+              The core product
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+              Four actions that make the ecosystem worth returning to.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-white/45">
+              Start here. Each loop has a concrete result, an account-aware path,
+              and a clear next step. The rest of SKYCOIN4444 stays available for
+              exploration without competing for attention.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {coreLoops.map(({ number, title, description, href, accent, icon: Icon }) => (
+              <Link key={title} href={href} className="group">
+                <Card className="h-full border-white/10 bg-white/[0.035] text-white transition duration-200 group-hover:-translate-y-1 group-hover:border-white/20 group-hover:bg-white/[0.06]">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <span className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-white`}>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="text-xs font-black tracking-[0.18em] text-white/25">
+                        {number}
+                      </span>
+                    </div>
+                    <CardTitle className="mt-5 text-white">{title}</CardTitle>
+                    <CardDescription className="leading-6 text-white/50">
+                      {description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <span className="inline-flex items-center text-sm font-bold text-sky-200">
+                      Open loop
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-14">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -267,13 +349,13 @@ export default function Home() {
               Headline ecosystem
             </p>
             <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-              Pick an area and actually use it.
+              Explore the wider ecosystem.
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-white/45">
-            The persistent navigation above stays available as you move between
-            areas, so the beta behaves like one product instead of a pile of
-            disconnected routes.
+            The core loop is the product. These additional labs are available for
+            testing with explicit boundaries, so breadth never disguises what is
+            genuinely usable today.
           </p>
         </div>
 
