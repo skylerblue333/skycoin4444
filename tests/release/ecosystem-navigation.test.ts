@@ -19,7 +19,7 @@ describe("ecosystem navigation and visual foundation", () => {
       "/activity-feed",
       "/sky-school",
       "/gaming",
-      "/live-streaming",
+      "/live",
       "/beta-commerce",
       "/language-partner-discovery",
       "/dating-profile-setup",
@@ -34,7 +34,7 @@ describe("ecosystem navigation and visual foundation", () => {
   it("makes the home page a front door to every headline beta journey", () => {
     for (const route of [
       "/activity-feed",
-      "/live-streaming",
+      "/live",
       "/sky-school",
       "/gaming",
       "/beta-commerce",

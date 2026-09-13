@@ -26,7 +26,7 @@ const links = [
   { label: "Social", route: "/activity-feed", icon: Activity },
   { label: "Learn", route: "/sky-school", icon: GraduationCap },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
-  { label: "Live", route: "/live-streaming", icon: Radio },
+  { label: "Live", route: "/live", icon: Radio },
   { label: "Shop", route: "/beta-commerce", icon: ShoppingBag },
   { label: "Language", route: "/language-partner-discovery", icon: Languages },
   { label: "Dating", route: "/dating-profile-setup", icon: Heart },

@@ -43,12 +43,12 @@ const experiences = [
     icon: Users,
   },
   {
-    title: "SkyLive Studio",
-    kicker: "Twitch-style creator setup",
+    title: "SkyLive",
+    kicker: "Small-room WebRTC broadcasting",
     description:
-      "Preview local camera and microphone devices, prepare a stream brief, and test creator setup safely.",
-    href: "/live-streaming",
-    status: "Local test lab",
+      "Start an authenticated small-room broadcast with real peer media, presence, and live chat.",
+    href: "/live",
+    status: "WebRTC beta",
     icon: Radio,
   },
   {

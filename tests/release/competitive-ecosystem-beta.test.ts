@@ -128,7 +128,7 @@ describe("competitive ecosystem beta", () => {
     );
     expect(auditSource).toMatch(/beta-route-evidence\.json/);
     for (const route of [
-      "/live-streaming",
+      "/live",
       "/language-partner-discovery",
       "/dating-profile-setup",
       "/arcade",
