@@ -182,6 +182,41 @@ export const commerceSandboxItems: readonly CommerceSandboxItem[] = [
     description: "A fictional moderation checklist for product testing.",
     unitAmountMinor: 900,
   },
+  {
+    sku: "FIXTURE-LED-LAMP",
+    name: "Adjustable creator desk lamp",
+    category: "Creator",
+    description: "Supplier-style fixture inspired by creator gear; no real seller, stock, shipping, or affiliation.",
+    unitAmountMinor: 2499,
+  },
+  {
+    sku: "FIXTURE-PHONE-STAND",
+    name: "Foldable phone stand",
+    category: "Creator",
+    description: "Generic marketplace rehearsal item for cart and quote testing only.",
+    unitAmountMinor: 799,
+  },
+  {
+    sku: "FIXTURE-USB-MIC",
+    name: "USB creator microphone",
+    category: "Creator",
+    description: "Fictional supplier catalog item; no product claim, review, or fulfillment is represented.",
+    unitAmountMinor: 3299,
+  },
+  {
+    sku: "FIXTURE-STUDY-PLANNER",
+    name: "Study sprint planner",
+    category: "Learning",
+    description: "Printable learning-planning fixture for testing product discovery and cart behavior.",
+    unitAmountMinor: 599,
+  },
+  {
+    sku: "FIXTURE-MODERATION-CARDS",
+    name: "Community moderation card set",
+    category: "Community",
+    description: "Fictional safety-planning fixture for community hosts.",
+    unitAmountMinor: 1099,
+  },
 ] as const;
 
 export type CommerceSandboxCart = Record<string, number>;

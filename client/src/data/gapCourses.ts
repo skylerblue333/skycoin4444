@@ -111,6 +111,33 @@ export const gapCourses: readonly GapCourse[] = [
       lesson('safety', 'User Safety', 'Verify networks and withdrawal paths.', 'Users should verify network identifiers, official bridge paths, fees, finality assumptions, and recovery options before moving valuable assets.', q('Before bridging, users should verify?', ['Network and bridge path', 'Only token logo', 'Nothing'], 0)),
     ]
   },
+  {
+    id: 'product-thinking-101', title: 'Product Thinking & Better Decisions', level: 'beginner', lessons: [
+      lesson('problems', 'Start With the Problem', 'Separate a user problem from a feature idea.', 'Strong products begin with a specific problem, a person affected by it, and evidence that the problem matters. A feature is only one possible response.', q('A useful product problem statement should describe?', ['A specific user problem', 'A list of trendy features', 'A guaranteed valuation'], 0)),
+      lesson('users', 'Understand the User', 'Identify context, constraints, and desired outcomes.', 'Interviews, observation, support records, and behavioral evidence help teams understand what people are trying to accomplish and what makes the current path difficult.', q('Good user research focuses on?', ['Goals and context', 'Only preferred colors', 'Invented testimonials'], 0)),
+      lesson('loops', 'Design a Complete Loop', 'Map the path from entry to return.', 'A product loop should let someone enter, do something valuable, save or share the result, and know what to do next. Stopping after a button click is not a complete loop.', q('A complete product loop should include?', ['Value and a next step', 'Only a landing page', 'A hidden state'], 0)),
+      lesson('metrics', 'Choose Useful Metrics', 'Distinguish outcome metrics from vanity counts.', 'Activation, completion, retention, failure rate, and time to value explain product health better than route counts or inflated audience claims.', q('Which is closer to an outcome metric?', ['Lesson completion rate', 'Number of menu items', 'Unverified follower count'], 0)),
+      lesson('experiments', 'Run Small Experiments', 'Test one assumption at a time.', 'A good experiment states the assumption, defines a measurable result, limits risk, and records what happened. Small tests reduce wasted work and make learning faster.', q('A good experiment should?', ['Test a clear assumption', 'Hide negative results', 'Change five variables at once'], 0)),
+    ]
+  },
+  {
+    id: 'web-safety-101', title: 'Web Safety & Privacy Basics', level: 'beginner', lessons: [
+      lesson('permissions', 'Permissions', 'Review what a website is allowed to access.', 'Camera, microphone, location, notifications, and file permissions should be requested at the moment of need and denied when unnecessary.', q('A safe permission pattern is to?', ['Request only what is needed', 'Request everything on load', 'Hide the purpose'], 0)),
+      lesson('accounts', 'Account Hygiene', 'Use strong, unique access practices.', 'Unique passwords, a password manager, multi-factor authentication, and session review reduce the impact of reused credentials and stolen sessions.', q('Why use unique passwords?', ['One breach should not unlock every account', 'They guarantee no phishing', 'They remove the need for recovery'], 0)),
+      lesson('phishing', 'Phishing Signals', 'Recognize urgency and impersonation.', 'Unexpected urgency, lookalike domains, unusual payment requests, and requests for secrets are common warning signs. Verify through a known channel.', q('Which is a warning sign?', ['Urgent request for a secret', 'A normal help article', 'A visible privacy policy'], 0)),
+      lesson('sharing', 'Share Less by Default', 'Reduce unnecessary personal-data exposure.', 'Before sharing, ask who needs the information, how long it will be kept, and whether a less identifying alternative would work.', q('Data minimization means?', ['Collecting and sharing only what is needed', 'Keeping every detail forever', 'Publishing by default'], 0)),
+      lesson('incidents', 'Respond to an Incident', 'Take calm, reversible steps after a mistake.', 'Revoke exposed sessions or keys, change affected credentials from a trusted device, preserve evidence, notify the right service, and avoid spreading the secret further.', q('After exposing a password, the first step is usually to?', ['Revoke or change it from a trusted path', 'Post it as a warning', 'Ignore it'], 0)),
+    ]
+  },
+  {
+    id: 'data-literacy-101', title: 'Data Literacy for Everyday Decisions', level: 'beginner', lessons: [
+      lesson('questions', 'Ask the Right Question', 'Turn a vague concern into a measurable question.', 'A clear question names the population, time period, comparison, and outcome. Ambiguous questions invite misleading conclusions.', q('A measurable question should define?', ['What, for whom, and when', 'Only a chart color', 'A conclusion first'], 0)),
+      lesson('averages', 'Read Averages Carefully', 'Understand what a summary hides.', 'Mean, median, range, and distribution answer different questions. Averages can conceal outliers, uneven groups, or missing data.', q('The median is useful when?', ['Outliers would distort the mean', 'Every value is identical', 'There is no data'], 0)),
+      lesson('correlation', 'Correlation Is Not Causation', 'Avoid treating association as proof of cause.', 'Two measures can move together because of coincidence, reverse direction, a shared cause, or selection effects. Causal claims need stronger evidence.', q('Correlation alone proves?', ['An association', 'The exact cause', 'A guaranteed forecast'], 0)),
+      lesson('samples', 'Samples and Bias', 'Recognize who is missing from a dataset.', 'A sample may overrepresent people who respond, have access, or remain visible. Good analysis describes the sample and its limits.', q('Sampling bias occurs when?', ['Some groups are systematically over- or under-represented', 'Every person is included', 'The chart has labels'], 0)),
+      lesson('uncertainty', 'Communicate Uncertainty', 'Make room for error and changing evidence.', 'Ranges, confidence limits, caveats, and updated measurements help people avoid false precision. Uncertainty is information, not failure.', q('Responsible data communication should?', ['State important limitations', 'Hide uncertainty', 'Promise exact outcomes'], 0)),
+    ]
+  },
 ];
 
 export function gradeCourseQuestion(question: CourseQuestion, selectedIndex: number) {

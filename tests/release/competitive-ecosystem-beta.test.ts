@@ -98,7 +98,7 @@ describe("competitive ecosystem beta", () => {
   });
 
   it("provides a labeled fixture catalog and bounded local cart", () => {
-    expect(commerceSandboxItems).toHaveLength(3);
+    expect(commerceSandboxItems).toHaveLength(8);
     expect(
       commerceSandboxItems.every(item => item.sku.startsWith("FIXTURE-"))
     ).toBe(true);
@@ -135,7 +135,7 @@ describe("competitive ecosystem beta", () => {
     ]) {
       expect(registryRoutes.has(route)).toBe(true);
     }
-    expect(arcadeSource).toMatch(/Thirteen local game experiences/);
+    expect(arcadeSource).toMatch(/Fifteen local game experiences/);
     expect(arcadeSource).toMatch(/No real-money wagering/);
     expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
   });
