@@ -6,8 +6,8 @@ import {
   Clock3,
   Eye,
   EyeOff,
-  KeyRound,
   Loader2,
+  LockKeyhole,
   LogIn,
   ShieldCheck,
   Sparkles,
@@ -38,26 +38,26 @@ type BetaAuthProbe = {
 function admissionMessage(reason: string | null) {
   if (reason === "not-invited") {
     return {
-      title: "This account is not on the beta invite list",
+      title: "This email is not invited yet",
       detail:
-        "SKYCOIN4444 is currently invitation-only. No session was issued for this account.",
+        "SKYCOIN4444 is currently an invitation-only beta, so no session was created.",
       tone: "warning" as const,
     };
   }
 
   if (reason === "oauth-unconfigured") {
     return {
-      title: "Sign-in provider is not configured",
+      title: "Sign-in provider is unavailable",
       detail:
-        "The external identity-provider path is unavailable in this environment.",
+        "The external identity-provider path is not configured in this environment.",
       tone: "warning" as const,
     };
   }
 
   return {
-    title: "Invitation-only engineering beta",
+    title: "Invitation-only beta",
     detail:
-      "Admission is checked before a session is created and again on protected requests.",
+      "Use your invited beta account to continue. Your access is checked again on protected requests.",
     tone: "normal" as const,
   };
 }
@@ -72,7 +72,7 @@ export function Signin() {
   const [probeError, setProbeError] = useState("");
   const [email, setEmail] = useState("");
   const [accessKey, setAccessKey] = useState("");
-  const [showAccessKey, setShowAccessKey] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [retrySeconds, setRetrySeconds] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -95,11 +95,9 @@ export function Signin() {
         setAuthProbe(payload);
       })
       .catch(error => {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
+        if (error instanceof DOMException && error.name === "AbortError") return;
         setProbeError(
-          "Sign-in configuration is unavailable. The beta remains fail-closed."
+          "Sign-in is temporarily unavailable. This beta fails closed instead of creating an unsafe session."
         );
       });
 
@@ -124,9 +122,7 @@ export function Signin() {
     try {
       const response = await fetch("/api/beta/access-login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
         body: JSON.stringify({ email, accessKey }),
       });
@@ -143,7 +139,7 @@ export function Signin() {
       }
 
       if (!response.ok) {
-        setSubmitError("Invitation credentials were not accepted.");
+        setSubmitError("Email or beta password was not accepted.");
         return;
       }
 
@@ -152,7 +148,7 @@ export function Signin() {
         redirect?: string;
       };
       if (!payload.ok) {
-        setSubmitError("Invitation credentials were not accepted.");
+        setSubmitError("Email or beta password was not accepted.");
         return;
       }
 
@@ -164,7 +160,7 @@ export function Signin() {
     }
   }
 
-  const accessKeyMode = authProbe?.mode === "access_key";
+  const passwordMode = authProbe?.mode === "access_key";
   const rateLimitMinutes = authProbe?.rateLimit
     ? Math.max(1, Math.round(authProbe.rateLimit.windowMs / 60_000))
     : null;
@@ -176,13 +172,13 @@ export function Signin() {
         <div className="absolute bottom-[-10rem] right-[-8rem] h-96 w-96 rounded-full bg-violet-500/15 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-5xl">
         <Link
           href="/"
           className="mb-7 inline-flex items-center gap-2 rounded-lg text-sm text-white/50 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to ecosystem
+          Back to SKYCOIN4444
         </Link>
 
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
@@ -192,23 +188,23 @@ export function Signin() {
                 variant="outline"
                 className="border-sky-300/25 bg-sky-300/[0.04] text-sky-100"
               >
-                SKYCOIN4444 engineering beta
+                SKYCOIN4444 beta
               </Badge>
               <h1 className="mt-6 text-4xl font-black tracking-tight">
-                One secure front door for the beta.
+                Sign in and start using the beta.
               </h1>
               <p className="mt-4 text-base leading-7 text-white/55">
-                The live beta is invitation-only. Sign-in creates the same
-                canonical browser session used by protected account routes,
-                while high-risk financial and chain actions remain gated.
+                One account takes you to your dashboard, profile, social beta,
+                SkySchool, HopeAI tools, games, feedback, and the rest of the
+                connected beta workspace.
               </p>
             </div>
 
             <div className="mt-10 space-y-3">
               {[
-                "Invitation checked before session issuance",
-                "Admission re-checked on protected requests",
-                "No SKYCOIN4444 password collected",
+                "Simple email + beta password sign-in",
+                "Persistent account session for protected beta screens",
+                "Rate-limited invitation access",
                 "No identity-verification claim",
               ].map(item => (
                 <div
@@ -225,14 +221,11 @@ export function Signin() {
           <Card className="border-white/10 bg-white/[0.035] text-white shadow-2xl shadow-black/30">
             <CardHeader className="space-y-4 p-6 sm:p-8">
               <div className="flex items-start justify-between gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-300/10 text-amber-200">
-                  <ShieldCheck className="h-6 w-6" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-300/10 text-sky-200">
+                  <LockKeyhole className="h-6 w-6" />
                 </div>
-                {accessKeyMode && authProbe?.rateLimit ? (
-                  <Badge
-                    variant="outline"
-                    className="border-white/10 text-white/45"
-                  >
+                {passwordMode && authProbe?.rateLimit ? (
+                  <Badge variant="outline" className="border-white/10 text-white/45">
                     <Clock3 className="h-3 w-3" />
                     {authProbe.rateLimit.maxAttempts} attempts /{" "}
                     {rateLimitMinutes} min
@@ -241,16 +234,16 @@ export function Signin() {
               </div>
 
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200/70">
-                  Invitation access
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/70">
+                  Invitation-only beta
                 </p>
                 <CardTitle className="mt-2 text-3xl font-black">
-                  Enter the beta
+                  Sign in to SKYCOIN4444
                 </CardTitle>
                 <CardDescription className="mt-2 text-white/50">
-                  {accessKeyMode
-                    ? "Use the invited email and beta access key provided for this engineering environment."
-                    : "Authentication uses the configured external identity provider when available."}
+                  {passwordMode
+                    ? "Use the email and beta password for your invited account."
+                    : "Continue with the approved identity provider for your invited account."}
                 </CardDescription>
               </div>
             </CardHeader>
@@ -291,7 +284,7 @@ export function Signin() {
               {!authProbe && !probeError ? (
                 <Button type="button" className="w-full" disabled>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking beta sign-in mode
+                  Checking sign-in
                 </Button>
               ) : null}
 
@@ -304,18 +297,18 @@ export function Signin() {
                   disabled={!authProbe.configured}
                 >
                   <LogIn className="mr-2 h-4 w-4" />
-                  Continue with approved identity provider
+                  Continue to sign in
                 </Button>
               ) : null}
 
-              {accessKeyMode ? (
+              {passwordMode ? (
                 <form className="space-y-4" onSubmit={submitAccessLogin}>
                   <div>
                     <label
                       htmlFor="beta-email"
                       className="mb-2 block text-sm font-medium text-white/80"
                     >
-                      Invited email
+                      Email
                     </label>
                     <input
                       id="beta-email"
@@ -326,38 +319,36 @@ export function Signin() {
                       autoComplete="email"
                       autoCapitalize="none"
                       spellCheck={false}
-                      className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-amber-300/50 focus:ring-2 focus:ring-amber-300/10"
+                      className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/10"
                       placeholder="you@example.com"
                     />
                   </div>
 
                   <div>
                     <label
-                      htmlFor="beta-access-key"
+                      htmlFor="beta-password"
                       className="mb-2 block text-sm font-medium text-white/80"
                     >
-                      Invitation access key
+                      Beta password
                     </label>
                     <div className="relative">
                       <input
-                        id="beta-access-key"
-                        type={showAccessKey ? "text" : "password"}
+                        id="beta-password"
+                        type={showPassword ? "text" : "password"}
                         required
                         value={accessKey}
                         onChange={event => setAccessKey(event.target.value)}
-                        autoComplete="off"
-                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-3 pr-12 text-white outline-none transition placeholder:text-white/25 focus:border-amber-300/50 focus:ring-2 focus:ring-amber-300/10"
-                        placeholder="Enter your beta access key"
+                        autoComplete="current-password"
+                        className="w-full rounded-xl border border-white/10 bg-black/30 px-3.5 py-3 pr-12 text-white outline-none transition placeholder:text-white/25 focus:border-sky-300/50 focus:ring-2 focus:ring-sky-300/10"
+                        placeholder="Enter your beta password"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowAccessKey(value => !value)}
+                        onClick={() => setShowPassword(value => !value)}
                         className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-xl text-white/35 transition hover:text-white"
-                        aria-label={
-                          showAccessKey ? "Hide access key" : "Show access key"
-                        }
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showAccessKey ? (
+                        {showPassword ? (
                           <EyeOff className="h-4 w-4" />
                         ) : (
                           <Eye className="h-4 w-4" />
@@ -402,24 +393,21 @@ export function Signin() {
                     {submitting ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <KeyRound className="mr-2 h-4 w-4" />
+                      <LogIn className="mr-2 h-4 w-4" />
                     )}
-                    {retrySeconds > 0
-                      ? "Sign-in temporarily limited"
-                      : "Enter invitation beta"}
+                    {retrySeconds > 0 ? "Try again shortly" : "Sign in"}
                   </Button>
                 </form>
               ) : null}
 
               <div className="rounded-2xl border border-white/[0.08] bg-black/15 p-4">
                 <p className="text-xs leading-5 text-white/40">
-                  {accessKeyMode
-                    ? "Access-key mode checks an allowlisted email plus a server-side invitation secret. It does not independently verify ownership of that email or legal identity, and the page does not persist the access key in browser storage."
-                    : "No local password is collected by the external-provider sign-in path."}
+                  {passwordMode
+                    ? "Your beta password is checked server-side and is not saved by this page in browser storage. This invitation account does not independently verify ownership of the submitted email or legal identity."
+                    : "The external-provider path does not store a local password on this page."}
                   {" "}
-                  This page never accepts a SKYCOIN4444 password. Financial
-                  settlement, wallet custody, token transfers, signing, and live
-                  chain execution remain outside this beta.
+                  Payment settlement, wallet custody, token transfers, signing,
+                  and live chain execution remain outside this beta.
                 </p>
               </div>
 
@@ -431,7 +419,7 @@ export function Signin() {
                 </Link>
                 <Link href="/beta-workspace">
                   <Button type="button" variant="ghost">
-                    Browse public beta labs
+                    Explore the beta
                   </Button>
                 </Link>
               </div>
