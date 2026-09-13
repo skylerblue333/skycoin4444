@@ -17,6 +17,38 @@ describe("LiveRoomRegistry", () => {
     expect(registry.get(host.roomId).viewerCount).toBe(0);
   });
 
+  it("lets the creator restore a room before host expiry and refreshes its lease", () => {
+    let now = Date.parse("2026-09-12T20:00:00.000Z");
+    const registry = new LiveRoomRegistry(() => now);
+    const host = registry.create("host-user", "Build night", "Technology");
+
+    now += 60_000;
+    expect(registry.hostSession(host.roomId, "host-user")).toMatchObject({
+      roomId: host.roomId,
+      peerId: host.peerId,
+      role: "host",
+    });
+
+    now += 60_000;
+    expect(registry.list()).toHaveLength(1);
+    expect(registry.get(host.roomId).status).toBe("live");
+  });
+
+  it("expires an abandoned creator room instead of advertising a stale broadcast", () => {
+    let now = Date.parse("2026-09-12T20:00:00.000Z");
+    const registry = new LiveRoomRegistry(() => now);
+    const host = registry.create("host-user", "Build night", "Technology");
+    registry.join(host.roomId, "viewer-user");
+
+    now += 91_000;
+    expect(registry.list()).toEqual([]);
+    expect(registry.get(host.roomId)).toMatchObject({
+      status: "ended",
+      viewerCount: 0,
+    });
+    expect(() => registry.join(host.roomId, "late-viewer")).toThrow("has ended");
+  });
+
   it("routes signaling only to the intended authenticated peer", () => {
     const registry = new LiveRoomRegistry(() => Date.parse("2026-09-12T20:00:00.000Z"));
     const host = registry.create("host-user", "Build night", "Technology");
