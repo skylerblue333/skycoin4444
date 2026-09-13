@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -86,6 +86,27 @@ export default function HopeAI() {
   const [focus, setFocus] = useState<HopeFocus>("build");
   const [plan, setPlan] = useState<HopePlan | null>(null);
   const [copied, setCopied] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sky4444.hopeai.plan");
+      if (saved) setPlan(JSON.parse(saved) as HopePlan);
+      const completed = localStorage.getItem("sky4444.hopeai.completed-steps");
+      if (completed) setCompletedSteps(JSON.parse(completed) as string[]);
+    } catch {
+      setPlan(null);
+      setCompletedSteps([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (plan) localStorage.setItem("sky4444.hopeai.plan", JSON.stringify(plan));
+  }, [plan]);
+
+  useEffect(() => {
+    localStorage.setItem("sky4444.hopeai.completed-steps", JSON.stringify(completedSteps));
+  }, [completedSteps]);
 
   const summary = useMemo(
     () => summarizeHopeActivity(activity.data ?? []),
@@ -142,14 +163,26 @@ export default function HopeAI() {
   }
 
   function generatePlan() {
-    setPlan(
-      createHopePlan({
+    const nextPlan = createHopePlan({
         goal,
         focus,
         activity: summary,
-      })
-    );
+      });
+    setPlan(nextPlan);
+    setCompletedSteps([]);
     setCopied(false);
+  }
+
+  function toggleStep(stepId: string) {
+    setCompletedSteps(current => current.includes(stepId) ? current.filter(id => id !== stepId) : [...current, stepId]);
+  }
+
+  function clearSavedSprint() {
+    localStorage.removeItem("sky4444.hopeai.plan");
+    localStorage.removeItem("sky4444.hopeai.completed-steps");
+    setPlan(null);
+    setCompletedSteps([]);
+    setGoal("");
   }
 
   async function copyPlan() {
@@ -292,6 +325,7 @@ export default function HopeAI() {
                   onClick={() => {
                     setGoal("");
                     setPlan(null);
+                    setCompletedSteps([]);
                   }}
                   className="inline-flex items-center gap-1 hover:text-white"
                 >
@@ -410,15 +444,16 @@ export default function HopeAI() {
                   </div>
 
                   <div className="space-y-3">
-                    {plan.steps.map((step, index) => (
-                      <div
+                    {plan.steps.map((step, index) => {
+                      const done = completedSteps.includes(step.id);
+                      return <div
                         key={step.id}
-                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                        className={"rounded-2xl border bg-black/20 p-4 transition " + (done ? "border-emerald-300/25" : "border-white/10")}
                       >
                         <div className="flex items-start gap-4">
-                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-300/10 text-sm font-black text-violet-100">
-                            {index + 1}
-                          </span>
+                          <button type="button" onClick={() => toggleStep(step.id)} aria-label={done ? `Mark ${step.title} incomplete` : `Mark ${step.title} complete`} className={"grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-black " + (done ? "bg-emerald-300/15 text-emerald-200" : "bg-violet-300/10 text-violet-100")}>
+                            {done ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
+                          </button>
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-start justify-between gap-2">
                               <h3 className="font-bold">{step.title}</h3>
@@ -438,8 +473,13 @@ export default function HopeAI() {
                             </Link>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      </div>;
+                    })}
+                  </div>
+
+                  <div className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] p-4">
+                    <div className="flex items-center justify-between text-xs"><span className="font-semibold text-emerald-100">Sprint progress</span><span className="text-white/45">{completedSteps.filter(id => plan.steps.some(step => step.id === id)).length}/{plan.steps.length} steps</span></div>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-emerald-300 transition-all" style={{ width: `${Math.round((completedSteps.filter(id => plan.steps.some(step => step.id === id)).length / plan.steps.length) * 100)}%` }} /></div>
                   </div>
 
                   <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
@@ -458,6 +498,7 @@ export default function HopeAI() {
                     <Clipboard className="mr-2 h-4 w-4" />
                     {copied ? "Plan copied" : "Copy sprint"}
                   </Button>
+                  <Button type="button" variant="ghost" className="w-full text-white/40 hover:text-white" onClick={clearSavedSprint}>Start a fresh sprint</Button>
                 </div>
               )}
             </CardContent>
