@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Home } from "lucide-react";
+import { AlertCircle, ArrowRight, BookOpen, Gamepad2, Home, Radio, Search, Users } from "lucide-react";
 import { useLocation } from "wouter";
 import type { ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AutonomousAgentWallets, ProvablyFairGaming, SkySchoolCredentialing, ZKMLVerificationCenter } from "./IntegrationGapPages";
 
 const integrationRoutes: Record<string, () => ReactNode> = {
@@ -12,25 +12,26 @@ const integrationRoutes: Record<string, () => ReactNode> = {
   "/skyschool-credentialing": SkySchoolCredentialing,
 };
 
+const recoveryAreas = [
+  { href: "/", label: "Home", detail: "Open the product launchpad.", icon: Home },
+  { href: "/gaming", label: "Gaming", detail: "Recover the Arcade and game paths.", icon: Gamepad2 },
+  { href: "/course-catalog", label: "Learn", detail: "Recover courses and lesson progress.", icon: BookOpen },
+  { href: "/live", label: "Live", detail: "Open creator rooms and real-time chat.", icon: Radio },
+  { href: "/activity-feed", label: "Social", detail: "Return to the community feed.", icon: Users },
+];
+
 export default function NotFound() {
   const [location, setLocation] = useLocation();
   const IntegrationScreen = integrationRoutes[location];
-
   if (IntegrationScreen) return <>{IntegrationScreen()}</>;
-
-  const handleGoHome = () => setLocation("/");
-
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-      <Card className="w-full max-w-lg mx-4 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardContent className="pt-8 pb-8 text-center">
-          <div className="flex justify-center mb-6"><div className="relative"><div className="absolute inset-0 bg-red-100 rounded-full animate-pulse" /><AlertCircle className="relative h-16 w-16 text-red-500" /></div></div>
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">404</h1>
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">Page Not Found</h2>
-          <p className="text-slate-600 mb-8 leading-relaxed">Sorry, the page you are looking for doesn't exist.<br />It may have been moved or deleted.</p>
-          <div id="not-found-button-group" className="flex flex-col sm:flex-row gap-3 justify-center"><Button onClick={handleGoHome} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"><Home className="w-4 h-4 mr-2" />Go Home</Button></div>
-        </CardContent>
-      </Card>
-    </div>
+    <main className="min-h-screen bg-[#050510] px-4 py-16 text-white">
+      <div className="mx-auto max-w-4xl">
+        <Card className="border-white/10 bg-white/[0.04] text-white">
+          <CardHeader className="pb-4"><div className="flex items-start gap-4"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-300/10 text-amber-200"><AlertCircle className="h-6 w-6" /></span><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200/70">Route recovery</p><CardTitle className="mt-2 text-3xl">That screen is not available here</CardTitle><p className="mt-2 text-sm leading-6 text-white/50">The route may have moved, but your core product areas are still one click away. Nothing was deleted.</p></div></div></CardHeader>
+          <CardContent><div className="rounded-2xl border border-white/10 bg-black/20 p-4"><p className="text-xs font-bold uppercase tracking-wide text-white/30">Requested path</p><p className="mt-1 break-all font-mono text-sm text-white/60">{location}</p></div><div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{recoveryAreas.map(({ href, label, detail, icon: Icon }) => <button key={href} type="button" onClick={() => setLocation(href)} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left transition hover:-translate-y-0.5 hover:border-sky-300/30 hover:bg-white/[0.06]"><Icon className="h-5 w-5 text-sky-200" /><p className="mt-4 font-bold">{label}</p><p className="mt-1 text-xs leading-5 text-white/40">{detail}</p><span className="mt-3 inline-flex items-center text-xs font-bold text-sky-200">Open <ArrowRight className="ml-1 h-3.5 w-3.5 transition group-hover:translate-x-1" /></span></button>)}</div><div className="mt-6 flex flex-wrap gap-2"><Button onClick={() => setLocation("/advanced-search")} variant="outline" className="border-white/15 bg-white/[0.03] text-white"><Search className="mr-2 h-4 w-4" />Search all areas</Button><Button onClick={() => setLocation("/")} className="bg-white text-[#050510] hover:bg-white/90"><Home className="mr-2 h-4 w-4" />Go home</Button></div></CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
