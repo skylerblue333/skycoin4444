@@ -25,6 +25,11 @@ describe("hosted beta full journey verifier contract", () => {
     expect(script).toContain('url: origin + "/api/trpc"');
   });
 
+  it("sends the verified hosted Origin on unsafe authenticated requests", () => {
+    expect(script).toContain("headers.set(\"origin\", origin)");
+    expect(script.match(/\n\s+origin,\n/g)?.length).toBeGreaterThanOrEqual(2);
+  });
+
   it("covers the complete persisted invitation-beta release journey", () => {
     for (const procedure of [
       '"auth.me"',
