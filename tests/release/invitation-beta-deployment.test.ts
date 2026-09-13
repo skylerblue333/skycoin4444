@@ -20,21 +20,24 @@ const platformWorkflow = fs.readFileSync(".github/workflows/platform-vertical-ci
 const identityWorkflow = fs.readFileSync(".github/workflows/skyidentity.yml", "utf8");
 
 describe("invitation-only deployable beta boundary", () => {
-  it("removes the historical fake account password while allowing a guarded invitation secret", () => {
-    expect(signin).toMatch(/Invitation-only engineering beta/);
+  it("keeps the beta credential guarded while presenting a normal email/password UX", () => {
+    expect(signin).toMatch(/Invitation-only beta/);
     expect(signin).toMatch(/approved identity provider/);
-    expect(signin).toMatch(/Invitation access key/);
-    expect(signin).toMatch(/never accepts a SKYCOIN4444 password/);
-    expect(signin).toMatch(/type=\{showAccessKey \? "text" : "password"\}/);
-    expect(signin).toMatch(/Show access key/);
-    expect(signin).toMatch(/Hide access key/);
-    expect(signin).toMatch(/autoComplete="off"/);
+    expect(signin).toMatch(/Beta password/);
+    expect(signin).toMatch(/Sign in to SKYCOIN4444/);
+    expect(signin).toMatch(/type=\{showPassword \? "text" : "password"\}/);
+    expect(signin).toMatch(/Show password/);
+    expect(signin).toMatch(/Hide password/);
+    expect(signin).toMatch(/autoComplete="current-password"/);
+    expect(signin).toMatch(/body: JSON\.stringify\(\{ email, accessKey \}\)/);
     expect(signin).not.toMatch(/auth_token/);
     expect(signin).not.toMatch(/demo@skycoin\.com/);
     expect(signin).not.toMatch(/demo1234/);
     expect(signin).not.toMatch(/btoa\(/);
 
     expect(betaAccessAuth).toMatch(/ACCESS_KEY_MIN_BYTES = 48/);
+    expect(betaAccessAuth).toMatch(/BETA_ACCESS_PASSWORD_SCRYPT/);
+    expect(betaAccessAuth).toMatch(/scryptSync/);
     expect(betaAccessAuth).toMatch(/timingSafeEqual/);
     expect(betaAccessRoutes).toMatch(/invalid invitation credentials/);
     expect(betaAccessRoutes).not.toMatch(/localStorage/);
@@ -44,7 +47,6 @@ describe("invitation-only deployable beta boundary", () => {
     expect(sdk).toMatch(/oauthProviderRuntimeEnabled/);
     expect(sdk).toMatch(/if \(!oauthProviderRuntimeEnabled\(\)\)/);
     expect(sdk).toMatch(/throw ForbiddenError\("User not found"\)/);
-
 
     const admissionPosition = oauth.indexOf("evaluateBetaAdmission");
     const upsertPosition = oauth.indexOf("await db.upsertUser");
