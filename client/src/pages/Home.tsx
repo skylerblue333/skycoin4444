@@ -2,11 +2,13 @@
  * Product launchpad: evidence-led SKYCOIN4444 beta navigation. Link only to
  * working or explicitly controlled surfaces; never imply unavailable providers.
  */
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Bot,
   Boxes,
   Compass,
+  CheckCircle2,
   GraduationCap,
   Gamepad2,
   Heart,
@@ -14,10 +16,12 @@ import {
   LayoutDashboard,
   MessageSquare,
   Radio,
+  RotateCcw,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
   Users,
+  Zap,
 } from "lucide-react";
 import { Link } from "wouter";
 import ThreeLightsEasterEgg from "@/components/ThreeLightsEasterEgg";
@@ -158,7 +162,35 @@ const coreLoops = [
   },
 ] as const;
 
+const dailyMissions = [
+  { id: "learn", label: "Complete one SkySchool lesson", detail: "Build a useful idea in under 10 minutes.", href: "/course-catalog", icon: GraduationCap },
+  { id: "play", label: "Play one Arcade Lab round", detail: "Keep the session short and replayable.", href: "/gaming", icon: Gamepad2 },
+  { id: "connect", label: "Leave one thoughtful community post", detail: "Add signal to the social loop.", href: "/activity-feed", icon: Users },
+  { id: "create", label: "Visit a Live room or start one", detail: "See the real-time creator path.", href: "/live", icon: Radio },
+] as const;
+
 export default function Home() {
+  const [completedMissions, setCompletedMissions] = useState<string[]>([]);
+  const [showReset, setShowReset] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sky4444.daily-missions");
+      if (saved) setCompletedMissions(JSON.parse(saved) as string[]);
+    } catch {
+      setCompletedMissions([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sky4444.daily-missions", JSON.stringify(completedMissions));
+  }, [completedMissions]);
+
+  const completion = Math.round((completedMissions.length / dailyMissions.length) * 100);
+  const dayLabel = useMemo(() => new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(new Date()), []);
+  const toggleMission = (id: string) => setCompletedMissions(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  const resetMissions = () => { setCompletedMissions([]); setShowReset(false); };
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
       <section className="relative border-b border-white/10">
@@ -338,6 +370,30 @@ export default function Home() {
                 </Card>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative border-b border-white/[0.07] bg-[#070719]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-200/70"><Zap className="h-4 w-4" /> Daily launchpad</div>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Make today count.</h2>
+              <p className="mt-4 text-sm leading-7 text-white/50">A small four-step run turns the ecosystem from a menu into a habit. Check off what you complete; this progress stays on this device and makes no activity or audience claim.</p>
+              <div className="mt-6 flex items-end gap-4"><div className="text-5xl font-black text-white">{completion}%</div><div className="pb-1 text-sm text-white/40">{dayLabel}<br />{completedMissions.length} of {dailyMissions.length} complete</div></div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-sky-300 transition-all" style={{ width: `${completion}%` }} /></div>
+              <div className="mt-5 flex gap-2"><Button variant="outline" onClick={() => setShowReset(current => !current)} className="border-white/15 bg-white/[0.03] text-white"><RotateCcw className="mr-2 h-4 w-4" />Reset run</Button>{showReset ? <Button variant="ghost" onClick={resetMissions} className="text-rose-200 hover:bg-rose-300/10 hover:text-rose-100">Confirm reset</Button> : null}</div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {dailyMissions.map(({ id, label, detail, href }, index) => {
+                const complete = completedMissions.includes(id);
+                return <div key={id} className={"rounded-2xl border p-4 transition " + (complete ? "border-emerald-300/25 bg-emerald-300/[0.06]" : "border-white/10 bg-white/[0.035]")}>
+                  <div className="flex items-start gap-3"><button type="button" onClick={() => toggleMission(id)} aria-label={complete ? `Mark mission ${index + 1} incomplete` : `Mark mission ${index + 1} complete`} className={"grid h-9 w-9 shrink-0 place-items-center rounded-xl " + (complete ? "bg-emerald-300/15 text-emerald-200" : "bg-white/[0.07] text-white/50")}>{complete ? <CheckCircle2 className="h-5 w-5" /> : <span className="text-sm font-black">0{index + 1}</span>}</button><div><p className={"font-bold " + (complete ? "text-emerald-100" : "text-white")}>{label}</p><p className="mt-1 text-xs leading-5 text-white/40">{detail}</p></div></div>
+                  <Link href={href} className="mt-4 inline-flex items-center text-xs font-bold text-sky-200 hover:text-white">Open experience <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+                </div>;
+              })}
+            </div>
           </div>
         </div>
       </section>
