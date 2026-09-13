@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Heart, X, MessageCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -22,6 +22,17 @@ export default function DatingDiscovery() {
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [superLiked, setSuperLiked] = useState<Set<string>>(new Set());
+  const [minAge, setMinAge] = useState(18);
+  const [maxAge, setMaxAge] = useState(80);
+  const [locationFilter, setLocationFilter] = useState('');
+  const [interestFilter, setInterestFilter] = useState('');
+  const [dragStart, setDragStart] = useState<number | null>(null);
+
+  const filteredProfiles = useMemo(() => profiles.filter(profile => {
+    const locationMatches = !locationFilter.trim() || profile.location.toLowerCase().includes(locationFilter.trim().toLowerCase());
+    const interestMatches = !interestFilter.trim() || profile.interests.some(interest => interest.toLowerCase().includes(interestFilter.trim().toLowerCase()));
+    return profile.age >= minAge && profile.age <= maxAge && locationMatches && interestMatches;
+  }), [profiles, minAge, maxAge, locationFilter, interestFilter]);
 
   useEffect(() => {
     loadProfiles();
@@ -41,7 +52,7 @@ export default function DatingDiscovery() {
     }
   };
 
-  const currentProfile = profiles[currentIndex];
+  const currentProfile = filteredProfiles[currentIndex];
 
   const handleLike = async () => {
     if (!currentProfile) return;
@@ -96,7 +107,16 @@ export default function DatingDiscovery() {
   };
 
   const nextProfile = () => {
-    setCurrentIndex((prev) => (prev + 1) % profiles.length);
+    setCurrentIndex((prev) => filteredProfiles.length ? (prev + 1) % filteredProfiles.length : 0);
+  };
+
+  const handleSwipeEnd = (endX: number) => {
+    if (dragStart === null) return;
+    const delta = endX - dragStart;
+    setDragStart(null);
+    if (Math.abs(delta) < 70) return;
+    if (delta > 0) void handleLike();
+    else void handlePass();
   };
 
   if (loading) {
@@ -126,11 +146,21 @@ export default function DatingDiscovery() {
         {/* Header */}
         <div className="text-white text-center mb-8">
           <h1 className="text-3xl font-bold">Discover</h1>
-          <p className="text-pink-100">Find your perfect match</p>
+          <p className="text-pink-100">Find meaningful connections at your pace</p>
+        </div>
+
+        <div className="mb-5 rounded-2xl bg-white/15 p-4 text-white backdrop-blur">
+          <div className="mb-3 flex items-center justify-between"><strong>Match filters</strong><span className="text-xs text-pink-100">{filteredProfiles.length} candidates</span></div>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs">Min age<input type="number" min={18} max={80} value={minAge} onChange={event => { setMinAge(Math.max(18, Number(event.target.value))); setCurrentIndex(0); }} className="mt-1 w-full rounded-lg border-0 bg-white/90 px-2 py-2 text-slate-900" /></label>
+            <label className="text-xs">Max age<input type="number" min={18} max={80} value={maxAge} onChange={event => { setMaxAge(Math.min(80, Number(event.target.value))); setCurrentIndex(0); }} className="mt-1 w-full rounded-lg border-0 bg-white/90 px-2 py-2 text-slate-900" /></label>
+            <label className="text-xs">Location<input value={locationFilter} onChange={event => { setLocationFilter(event.target.value); setCurrentIndex(0); }} placeholder="City or region" className="mt-1 w-full rounded-lg border-0 bg-white/90 px-2 py-2 text-slate-900" /></label>
+            <label className="text-xs">Interest<input value={interestFilter} onChange={event => { setInterestFilter(event.target.value); setCurrentIndex(0); }} placeholder="Music, hiking…" className="mt-1 w-full rounded-lg border-0 bg-white/90 px-2 py-2 text-slate-900" /></label>
+          </div>
         </div>
 
         {/* Profile Card */}
-        <Card className="relative overflow-hidden mb-6 shadow-2xl">
+          <Card className="relative mb-6 overflow-hidden shadow-2xl" onMouseDown={event => setDragStart(event.clientX)} onMouseUp={event => handleSwipeEnd(event.clientX)} onTouchStart={event => setDragStart(event.touches[0]?.clientX ?? null)} onTouchEnd={event => handleSwipeEnd(event.changedTouches[0]?.clientX ?? 0)}>
           {/* Profile Image */}
           <div className="relative h-96 bg-gray-200 overflow-hidden">
             <img
@@ -171,6 +201,8 @@ export default function DatingDiscovery() {
             </div>
           </div>
         </Card>
+
+        <p className="mb-4 text-center text-sm text-white/80">Swipe right to like, left to pass, or use the buttons below.</p>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-6 mb-8">

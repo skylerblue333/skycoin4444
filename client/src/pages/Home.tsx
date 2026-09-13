@@ -2,11 +2,13 @@
  * Product launchpad: evidence-led SKYCOIN4444 beta navigation. Link only to
  * working or explicitly controlled surfaces; never imply unavailable providers.
  */
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Bot,
   Boxes,
   Compass,
+  CheckCircle2,
   GraduationCap,
   Gamepad2,
   Heart,
@@ -14,10 +16,12 @@ import {
   LayoutDashboard,
   MessageSquare,
   Radio,
+  RotateCcw,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
   Users,
+  Zap,
 } from "lucide-react";
 import { Link } from "wouter";
 import ThreeLightsEasterEgg from "@/components/ThreeLightsEasterEgg";
@@ -43,12 +47,12 @@ const experiences = [
     icon: Users,
   },
   {
-    title: "SkyLive Studio",
-    kicker: "Twitch-style creator setup",
+    title: "SkyLive",
+    kicker: "Small-room WebRTC broadcasting",
     description:
-      "Preview local camera and microphone devices, prepare a stream brief, and test creator setup safely.",
-    href: "/live-streaming",
-    status: "Local test lab",
+      "Start an authenticated small-room broadcast with real peer media, presence, and live chat.",
+    href: "/live",
+    status: "WebRTC beta",
     icon: Radio,
   },
   {
@@ -123,7 +127,76 @@ const stats = [
   { value: "0", label: "missing routed source files" },
 ] as const;
 
+const coreLoops = [
+  {
+    number: "01",
+    title: "Connect",
+    description: "Publish, reply, react, and build a real account-owned community identity.",
+    href: "/activity-feed",
+    accent: "from-sky-400/25 to-blue-500/10",
+    icon: Users,
+  },
+  {
+    number: "02",
+    title: "Learn",
+    description: "Complete lessons, keep your progress, and turn curiosity into a repeatable habit.",
+    href: "/course-catalog",
+    accent: "from-emerald-400/25 to-cyan-500/10",
+    icon: GraduationCap,
+  },
+  {
+    number: "03",
+    title: "Play",
+    description: "Build skill and streaks in deterministic games designed for short, replayable sessions.",
+    href: "/gaming",
+    accent: "from-violet-400/25 to-fuchsia-500/10",
+    icon: Gamepad2,
+  },
+  {
+    number: "04",
+    title: "Create",
+    description: "Open a small-room creator broadcast with real peer media, presence, and live chat.",
+    href: "/live",
+    accent: "from-amber-400/25 to-rose-500/10",
+    icon: Radio,
+  },
+] as const;
+
+const dailyMissions = [
+  { id: "learn", label: "Complete one SkySchool lesson", detail: "Build a useful idea in under 10 minutes.", href: "/course-catalog", icon: GraduationCap },
+  { id: "play", label: "Play one Arcade Lab round", detail: "Keep the session short and replayable.", href: "/gaming", icon: Gamepad2 },
+  { id: "connect", label: "Leave one thoughtful community post", detail: "Add signal to the social loop.", href: "/activity-feed", icon: Users },
+  { id: "create", label: "Visit a Live room or start one", detail: "See the real-time creator path.", href: "/live", icon: Radio },
+] as const;
+
 export default function Home() {
+  const [completedMissions, setCompletedMissions] = useState<string[]>([]);
+  const [showReset, setShowReset] = useState(false);
+  const [missionDate, setMissionDate] = useState("");
+
+  useEffect(() => {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const saved = localStorage.getItem("sky4444.daily-missions");
+      const savedDate = localStorage.getItem("sky4444.daily-missions-date");
+      setMissionDate(today);
+      if (saved && savedDate === today) setCompletedMissions(JSON.parse(saved) as string[]);
+    } catch {
+      setCompletedMissions([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("sky4444.daily-missions", JSON.stringify(completedMissions));
+    if (missionDate) localStorage.setItem("sky4444.daily-missions-date", missionDate);
+  }, [completedMissions, missionDate]);
+
+  const completion = Math.round((completedMissions.length / dailyMissions.length) * 100);
+  const dayLabel = useMemo(() => new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(new Date()), []);
+  const toggleMission = (id: string) => setCompletedMissions(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  const resetMissions = () => { setCompletedMissions([]); setShowReset(false); };
+  const nextMission = dailyMissions.find(mission => !completedMissions.includes(mission.id)) ?? dailyMissions[0];
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
       <section className="relative border-b border-white/10">
@@ -157,20 +230,20 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-3xl text-base leading-8 text-white/60 sm:text-lg">
-              Move through social, live creator tools, learning, gaming, commerce,
-              language exchange, dating, digital-asset evidence, and HopeAI
-              without getting lost in the wider historical screen inventory.
-              Every promoted journey is labeled by what it actually proves.
+              SKYCOIN4444 is a social learning arcade with creator rooms: connect
+              with people, learn something useful, play a short session, and make
+              something worth returning to. The wider ecosystem is available as
+              clearly labeled labs—not inflated promises.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/beta-workspace">
+              <Link href="/onboarding">
                 <Button
                   size="lg"
                   className="bg-white text-[#050510] hover:bg-white/90"
                 >
                   <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Open ecosystem workspace
+                  Start the beta journey
                 </Button>
               </Link>
               <Link href="/activity-feed">
@@ -179,7 +252,7 @@ export default function Home() {
                   variant="outline"
                   className="border-white/15 bg-white/[0.04] text-white hover:bg-white/10"
                 >
-                  Start with social
+                  See the core loop
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -189,7 +262,7 @@ export default function Home() {
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Search all 67 beta routes
+                  Browse wider labs · 67 beta routes
                 </Button>
               </Link>
             </div>
@@ -260,6 +333,77 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="relative border-b border-white/[0.07] bg-gradient-to-b from-white/[0.025] to-transparent">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-200/65">
+              The core product
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+              Four actions that make the ecosystem worth returning to.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-white/45">
+              Start here. Each loop has a concrete result, an account-aware path,
+              and a clear next step. The rest of SKYCOIN4444 stays available for
+              exploration without competing for attention.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {coreLoops.map(({ number, title, description, href, accent, icon: Icon }) => (
+              <Link key={title} href={href} className="group">
+                <Card className="h-full border-white/10 bg-white/[0.035] text-white transition duration-200 group-hover:-translate-y-1 group-hover:border-white/20 group-hover:bg-white/[0.06]">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <span className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${accent} text-white`}>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="text-xs font-black tracking-[0.18em] text-white/25">
+                        {number}
+                      </span>
+                    </div>
+                    <CardTitle className="mt-5 text-white">{title}</CardTitle>
+                    <CardDescription className="leading-6 text-white/50">
+                      {description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <span className="inline-flex items-center text-sm font-bold text-sky-200">
+                      Open loop
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="relative border-b border-white/[0.07] bg-[#070719]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:py-16">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-200/70"><Zap className="h-4 w-4" /> Daily launchpad</div>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Make today count.</h2>
+              <p className="mt-4 text-sm leading-7 text-white/50">A small four-step run turns the ecosystem from a menu into a habit. Check off what you complete; this progress stays on this device and makes no activity or audience claim.</p>
+              <div className="mt-6 flex items-end gap-4"><div className="text-5xl font-black text-white">{completion}%</div><div className="pb-1 text-sm text-white/40">{dayLabel}<br />{completedMissions.length} of {dailyMissions.length} complete</div></div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-sky-300 transition-all" style={{ width: `${completion}%` }} /></div>
+              <div className="mt-5 flex flex-wrap gap-2"><Link href={nextMission.href}><Button className="bg-white text-[#050510] hover:bg-white/90">{completedMissions.length === dailyMissions.length ? "Replay today's run" : "Continue next mission"}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link><Button variant="outline" onClick={() => setShowReset(current => !current)} className="border-white/15 bg-white/[0.03] text-white"><RotateCcw className="mr-2 h-4 w-4" />Reset run</Button>{showReset ? <Button variant="ghost" onClick={resetMissions} className="text-rose-200 hover:bg-rose-300/10 hover:text-rose-100">Confirm reset</Button> : null}</div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {dailyMissions.map(({ id, label, detail, href }, index) => {
+                const complete = completedMissions.includes(id);
+                return <div key={id} className={"rounded-2xl border p-4 transition " + (complete ? "border-emerald-300/25 bg-emerald-300/[0.06]" : "border-white/10 bg-white/[0.035]")}>
+                  <div className="flex items-start gap-3"><button type="button" onClick={() => toggleMission(id)} aria-label={complete ? `Mark mission ${index + 1} incomplete` : `Mark mission ${index + 1} complete`} className={"grid h-9 w-9 shrink-0 place-items-center rounded-xl " + (complete ? "bg-emerald-300/15 text-emerald-200" : "bg-white/[0.07] text-white/50")}>{complete ? <CheckCircle2 className="h-5 w-5" /> : <span className="text-sm font-black">0{index + 1}</span>}</button><div><p className={"font-bold " + (complete ? "text-emerald-100" : "text-white")}>{label}</p><p className="mt-1 text-xs leading-5 text-white/40">{detail}</p></div></div>
+                  <Link href={href} className="mt-4 inline-flex items-center text-xs font-bold text-sky-200 hover:text-white">Open experience <ArrowRight className="ml-1 h-3.5 w-3.5" /></Link>
+                </div>;
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-14">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -267,13 +411,13 @@ export default function Home() {
               Headline ecosystem
             </p>
             <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-              Pick an area and actually use it.
+              Explore the wider ecosystem.
             </h2>
           </div>
           <p className="max-w-md text-sm leading-6 text-white/45">
-            The persistent navigation above stays available as you move between
-            areas, so the beta behaves like one product instead of a pile of
-            disconnected routes.
+            The core loop is the product. These additional labs are available for
+            testing with explicit boundaries, so breadth never disguises what is
+            genuinely usable today.
           </p>
         </div>
 

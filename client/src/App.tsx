@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Switch, Route } from "wouter";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ErrorBoundary, ScreenLoadingFallback } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -1079,7 +1079,7 @@ const ZeroKnowledgeProof = lazy(() => import('./pages/ZeroKnowledgeProof'));
 
 function Router() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="text-lg">Loading...</div></div>}>
+    <Suspense fallback={<ScreenLoadingFallback />}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/a-b-testing" component={ABTesting} />

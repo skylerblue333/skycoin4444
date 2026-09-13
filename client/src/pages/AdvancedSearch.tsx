@@ -71,8 +71,8 @@ const betaRoutes: readonly SearchableBetaRoute[] = [
     "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
   },
   {
-    "route": "/live-streaming",
-    "capability": "Previously verified SKYCOIN4444 engineering-beta route",
+    "route": "/live",
+    "capability": "Authenticated small-room WebRTC broadcasting with presence and live chat",
     "persistence": "Route-specific; see implementation and release docs",
     "boundary": "Launchable beta status proves only the route-specific behavior already documented; unavailable production integrations remain gated."
   },

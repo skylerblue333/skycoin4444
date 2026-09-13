@@ -26,10 +26,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+
+const postTemplates = [
+  ["Build update", "Today I tested a small product loop and learned: "],
+  ["Video drop", "New video: here is the idea I am exploring and why it matters. "],
+  ["Wallet tip", "Wallet safety tip: verify the destination and never share recovery material. "],
+  ["Dating safety", "Dating safety reminder: meet in public, protect personal details, and report pressure. "],
+  ["Marketplace test", "Marketplace experiment: I am comparing value, quality, and delivery assumptions before buying. "],
+] as const;
 
 export default function ActivityFeed() {
   const { isAuthenticated, loading } = useAuth();
   const [content, setContent] = useState("");
+  const [mediaUrl, setMediaUrl] = useState("");
   const [query, setQuery] = useState("");
   const [activePostId, setActivePostId] = useState<string>();
   const [commentDraft, setCommentDraft] = useState("");
@@ -42,6 +52,7 @@ export default function ActivityFeed() {
   const createPost = trpc.social.createPost.useMutation({
     onSuccess: async () => {
       setContent("");
+      setMediaUrl("");
       await Promise.all([
         utils.feed.getFeed.invalidate(),
         utils.activation.status.invalidate(),
@@ -177,8 +188,9 @@ export default function ActivityFeed() {
                 Share an update
               </CardTitle>
               <CardDescription className="text-white/45">
-                Post a build note, question, or useful discovery. The server
-                trims and limits posts to 255 characters.
+                Post a build note, question, tip, or useful discovery. You can
+                attach a direct image or video URL; only the post record is
+                persisted by this beta.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -189,6 +201,28 @@ export default function ActivityFeed() {
                 placeholder="What are you building or testing?"
                 aria-label="Social post content"
               />
+              <div className="flex flex-wrap gap-2" aria-label="Post templates">
+                {postTemplates.map(([label, template]) => (
+                  <Button
+                    key={label}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-white/10 bg-white/[0.02] text-white/65"
+                    onClick={() => setContent(template)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+              <Input
+                value={mediaUrl}
+                onChange={event => setMediaUrl(event.target.value)}
+                maxLength={255}
+                placeholder="Optional image/video URL (https://…)"
+                aria-label="Optional post media URL"
+                className="border-white/10 bg-black/25 text-white placeholder:text-white/25"
+              />
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs text-white/35">
                   {content.length}/255
@@ -198,7 +232,7 @@ export default function ActivityFeed() {
                   onClick={() =>
                     createPost.mutate({
                       content: content.trim(),
-                      media: null,
+                      media: mediaUrl.trim() || null,
                     })
                   }
                 >
@@ -342,6 +376,24 @@ export default function ActivityFeed() {
                 <p className="mt-4 whitespace-pre-wrap leading-7 text-white/75">
                   {post.content}
                 </p>
+
+                {post.media ? (
+                  /\.(mp4|webm|ogg)(\?|$)/i.test(post.media) ? (
+                    <video
+                      className="mt-4 max-h-[28rem] w-full rounded-2xl border border-white/10 bg-black object-contain"
+                      controls
+                      preload="metadata"
+                      src={post.media}
+                    />
+                  ) : (
+                    <img
+                      className="mt-4 max-h-[28rem] w-full rounded-2xl border border-white/10 object-contain"
+                      loading="lazy"
+                      src={post.media}
+                      alt="Attached community post media"
+                    />
+                  )
+                ) : null}
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Button

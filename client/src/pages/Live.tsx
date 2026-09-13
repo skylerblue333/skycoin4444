@@ -6,6 +6,8 @@ import {
   Camera,
   Eye,
   Loader2,
+  Mic,
+  MicOff,
   MessageCircle,
   Radio,
   Send,
@@ -66,6 +68,8 @@ export default function Live() {
   const [busy, setBusy] = useState(false);
   const [messages, setMessages] = useState<LiveChatMessage[]>([]);
   const [draft, setDraft] = useState("");
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(true);
 
   const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const remoteVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -119,6 +123,8 @@ export default function Live() {
     localStreamRef.current?.getTracks().forEach(track => track.stop());
     localStreamRef.current = null;
     setLocalStream(null);
+    setAudioEnabled(true);
+    setVideoEnabled(true);
   }, []);
 
   const resetRoom = useCallback((stopMedia: boolean) => {
@@ -430,6 +436,42 @@ export default function Live() {
     }
   };
 
+  const toggleLocalTrack = (kind: "audio" | "video") => {
+    const tracks = localStreamRef.current?.getTracks().filter(track => track.kind === kind) ?? [];
+    if (!tracks.length) return;
+    const nextEnabled = !tracks[0].enabled;
+    tracks.forEach(track => { track.enabled = nextEnabled; });
+    if (kind === "audio") setAudioEnabled(nextEnabled);
+    else setVideoEnabled(nextEnabled);
+  };
+
+  const sendPrompt = (message: string) => {
+    if (!session) return;
+    setDraft(message);
+    void liveRoomsApi.sendChat(session, message).then(sent => {
+      chatCursorRef.current = Math.max(chatCursorRef.current, sent.sequence);
+      setMessages(current => mergeMessages(current, [sent]));
+      setDraft("");
+    }).catch(error => toast.error(messageFrom(error)));
+  };
+
+  const shareRoom = async (room: LiveRoomSummary) => {
+    const url = `${window.location.origin}/live?room=${encodeURIComponent(room.id)}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: room.title, text: `Join ${room.title} on SkyLive`, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        toast.success("Live room link copied.");
+      } else {
+        toast(url);
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      toast.error("Room link could not be shared.");
+    }
+  };
+
   const moderateMessage = async (message: LiveChatMessage) => {
     if (!session || session.role !== "host") return;
     try {
@@ -526,7 +568,7 @@ export default function Live() {
                       <div className="flex items-center justify-between"><span className="rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider">Live beta</span><span className="flex items-center gap-1 rounded-full bg-black/25 px-2.5 py-1 text-xs"><Eye className="h-3.5 w-3.5" /> {room.viewerCount}</span></div>
                       <div className="flex h-[calc(100%-2rem)] items-end"><div><div className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">{room.category}</div><h3 className="mt-1 text-xl font-black">{room.title}</h3></div></div>
                     </div>
-                    <div className="flex items-center justify-between gap-3 p-4"><div className="text-xs text-slate-500">Direct browser peer media</div><Button onClick={() => void joinRoom(room)} disabled={busy} className="rounded-xl bg-indigo-600 hover:bg-indigo-700"><Wifi className="mr-2 h-4 w-4" /> Join</Button></div>
+                    <div className="flex items-center justify-between gap-3 p-4"><div className="text-xs text-slate-500">Direct browser peer media</div><div className="flex gap-2"><Button variant="outline" onClick={() => void shareRoom(room)} className="rounded-xl border-slate-200">Share</Button><Button onClick={() => void joinRoom(room)} disabled={busy} className="rounded-xl bg-indigo-600 hover:bg-indigo-700"><Wifi className="mr-2 h-4 w-4" /> Join</Button></div></div>
                   </SurfaceCard>
                 ))}
               </div>
@@ -554,7 +596,10 @@ export default function Live() {
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-slate-950 p-4 text-white">
                 <div className="text-xs text-white/45">{hosting ? "Your browser sends one peer stream per connected viewer." : "Media travels browser-to-browser after signaling."}</div>
-                <Button onClick={() => void leaveOrEnd()} disabled={busy} variant="outline" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">{hosting ? "End broadcast" : "Leave room"}</Button>
+                <div className="flex flex-wrap gap-2">
+                  {hosting ? <><Button onClick={() => toggleLocalTrack("audio")} variant="outline" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">{audioEnabled ? <Mic className="mr-2 h-4 w-4" /> : <MicOff className="mr-2 h-4 w-4" />}{audioEnabled ? "Mute" : "Unmute"}</Button><Button onClick={() => toggleLocalTrack("video")} variant="outline" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">{videoEnabled ? <Video className="mr-2 h-4 w-4" /> : <VideoOff className="mr-2 h-4 w-4" />}{videoEnabled ? "Camera" : "Video off"}</Button></> : null}
+                  <Button onClick={() => void leaveOrEnd()} disabled={busy} variant="outline" className="rounded-xl border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-white">{hosting ? "End broadcast" : "Leave room"}</Button>
+                </div>
               </div>
             </SurfaceCard>
 
@@ -583,6 +628,9 @@ export default function Live() {
               ))}
             </div>
             <div className="border-t border-slate-100 p-3">
+              <div className="mb-2 flex flex-wrap gap-2">
+                {["Hello!", "What are you building?", "Share a tip"].map(prompt => <Button key={prompt} type="button" size="sm" variant="outline" onClick={() => sendPrompt(prompt)} disabled={!session} className="rounded-full border-slate-200 text-xs">{prompt}</Button>)}
+              </div>
               <div className="flex gap-2"><Input value={draft} maxLength={500} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) void sendChat(); }} className="rounded-xl border-slate-200" placeholder="Message the live room" /><Button onClick={() => void sendChat()} disabled={!draft.trim()} aria-label="Send live chat message" className="rounded-xl bg-indigo-600 px-3 hover:bg-indigo-700"><Send className="h-4 w-4" /></Button></div>
               <p className="mt-2 text-[11px] leading-5 text-slate-400">Chat is bounded to signed-in room participants. Host deletion is moderation only; there is no automated safety classification in this beta.</p>
             </div>

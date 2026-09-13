@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -9,6 +9,8 @@ import {
   Gamepad2,
   GraduationCap,
   Lightbulb,
+  Mic,
+  MicOff,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -86,6 +88,30 @@ export default function HopeAI() {
   const [focus, setFocus] = useState<HopeFocus>("build");
   const [plan, setPlan] = useState<HopePlan | null>(null);
   const [copied, setCopied] = useState(false);
+  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [voiceListening, setVoiceListening] = useState(false);
+  const [voiceMessage, setVoiceMessage] = useState("");
+  const speechRecognition = useState<{ current: any }>({ current: null })[0];
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sky4444.hopeai.plan");
+      if (saved) setPlan(JSON.parse(saved) as HopePlan);
+      const completed = localStorage.getItem("sky4444.hopeai.completed-steps");
+      if (completed) setCompletedSteps(JSON.parse(completed) as string[]);
+    } catch {
+      setPlan(null);
+      setCompletedSteps([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (plan) localStorage.setItem("sky4444.hopeai.plan", JSON.stringify(plan));
+  }, [plan]);
+
+  useEffect(() => {
+    localStorage.setItem("sky4444.hopeai.completed-steps", JSON.stringify(completedSteps));
+  }, [completedSteps]);
 
   const summary = useMemo(
     () => summarizeHopeActivity(activity.data ?? []),
@@ -142,15 +168,59 @@ export default function HopeAI() {
   }
 
   function generatePlan() {
-    setPlan(
-      createHopePlan({
+    const nextPlan = createHopePlan({
         goal,
         focus,
         activity: summary,
-      })
-    );
+      });
+    setPlan(nextPlan);
+    setCompletedSteps([]);
     setCopied(false);
   }
+
+  function toggleStep(stepId: string) {
+    setCompletedSteps(current => current.includes(stepId) ? current.filter(id => id !== stepId) : [...current, stepId]);
+  }
+
+  function clearSavedSprint() {
+    localStorage.removeItem("sky4444.hopeai.plan");
+    localStorage.removeItem("sky4444.hopeai.completed-steps");
+    setPlan(null);
+    setCompletedSteps([]);
+    setGoal("");
+  }
+
+  function toggleSpeechInput() {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceMessage("Speech-to-text is not supported in this browser. Type your goal instead.");
+      return;
+    }
+    if (voiceListening) {
+      speechRecognition.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceListening(true);
+      setVoiceMessage("Listening for your goal…");
+    };
+    recognition.onresult = (event: any) => {
+      const transcript = String(event.results?.[0]?.[0]?.transcript ?? "").trim();
+      if (transcript) setGoal(current => current ? `${current} ${transcript}`.slice(0, 500) : transcript.slice(0, 500));
+      setVoiceMessage(transcript ? "Goal captured. Review it before building your sprint." : "No speech was captured.");
+    };
+    recognition.onerror = () => setVoiceMessage("Speech input was unavailable. You can type your goal instead.");
+    recognition.onend = () => setVoiceListening(false);
+    speechRecognition.current = recognition;
+    recognition.start();
+  }
+
+  useEffect(() => () => speechRecognition.current?.stop(), [speechRecognition]);
 
   async function copyPlan() {
     if (!plan) return;
@@ -278,13 +348,19 @@ export default function HopeAI() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
-              <Textarea
-                value={goal}
-                maxLength={500}
-                onChange={event => setGoal(event.target.value)}
-                placeholder="Example: make the gaming hub more fun and give me a useful next step"
-                className="min-h-32 border-white/10 bg-black/25 text-white placeholder:text-white/25"
-              />
+              <div className="relative">
+                <Textarea
+                  value={goal}
+                  maxLength={500}
+                  onChange={event => setGoal(event.target.value)}
+                  placeholder="Example: make the gaming hub more fun and give me a useful next step"
+                  className="min-h-32 border-white/10 bg-black/25 pr-14 text-white placeholder:text-white/25"
+                />
+                <button type="button" onClick={toggleSpeechInput} aria-label={voiceListening ? "Stop speech-to-text" : "Start speech-to-text"} title="Speak your goal" className={"absolute bottom-3 right-3 grid h-9 w-9 place-items-center rounded-xl border " + (voiceListening ? "border-rose-300/40 bg-rose-300/15 text-rose-100" : "border-white/10 bg-white/[0.06] text-white/60 hover:text-white")}>
+                  {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              </div>
+              {voiceMessage ? <p className="text-xs text-sky-200/70" role="status" aria-live="polite">{voiceMessage}</p> : null}
               <div className="flex items-center justify-between text-xs text-white/30">
                 <span>{goal.length}/500</span>
                 <button
@@ -292,6 +368,7 @@ export default function HopeAI() {
                   onClick={() => {
                     setGoal("");
                     setPlan(null);
+                    setCompletedSteps([]);
                   }}
                   className="inline-flex items-center gap-1 hover:text-white"
                 >
@@ -410,15 +487,16 @@ export default function HopeAI() {
                   </div>
 
                   <div className="space-y-3">
-                    {plan.steps.map((step, index) => (
-                      <div
+                    {plan.steps.map((step, index) => {
+                      const done = completedSteps.includes(step.id);
+                      return <div
                         key={step.id}
-                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                        className={"rounded-2xl border bg-black/20 p-4 transition " + (done ? "border-emerald-300/25" : "border-white/10")}
                       >
                         <div className="flex items-start gap-4">
-                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-300/10 text-sm font-black text-violet-100">
-                            {index + 1}
-                          </span>
+                          <button type="button" onClick={() => toggleStep(step.id)} aria-label={done ? `Mark ${step.title} incomplete` : `Mark ${step.title} complete`} className={"grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-black " + (done ? "bg-emerald-300/15 text-emerald-200" : "bg-violet-300/10 text-violet-100")}>
+                            {done ? <CheckCircle2 className="h-5 w-5" /> : index + 1}
+                          </button>
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-start justify-between gap-2">
                               <h3 className="font-bold">{step.title}</h3>
@@ -438,8 +516,13 @@ export default function HopeAI() {
                             </Link>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      </div>;
+                    })}
+                  </div>
+
+                  <div className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] p-4">
+                    <div className="flex items-center justify-between text-xs"><span className="font-semibold text-emerald-100">Sprint progress</span><span className="text-white/45">{completedSteps.filter(id => plan.steps.some(step => step.id === id)).length}/{plan.steps.length} steps</span></div>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-emerald-300 transition-all" style={{ width: `${Math.round((completedSteps.filter(id => plan.steps.some(step => step.id === id)).length / plan.steps.length) * 100)}%` }} /></div>
                   </div>
 
                   <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
@@ -458,6 +541,7 @@ export default function HopeAI() {
                     <Clipboard className="mr-2 h-4 w-4" />
                     {copied ? "Plan copied" : "Copy sprint"}
                   </Button>
+                  <Button type="button" variant="ghost" className="w-full text-white/40 hover:text-white" onClick={clearSavedSprint}>Start a fresh sprint</Button>
                 </div>
               )}
             </CardContent>

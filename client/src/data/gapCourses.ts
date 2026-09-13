@@ -111,6 +111,60 @@ export const gapCourses: readonly GapCourse[] = [
       lesson('safety', 'User Safety', 'Verify networks and withdrawal paths.', 'Users should verify network identifiers, official bridge paths, fees, finality assumptions, and recovery options before moving valuable assets.', q('Before bridging, users should verify?', ['Network and bridge path', 'Only token logo', 'Nothing'], 0)),
     ]
   },
+  {
+    id: 'product-thinking-101', title: 'Product Thinking & Better Decisions', level: 'beginner', lessons: [
+      lesson('problems', 'Start With the Problem', 'Separate a user problem from a feature idea.', 'Strong products begin with a specific problem, a person affected by it, and evidence that the problem matters. A feature is only one possible response.', q('A useful product problem statement should describe?', ['A specific user problem', 'A list of trendy features', 'A guaranteed valuation'], 0)),
+      lesson('users', 'Understand the User', 'Identify context, constraints, and desired outcomes.', 'Interviews, observation, support records, and behavioral evidence help teams understand what people are trying to accomplish and what makes the current path difficult.', q('Good user research focuses on?', ['Goals and context', 'Only preferred colors', 'Invented testimonials'], 0)),
+      lesson('loops', 'Design a Complete Loop', 'Map the path from entry to return.', 'A product loop should let someone enter, do something valuable, save or share the result, and know what to do next. Stopping after a button click is not a complete loop.', q('A complete product loop should include?', ['Value and a next step', 'Only a landing page', 'A hidden state'], 0)),
+      lesson('metrics', 'Choose Useful Metrics', 'Distinguish outcome metrics from vanity counts.', 'Activation, completion, retention, failure rate, and time to value explain product health better than route counts or inflated audience claims.', q('Which is closer to an outcome metric?', ['Lesson completion rate', 'Number of menu items', 'Unverified follower count'], 0)),
+      lesson('experiments', 'Run Small Experiments', 'Test one assumption at a time.', 'A good experiment states the assumption, defines a measurable result, limits risk, and records what happened. Small tests reduce wasted work and make learning faster.', q('A good experiment should?', ['Test a clear assumption', 'Hide negative results', 'Change five variables at once'], 0)),
+    ]
+  },
+  {
+    id: 'web-safety-101', title: 'Web Safety & Privacy Basics', level: 'beginner', lessons: [
+      lesson('permissions', 'Permissions', 'Review what a website is allowed to access.', 'Camera, microphone, location, notifications, and file permissions should be requested at the moment of need and denied when unnecessary.', q('A safe permission pattern is to?', ['Request only what is needed', 'Request everything on load', 'Hide the purpose'], 0)),
+      lesson('accounts', 'Account Hygiene', 'Use strong, unique access practices.', 'Unique passwords, a password manager, multi-factor authentication, and session review reduce the impact of reused credentials and stolen sessions.', q('Why use unique passwords?', ['One breach should not unlock every account', 'They guarantee no phishing', 'They remove the need for recovery'], 0)),
+      lesson('phishing', 'Phishing Signals', 'Recognize urgency and impersonation.', 'Unexpected urgency, lookalike domains, unusual payment requests, and requests for secrets are common warning signs. Verify through a known channel.', q('Which is a warning sign?', ['Urgent request for a secret', 'A normal help article', 'A visible privacy policy'], 0)),
+      lesson('sharing', 'Share Less by Default', 'Reduce unnecessary personal-data exposure.', 'Before sharing, ask who needs the information, how long it will be kept, and whether a less identifying alternative would work.', q('Data minimization means?', ['Collecting and sharing only what is needed', 'Keeping every detail forever', 'Publishing by default'], 0)),
+      lesson('incidents', 'Respond to an Incident', 'Take calm, reversible steps after a mistake.', 'Revoke exposed sessions or keys, change affected credentials from a trusted device, preserve evidence, notify the right service, and avoid spreading the secret further.', q('After exposing a password, the first step is usually to?', ['Revoke or change it from a trusted path', 'Post it as a warning', 'Ignore it'], 0)),
+    ]
+  },
+  {
+    id: 'data-literacy-101', title: 'Data Literacy for Everyday Decisions', level: 'beginner', lessons: [
+      lesson('questions', 'Ask the Right Question', 'Turn a vague concern into a measurable question.', 'A clear question names the population, time period, comparison, and outcome. Ambiguous questions invite misleading conclusions.', q('A measurable question should define?', ['What, for whom, and when', 'Only a chart color', 'A conclusion first'], 0)),
+      lesson('averages', 'Read Averages Carefully', 'Understand what a summary hides.', 'Mean, median, range, and distribution answer different questions. Averages can conceal outliers, uneven groups, or missing data.', q('The median is useful when?', ['Outliers would distort the mean', 'Every value is identical', 'There is no data'], 0)),
+      lesson('correlation', 'Correlation Is Not Causation', 'Avoid treating association as proof of cause.', 'Two measures can move together because of coincidence, reverse direction, a shared cause, or selection effects. Causal claims need stronger evidence.', q('Correlation alone proves?', ['An association', 'The exact cause', 'A guaranteed forecast'], 0)),
+      lesson('samples', 'Samples and Bias', 'Recognize who is missing from a dataset.', 'A sample may overrepresent people who respond, have access, or remain visible. Good analysis describes the sample and its limits.', q('Sampling bias occurs when?', ['Some groups are systematically over- or under-represented', 'Every person is included', 'The chart has labels'], 0)),
+      lesson('uncertainty', 'Communicate Uncertainty', 'Make room for error and changing evidence.', 'Ranges, confidence limits, caveats, and updated measurements help people avoid false precision. Uncertainty is information, not failure.', q('Responsible data communication should?', ['State important limitations', 'Hide uncertainty', 'Promise exact outcomes'], 0)),
+    ]
+  },
+  {
+    id: 'creator-communication-101', title: 'Creator Communication Essentials', level: 'beginner', lessons: [
+      lesson('audience', 'Know the Audience', 'Choose language for a specific audience.', 'A useful creator message names who it helps, what problem it addresses, and what the audience should do next.', q('A focused message should name?', ['Audience and outcome', 'Only a color', 'A secret metric'], 0)),
+      lesson('hooks', 'Strong Openings', 'Create honest attention without misleading claims.', 'An opening can state the tension, question, or promised learning clearly. Avoid urgency, guarantees, and exaggerated proof.', q('A responsible hook should avoid?', ['Guaranteed outcomes', 'A clear question', 'Specific context'], 0)),
+      lesson('accessibility', 'Accessible Formats', 'Make content easier to understand and use.', 'Captions, readable contrast, descriptive labels, structured headings, and plain language widen participation without changing the core idea.', q('Captions primarily improve?', ['Access to spoken content', 'Token value', 'Password strength'], 0)),
+      lesson('feedback', 'Use Feedback Well', 'Turn reactions into actionable learning.', 'Separate a preference from a reproducible issue, look for patterns, and record what changed after a test rather than chasing every reaction.', q('Useful feedback should be?', ['Specific enough to act on', 'Always positive', 'Kept secret'], 0)),
+      lesson('disclosure', 'Disclose Clearly', 'Make sponsorship and limitations visible.', 'People should be able to distinguish personal experience, paid promotion, affiliate relationships, and unverified claims before relying on content.', q('Clear disclosure helps people?', ['Interpret incentives and limits', 'Guarantee a result', 'Skip verification'], 0)),
+    ]
+  },
+  {
+    id: 'digital-wellbeing-101', title: 'Digital Wellbeing & Boundaries', level: 'beginner', lessons: [
+      lesson('attention', 'Protect Attention', 'Design intentional notification habits.', 'Notifications compete for attention. Batching, quiet periods, and turning off nonessential alerts can make technology serve a chosen goal.', q('A useful attention practice is?', ['Batching nonessential alerts', 'Enabling every alert', 'Removing all goals'], 0)),
+      lesson('boundaries', 'Set Boundaries', 'Communicate availability and limits.', 'A boundary can state when you are available, which channels you use, and what kind of response time people should expect.', q('A boundary should be?', ['Clear and communicated', 'A hidden test', 'Impossible to follow'], 0)),
+      lesson('consent', 'Consent Online', 'Respect participation and sharing choices.', 'Ask before recording, reposting, tagging, or adding someone to a group. Consent should be informed, specific, and reversible where practical.', q('Before reposting someone’s private message, you should?', ['Ask permission', 'Assume consent', 'Remove context'], 0)),
+      lesson('conflict', 'Handle Conflict', 'De-escalate disagreement in digital spaces.', 'Pause before replying, separate intent from impact, move sensitive issues to an appropriate channel, and use reporting tools for abuse or threats.', q('A de-escalating first step is?', ['Pause and clarify', 'Escalate immediately', 'Publish private details'], 0)),
+      lesson('rest', 'Build Recovery Time', 'Use technology without making constant availability the default.', 'Regular offline time, sleep protection, movement, and real-world relationships support sustainable participation better than endless engagement metrics.', q('Sustainable participation needs?', ['Recovery time', 'Constant availability', 'More notifications'], 0)),
+    ]
+  },
+  {
+    id: 'ai-literacy-101', title: 'Practical AI Literacy', level: 'beginner', lessons: [
+      lesson('capabilities', 'Know the Boundary', 'Distinguish generated output from verified facts.', 'An AI system can produce useful drafts while still being wrong, incomplete, or unable to access the context a user assumes it has.', q('Generated output should be?', ['Reviewed before reliance', 'Treated as guaranteed fact', 'Presented as human memory'], 0)),
+      lesson('prompts', 'Give Useful Context', 'Write goals and constraints clearly.', 'A good request describes the task, audience, format, constraints, examples, and what a successful answer should include.', q('Useful context includes?', ['Goal and constraints', 'Only a greeting', 'A hidden password'], 0)),
+      lesson('privacy', 'Protect Sensitive Data', 'Minimize information shared with tools.', 'Do not paste secrets, credentials, private keys, unnecessary personal data, or confidential business material into an AI tool without an approved handling policy.', q('What should never be pasted into an unapproved AI tool?', ['Private keys and credentials', 'A public topic', 'A formatting preference'], 0)),
+      lesson('verification', 'Verify Important Claims', 'Use trusted sources for consequential decisions.', 'For medical, legal, financial, safety, or operational decisions, check primary sources and qualified professionals rather than treating a fluent response as proof.', q('Consequential claims need?', ['Independent verification', 'More confidence wording', 'No sources'], 0)),
+      lesson('human-loop', 'Keep Human Review', 'Assign responsibility for the final decision.', 'Automation can accelerate work, but a responsible person should review outputs, handle exceptions, and own the decision when stakes are meaningful.', q('A human review loop provides?', ['Accountability and exception handling', 'Guaranteed accuracy', 'Invisible automation'], 0)),
+    ]
+  },
 ];
 
 export function gradeCourseQuestion(question: CourseQuestion, selectedIndex: number) {

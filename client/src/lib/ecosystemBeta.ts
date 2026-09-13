@@ -38,16 +38,16 @@ export const ecosystemAreas: readonly EcosystemArea[] = [
   },
   {
     id: "live",
-    name: "Creator live studio",
-    inspiration: "Twitch-style creator setup",
+    name: "SkyLive small-room beta",
+    inspiration: "Twitch-style creator broadcasting",
     description:
-      "Check camera and microphone permissions, preview devices, and save a stream brief locally.",
-    route: "/live-streaming",
-    status: "Local test lab",
+      "Start an authenticated small-room WebRTC broadcast with real peer media, presence, and live chat.",
+    route: "/live",
+    status: "Working beta",
     testGoal:
-      "Preview your devices, toggle them, and restore a saved stream brief.",
+      "Create a room, join it from an invited account, verify peer media and chat, then end the room.",
     boundary:
-      "No ingest, broadcast, recording, audience, chat, subscription, or revenue service.",
+      "No claim of server ingest, transcoding, TURN relay, CDN delivery, recording/VOD, subscriptions, payouts, or production-scale availability; this is small-room direct WebRTC only.",
   },
   {
     id: "finance",

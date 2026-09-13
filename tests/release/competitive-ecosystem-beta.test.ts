@@ -14,7 +14,7 @@ import {
 } from "../../client/src/lib/competitiveLabs";
 
 const liveSource = fs.readFileSync(
-  "client/src/pages/LiveStreaming.tsx",
+  "client/src/pages/Live.tsx",
   "utf8"
 );
 const languageSource = fs.readFileSync(
@@ -68,13 +68,19 @@ describe("competitive ecosystem beta", () => {
     expect(getEcosystemProgressPercent(next)).toBe(25);
   });
 
-  it("replaces fake live claims with a real local device preview", () => {
-    expect(liveSource).toMatch(/navigator\.mediaDevices\.getUserMedia/);
-    expect(liveSource).toMatch(
-      /getTracks\(\)\.forEach\(track => track\.stop\(\)\)/
+  it("validates the promoted authenticated WebRTC small-room beta", () => {
+    expect(liveSource).toContain("navigator.mediaDevices.getUserMedia");
+    expect(liveSource).toContain("new RTCPeerConnection");
+    expect(liveSource).toContain(
+      "getTracks().forEach(track => track.stop())"
     );
-    expect(liveSource).toMatch(/does not upload, broadcast, record/);
-    expect(liveSource).not.toMatch(/802K\+|2\.4M|99\.9%|45ms/);
+    expect(liveSource).toContain(
+      "server coordinates authenticated room/signaling state"
+    );
+    expect(liveSource).toContain("no server media ingest");
+    for (const fakeClaim of ["802K+", "2.4M", "99.9%", "45ms"]) {
+      expect(liveSource).not.toContain(fakeClaim);
+    }
   });
 
   it("builds a balanced language plan without fake partners", () => {
@@ -98,7 +104,7 @@ describe("competitive ecosystem beta", () => {
   });
 
   it("provides a labeled fixture catalog and bounded local cart", () => {
-    expect(commerceSandboxItems).toHaveLength(3);
+    expect(commerceSandboxItems).toHaveLength(12);
     expect(
       commerceSandboxItems.every(item => item.sku.startsWith("FIXTURE-"))
     ).toBe(true);
@@ -128,14 +134,14 @@ describe("competitive ecosystem beta", () => {
     );
     expect(auditSource).toMatch(/beta-route-evidence\.json/);
     for (const route of [
-      "/live-streaming",
+      "/live",
       "/language-partner-discovery",
       "/dating-profile-setup",
       "/arcade",
     ]) {
       expect(registryRoutes.has(route)).toBe(true);
     }
-    expect(arcadeSource).toMatch(/Thirteen local game experiences/);
+    expect(arcadeSource).toMatch(/Seventeen local game experiences/);
     expect(arcadeSource).toMatch(/No real-money wagering/);
     expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
   });

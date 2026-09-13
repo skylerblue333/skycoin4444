@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
-import { Activity, Database, Eye, LockKeyhole, Search, ShieldCheck } from "lucide-react";
+import { Activity, CheckCircle2, Database, Eye, LockKeyhole, Search, ShieldCheck } from "lucide-react";
 
 type NFTFixture = {
   tokenId: string;
@@ -37,9 +37,19 @@ const tokenMetadata = [
   { symbol: "SKYTEST", name: "Testnet fixture token metadata", network: "testnet", decimals: 8, address: "0xtest…metadata" },
 ] as const;
 
+const securityChecks = [
+  "I will never share a recovery phrase or private key.",
+  "I will verify the recipient and network independently.",
+  "I understand crypto transfers may be irreversible.",
+  "I will review fees and approvals before signing.",
+] as const;
+
 export default function BetaWeb3Sandbox() {
   const [query, setQuery] = useState("");
   const [network, setNetwork] = useState<"all" | NFTFixture["network"]>("all");
+  const [completedSecurity, setCompletedSecurity] = useState<string[]>([]);
+  const [tipRecipient, setTipRecipient] = useState("");
+  const [tipAmount, setTipAmount] = useState("");
 
   const filteredNFTs = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -89,6 +99,17 @@ export default function BetaWeb3Sandbox() {
           <Card className="border-amber-500/30 bg-amber-500/5">
             <CardHeader><CardTitle className="flex items-center gap-2"><LockKeyhole className="h-5 w-5" />Wallet observation</CardTitle><CardDescription>Connection and signing are not part of this beta.</CardDescription></CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground"><p>No address, balance, transaction history, or portfolio value is displayed.</p><p>No wallet connector, private-key input, signature request, custody, transfer, or chain submission is available.</p><Badge variant="outline" className="border-destructive/40 text-destructive">Wallet actions unavailable</Badge></CardContent>
+          </Card>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-2">
+          <Card className="border-emerald-500/30 bg-emerald-500/5">
+            <CardHeader><CardTitle className="flex items-center gap-2"><ShieldCheck className="h-5 w-5" />Wallet security rehearsal</CardTitle><CardDescription>Mark the safeguards you understand before any future provider connection.</CardDescription></CardHeader>
+            <CardContent className="space-y-2">{securityChecks.map(check => { const done = completedSecurity.includes(check); return <button key={check} type="button" onClick={() => setCompletedSecurity(current => done ? current.filter(item => item !== check) : [...current, check])} className="flex w-full items-start gap-2 rounded-lg border p-3 text-left text-sm"><CheckCircle2 className={`mt-0.5 h-4 w-4 shrink-0 ${done ? "text-emerald-600" : "text-muted-foreground"}`} /><span>{check}</span></button>; })}</CardContent>
+          </Card>
+          <Card className="border-amber-500/30 bg-amber-500/5">
+            <CardHeader><CardTitle className="flex items-center gap-2"><LockKeyhole className="h-5 w-5" />Crypto-tip rehearsal</CardTitle><CardDescription>Draft a hypothetical tip review; this never connects, signs, or sends.</CardDescription></CardHeader>
+            <CardContent className="space-y-3"><Input value={tipRecipient} onChange={event => setTipRecipient(event.target.value)} placeholder="Recipient label or public address" aria-label="Tip recipient" /><Input value={tipAmount} onChange={event => setTipAmount(event.target.value.replace(/[^0-9.]/g, ""))} inputMode="decimal" placeholder="Amount (display only)" aria-label="Tip amount" /><div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">Review: {tipRecipient || "no recipient"} · {tipAmount || "0"} SKYTEST · network: testnet fixture</div><Button type="button" disabled className="w-full">Tip unavailable — safety mode</Button></CardContent>
           </Card>
         </section>
 

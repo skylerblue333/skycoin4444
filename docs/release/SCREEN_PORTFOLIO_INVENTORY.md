@@ -62,7 +62,7 @@ Generated from client/src/App.tsx and catalogs/beta-route-evidence.json. This re
 - /file-converter
 - /help-center
 - /language-partner-discovery
-- /live-streaming
+- /live
 - /markdown-rendering
 - /mission-control
 - /notes-app
