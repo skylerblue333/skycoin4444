@@ -217,6 +217,34 @@ export const commerceSandboxItems: readonly CommerceSandboxItem[] = [
     description: "Fictional safety-planning fixture for community hosts.",
     unitAmountMinor: 1099,
   },
+  {
+    sku: "FIXTURE-CABLE-ORGANIZER",
+    name: "Desk cable organizer set",
+    category: "Creator",
+    description: "Generic home-office fixture for testing category filters and quote totals.",
+    unitAmountMinor: 499,
+  },
+  {
+    sku: "FIXTURE-WHITEBOARD",
+    name: "Portable lesson whiteboard",
+    category: "Learning",
+    description: "Fictional study-room fixture; no supplier, stock, shipping, or quality claim.",
+    unitAmountMinor: 1499,
+  },
+  {
+    sku: "FIXTURE-COMMUNITY-BADGES",
+    name: "Community event badge pack",
+    category: "Community",
+    description: "Print-ready event fixture for rehearsal of community merchandising flows.",
+    unitAmountMinor: 699,
+  },
+  {
+    sku: "FIXTURE-LIGHTING-CLIPS",
+    name: "Clip-on accent light set",
+    category: "Creator",
+    description: "Supplier-style creator fixture with no real listing or fulfillment behind it.",
+    unitAmountMinor: 1899,
+  },
 ] as const;
 
 export type CommerceSandboxCart = Record<string, number>;

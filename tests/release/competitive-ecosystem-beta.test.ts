@@ -98,7 +98,7 @@ describe("competitive ecosystem beta", () => {
   });
 
   it("provides a labeled fixture catalog and bounded local cart", () => {
-    expect(commerceSandboxItems).toHaveLength(8);
+    expect(commerceSandboxItems).toHaveLength(12);
     expect(
       commerceSandboxItems.every(item => item.sku.startsWith("FIXTURE-"))
     ).toBe(true);
