@@ -301,6 +301,33 @@ HOSTED_BETA_ORIGIN=https://beta.example.com pnpm beta:smoke:hosted
 
 Credentialed verification should be run only where the environment can inject the secret values without exposing them.
 
+## Full hosted journey verifier
+
+The repository also includes `pnpm beta:smoke:hosted:journey` for the **credentialed persisted-flow gate**. It is intentionally separate from the non-destructive public smoke command because it creates beta records.
+
+Run it only with a disposable invited smoke identity in a secret-injected environment. It requires:
+- exact `BETA_PUBLIC_ORIGIN` or `HOSTED_BETA_ORIGIN`;
+- `BETA_SMOKE_EMAIL`;
+- `BETA_ACCESS_KEY`;
+- an invitation admission rule for that disposable identity.
+
+The verifier:
+- signs in and requires the canonical production session cookie;
+- confirms authenticated `auth.me` plus a protected `activation.status` call;
+- writes a private smoke profile, logs out, logs back in, and proves the profile survived re-authentication;
+- records and re-reads one SkySchool completion;
+- creates one social post;
+- submits one low-severity release-smoke feedback record;
+- requires persisted activation to reach 5/5 and 100%;
+- confirms the `/onboarding` route is reachable;
+- exports the authenticated subject's integrated beta data and verifies the smoke profile/post/learning/feedback records belong to that subject;
+- records a deletion **request** and verifies the API still says erasure has not been completed;
+- logs out.
+
+The command never intentionally prints the smoke email, invitation access key, session cookie, JWT, or returned user object.
+
+A disposable smoke account will leave deliberately labeled beta evidence in the managed database (profile, learning, feedback, privacy request, and unless separately removed, social data). Do not run this verifier against an owner's or real tester's account merely to satisfy a checklist.
+
 ## Rollback control
 
 Application rollback follows `docs/BETA_ROLLBACK.md`. A rollback target must be a previously exact-head-CI-green and hosted-`SUCCESS` application revision. Application rollback does not imply database rollback; any incompatible schema/data recovery requires a separate reviewed plan.
