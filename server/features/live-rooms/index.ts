@@ -63,6 +63,7 @@ type Room = {
 const MAX_ACTIVE_ROOMS = 20;
 const MAX_VIEWERS_PER_ROOM = 12;
 const PARTICIPANT_TTL_MS = 45_000;
+const HOST_TTL_MS = 90_000;
 const SIGNAL_TTL_MS = 120_000;
 const ENDED_ROOM_TTL_MS = 300_000;
 const MAX_SIGNAL_BUFFER = 500;
@@ -94,9 +95,15 @@ export class LiveRoomRegistry {
       }
 
       if (room.status === "live") {
-        for (const [peerId, participant] of room.participants) {
-          if (participant.role === "viewer" && now - participant.lastSeenAt > PARTICIPANT_TTL_MS) {
-            room.participants.delete(peerId);
+        const host = room.participants.get(room.hostPeerId);
+        if (!host || host.role !== "host" || now - host.lastSeenAt > HOST_TTL_MS) {
+          room.status = "ended";
+          room.endedAt = now;
+        } else {
+          for (const [peerId, participant] of room.participants) {
+            if (participant.role === "viewer" && now - participant.lastSeenAt > PARTICIPANT_TTL_MS) {
+              room.participants.delete(peerId);
+            }
           }
         }
       }
@@ -130,9 +137,11 @@ export class LiveRoomRegistry {
 
   private summary(room: Room): LiveRoomSummary {
     const now = this.now();
-    const viewerCount = [...room.participants.values()].filter(
-      participant => participant.role === "viewer" && now - participant.lastSeenAt <= PARTICIPANT_TTL_MS,
-    ).length;
+    const viewerCount = room.status === "live"
+      ? [...room.participants.values()].filter(
+          participant => participant.role === "viewer" && now - participant.lastSeenAt <= PARTICIPANT_TTL_MS,
+        ).length
+      : 0;
     return {
       id: room.id,
       title: room.title,

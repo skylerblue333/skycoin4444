@@ -9,9 +9,9 @@ SkyLive now includes a bounded browser-to-browser live media path for invited SK
 3. Signed-in viewers discover and join the room.
 4. The server validates room membership and relays bounded WebRTC signaling metadata (ready/offer/answer/ICE).
 5. The creator browser sends camera/microphone tracks directly to each viewer with `RTCPeerConnection`.
-6. Viewer heartbeat updates the room's active viewer count.
+6. Creator and viewer heartbeats refresh their bounded room-presence leases; viewer heartbeat drives the active viewer count.
 7. Room participants exchange bounded live chat messages; the creator can delete room chat messages.
-8. The creator explicitly ends the room. Process restart also clears room/signaling/chat state.
+8. The creator can explicitly end the room. If the creator stops heartbeating, the server marks the room ended after the host lease expires instead of advertising a stale broadcast. Process restart also clears room/signaling/chat state.
 
 ## Security boundaries
 
@@ -21,6 +21,8 @@ SkyLive now includes a bounded browser-to-browser live media path for invited SK
 - Signals can target only peers already in the same room.
 - Signal payloads are bounded to 24 KB and buffers/room counts/viewer fan-out/chat history are bounded.
 - A room supports at most 12 viewer peers because the creator browser sends one direct media stream per viewer.
+- Viewer presence expires after 45 seconds without a heartbeat. Creator room presence expires after 90 seconds without a heartbeat.
+- A signed-in creator can refresh the existing host participant lease through the host-session contract before it expires; the current browser UI still requires a normal active-page session and does not promise seamless reload recovery.
 - Host-only chat deletion is basic room moderation; it is not automated content-safety classification.
 - Existing application request-security/origin checks remain in front of unsafe REST operations.
 
@@ -44,7 +46,7 @@ Wave-2 SkyStreamingGateway remains a provider-neutral route-policy core for HLS/
 
 Repository validation should cover:
 
-- `server/features/live-rooms/index.test.ts` room lifecycle, peer authorization, signaling, chat moderation, and viewer-cap behavior;
+- `server/features/live-rooms/index.test.ts` room lifecycle, creator lease expiry/recovery, peer authorization, signaling, chat moderation, and viewer-cap behavior;
 - TypeScript/build/lint gates for the REST transport and browser WebRTC page;
 - exact-head pull-request CI before merge;
 - two-account browser validation on the deployed beta after merge, with camera/mic permission and an ICE environment appropriate for the test network.
