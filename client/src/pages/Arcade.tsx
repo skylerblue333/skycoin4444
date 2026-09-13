@@ -56,6 +56,10 @@ export default function Arcade() {
   const [sequenceInput, setSequenceInput] = useState("");
   const [sequenceMessage, setSequenceMessage] = useState("");
   const sequence = "2468";
+  const [colorChoice, setColorChoice] = useState("");
+  const [colorMessage, setColorMessage] = useState("Pick the color named by the prompt.");
+  const [mathInput, setMathInput] = useState("");
+  const [mathMessage, setMathMessage] = useState("Solve 7 × 6.");
 
   const playHighLow = (guess: "higher" | "lower") => {
     const next = ((currentCard * 7 + 3) % 13) + 1;
@@ -140,13 +144,20 @@ export default function Arcade() {
     setSequenceMessage(sequenceInput === sequence ? "Correct — sequence recalled." : "Not quite. Try again.");
   };
 
+  const chooseColor = (choice: string) => {
+    setColorChoice(choice);
+    setColorMessage(choice === "blue" ? "Correct — fast recognition." : "Try again: the prompt asks for blue.");
+  };
+
+  const checkMath = () => setMathMessage(mathInput === "42" ? "Correct — mental math complete." : "Not quite. Try 7 × 6.");
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-7xl px-4 py-8">
         <div className="mb-8">
           <Badge variant="outline" className="mb-3">Engineering beta · simulated play only</Badge>
           <h1 className="flex items-center gap-2 text-3xl font-bold"><Gamepad2 className="h-7 w-7" /> SKY4444 Arcade Lab</h1>
-          <p className="mt-2 max-w-3xl text-muted-foreground">Fifteen local game experiences backed by tested deterministic domain logic. No real-money wagering, custody, blockchain settlement, token payouts, or production multiplayer services are performed here.</p>
+          <p className="mt-2 max-w-3xl text-muted-foreground">Seventeen local game experiences backed by tested deterministic domain logic. No real-money wagering, custody, blockchain settlement, token payouts, or production multiplayer services are performed here.</p>
         </div>
 
         <div className="mb-8 grid gap-3 sm:grid-cols-3">
@@ -157,7 +168,7 @@ export default function Arcade() {
 
         <Tabs defaultValue="high-low">
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start">
-            {[["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["legacy","5 More"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+            {[["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
           </TabsList>
 
           <TabsContent value="high-low"><GameCard title="High-Low" description="Predict whether the deterministic next card is higher or lower."><div className="text-5xl font-bold">{currentCard}</div><div className="flex gap-2"><Button onClick={() => playHighLow("higher")}>Higher</Button><Button variant="outline" onClick={() => playHighLow("lower")}>Lower</Button></div><p className="text-sm text-muted-foreground">{highLowResult}</p></GameCard></TabsContent>
@@ -179,6 +190,10 @@ export default function Arcade() {
           <TabsContent value="reaction"><GameCard title="Reaction Sprint" description="Wait for the signal, then tap as quickly as you can. Early taps reset the round."><div className="rounded-2xl border bg-muted/30 p-8 text-center"><Timer className="mx-auto mb-3 h-8 w-8" /><p className="text-2xl font-bold">{reactionState === "waiting" ? "Wait…" : reactionState === "go" ? "TAP NOW" : reactionScore ? `${reactionScore} ms` : "Ready?"}</p><Button className="mt-4" onClick={reactionState === "ready" ? startReaction : hitReaction}>{reactionState === "ready" ? "Start round" : "Tap"}</Button></div><p className="text-sm text-muted-foreground">{sequenceMessage || "Timing practice only. No wager, payout, or device-performance claim."}</p></GameCard></TabsContent>
 
           <TabsContent value="sequence"><GameCard title="Sequence Recall" description="Memorize the sequence, then enter it without spaces."><div className="rounded-2xl border bg-muted/30 p-6 text-center"><Brain className="mx-auto mb-3 h-7 w-7" /><p className="text-4xl font-black tracking-[0.35em]">{sequence}</p><p className="mt-2 text-sm text-muted-foreground">Memorize this four-digit sequence.</p></div><div className="flex gap-2"><Input value={sequenceInput} onChange={(event) => setSequenceInput(event.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="Enter sequence" inputMode="numeric" /><Button onClick={submitSequence}>Check</Button></div><p className="text-sm text-muted-foreground">{sequenceMessage}</p></GameCard></TabsContent>
+
+          <TabsContent value="color"><GameCard title="Color Match" description="Choose the color named by the prompt as quickly as you can."><p className="text-2xl font-bold">Prompt: blue</p><div className="flex flex-wrap gap-2">{["red", "blue", "green", "yellow"].map(color => <Button key={color} variant={colorChoice === color ? "default" : "outline"} onClick={() => chooseColor(color)}>{color}</Button>)}</div><p className="text-sm text-muted-foreground">{colorMessage}</p></GameCard></TabsContent>
+
+          <TabsContent value="math"><GameCard title="Math Sprint" description="Solve a bounded mental-math challenge and build accuracy."><p className="text-3xl font-black">7 × 6 = ?</p><div className="flex gap-2"><Input value={mathInput} onChange={(event) => setMathInput(event.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="Answer" inputMode="numeric" /><Button onClick={checkMath}>Check</Button></div><p className="text-sm text-muted-foreground">{mathMessage}</p></GameCard></TabsContent>
 
           <TabsContent value="legacy">
             <div className="grid gap-4 lg:grid-cols-2">

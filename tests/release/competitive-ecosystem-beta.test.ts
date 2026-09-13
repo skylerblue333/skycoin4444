@@ -135,7 +135,7 @@ describe("competitive ecosystem beta", () => {
     ]) {
       expect(registryRoutes.has(route)).toBe(true);
     }
-    expect(arcadeSource).toMatch(/Fifteen local game experiences/);
+    expect(arcadeSource).toMatch(/Seventeen local game experiences/);
     expect(arcadeSource).toMatch(/No real-money wagering/);
     expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
   });

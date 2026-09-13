@@ -138,6 +138,33 @@ export const gapCourses: readonly GapCourse[] = [
       lesson('uncertainty', 'Communicate Uncertainty', 'Make room for error and changing evidence.', 'Ranges, confidence limits, caveats, and updated measurements help people avoid false precision. Uncertainty is information, not failure.', q('Responsible data communication should?', ['State important limitations', 'Hide uncertainty', 'Promise exact outcomes'], 0)),
     ]
   },
+  {
+    id: 'creator-communication-101', title: 'Creator Communication Essentials', level: 'beginner', lessons: [
+      lesson('audience', 'Know the Audience', 'Choose language for a specific audience.', 'A useful creator message names who it helps, what problem it addresses, and what the audience should do next.', q('A focused message should name?', ['Audience and outcome', 'Only a color', 'A secret metric'], 0)),
+      lesson('hooks', 'Strong Openings', 'Create honest attention without misleading claims.', 'An opening can state the tension, question, or promised learning clearly. Avoid urgency, guarantees, and exaggerated proof.', q('A responsible hook should avoid?', ['Guaranteed outcomes', 'A clear question', 'Specific context'], 0)),
+      lesson('accessibility', 'Accessible Formats', 'Make content easier to understand and use.', 'Captions, readable contrast, descriptive labels, structured headings, and plain language widen participation without changing the core idea.', q('Captions primarily improve?', ['Access to spoken content', 'Token value', 'Password strength'], 0)),
+      lesson('feedback', 'Use Feedback Well', 'Turn reactions into actionable learning.', 'Separate a preference from a reproducible issue, look for patterns, and record what changed after a test rather than chasing every reaction.', q('Useful feedback should be?', ['Specific enough to act on', 'Always positive', 'Kept secret'], 0)),
+      lesson('disclosure', 'Disclose Clearly', 'Make sponsorship and limitations visible.', 'People should be able to distinguish personal experience, paid promotion, affiliate relationships, and unverified claims before relying on content.', q('Clear disclosure helps people?', ['Interpret incentives and limits', 'Guarantee a result', 'Skip verification'], 0)),
+    ]
+  },
+  {
+    id: 'digital-wellbeing-101', title: 'Digital Wellbeing & Boundaries', level: 'beginner', lessons: [
+      lesson('attention', 'Protect Attention', 'Design intentional notification habits.', 'Notifications compete for attention. Batching, quiet periods, and turning off nonessential alerts can make technology serve a chosen goal.', q('A useful attention practice is?', ['Batching nonessential alerts', 'Enabling every alert', 'Removing all goals'], 0)),
+      lesson('boundaries', 'Set Boundaries', 'Communicate availability and limits.', 'A boundary can state when you are available, which channels you use, and what kind of response time people should expect.', q('A boundary should be?', ['Clear and communicated', 'A hidden test', 'Impossible to follow'], 0)),
+      lesson('consent', 'Consent Online', 'Respect participation and sharing choices.', 'Ask before recording, reposting, tagging, or adding someone to a group. Consent should be informed, specific, and reversible where practical.', q('Before reposting someone’s private message, you should?', ['Ask permission', 'Assume consent', 'Remove context'], 0)),
+      lesson('conflict', 'Handle Conflict', 'De-escalate disagreement in digital spaces.', 'Pause before replying, separate intent from impact, move sensitive issues to an appropriate channel, and use reporting tools for abuse or threats.', q('A de-escalating first step is?', ['Pause and clarify', 'Escalate immediately', 'Publish private details'], 0)),
+      lesson('rest', 'Build Recovery Time', 'Use technology without making constant availability the default.', 'Regular offline time, sleep protection, movement, and real-world relationships support sustainable participation better than endless engagement metrics.', q('Sustainable participation needs?', ['Recovery time', 'Constant availability', 'More notifications'], 0)),
+    ]
+  },
+  {
+    id: 'ai-literacy-101', title: 'Practical AI Literacy', level: 'beginner', lessons: [
+      lesson('capabilities', 'Know the Boundary', 'Distinguish generated output from verified facts.', 'An AI system can produce useful drafts while still being wrong, incomplete, or unable to access the context a user assumes it has.', q('Generated output should be?', ['Reviewed before reliance', 'Treated as guaranteed fact', 'Presented as human memory'], 0)),
+      lesson('prompts', 'Give Useful Context', 'Write goals and constraints clearly.', 'A good request describes the task, audience, format, constraints, examples, and what a successful answer should include.', q('Useful context includes?', ['Goal and constraints', 'Only a greeting', 'A hidden password'], 0)),
+      lesson('privacy', 'Protect Sensitive Data', 'Minimize information shared with tools.', 'Do not paste secrets, credentials, private keys, unnecessary personal data, or confidential business material into an AI tool without an approved handling policy.', q('What should never be pasted into an unapproved AI tool?', ['Private keys and credentials', 'A public topic', 'A formatting preference'], 0)),
+      lesson('verification', 'Verify Important Claims', 'Use trusted sources for consequential decisions.', 'For medical, legal, financial, safety, or operational decisions, check primary sources and qualified professionals rather than treating a fluent response as proof.', q('Consequential claims need?', ['Independent verification', 'More confidence wording', 'No sources'], 0)),
+      lesson('human-loop', 'Keep Human Review', 'Assign responsibility for the final decision.', 'Automation can accelerate work, but a responsible person should review outputs, handle exceptions, and own the decision when stakes are meaningful.', q('A human review loop provides?', ['Accountability and exception handling', 'Guaranteed accuracy', 'Invisible automation'], 0)),
+    ]
+  },
 ];
 
 export function gradeCourseQuestion(question: CourseQuestion, selectedIndex: number) {
