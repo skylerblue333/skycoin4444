@@ -34,6 +34,7 @@ const links = [
   { label: "Dating", route: "/dating-profile-setup", icon: Heart },
   { label: "Web3", route: "/beta-web3", icon: Boxes },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
+  { label: "Health", route: "/route-health", icon: Activity },
 ] as const;
 
 const fourFoursTrail = [
