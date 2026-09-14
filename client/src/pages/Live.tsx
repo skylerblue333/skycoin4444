@@ -500,6 +500,12 @@ export default function Live() {
       icon={Radio}
       accent="indigo"
       badge="WebRTC beta"
+      quickLinks={[
+        { href: "/livestream-dashboard", label: "Creator studio", detail: "Manage broadcasts", icon: Video },
+        { href: "/live-reactions", label: "Live reactions", detail: "Test room engagement", icon: MessageCircle },
+        { href: "/live-gifting", label: "Gifting safety", detail: "Review tip boundaries", icon: ShieldCheck },
+        { href: "/platform-map", label: "Platform map", detail: "Explore connected areas", icon: Radio },
+      ]}
       actions={isAuthenticated ? (
         <div className="flex items-center gap-2 text-xs text-emerald-700"><ShieldCheck className="h-4 w-4" /> Signed-in beta session</div>
       ) : (

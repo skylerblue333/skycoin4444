@@ -24,9 +24,10 @@ const ACCENTS: Record<ExperienceAccent, { pill: string; icon: string; glow: stri
   orange: { pill: "bg-orange-600 text-white shadow-orange-500/20", icon: "bg-orange-100 text-orange-700", glow: "from-orange-500/10 via-transparent to-transparent" },
 };
 
-interface ExperienceShellProps { title: string; subtitle: string; icon: LucideIcon; accent: ExperienceAccent; badge?: string; actions?: ReactNode; children: ReactNode; }
+interface ExperienceQuickLink { href: string; label: string; detail: string; icon: LucideIcon; }
+interface ExperienceShellProps { title: string; subtitle: string; icon: LucideIcon; accent: ExperienceAccent; badge?: string; actions?: ReactNode; quickLinks?: ExperienceQuickLink[]; children: ReactNode; }
 
-export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, actions, children }: ExperienceShellProps) {
+export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, actions, quickLinks = [], children }: ExperienceShellProps) {
   const [location] = useLocation();
   const palette = ACCENTS[accent];
 
@@ -57,6 +58,7 @@ export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, ac
               <div className="hidden items-center gap-3 md:flex"><div className="relative w-56 xl:w-72"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" /><Input disabled aria-label="Experience search preview unavailable" placeholder="Search integration pending" className="h-9 rounded-xl border-slate-200 bg-slate-50 pl-9" /></div>{actions}</div>
             </div>
             <nav className="mx-auto mt-4 flex max-w-[1500px] gap-2 overflow-x-auto pb-1 lg:hidden" aria-label="Mobile ecosystem navigation">{nav(true)}</nav>
+            {quickLinks.length > 0 ? <div className="mx-auto mt-4 max-w-[1500px] border-t border-slate-200 pt-3"><div className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Platform tools</div><div className="flex gap-2 overflow-x-auto pb-1">{quickLinks.map(({ href, label, detail, icon: QuickIcon }) => <Link key={href} href={href} className="group flex min-w-[170px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 transition-colors hover:border-indigo-300 hover:bg-indigo-50"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700"><QuickIcon className="h-3.5 w-3.5" aria-hidden="true" /></span><span className="min-w-0"><span className="block text-xs font-bold text-slate-700">{label}</span><span className="block truncate text-[10px] text-slate-400">{detail}</span></span></Link>)}</div></div> : null}
           </header>
           <div className="relative z-10 mx-auto max-w-[1500px] p-4 md:p-7">{children}</div>
         </main>
