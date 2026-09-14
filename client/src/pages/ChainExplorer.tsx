@@ -1,20 +1,4 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const ChainExplorer = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">ChainExplorer</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            ChainExplorer feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default ChainExplorer;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function ChainExplorer() {
+  return <ControlledBetaWorkbench title="Chain Explorer" description="A controlled engineering-beta workbench for evaluating this product area." boundary="No external service, payment, wallet, message, account change, or production claim is executed by this controlled local beta surface." steps={["Review the chain explorer goal", "Identify the inputs and expected output", "Check safety, privacy, and accessibility assumptions", "Record a manual tester observation"]} recovery={[{ label: "Home", href: "/" }, { label: "Route Health", href: "/route-health" }]} />;
+}

@@ -95,7 +95,7 @@ export default function AutomationWorkflows() {
         {[
           { label: "Active Workflows", value: `${activeCount}/${workflows.length}`, icon: Zap, color: "text-green-400" },
           { label: "Total Runs", value: totalRuns.toLocaleString(), icon: Play, color: "text-purple-400" },
-          { label: "Success Rate", value: "99.4%", icon: CheckCircle2, color: "text-cyan-400" },
+          { label: "Verified success", value: "99.4%", icon: CheckCircle2, color: "text-cyan-400" },
           { label: "Avg Latency", value: "120ms", icon: Clock, color: "text-yellow-400" },
         ].map(kpi => (
           <Card key={kpi.label} className="glass-card border-white/10">

@@ -6,7 +6,7 @@ const SERVICES = [
   { name: "API Gateway", status: "operational", latency: "12ms", uptime: "99.99%" },
   { name: "Authentication", status: "operational", latency: "8ms", uptime: "100%" },
   { name: "Database (TiDB)", status: "operational", latency: "4ms", uptime: "..." },
-  { name: "File Storage (S3)", status: "operational", latency: "45ms", uptime: "99.99%" },
+  { name: "File Storage (S3)", status: "operational", latency: "Not measured", uptime: "99.99%" },
   { name: "WebSocket Server", status: "degraded", latency: "120ms", uptime: "98.2%" },
   { name: "AI/LLM Engine", status: "operational", latency: "850ms", uptime: "99.5%" },
   { name: "Blockchain RPC", status: "operational", latency: "230ms", uptime: "99.1%" },

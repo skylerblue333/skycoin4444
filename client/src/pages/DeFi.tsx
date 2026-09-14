@@ -18,7 +18,7 @@ const PROTOCOLS = [
 const POOLS = [
   { pair: "SKY444/USDT", tvl: "$1.8M", apy: "24.6%", volume: "$420K", myLiquidity: "$0" },
   { pair: "SKY444/ETH",  tvl: "$980K", apy: "31.2%", volume: "$218K", myLiquidity: "$0" },
-  { pair: "ETH/USDT",    tvl: "$2.4M", apy: "8.4%",  volume: "$1.2M", myLiquidity: "$0" },
+  { pair: "ETH/USDT",    tvl: "$Not measured", apy: "8.4%",  volume: "$1.2M", myLiquidity: "$0" },
   { pair: "BTC/USDT",    tvl: "$5.1M", apy: "6.1%",  volume: "$3.8M", myLiquidity: "$0" },
 ];
 

@@ -1,20 +1,2 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const ComplianceChecking = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">ComplianceChecking</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            ComplianceChecking feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default ComplianceChecking;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function ComplianceChecking() { return <ControlledBetaWorkbench title="Compliance Review Lab" description="Walk through a product-control checklist and record evidence gaps for a future formal review." boundary="This is not legal advice, certification, KYC, AML approval, regulatory attestation, or an automated compliance decision." steps={["Identify the product claim under review", "Check the applicable data and consent boundary", "Record missing evidence or owner", "Mark the item for human follow-up"]} recovery={[{ label: "Operational Readiness", href: "/operational-readiness" }, { label: "Route Health", href: "/route-health" }]} />; }

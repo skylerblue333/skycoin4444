@@ -33,13 +33,13 @@ const TradingTerminal: React.FC = () => {
     name: 'SkyCoin444',
     price: '$4.44',
     change: 12.5,
-    volume: '$2.4M',
+    volume: '$Not measured',
     chart: [3.2, 3.5, 3.8, 4.1, 3.9, 4.2, 4.44],
     type: 'token',
   });
 
   const assets: Asset[] = [
-    { symbol: 'SKY4444', name: 'SkyCoin444', price: '$4.44', change: 12.5, volume: '$2.4M', chart: [3, 4, 3, 5, 4, 6, 7], type: 'token' },
+    { symbol: 'SKY4444', name: 'SkyCoin444', price: '$4.44', change: 12.5, volume: '$Not measured', chart: [3, 4, 3, 5, 4, 6, 7], type: 'token' },
     { symbol: 'BTC', name: 'Bitcoin', price: '$68,450', change: 2.4, volume: '$45B', chart: [6, 5, 7, 6, 8, 7, 9], type: 'crypto' },
     { symbol: 'ETH', name: 'Ethereum', price: '$3,840', change: -1.2, volume: '$18B', chart: [8, 7, 6, 5, 4, 3, 2], type: 'crypto' },
     { symbol: 'SOL', name: 'Solana', price: '$145.20', change: 5.8, volume: '$3.2B', chart: [2, 4, 3, 5, 6, 8, 9], type: 'crypto' },

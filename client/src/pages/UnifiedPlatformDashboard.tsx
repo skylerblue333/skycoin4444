@@ -287,7 +287,7 @@ export function UnifiedPlatformDashboard() {
                     type="monotone"
                     dataKey="users"
                     stroke="#10b981"
-                    name="Active Users"
+                    name="Verified users"
                     strokeWidth={2}
                   />
                 </LineChart>
@@ -380,14 +380,14 @@ export function UnifiedPlatformDashboard() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-white text-sm">API Response Time</span>
-                      <span className="text-green-400 font-bold">45ms</span>
+                      <span className="text-green-400 font-bold">Not measured</span>
                     </div>
                     <Progress value={90} className="h-2" />
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="text-white text-sm">Server Uptime</span>
-                      <span className="text-green-400 font-bold">99.9%</span>
+                      <span className="text-green-400 font-bold">Not measured</span>
                     </div>
                     <Progress value={99.9} className="h-2" />
                   </div>

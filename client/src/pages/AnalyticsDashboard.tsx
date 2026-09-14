@@ -68,7 +68,7 @@ export default function AnalyticsDashboard() {
   const keyMetrics = [
     {
       title: 'API Response Time (p95)',
-      value: '145ms',
+      value: '1Not measured',
       target: '<200ms',
       status: 'good',
       icon: Zap,
@@ -90,7 +90,7 @@ export default function AnalyticsDashboard() {
     {
       title: 'System Uptime',
       value: '99.2%',
-      target: '99.9%',
+      target: 'Not measured',
       status: 'warning',
       icon: Shield,
     },

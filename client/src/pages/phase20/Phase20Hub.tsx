@@ -53,7 +53,7 @@ export default function Phase20Hub() {
         <TabsContent value="benchmarks" className="space-y-4">
           <h2 className="text-2xl font-bold">Performance Benchmarks</h2>
           <Card className="p-4 bg-gray-900 border-cyan-500">
-            <p>Execution Time: 45ms | Memory: 128MB | Score: 92/100</p>
+            <p>Execution, memory, and score telemetry are not measured in this engineering beta.</p>
             <Button className="mt-4 bg-cyan-600 hover:bg-cyan-700">Analyze Code</Button>
           </Card>
         </TabsContent>

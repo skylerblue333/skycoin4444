@@ -1,20 +1,4 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const APYTracking = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">APYTracking</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            APYTracking feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default APYTracking;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function APYTracking() {
+  return <ControlledBetaWorkbench title="A P Y Tracking" description="A controlled engineering-beta workbench for evaluating this product area." boundary="No external service, payment, wallet, message, account change, or production claim is executed by this controlled local beta surface." steps={["Review the a p y tracking goal", "Identify the inputs and expected output", "Check safety, privacy, and accessibility assumptions", "Record a manual tester observation"]} recovery={[{ label: "Home", href: "/" }, { label: "Route Health", href: "/route-health" }]} />;
+}

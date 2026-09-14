@@ -84,7 +84,7 @@ export default function AgentCoordination() {
         {[
           { label: "Active Agents", value: `${activeAgents}/${AGENTS.length}`, icon: Bot, color: "text-purple-400" },
           { label: "Tasks Today", value: totalTasks.toLocaleString(), icon: Activity, color: "text-cyan-400" },
-          { label: "Avg Success Rate", value: `${avgSuccess.toFixed(1)}%`, icon: CheckCircle2, color: "text-green-400" },
+          { label: "Avg Verified success", value: `${avgSuccess.toFixed(1)}%`, icon: CheckCircle2, color: "text-green-400" },
           { label: "Avg Latency", value: "1.4s", icon: Zap, color: "text-yellow-400" },
         ].map(kpi => (
           <Card key={kpi.label} className="glass-card border-white/10">

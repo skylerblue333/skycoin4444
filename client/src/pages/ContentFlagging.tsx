@@ -1,20 +1,2 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const ContentFlagging = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">ContentFlagging</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            ContentFlagging feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default ContentFlagging;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function ContentFlagging() { return <ControlledBetaWorkbench title="Content Safety Review Lab" description="Practice documenting a content-safety concern and its evidence without changing a live account or post." boundary="No report is submitted, user is penalized, content is removed, or moderation decision is made by this local lab." steps={["Describe the concern without exposing private data", "Select the relevant safety category", "Record the evidence a reviewer would need", "Choose an appropriate human-review follow-up"]} recovery={[{ label: "Community Guidelines", href: "/community-guidelines" }, { label: "Social Feed", href: "/activity-feed" }, { label: "Route Health", href: "/route-health" }]} />; }

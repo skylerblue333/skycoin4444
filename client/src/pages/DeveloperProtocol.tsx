@@ -95,7 +95,7 @@ export default function DeveloperProtocol() {
                 Build on SKYCOIN4444
               </h1>
               <p className="text-white/60 mb-6 max-w-lg">
-                A complete REST + WebSocket API for social, crypto, AI, marketplace, and governance. OAuth2, JWT, and API key auth. 99.9% uptime SLA.
+                A complete REST + WebSocket API for social, crypto, AI, marketplace, and governance. OAuth2, JWT, and API key auth. Not measured uptime SLA.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Button className="gradient-primary text-white font-bold gap-2"
@@ -113,7 +113,7 @@ export default function DeveloperProtocol() {
                 { icon: Zap, label: "< 50ms", sub: "P99 latency" },
                 { icon: Globe, label: "12 regions", sub: "Global CDN" },
                 { icon: Shield, label: "SOC 2", sub: "Compliant" },
-                { icon: BarChart3, label: "99.9%", sub: "Uptime SLA" },
+                { icon: BarChart3, label: "Not measured", sub: "Uptime SLA" },
               ].map(s => (
                 <div key={s.label} className="rounded-xl bg-white/5 border border-white/10 p-3 text-center">
                   <s.icon className="w-5 h-5 text-cyan-400 mx-auto mb-1" />

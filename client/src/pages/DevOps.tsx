@@ -262,7 +262,7 @@ export default function DevOps() {
               <h3 className="font-semibold text-white mb-4">Active Topics</h3>
               <div className="space-y-3">
                 {[
-                  { topic: "enterprise.telemetry.stream", partitions: 12, msgs: "2.4M", lag: 0 },
+                  { topic: "enterprise.telemetry.stream", partitions: 12, msgs: "Not measured", lag: 0 },
                   { topic: "social.feed.events", partitions: 6, msgs: "847K", lag: 0 },
                   { topic: "defi.transactions", partitions: 8, msgs: "156K", lag: 0 },
                   { topic: "ai.inference.results", partitions: 4, msgs: "89K", lag: 0 },
