@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { href: "/dating-home", label: "Dating", icon: Heart },
   { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
   { href: "/a-i-assistant", label: "HopeAI", icon: Sparkles },
-  { href: "/education", label: "Education", icon: GraduationCap },
+  { href: "/course-catalog", label: "Education", icon: GraduationCap },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 
