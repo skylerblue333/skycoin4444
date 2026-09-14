@@ -60,18 +60,19 @@ describe("Arcade Passport gaming loop", () => {
     expect(blackjack).not.toMatch(/SKY444/);
   });
 
-  it("replaces multiplier wagering with reflex scoring", () => {
+  it("keeps multiplier play bounded to local demo credits", () => {
     expect(reflex).toMatch(/Multiplier Reflex Lab/);
     expect(reflex).toMatch(/scoreLock/);
     expect(reflex).toMatch(/Target .*x/);
     expect(reflex).toMatch(/gameId: "crash-lab"/);
-    expect(reflex).toMatch(/Score only · no wager · no cashout/);
+    expect(reflex).toMatch(/demo credits only/);
+    expect(reflex).toMatch(/autoCashout/);
+    expect(reflex).toMatch(/demoBalance/);
 
     expect(reflex).not.toMatch(/setBalance/);
     expect(reflex).not.toMatch(/hasBet/);
     expect(reflex).not.toMatch(/setPlayers/);
     expect(reflex).not.toMatch(/CASH OUT/);
-    expect(reflex).not.toMatch(/autoCashout/);
     expect(reflex).not.toMatch(/handleBet/);
     expect(reflex).not.toMatch(/SKY444/);
   });

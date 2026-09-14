@@ -13,6 +13,7 @@ import {
 import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -55,6 +56,10 @@ export default function GameCrash() {
   const [roundScore, setRoundScore] = useState(0);
   const [sessionScore, setSessionScore] = useState(0);
   const [bestRound, setBestRound] = useState(0);
+  const [demoBalance, setDemoBalance] = useState(1000);
+  const [betAmount, setBetAmount] = useState(25);
+  const [autoCashout, setAutoCashout] = useState(0);
+  const [recentRounds, setRecentRounds] = useState<string[]>([]);
   const [message, setMessage] = useState(
     "Track the rising curve and lock as close to the target band as you can."
   );
@@ -71,6 +76,17 @@ export default function GameCrash() {
       setMultiplier(current => {
         const step = 0.018 + Math.min(0.045, (current - 1) * 0.0025);
         const next = Number((current + step).toFixed(3));
+        if (autoCashout > 0 && next >= autoCashout && next < config.breakPoint) {
+          const score = scoreLock(next, config.target);
+          setLockedAt(next);
+          setRoundScore(score);
+          setSessionScore(value => value + score);
+          setDemoBalance(value => Number((value + betAmount * next).toFixed(2)));
+          setRecentRounds(value => [`${next.toFixed(2)}x · auto +${(betAmount * next).toFixed(2)} demo credits`, ...value].slice(0, 6));
+          setMessage(`Auto cash-out secured at ${next.toFixed(2)}x.`);
+          setState("resolved");
+          return next;
+        }
         if (next >= config.breakPoint) {
           window.clearInterval(timer);
           setRoundScore(0);
@@ -86,9 +102,13 @@ export default function GameCrash() {
     }, 45);
 
     return () => window.clearInterval(timer);
-  }, [config.breakPoint, state]);
+  }, [autoCashout, betAmount, config.breakPoint, config.target, state]);
 
   function startSession() {
+    if (!Number.isFinite(betAmount) || betAmount <= 0 || betAmount > demoBalance) {
+      setMessage("Choose a valid demo-credit bet within your available balance.");
+      return;
+    }
     const nextSeed = seed + 1;
     setSeed(nextSeed);
     setRound(1);
@@ -97,6 +117,7 @@ export default function GameCrash() {
     setRoundScore(0);
     setSessionScore(0);
     setBestRound(0);
+    setDemoBalance(value => Number((value - betAmount).toFixed(2)));
     setMessage("Round one started. Lock inside the highlighted target band.");
     recorded.current = false;
     setState("running");
@@ -108,6 +129,8 @@ export default function GameCrash() {
     setLockedAt(multiplier);
     setRoundScore(score);
     setSessionScore(value => value + score);
+    setDemoBalance(value => Number((value + betAmount * multiplier).toFixed(2)));
+    setRecentRounds(value => [`${multiplier.toFixed(2)}x · +${(betAmount * multiplier).toFixed(2)} demo credits`, ...value].slice(0, 6));
     setBestRound(value => Math.max(value, score));
 
     if (multiplier >= targetLow && multiplier <= targetHigh) {
@@ -139,6 +162,7 @@ export default function GameCrash() {
     }
 
     setRound(value => value + 1);
+    if (betAmount <= demoBalance) setDemoBalance(value => Number((value - betAmount).toFixed(2)));
     setMultiplier(1);
     setLockedAt(null);
     setRoundScore(0);
@@ -203,6 +227,7 @@ export default function GameCrash() {
             ["Session score", sessionScore],
             ["Best round", bestRound],
             ["Average", average || "—"],
+            ["Demo credits", demoBalance.toFixed(2)],
           ].map(([label, value]) => (
             <Card
               key={label}
@@ -231,6 +256,7 @@ export default function GameCrash() {
                   early enough to stay alive, but close enough to the target to
                   score well.
                 </p>
+                <div className="mx-auto mt-6 grid max-w-sm gap-3 text-left sm:grid-cols-2"><label className="text-xs text-white/45">Demo bet<Input type="number" min="1" value={betAmount} onChange={event => setBetAmount(Math.max(1, Number(event.target.value)))} className="mt-1 border-white/10 bg-black/30 text-white" /></label><label className="text-xs text-white/45">Auto cash-out<Input type="number" min="0" step="0.1" value={autoCashout} onChange={event => setAutoCashout(Math.max(0, Number(event.target.value)))} className="mt-1 border-white/10 bg-black/30 text-white" placeholder="0 = off" /></label></div>
                 <Button size="lg" className="mt-6" onClick={startSession}>
                   <Zap className="mr-2 h-5 w-5" />
                   Start reflex session
@@ -347,12 +373,11 @@ export default function GameCrash() {
           </Card>
         )}
 
+        {recentRounds.length > 0 ? <Card className="border-white/10 bg-white/[0.03] text-white"><CardHeader><CardTitle className="text-base">Recent demo rounds</CardTitle><CardDescription className="text-white/40">Local session history only.</CardDescription></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2">{recentRounds.map((result, index) => <div key={`${result}-${index}`} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">{result}</div>)}</CardContent></Card> : null}
+
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          This route is a timing/reflex simulation. It has no bet, balance,
-          cashout, payout, house edge, fake players, wallet, token transfer,
-          wagering recommendation, or real-money execution. The rising
-          multiplier is only a visual timing scale.
+          This route uses demo credits only. Credits have no cash value and cannot be withdrawn, transferred, wagered externally, or represented as cryptocurrency. The session is local and does not create a wallet, settlement, house edge, or real-money outcome.
         </section>
       </div>
     </main>
