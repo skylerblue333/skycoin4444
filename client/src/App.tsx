@@ -13,6 +13,7 @@ import BetaWeb3Sandbox from "./pages/BetaWeb3Sandbox";
 import BetaFeedback from "./pages/BetaFeedback";
 import BetaWorkspace from "./pages/BetaWorkspace";
 import OperationalReadiness from "./pages/OperationalReadiness";
+import RouteHealth from "./pages/RouteHealth";
 import DiscoveryCenter from "./pages/DiscoveryCenter";
 import BetaNavigation from "./components/BetaNavigation";
 
@@ -1653,6 +1654,7 @@ function Router() {
         <Route path="/mission-control" component={MissionControl} />
         <Route path="/beta-workspace" component={BetaWorkspace} />
         <Route path="/operational-readiness" component={OperationalReadiness} />
+        <Route path="/route-health" component={RouteHealth} />
         <Route path="/discovery-center" component={DiscoveryCenter} />
         <Route path="/beta-catalog" component={BetaAreaCatalog} />
         <Route path="/beta-journey" component={BetaJourney} />
