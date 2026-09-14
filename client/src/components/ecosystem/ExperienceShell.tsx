@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: "/live", label: "Live", icon: Radio },
   { href: "/dating-home", label: "Dating", icon: Heart },
   { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/a-i-assistant", label: "HopeAI", icon: Sparkles },
+  { href: "/hope-a-i", label: "HopeAI", icon: Sparkles },
   { href: "/course-catalog", label: "Education", icon: GraduationCap },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;

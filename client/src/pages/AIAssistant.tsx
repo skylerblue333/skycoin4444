@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,7 +23,8 @@ export default function AIAssistant() {
             <CardDescription>Sign in to access this feature</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full">Sign In</Button>
+            <Button onClick={() => startLogin()} className="w-full">Sign In</Button>
+            <Link href="/hope-a-i" className="mt-3 block text-center text-xs font-semibold text-primary hover:underline">Open the developed HopeAI lab</Link>
           </CardContent>
         </Card>
       </div>
@@ -36,7 +39,7 @@ export default function AIAssistant() {
             <h1 className="text-3xl font-bold">AIAssistant</h1>
             <p className="text-muted-foreground mt-2">AI helper interface</p>
           </div>
-          <Button>
+          <Button onClick={() => setSearchQuery("")}>
             <Plus className="w-4 h-4 mr-2" />
             New
           </Button>
@@ -52,9 +55,9 @@ export default function AIAssistant() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="max-w-sm"
               />
-              <Button variant="outline" size="icon">
+              <Link href="/hope-a-i" aria-label="Open developed HopeAI lab" className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground">
                 <Settings className="w-4 h-4" />
-              </Button>
+              </Link>
             </div>
           </CardHeader>
           <CardContent>
