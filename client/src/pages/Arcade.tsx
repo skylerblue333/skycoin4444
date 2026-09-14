@@ -161,9 +161,9 @@ export default function Arcade() {
         </div>
 
         <div className="mb-8 grid gap-3 sm:grid-cols-3">
-          <Link href="/game/crash"><Card className="p-4 hover:border-primary"><strong>Crash</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
-          <Link href="/game/slots"><Card className="p-4 hover:border-primary"><strong>Slots</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
-          <Link href="/game/blackjack"><Card className="p-4 hover:border-primary"><strong>Blackjack</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
+          <Link href="/game-crash"><Card className="p-4 hover:border-primary"><strong>Crash</strong><p className="text-sm text-muted-foreground">Reflex lab · virtual-credit engine</p></Card></Link>
+          <Link href="/game-slots"><Card className="p-4 hover:border-primary"><strong>Slots</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
+          <Link href="/game-blackjack"><Card className="p-4 hover:border-primary"><strong>Blackjack</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
         </div>
 
         <Tabs defaultValue="high-low">
