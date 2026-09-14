@@ -1,122 +1,318 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  Filter,
+  RotateCcw,
+  ShieldCheck,
+  XCircle,
+} from "lucide-react";
+import { quizBank } from "@/data/quizBank";
+import {
+  filterQuizQuestions,
+  quizCategories,
+  scoreQuiz,
+  type QuizAnswers,
+  type QuizDifficulty,
+} from "@/lib/quizEngine";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, XCircle, Clock, Trophy, Zap, ArrowRight, RotateCcw } from "lucide-react";
 
-const QUESTIONS = [
-  { q: "What is the primary purpose of a cryptographic hash function in blockchain?", options: ["Encrypt data for privacy", "Create a fixed-size fingerprint of data", "Sign transactions with private keys", "Compress data for storage"], correct: 1, explanation: "Hash functions create a fixed-size output (digest) from any input. In blockchain, this ensures data integrity — any change to the data produces a completely different hash." },
-  { q: "Which consensus mechanism does Bitcoin use?", options: ["Proof of Stake", "Delegated Proof of Stake", "Proof of Work", "Proof of Authority"], correct: 2, explanation: "Bitcoin uses Proof of Work (PoW), where miners compete to solve computationally expensive puzzles to add new blocks to the chain." },
-  { q: "What is a smart contract?", options: ["A legal document stored on blockchain", "Self-executing code stored on a blockchain", "A type of cryptocurrency wallet", "A centralized database contract"], correct: 1, explanation: "Smart contracts are self-executing programs stored on a blockchain that automatically enforce and execute the terms of an agreement when predefined conditions are met." },
-  { q: "What does 'immutability' mean in the context of blockchain?", options: ["Data can be easily modified", "Data cannot be changed once recorded", "Data is encrypted at rest", "Data is replicated across nodes"], correct: 1, explanation: "Immutability means that once data is written to a blockchain, it cannot be altered or deleted. This is achieved through cryptographic linking of blocks." },
-  { q: "What is the Ethereum Virtual Machine (EVM)?", options: ["A cloud server running Ethereum", "A hardware wallet for ETH", "A sandboxed runtime for executing smart contracts", "Ethereum's mining algorithm"], correct: 2, explanation: "The EVM is a sandboxed virtual machine that executes smart contract bytecode. It's deterministic and isolated, ensuring consistent execution across all nodes." },
-  { q: "What is a 51% attack?", options: ["Attacking 51% of user wallets", "When one entity controls majority of network hash rate", "A type of smart contract vulnerability", "Stealing 51% of a token supply"], correct: 1, explanation: "A 51% attack occurs when a single entity gains control of more than 50% of a blockchain's mining power, potentially allowing them to manipulate transactions." },
-  { q: "What is gas in Ethereum?", options: ["The native currency of Ethereum", "A fee paid for computational work on the network", "A type of smart contract", "The block reward for miners"], correct: 1, explanation: "Gas is the unit that measures computational effort required to execute operations on Ethereum. Users pay gas fees (in ETH) to compensate validators for processing transactions." },
-  { q: "What is a private key in cryptocurrency?", options: ["A password for an exchange account", "A secret number that proves ownership of funds", "A public identifier for receiving funds", "A key used to encrypt blockchain data"], correct: 1, explanation: "A private key is a secret cryptographic number that proves ownership of a cryptocurrency address. Anyone with your private key has full control of your funds." },
-  { q: "What is DeFi?", options: ["Decentralized Finance — financial services without intermediaries", "Digital Finance — finance using digital currencies only", "Deferred Finance — delayed payment systems", "Distributed Finance — finance across multiple banks"], correct: 0, explanation: "DeFi (Decentralized Finance) refers to financial services and applications built on blockchain that operate without traditional intermediaries like banks." },
-  { q: "What is a blockchain fork?", options: ["A copy of a blockchain for testing", "A change to the blockchain protocol", "A type of wallet backup", "A method of mining blocks faster"], correct: 1, explanation: "A fork is a change to the blockchain protocol. Soft forks are backward-compatible changes; hard forks create a permanent divergence in the blockchain, potentially creating two separate chains." },
-];
+const PASS_PERCENTAGE = 70;
+
+type DifficultyFilter = QuizDifficulty | "all";
 
 export default function SchoolQuiz() {
+  const [difficulty, setDifficulty] = useState<DifficultyFilter>("all");
+  const [category, setCategory] = useState("all");
   const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [answered, setAnswered] = useState(false);
-  const [score, setScore] = useState(0);
-  const [answers, setAnswers] = useState<boolean[]>([]);
+  const [answers, setAnswers] = useState<QuizAnswers>({});
   const [finished, setFinished] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(600);
 
-  useEffect(() => {
-    if (finished) return;
-    const t = setInterval(() => setTimeLeft(p => { if (p <= 1) { setFinished(true); return 0; } return p - 1; }), 1000);
-    return () => clearInterval(t);
-  }, [finished]);
-
-  const handleSelect = (idx: number) => {
-    if (answered) return;
-    setSelected(idx);
-    setAnswered(true);
-    const correct = idx === QUESTIONS[current].correct;
-    if (correct) setScore(s => s + 1);
-    setAnswers(a => [...a, correct]);
-  };
-
-  const handleNext = () => {
-    if (current + 1 >= QUESTIONS.length) { setFinished(true); return; }
-    setCurrent(c => c + 1);
-    setSelected(null);
-    setAnswered(false);
-  };
-
-  const handleRetry = () => { setCurrent(0); setSelected(null); setAnswered(false); setScore(0); setAnswers([]); setFinished(false); setTimeLeft(600); };
-
-  const pct = Math.round((score / QUESTIONS.length) * 100);
-  const passed = pct >= 70;
-  const mins = Math.floor(timeLeft / 60);
-  const secs = timeLeft % 60;
-
-  if (finished) return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className={`rounded-2xl border p-8 text-center ${passed ? "border-purple-500/30 bg-purple-600/5" : "border-red-500/30 bg-red-500/5"}`}>
-          <div className="text-6xl mb-4">{passed ? "🏆" : "📚"}</div>
-          <div className={`text-5xl font-bold mb-2 ${passed ? "text-purple-400" : "text-red-400"}`}>{pct}%</div>
-          <div className={`text-lg font-semibold mb-1 ${passed ? "text-purple-400" : "text-red-400"}`}>{passed ? "Quiz Passed!" : "Keep Studying"}</div>
-          <p className="text-muted-foreground text-sm mb-6">{score}/{QUESTIONS.length} correct answers</p>
-          {passed && <div className="flex items-center justify-center gap-2 text-yellow-400 text-sm font-medium mb-6"><Zap className="h-4 w-4" />+200 XP Earned!</div>}
-          <div className="grid grid-cols-10 gap-1 mb-6">
-            {answers.map((a, i) => <div key={i} className={`h-2 rounded-full ${a ? "bg-purple-600" : "bg-red-500"}`} />)}
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1 gap-2" onClick={handleRetry}><RotateCcw className="h-4 w-4" />Retry</Button>
-            <Link href="/school/lesson/8" className="flex-1">
-              <Button className="w-full bg-primary text-primary-foreground gap-2">Continue<ArrowRight className="h-4 w-4" /></Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+  const categories = useMemo(
+    () => quizCategories(filterQuizQuestions(quizBank, difficulty, "all")),
+    [difficulty],
   );
 
-  const q = QUESTIONS[current];
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b border-border/50 bg-card/30 px-4 py-3">
-        <div className="container max-w-2xl flex items-center justify-between">
-          <span className="text-sm font-medium">Blockchain Fundamentals — Module Quiz</span>
-          <div className="flex items-center gap-4">
-            <span className={`flex items-center gap-1 text-sm font-mono ${timeLeft < 60 ? "text-red-400 animate-pulse" : "text-muted-foreground"}`}><Clock className="h-4 w-4" />{mins}:{secs.toString().padStart(2, "0")}</span>
-            <span className="text-sm text-muted-foreground">Q {current + 1}/{QUESTIONS.length}</span>
+  const questions = useMemo(
+    () => filterQuizQuestions(quizBank, difficulty, category),
+    [difficulty, category],
+  );
+
+  const [timeLeft, setTimeLeft] = useState(quizBank.length * 60);
+
+  const resetAttempt = () => {
+    setCurrent(0);
+    setAnswers({});
+    setFinished(false);
+    setTimeLeft(Math.max(60, questions.length * 60));
+  };
+
+  useEffect(() => {
+    if (category !== "all" && !categories.includes(category)) {
+      setCategory("all");
+      return;
+    }
+    setCurrent(0);
+    setAnswers({});
+    setFinished(false);
+    setTimeLeft(Math.max(60, questions.length * 60));
+  }, [difficulty, category, categories, questions.length]);
+
+  useEffect(() => {
+    if (finished || questions.length === 0) return;
+    const timer = window.setInterval(() => {
+      setTimeLeft(previous => {
+        if (previous <= 1) {
+          setFinished(true);
+          return 0;
+        }
+        return previous - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [finished, questions.length]);
+
+  const result = useMemo(
+    () => scoreQuiz(questions, answers, PASS_PERCENTAGE),
+    [questions, answers],
+  );
+
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  const question = questions[current];
+  const selected = question ? answers[question.id] : undefined;
+  const answered = selected !== undefined;
+
+  const chooseAnswer = (choiceIndex: number) => {
+    if (!question || answered || finished) return;
+    setAnswers(previous => ({ ...previous, [question.id]: choiceIndex }));
+  };
+
+  const nextQuestion = () => {
+    if (!answered) return;
+    if (current + 1 >= questions.length) {
+      setFinished(true);
+      return;
+    }
+    setCurrent(previous => previous + 1);
+  };
+
+  if (finished) {
+    return (
+      <main className="min-h-screen bg-[#050510] px-4 py-10 text-white">
+        <div className="mx-auto max-w-4xl space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link href="/course-catalog" className="inline-flex items-center text-sm text-white/60 hover:text-white">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Course catalog
+            </Link>
+            <Badge variant="outline" className="border-white/15 text-white/55">
+              SkySchool engineering beta
+            </Badge>
           </div>
-        </div>
-      </div>
-      <div className="container max-w-2xl py-8">
-        <Progress value={((current + (answered ? 1 : 0)) / QUESTIONS.length) * 100} className="mb-8 h-2" />
-        <div className="rounded-2xl border border-border/50 bg-card/30 p-6 md:p-8 mb-6">
-          <p className="text-lg font-semibold mb-6">{q.q}</p>
-          <div className="space-y-3">
-            {q.options.map((opt, i) => {
-              let cls = "rounded-xl border p-4 cursor-pointer transition-all text-sm ";
-              if (!answered) cls += "border-border/50 bg-card/20 hover:border-primary/50 hover:bg-primary/5";
-              else if (i === q.correct) cls += "border-purple-500/50 bg-purple-600/10 text-purple-400";
-              else if (i === selected && i !== q.correct) cls += "border-red-500/50 bg-red-500/10 text-red-400";
-              else cls += "border-border/30 bg-card/10 text-muted-foreground";
-              return (
-                <div key={i} className={cls} onClick={() => handleSelect(i)}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0 ${!answered ? "border-border/50" : i === q.correct ? "border-purple-500 bg-purple-600/20" : i === selected ? "border-red-500 bg-red-500/20" : "border-border/30"}`}>
-                      {answered && i === q.correct ? <CheckCircle2 className="h-3.5 w-3.5 text-purple-400" /> : answered && i === selected && i !== q.correct ? <XCircle className="h-3.5 w-3.5 text-red-400" /> : String.fromCharCode(65 + i)}
-                    </div>
-                    {opt}
-                  </div>
+
+          <Card className={result.passed ? "border-emerald-300/25 bg-emerald-300/[0.04] text-white" : "border-amber-300/25 bg-amber-300/[0.04] text-white"}>
+            <CardHeader className="text-center">
+              <div className="mx-auto mb-2 text-5xl">{result.passed ? "🏆" : "📚"}</div>
+              <CardTitle className="text-4xl text-white">{result.percentage}%</CardTitle>
+              <p className="text-sm text-white/55">
+                {result.correctCount}/{questions.length} correct · {result.earnedPoints}/{result.totalPoints} weighted points
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-white/55">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-sky-200" />
+                  <p>
+                    {result.passed ? "Passing result recorded only in this browser session." : "Review the explanations below and retry when ready."}
+                    {" "}This quiz is educational beta content. A passing result is a SkySchool platform completion signal, not an accredited credential, professional license, or financial qualification.
+                  </p>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Button variant="outline" className="gap-2 border-white/15" onClick={resetAttempt}>
+                  <RotateCcw className="h-4 w-4" />
+                  Retry this quiz
+                </Button>
+                <Link href="/course-catalog">
+                  <Button className="w-full gap-2 sm:w-auto">
+                    Continue learning
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <section aria-labelledby="review-heading" className="space-y-3">
+            <div>
+              <h2 id="review-heading" className="text-xl font-bold">Answer review</h2>
+              <p className="mt-1 text-sm text-white/45">Every authored question includes an explanation so missed concepts can be reviewed immediately.</p>
+            </div>
+            {questions.map((item, index) => {
+              const answer = answers[item.id];
+              const correct = answer === item.correctIndex;
+              return (
+                <Card key={item.id} className="border-white/10 bg-white/[0.025] text-white">
+                  <CardContent className="p-5">
+                    <div className="flex items-start gap-3">
+                      {correct ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" /> : <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-[0.14em] text-white/30">Question {index + 1}</span>
+                          <Badge variant="outline" className="border-white/10 text-white/45">{item.category}</Badge>
+                          <Badge variant="outline" className="border-white/10 text-white/45">{item.difficulty}</Badge>
+                        </div>
+                        <p className="mt-3 font-medium">{item.prompt}</p>
+                        <p className="mt-2 text-sm text-white/45">
+                          {answer === undefined ? "No answer submitted." : `Your answer: ${item.choices[answer]}`}
+                        </p>
+                        {!correct ? <p className="mt-1 text-sm text-emerald-200">Correct answer: {item.choices[item.correctIndex]}</p> : null}
+                        <p className="mt-3 text-sm leading-6 text-white/55">{item.explanation}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               );
             })}
-          </div>
-          {answered && <div className="mt-4 p-4 rounded-xl bg-card/50 border border-border/30 text-sm text-muted-foreground"><strong className="text-foreground">Explanation: </strong>{q.explanation}</div>}
+          </section>
         </div>
-        {answered && <div className="flex justify-end"><Button className="bg-primary text-primary-foreground gap-2" onClick={handleNext}>{current + 1 >= QUESTIONS.length ? "See Results" : "Next Question"}<ArrowRight className="h-4 w-4" /></Button></div>}
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#050510] text-white">
+      <div className="border-b border-white/10 bg-white/[0.02] px-4 py-4">
+        <div className="mx-auto flex max-w-4xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="border-blue-300/25 bg-blue-300/[0.04] text-blue-100">SkySchool quiz lab</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/45">{questions.length} questions</Badge>
+            </div>
+            <h1 className="mt-2 text-xl font-bold">Knowledge check</h1>
+          </div>
+          <div className="flex items-center gap-4 text-sm text-white/50">
+            <span className={timeLeft < 60 ? "flex items-center gap-1 text-rose-300" : "flex items-center gap-1"}>
+              <Clock className="h-4 w-4" />
+              {mins}:{secs.toString().padStart(2, "0")}
+            </span>
+            <span>{questions.length ? `Q ${current + 1}/${questions.length}` : "No questions"}</span>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+        <Card className="border-white/10 bg-white/[0.025] text-white">
+          <CardContent className="grid gap-4 p-4 md:grid-cols-[auto_1fr_1fr] md:items-end">
+            <div className="hidden md:block">
+              <Filter className="mb-2 h-5 w-5 text-blue-200" />
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/30">Build your quiz</p>
+            </div>
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-white/70">Difficulty</span>
+              <select
+                value={difficulty}
+                onChange={event => setDifficulty(event.target.value as DifficultyFilter)}
+                className="h-10 w-full rounded-md border border-white/10 bg-[#090916] px-3 text-white outline-none focus:ring-2 focus:ring-blue-300/40"
+                aria-label="Quiz difficulty"
+              >
+                <option value="all">All levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </label>
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-white/70">Category</span>
+              <select
+                value={category}
+                onChange={event => setCategory(event.target.value)}
+                className="h-10 w-full rounded-md border border-white/10 bg-[#090916] px-3 text-white outline-none focus:ring-2 focus:ring-blue-300/40"
+                aria-label="Quiz category"
+              >
+                <option value="all">All categories</option>
+                {categories.map(item => <option key={item} value={item}>{item}</option>)}
+              </select>
+            </label>
+          </CardContent>
+        </Card>
+
+        {questions.length === 0 || !question ? (
+          <Card className="border-dashed border-white/15 bg-white/[0.02] text-white">
+            <CardContent className="p-8 text-center">
+              <p className="font-semibold">No questions match this filter.</p>
+              <p className="mt-2 text-sm text-white/45">Choose another category or difficulty to continue.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <Progress value={((current + (answered ? 1 : 0)) / questions.length) * 100} className="h-2" />
+
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant="outline" className="border-white/10 text-white/45">{question.category}</Badge>
+                  <Badge variant="outline" className="border-white/10 text-white/45">{question.difficulty}</Badge>
+                  <Badge variant="outline" className="border-white/10 text-white/45">{question.points} {question.points === 1 ? "point" : "points"}</Badge>
+                </div>
+                <CardTitle className="pt-3 text-xl leading-8 text-white">{question.prompt}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {question.choices.map((choice, choiceIndex) => {
+                  const isCorrectChoice = choiceIndex === question.correctIndex;
+                  const isSelectedChoice = choiceIndex === selected;
+                  let stateClass = "border-white/10 bg-black/20 hover:border-blue-300/35 hover:bg-blue-300/[0.04]";
+                  if (answered && isCorrectChoice) stateClass = "border-emerald-300/35 bg-emerald-300/[0.06]";
+                  else if (answered && isSelectedChoice) stateClass = "border-rose-300/35 bg-rose-300/[0.06]";
+                  else if (answered) stateClass = "border-white/[0.06] bg-black/10 text-white/40";
+
+                  return (
+                    <button
+                      key={choice}
+                      type="button"
+                      disabled={answered}
+                      onClick={() => chooseAnswer(choiceIndex)}
+                      className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300/50 disabled:cursor-default ${stateClass}`}
+                    >
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 text-xs font-bold">
+                        {answered && isCorrectChoice ? <CheckCircle2 className="h-4 w-4 text-emerald-300" /> : answered && isSelectedChoice ? <XCircle className="h-4 w-4 text-rose-300" /> : String.fromCharCode(65 + choiceIndex)}
+                      </span>
+                      <span>{choice}</span>
+                    </button>
+                  );
+                })}
+
+                {answered ? (
+                  <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.025] p-4" role="status" aria-live="polite">
+                    <p className={selected === question.correctIndex ? "font-semibold text-emerald-200" : "font-semibold text-amber-200"}>
+                      {selected === question.correctIndex ? "Correct" : "Review this concept"}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-white/55">{question.explanation}</p>
+                  </div>
+                ) : null}
+
+                <div className="flex flex-col gap-3 pt-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs leading-5 text-white/35">
+                    Answers and results are session-only on this screen. No credential is issued here.
+                  </p>
+                  <Button type="button" disabled={!answered} onClick={nextQuestion} className="shrink-0 gap-2">
+                    {current + 1 >= questions.length ? "See results" : "Next question"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+    </main>
   );
 }
