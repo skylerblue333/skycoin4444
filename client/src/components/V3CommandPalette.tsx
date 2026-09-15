@@ -5,6 +5,7 @@ import routeCatalog from "@/data/routeCatalog.json";
 import HopeAISprintClosure from "@/components/HopeAISprintClosure";
 import V3JourneyNavigator from "@/components/V3JourneyNavigator";
 import V3JourneyEvidenceCompanion from "@/components/V3JourneyEvidenceCompanion";
+import V4DemoCompanion from "@/components/V4DemoCompanion";
 import {
   mergeRecentRoutePaths,
   resolveRecentRoutes,
@@ -90,6 +91,7 @@ export default function V3CommandPalette({ open, onOpenChange }: { open: boolean
       <V3JourneyNavigator />
       <V3JourneyEvidenceCompanion />
       <HopeAISprintClosure />
+      <V4DemoCompanion />
       {open ? (
         <div
           className="fixed inset-0 z-[120] bg-[#020208]/82 p-3 backdrop-blur-md sm:p-6"
