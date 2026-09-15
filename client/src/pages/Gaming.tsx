@@ -35,6 +35,7 @@ import { Progress } from "@/components/ui/progress";
 
 type GameCategory =
   | "all"
+  | "favorites"
   | "arcade"
   | "knowledge"
   | "strategy"
@@ -209,6 +210,7 @@ const directArcadeModes = new Set([
 
 const filters: ReadonlyArray<{ id: GameCategory; label: string }> = [
   { id: "all", label: "All" },
+  { id: "favorites", label: "Favorites" },
   { id: "arcade", label: "Arcade" },
   { id: "knowledge", label: "Knowledge" },
   { id: "strategy", label: "Strategy" },
@@ -243,16 +245,16 @@ export default function Gaming() {
     () => {
       const query = catalogQuery.trim().toLowerCase();
       return games.filter(game => {
-        const matchesFilter = filter === "all" || game.category === filter;
+        const matchesFilter = filter === "all" || (filter === "favorites" ? passport.favorites.includes(game.id) : game.category === filter);
         const matchesQuery = !query || `${game.name} ${game.detail} ${game.category}`.toLowerCase().includes(query);
         return matchesFilter && matchesQuery;
       });
     },
-    [catalogQuery, filter]
+    [catalogQuery, filter, passport.favorites]
   );
   const normalizedCatalogQuery = catalogQuery.trim().toLowerCase();
   const visibleAdditionalGames = additionalGames.filter(([name, detail, category]) => {
-    const matchesFilter = filter === "all" || category === filter;
+    const matchesFilter = filter !== "favorites" && (filter === "all" || category === filter);
     const matchesQuery = !normalizedCatalogQuery || `${name} ${detail} ${category}`.toLowerCase().includes(normalizedCatalogQuery);
     return matchesFilter && matchesQuery;
   });
