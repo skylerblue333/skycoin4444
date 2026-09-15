@@ -1,6 +1,7 @@
 import { Activity, Compass, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import SkyMarkEasterEgg from "@/components/SkyMarkEasterEgg";
+import V4DemoDirector from "@/components/V4DemoDirector";
 import routeCatalog from "@/data/routeCatalog.json";
 import V4Beta from "./V4Beta";
 
@@ -30,6 +31,10 @@ const gatedCapabilities = [
 export default function BetaWorkspace() {
   return (
     <div className="bg-[#04040d] text-white">
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
+        <V4DemoDirector />
+      </div>
+
       <V4Beta />
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6" aria-label="V4 compatibility and evidence links">
