@@ -8,16 +8,18 @@ import { protectedProcedure, router } from "../_core/trpc";
 const courseId = z.string().trim().min(1).max(120);
 const lessonId = z.string().trim().min(1).max(120);
 
+const progressSelection = {
+  courseId: courseProgress.courseId,
+  lessonId: courseProgress.lessonId,
+  completedAt: courseProgress.completedAt,
+} as const;
+
 export const learningProgressRouter = router({
   get: protectedProcedure
     .input(z.object({ courseId }))
     .query(async ({ ctx, input }) => {
       return db
-        .select({
-          courseId: courseProgress.courseId,
-          lessonId: courseProgress.lessonId,
-          completedAt: courseProgress.completedAt,
-        })
+        .select(progressSelection)
         .from(courseProgress)
         .where(
           and(
@@ -27,6 +29,14 @@ export const learningProgressRouter = router({
         )
         .orderBy(asc(courseProgress.lessonId));
     }),
+
+  listAll: protectedProcedure.query(async ({ ctx }) => {
+    return db
+      .select(progressSelection)
+      .from(courseProgress)
+      .where(eq(courseProgress.userId, ctx.user.id))
+      .orderBy(asc(courseProgress.courseId), asc(courseProgress.lessonId));
+  }),
 
   complete: protectedProcedure
     .input(z.object({ courseId, lessonId }))
