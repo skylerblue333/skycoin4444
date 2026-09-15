@@ -275,8 +275,14 @@ export default function Live() {
       try {
         const signals = await liveRoomsApi.signals(session, signalCursorRef.current);
         for (const signal of signals) {
-          await handleSignal(signal, session);
-          signalCursorRef.current = Math.max(signalCursorRef.current, signal.sequence);
+          try {
+            await handleSignal(signal, session);
+          } catch (error) {
+            if (!cancelled) setTransportState(`Signal skipped: ${messageFrom(error)}`);
+          } finally {
+            // Advance past malformed packets so a bad record cannot replay forever.
+            signalCursorRef.current = Math.max(signalCursorRef.current, signal.sequence);
+          }
         }
       } catch (error) {
         if (!cancelled) setTransportState(messageFrom(error));
