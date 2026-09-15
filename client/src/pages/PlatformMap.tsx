@@ -3,7 +3,7 @@
  * All 246+ routes organized by group with value scores and rarity badges.
  * The definitive "what is this platform" overview.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import routeCatalog from "@/data/routeCatalog.json";
 import {
@@ -281,14 +281,50 @@ export default function PlatformMap() {
   const [filterRarity, setFilterRarity] = useState<Rarity | "all">("all");
   const [filterLive, setFilterLive] = useState<"all" | "live" | "coming">("all");
   const [activeGroup, setActiveGroup] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<"value" | "alpha">("value");
+  const [shortlist, setShortlist] = useState<string[]>([]);
+  const [shortlistOnly, setShortlistOnly] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("sky4444.feature-shortlist") ?? "[]");
+      if (Array.isArray(saved)) setShortlist(saved.filter((href): href is string => typeof href === "string"));
+    } catch {
+      setShortlist([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("sky4444.feature-shortlist", JSON.stringify(shortlist));
+    } catch {
+      // Local-only preferences should never block browsing.
+    }
+  }, [shortlist]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
+        event.preventDefault();
+        document.getElementById("platform-map-search")?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  const toggleShortlist = (href: string) => {
+    setShortlist(current => current.includes(href) ? current.filter(item => item !== href) : [...current, href]);
+  };
 
   const filtered = ALL_FEATURES.filter(f => {
     const matchSearch = !search || f.label.toLowerCase().includes(search.toLowerCase()) || f.desc.toLowerCase().includes(search.toLowerCase());
     const matchRarity = filterRarity === "all" || f.rarity === filterRarity;
     const matchLive = filterLive === "all" || (filterLive === "live" ? f.live : !f.live);
     const matchGroup = !activeGroup || f.groupId === activeGroup;
-    return matchSearch && matchRarity && matchLive && matchGroup;
-  });
+    const matchShortlist = !shortlistOnly || shortlist.includes(f.href);
+    return matchSearch && matchRarity && matchLive && matchGroup && matchShortlist;
+  }).sort((a, b) => sortMode === "alpha" ? a.label.localeCompare(b.label) : b.value - a.value || a.label.localeCompare(b.label));
 
   const totalFeatures = ALL_FEATURES.length;
   const liveFeatures = ALL_FEATURES.filter(f => f.live).length;
@@ -331,11 +367,13 @@ export default function PlatformMap() {
             <div className="relative flex-1 min-w-48">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
               <input
+                id="platform-map-search"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search every route, module, or capability…"
-                className="w-full pl-9 pr-4 py-2 bg-slate-800/70 border border-slate-700/50 rounded-xl text-sm text-white placeholder-slate-600 outline-none focus:border-purple-500/50 transition-colors"
+                className="w-full pl-9 pr-16 py-2 bg-slate-800/70 border border-slate-700/50 rounded-xl text-sm text-white placeholder-slate-600 outline-none focus:border-purple-500/50 transition-colors"
               />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-white/10 px-1.5 py-0.5 text-[10px] text-slate-500">/</span>
             </div>
 
             {/* Rarity filter */}
@@ -370,7 +408,8 @@ export default function PlatformMap() {
                   {l === "all" ? "All Status" : l === "live" ? "● Live" : "Coming Soon"}
                 </button>
               ))}
-            </div>
+              <div className="flex gap-1.5"><button type="button" onClick={() => setSortMode("value")} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${sortMode === "value" ? "border-cyan-400/50 bg-cyan-400/15 text-cyan-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>Value</button><button type="button" onClick={() => setSortMode("alpha")} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${sortMode === "alpha" ? "border-cyan-400/50 bg-cyan-400/15 text-cyan-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>A–Z</button></div><button type="button" onClick={() => setShortlistOnly(current => !current)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${shortlistOnly ? "border-amber-400/50 bg-amber-400/15 text-amber-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>★ Shortlist ({shortlist.length})</button>
+          </div>
           </div>
         </div>
       </div>
@@ -419,11 +458,11 @@ export default function PlatformMap() {
         <p className="text-xs text-slate-600 mb-4">{filtered.length} indexed capabilities</p>
 
         {/* Feature grid — grouped */}
-        {search || filterRarity !== "all" || filterLive !== "all" || activeGroup ? (
+        {search || filterRarity !== "all" || filterLive !== "all" || activeGroup || shortlistOnly ? (
           /* Flat search results */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map(f => (
-              <FeatureCard key={f.href} feature={f} accentText={f.accentText} />
+              <FeatureCard key={f.href} feature={f} accentText={f.accentText} shortlisted={shortlist.includes(f.href)} onToggleShortlist={toggleShortlist} />
             ))}
           </div>
         ) : (
@@ -444,7 +483,7 @@ export default function PlatformMap() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                     {group.features.map(f => (
-                      <FeatureCard key={f.href} feature={f} accentText={group.accentText} />
+                      <FeatureCard key={f.href} feature={f} accentText={group.accentText} shortlisted={shortlist.includes(f.href)} onToggleShortlist={toggleShortlist} />
                     ))}
                   </div>
                 </div>
@@ -457,13 +496,14 @@ export default function PlatformMap() {
   );
 }
 
-function FeatureCard({ feature, accentText }: { feature: Feature; accentText: string }) {
+function FeatureCard({ feature, accentText, shortlisted, onToggleShortlist }: { feature: Feature; accentText: string; shortlisted: boolean; onToggleShortlist: (href: string) => void }) {
   const rarity = RARITY_CONFIG[feature.rarity];
   const Icon = feature.icon;
 
   return (
     <Link href={feature.href}>
       <div className="group relative bg-slate-900/60 border border-slate-800/60 rounded-xl p-3.5 hover:bg-slate-800/70 hover:border-slate-700/60 transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:shadow-lg">
+        <button type="button" aria-label={shortlisted ? `Remove ${feature.label} from shortlist` : `Add ${feature.label} to shortlist`} onClick={event => { event.preventDefault(); event.stopPropagation(); onToggleShortlist(feature.href); }} className={`absolute right-3 top-3 z-10 text-sm transition-colors ${shortlisted ? "text-amber-300" : "text-slate-600 hover:text-amber-200"}`}>{shortlisted ? "★" : "☆"}</button>
         {/* Value bar */}
         <div className="absolute top-0 left-0 h-0.5 rounded-t-xl bg-gradient-to-r from-transparent via-slate-600 to-transparent" style={{ width: `${feature.value * 10}%` }} />
 
