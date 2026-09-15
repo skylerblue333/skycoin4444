@@ -3,6 +3,7 @@ import { ArrowUpRight, Clock3, Command, CornerDownLeft, Search, X } from "lucide
 import { useLocation } from "wouter";
 import routeCatalog from "@/data/routeCatalog.json";
 import V3JourneyNavigator from "@/components/V3JourneyNavigator";
+import V3JourneyEvidenceCompanion from "@/components/V3JourneyEvidenceCompanion";
 import {
   mergeRecentRoutePaths,
   resolveRecentRoutes,
@@ -86,6 +87,7 @@ export default function V3CommandPalette({ open, onOpenChange }: { open: boolean
   return (
     <>
       <V3JourneyNavigator />
+      <V3JourneyEvidenceCompanion />
       {open ? (
         <div
           className="fixed inset-0 z-[120] bg-[#020208]/82 p-3 backdrop-blur-md sm:p-6"
