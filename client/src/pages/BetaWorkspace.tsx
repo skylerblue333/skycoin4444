@@ -2,6 +2,7 @@ import { Activity, Compass, ShieldCheck } from "lucide-react";
 import { Link } from "wouter";
 import SkyMarkEasterEgg from "@/components/SkyMarkEasterEgg";
 import V4DemoDirector from "@/components/V4DemoDirector";
+import V4DemoReviewCard from "@/components/V4DemoReviewCard";
 import routeCatalog from "@/data/routeCatalog.json";
 import V4Beta from "./V4Beta";
 
@@ -31,11 +32,39 @@ const gatedCapabilities = [
 export default function BetaWorkspace() {
   return (
     <div className="bg-[#04040d] text-white">
-      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
+      <div className="mx-auto max-w-7xl space-y-6 px-4 pt-8 sm:px-6">
         <V4DemoDirector />
+        <V4DemoReviewCard />
       </div>
 
-      <V4Beta />
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6" aria-label="Advanced V4 evidence console">
+        <details className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.02]">
+          <summary className="cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 sm:p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-100/40">
+                  Advanced evidence
+                </p>
+                <strong className="mt-1 block text-lg text-white/80">
+                  Open the V4 mission & evidence command center
+                </strong>
+                <p className="mt-1 max-w-3xl text-xs leading-5 text-white/35">
+                  For testers who want the full seven-flagship evidence dashboard, mission passes, readiness links, and implementation boundaries after running the product-first demo.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-cyan-200/60 group-open:hidden">
+                Expand ↓
+              </span>
+              <span className="hidden text-xs font-bold text-cyan-200/60 group-open:inline">
+                Collapse ↑
+              </span>
+            </div>
+          </summary>
+          <div className="border-t border-white/[0.07]">
+            <V4Beta />
+          </div>
+        </details>
+      </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6" aria-label="V4 compatibility and evidence links">
         <div className="grid gap-4 rounded-3xl border border-white/10 bg-white/[0.025] p-5 md:grid-cols-[1fr_1fr]">
