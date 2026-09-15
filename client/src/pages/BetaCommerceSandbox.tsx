@@ -79,13 +79,18 @@ export default function BetaCommerceSandbox() {
     (sum, line) => sum + line.quantity * line.unitAmountMinor,
     0
   );
-  const quote = quoteCheckout({
-    checkoutId: "checkout:beta:fixture-marketplace",
-    currency: "usd",
-    lines: cartLines,
-    taxAmountMinor: Math.round(subtotalMinor * 0.08),
-    discountAmountMinor: 0,
-  });
+  // The quote contract intentionally rejects an empty order. Keep the empty
+  // cart as a first-class UI state instead of invoking checkout math with an
+  // invalid payload (which previously sent the whole Shop page to recovery).
+  const quote = cartLines.length
+    ? quoteCheckout({
+        checkoutId: "checkout:beta:fixture-marketplace",
+        currency: "usd",
+        lines: cartLines,
+        taxAmountMinor: Math.round(subtotalMinor * 0.08),
+        discountAmountMinor: 0,
+      })
+    : null;
   const itemCount = cartLines.reduce((sum, line) => sum + line.quantity, 0);
 
   return (
@@ -296,7 +301,7 @@ export default function BetaCommerceSandbox() {
                   Add a fixture product to test the cart.
                 </p>
               )}
-              <div className="space-y-2 border-t border-white/10 pt-4 text-sm">
+              {quote ? <div className="space-y-2 border-t border-white/10 pt-4 text-sm">
                 <div className="flex justify-between text-white/60">
                   <span>Subtotal</span>
                   <span>{"$" + (quote.subtotalMinor / 100).toFixed(2)}</span>
@@ -312,7 +317,11 @@ export default function BetaCommerceSandbox() {
                     {quote.currency}
                   </span>
                 </div>
-              </div>
+              </div> : (
+                <div className="border-t border-white/10 pt-4 text-sm text-white/45">
+                  Your quote will appear after you add the first fixture.
+                </div>
+              )}
               <Button type="button" className="w-full" disabled>
                 Payment unavailable in beta
               </Button>

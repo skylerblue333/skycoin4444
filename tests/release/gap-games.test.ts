@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createMemoryDeck,
   createMinesBoard,
+  dropPlinko,
   gapGameCapabilities,
   isLegalCheckersStep,
   isLegalChessGeometry,
@@ -69,6 +70,16 @@ describe('gap game engineering-beta domain cores', () => {
     expect(spinRoulette(12).value).toBeLessThanOrEqual(36);
   });
 
+  it('runs deterministic Plinko drops without financial value', () => {
+    const first = dropPlinko(44);
+    expect(first).toEqual(dropPlinko(44));
+    expect(first.path).toHaveLength(6);
+    expect(first.bucket).toBeGreaterThanOrEqual(0);
+    expect(first.bucket).toBeLessThanOrEqual(6);
+    expect(first.multiplierLabel).toMatch(/×$/);
+    expect(() => dropPlinko(1, 3)).toThrow(/4-12 rows/);
+  });
+
   it('fills snake, tic-tac-toe, and assembly puzzle domain gaps', () => {
     expect(moveSnake({ x: 1, y: 1 }, 'right', 3, 3)).toEqual({ x: 2, y: 1, collided: false });
     expect(moveSnake({ x: 2, y: 1 }, 'right', 3, 3).collided).toBe(true);
@@ -76,8 +87,8 @@ describe('gap game engineering-beta domain cores', () => {
     expect(validateAssemblyOrder(['frame', 'engine', 'wheels'], ['frame', 'engine', 'wheels'])).toEqual({ correct: true, placed: 3, total: 3 });
   });
 
-  it('documents thirteen local gap cores without claiming production services', () => {
-    expect(Object.keys(gapGameCapabilities)).toHaveLength(13);
+  it('documents fourteen local gap cores without claiming production services', () => {
+    expect(Object.keys(gapGameCapabilities)).toHaveLength(14);
     expect(gapGameCapabilities.chess).toMatch(/remain.*work/i);
   });
 });

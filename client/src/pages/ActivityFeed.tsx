@@ -6,6 +6,9 @@ import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
+  Bookmark,
+  Coins,
+  Flag,
   Heart,
   MessageSquare,
   Radio,
@@ -37,12 +40,25 @@ const postTemplates = [
 ] as const;
 
 export default function ActivityFeed() {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const [content, setContent] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
   const [query, setQuery] = useState("");
   const [activePostId, setActivePostId] = useState<string>();
   const [commentDraft, setCommentDraft] = useState("");
+  const [feedMode, setFeedMode] = useState<"all" | "video" | "text">("all");
+  const [savedPostIds, setSavedPostIds] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sky4444.social.saved-posts") ?? "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [tipPostId, setTipPostId] = useState<string>();
+  const [tipAmount, setTipAmount] = useState(1);
+  const [tipChecks, setTipChecks] = useState({ recipient: false, irreversible: false });
+  const [tipReceipt, setTipReceipt] = useState("");
+  const [reportedPostIds, setReportedPostIds] = useState<string[]>([]);
   const utils = trpc.useUtils();
 
   const feed = trpc.feed.getFeed.useQuery(
@@ -65,6 +81,12 @@ export default function ActivityFeed() {
   const unlikePost = trpc.social.unlikePost.useMutation({
     onSuccess: () => utils.feed.getFeed.invalidate(),
   });
+  const followUser = trpc.user.follow.useMutation({
+    onSuccess: () => utils.feed.getFeed.invalidate(),
+  });
+  const unfollowUser = trpc.user.unfollow.useMutation({
+    onSuccess: () => utils.feed.getFeed.invalidate(),
+  });
   const comments = trpc.social.comments.useQuery(
     { postId: activePostId ?? "", limit: 30 },
     { enabled: Boolean(activePostId), retry: false }
@@ -84,17 +106,19 @@ export default function ActivityFeed() {
 
   const posts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return (feed.data ?? []).filter(
-      post =>
-        !normalized ||
+    return (feed.data ?? []).filter(post => {
+      const isVideo = Boolean(post.media && /\.(mp4|webm|ogg)(\?|$)/i.test(post.media));
+      const matchesMode = feedMode === "all" || (feedMode === "video" ? isVideo : !isVideo);
+      const matchesQuery = !normalized ||
         `${post.content} ${post.author?.name ?? ""} ${post.author?.username ?? ""}`
           .toLowerCase()
-          .includes(normalized)
-    );
-  }, [feed.data, query]);
+          .includes(normalized);
+      return matchesMode && matchesQuery;
+    });
+  }, [feed.data, feedMode, query]);
 
   const interactionError =
-    createPost.error || likePost.error || unlikePost.error || addComment.error;
+    createPost.error || likePost.error || unlikePost.error || addComment.error || followUser.error || unfollowUser.error;
 
   if (loading) {
     return (
@@ -110,6 +134,28 @@ export default function ActivityFeed() {
   function toggleComments(postId: string) {
     setCommentDraft("");
     setActivePostId(current => (current === postId ? undefined : postId));
+  }
+
+  function toggleSaved(postId: string) {
+    setSavedPostIds(current => {
+      const next = current.includes(postId)
+        ? current.filter(id => id !== postId)
+        : [...current, postId];
+      localStorage.setItem("sky4444.social.saved-posts", JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function openTipPractice(postId: string) {
+    setTipPostId(current => current === postId ? undefined : postId);
+    setTipAmount(1);
+    setTipChecks({ recipient: false, irreversible: false });
+    setTipReceipt("");
+  }
+
+  function completeTipPractice(postId: string) {
+    if (!tipChecks.recipient || !tipChecks.irreversible) return;
+    setTipReceipt(`Practice complete: ${tipAmount} SKY demo units reviewed for post ${postId.slice(0, 8)}. No value moved.`);
   }
 
   return (
@@ -284,6 +330,14 @@ export default function ActivityFeed() {
                 </CardDescription>
               </div>
 
+              <div className="flex flex-wrap gap-2" aria-label="Feed filters">
+                {(["all", "video", "text"] as const).map(mode => (
+                  <Button key={mode} type="button" size="sm" variant={feedMode === mode ? "default" : "outline"} onClick={() => setFeedMode(mode)} className={feedMode === mode ? "" : "border-white/10 bg-white/[0.02] text-white/60"}>
+                    {mode === "all" ? "All posts" : mode === "video" ? "Video" : "Text & images"}
+                  </Button>
+                ))}
+              </div>
+
               <div className="flex gap-2">
                 <div className="relative min-w-0 flex-1 sm:flex-none">
                   <label className="sr-only" htmlFor="activity-feed-search">
@@ -360,17 +414,24 @@ export default function ActivityFeed() {
                 key={post.id}
                 className="rounded-2xl border border-white/10 bg-black/20 p-5"
               >
-                <div>
-                  <p className="font-semibold text-white">
-                    {post.author?.name ||
-                      post.author?.username ||
-                      "Community member"}
-                  </p>
-                  <p className="mt-0.5 text-xs text-white/30">
-                    {post.author?.username
-                      ? `@${post.author.username}`
-                      : "Stored account record"}
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-white">
+                      {post.author?.name ||
+                        post.author?.username ||
+                        "Community member"}
+                    </p>
+                    <p className="mt-0.5 text-xs text-white/30">
+                      {post.author?.username
+                        ? `@${post.author.username}`
+                        : "Stored account record"}
+                    </p>
+                  </div>
+                  {isAuthenticated && post.author?.id && post.author.id !== user?.id ? (
+                    <Button type="button" size="sm" variant={post.author.followedByMe ? "outline" : "default"} disabled={followUser.isPending || unfollowUser.isPending} onClick={() => post.author?.followedByMe ? unfollowUser.mutate({ userId: post.author?.id ?? "" }) : followUser.mutate({ userId: post.author?.id ?? "" })}>
+                      {post.author.followedByMe ? "Following" : "Follow"}
+                    </Button>
+                  ) : null}
                 </div>
 
                 <p className="mt-4 whitespace-pre-wrap leading-7 text-white/75">
@@ -427,7 +488,43 @@ export default function ActivityFeed() {
                     {post.commentCount}
                     <span className="sr-only"> replies</span>
                   </Button>
+
+                  <Button type="button" size="sm" variant="ghost" onClick={() => toggleSaved(post.id)} aria-pressed={savedPostIds.includes(post.id)}>
+                    <Bookmark className={`mr-2 h-4 w-4 ${savedPostIds.includes(post.id) ? "fill-current" : ""}`} />
+                    {savedPostIds.includes(post.id) ? "Saved" : "Save"}
+                  </Button>
+
+                  <Button type="button" size="sm" variant="ghost" onClick={() => openTipPractice(post.id)} aria-expanded={tipPostId === post.id}>
+                    <Coins className="mr-2 h-4 w-4" />
+                    Practice tip
+                  </Button>
+
+                  <Button type="button" size="sm" variant="ghost" disabled={reportedPostIds.includes(post.id)} onClick={() => setReportedPostIds(current => current.includes(post.id) ? current : [...current, post.id])}>
+                    <Flag className="mr-2 h-4 w-4" />
+                    {reportedPostIds.includes(post.id) ? "Reported locally" : "Report"}
+                  </Button>
                 </div>
+
+                {tipPostId === post.id ? (
+                  <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4">
+                    <div className="flex items-start gap-3">
+                      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+                      <div>
+                        <p className="font-semibold text-amber-100">Crypto tip safety rehearsal</p>
+                        <p className="mt-1 text-xs leading-5 text-white/45">Choose a demo amount and complete both checks. This creates no wallet instruction, transfer, receipt, payout, or financial value.</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {[1, 5, 10].map(amount => <Button key={amount} type="button" size="sm" variant={tipAmount === amount ? "default" : "outline"} onClick={() => { setTipAmount(amount); setTipReceipt(""); }}>{amount} demo SKY</Button>)}
+                    </div>
+                    <div className="mt-4 space-y-2 text-sm text-white/65">
+                      <label className="flex items-start gap-2"><input type="checkbox" checked={tipChecks.recipient} onChange={event => setTipChecks(current => ({ ...current, recipient: event.target.checked }))} className="mt-1" /> I would independently verify the recipient and destination.</label>
+                      <label className="flex items-start gap-2"><input type="checkbox" checked={tipChecks.irreversible} onChange={event => setTipChecks(current => ({ ...current, irreversible: event.target.checked }))} className="mt-1" /> I understand a real blockchain transfer may be irreversible.</label>
+                    </div>
+                    <Button type="button" size="sm" className="mt-4" disabled={!tipChecks.recipient || !tipChecks.irreversible} onClick={() => completeTipPractice(post.id)}>Complete safety practice</Button>
+                    {tipReceipt ? <p className="mt-3 text-sm text-emerald-200" role="status">{tipReceipt}</p> : null}
+                  </div>
+                ) : null}
 
                 {activePostId === post.id ? (
                   <div className="mt-4 space-y-3 border-t border-white/[0.07] pt-4">
@@ -513,6 +610,8 @@ export default function ActivityFeed() {
           Social counts on this screen come from stored beta records. A profile
           field or database flag is not presented here as independent identity
           verification.
+          Saves and reports in this iteration remain device-local. Tip practice
+          is education only and never creates a transaction or balance.
         </section>
       </div>
     </main>

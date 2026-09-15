@@ -39,6 +39,50 @@ function clampGoal(goal: string) {
 function keywordRoute(goal: string): HopePlanStep | null {
   const normalized = goal.toLowerCase();
 
+  if (/live|stream|camera|broadcast|viewer/.test(normalized)) {
+    return {
+      id: "goal-live",
+      title: "Test a real small-room live session",
+      detail:
+        "Open Live, review camera and microphone permissions, create a room, and validate the join flow in a second browser before expanding reach.",
+      href: "/live",
+      minutes: 15,
+    };
+  }
+
+  if (/shop|market|commerce|cart|product|sell/.test(normalized)) {
+    return {
+      id: "goal-commerce",
+      title: "Walk the safe commerce loop",
+      detail:
+        "Open Shop, filter the fictional catalog, add a fixture, verify quote math, and record friction without implying payment or fulfillment.",
+      href: "/beta-commerce-sandbox",
+      minutes: 12,
+    };
+  }
+
+  if (/dating|match|relationship|profile|consent/.test(normalized)) {
+    return {
+      id: "goal-dating",
+      title: "Review the adults-only dating safety loop",
+      detail:
+        "Confirm the 18+ boundary, inspect profile and consent cues, then rehearse block and report controls with sample profiles.",
+      href: "/dating-home",
+      minutes: 12,
+    };
+  }
+
+  if (/wallet|tip|crypto payment|transfer|seed phrase/.test(normalized)) {
+    return {
+      id: "goal-wallet-safety",
+      title: "Complete a wallet or tip safety rehearsal",
+      detail:
+        "Use the Wallet Safety Center or social tip practice to verify recipient, network, amount, fees, and irreversibility without moving value.",
+      href: "/wallet-overview",
+      minutes: 10,
+    };
+  }
+
   if (/game|gaming|arcade|rush|quiz|chess|play/.test(normalized)) {
     return {
       id: "goal-game",

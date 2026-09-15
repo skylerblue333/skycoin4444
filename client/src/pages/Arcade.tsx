@@ -9,6 +9,7 @@ import { Brain, Gamepad2, ShieldCheck, Timer } from "lucide-react";
 import {
   createMemoryDeck,
   createMinesBoard,
+  dropPlinko,
   isLegalCheckersStep,
   isLegalChessGeometry,
   isMemoryMatch,
@@ -60,6 +61,8 @@ export default function Arcade() {
   const [colorMessage, setColorMessage] = useState("Pick the color named by the prompt.");
   const [mathInput, setMathInput] = useState("");
   const [mathMessage, setMathMessage] = useState("Solve 7 × 6.");
+  const [plinkoSeed, setPlinkoSeed] = useState(44);
+  const plinkoDrop = useMemo(() => dropPlinko(plinkoSeed), [plinkoSeed]);
 
   const playHighLow = (guess: "higher" | "lower") => {
     const next = ((currentCard * 7 + 3) % 13) + 1;
@@ -157,19 +160,22 @@ export default function Arcade() {
         <div className="mb-8">
           <Badge variant="outline" className="mb-3">Engineering beta · simulated play only</Badge>
           <h1 className="flex items-center gap-2 text-3xl font-bold"><Gamepad2 className="h-7 w-7" /> SKY4444 Arcade Lab</h1>
-          <p className="mt-2 max-w-3xl text-muted-foreground">Seventeen local game experiences backed by tested deterministic domain logic. No real-money wagering, custody, blockchain settlement, token payouts, or production multiplayer services are performed here.</p>
+          <p className="mt-2 max-w-3xl text-muted-foreground">Eighteen local game experiences backed by tested deterministic domain logic. No real-money wagering, custody, blockchain settlement, token payouts, or production multiplayer services are performed here.</p>
         </div>
 
-        <div className="mb-8 grid gap-3 sm:grid-cols-3">
+        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Link href="/game-crash"><Card className="p-4 hover:border-primary"><strong>Crash</strong><p className="text-sm text-muted-foreground">Reflex lab · virtual-credit engine</p></Card></Link>
           <Link href="/game-slots"><Card className="p-4 hover:border-primary"><strong>Slots</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
           <Link href="/game-blackjack"><Card className="p-4 hover:border-primary"><strong>Blackjack</strong><p className="text-sm text-muted-foreground">Existing routed surface</p></Card></Link>
+          <Card className="p-4 border-primary/30"><strong>Plinko</strong><p className="text-sm text-muted-foreground">New tested local lab below</p></Card>
         </div>
 
         <Tabs defaultValue="high-low">
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start">
-            {[["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+            {[["plinko","Plinko"],["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
           </TabsList>
+
+          <TabsContent value="plinko"><GameCard title="Plinko Lab" description="Drop a deterministic practice chip through six peg rows. Multipliers are labels for game feel only—there is no wager, token, payout, or cash value."><div className="space-y-2 rounded-2xl border bg-muted/30 p-5"><div className="flex justify-center gap-2 font-mono text-lg">{plinkoDrop.path.map((direction, index) => <span key={`${plinkoSeed}-${index}`} className="grid h-9 w-9 place-items-center rounded-full border bg-background">{direction === "left" ? "↙" : "↘"}</span>)}</div><div className="grid grid-cols-7 gap-1 text-center text-xs">{["3×","1.5×","1×","0.5×","1×","1.5×","3×"].map((label, index) => <span key={`${label}-${index}`} className={`rounded-lg border px-1 py-2 ${Math.round((plinkoDrop.bucket / plinkoDrop.rows) * 6) === index ? "border-primary bg-primary/15 font-bold" : "text-muted-foreground"}`}>{label}</span>)}</div></div><p className="font-medium">Bucket {plinkoDrop.bucket + 1}/{plinkoDrop.rows + 1} · practice score {plinkoDrop.score} · label {plinkoDrop.multiplierLabel}</p><Button onClick={() => setPlinkoSeed(value => value + 1)}>Drop again</Button></GameCard></TabsContent>
 
           <TabsContent value="high-low"><GameCard title="High-Low" description="Predict whether the deterministic next card is higher or lower."><div className="text-5xl font-bold">{currentCard}</div><div className="flex gap-2"><Button onClick={() => playHighLow("higher")}>Higher</Button><Button variant="outline" onClick={() => playHighLow("lower")}>Lower</Button></div><p className="text-sm text-muted-foreground">{highLowResult}</p></GameCard></TabsContent>
 

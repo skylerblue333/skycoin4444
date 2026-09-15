@@ -19,6 +19,8 @@ describe("activity evidence", () => {
     expect(router).toContain("eq(privacyRequests.userId, userId)");
     expect(router).toContain("Recorded a privacy request");
     expect(router).toContain("slice(0, 50)");
+    expect(router).toContain("readEvidenceRows");
+    expect(router).toMatch(/optional[\s\S]*source must not erase/);
   });
 
   it("does not expose inferred metrics or financial/chain activity", () => {
