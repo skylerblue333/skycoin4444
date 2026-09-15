@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "wouter";
 import { Brain, Gamepad2, ShieldCheck, Timer } from "lucide-react";
@@ -183,6 +184,8 @@ export default function Arcade() {
   const towerScore = scoreTowerStack(towerOverlaps);
   const ticWinner = ticTacToeWinner(ticCells);
   const assemblyResult = validateAssemblyOrder(assembly, assemblyTarget);
+  const skillAnswered = Object.keys(skillAnswers).length;
+  const skillCorrect = Object.entries(skillAnswers).filter(([index, answer]) => skillLibrary[Number(index)]?.[3] === answer).length;
 
   const startReaction = () => {
     setReactionScore(null);
@@ -268,7 +271,7 @@ export default function Arcade() {
 
           <TabsContent value="math"><GameCard title="Math Sprint" description="Solve a bounded mental-math challenge and build accuracy."><p className="text-3xl font-black">7 × 6 = ?</p><div className="flex gap-2"><Input value={mathInput} onChange={(event) => setMathInput(event.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="Answer" inputMode="numeric" /><Button onClick={checkMath}>Check</Button></div><p className="text-sm text-muted-foreground">{mathMessage}</p></GameCard></TabsContent>
 
-          <TabsContent value="skills"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{focusedSkillSlug ? "Focused challenge · one decision at a time" : "Choose from 33 practical decision labs."} · {Object.keys(skillAnswers).length}/33 answered</p><div className="flex gap-2">{Object.keys(skillAnswers).length > 0 ? <Button variant="ghost" onClick={() => setSkillAnswers({})}>Reset progress</Button> : null}{focusedSkillSlug ? <Button variant="outline" onClick={() => setFocusedSkillSlug("")}>Show all skill labs</Button> : null}</div></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{skillLibrary.map(([title, description, choices, correctIndex], index) => ({ title, description, choices, correctIndex, index })).filter(skill => !focusedSkillSlug || skillSlug(skill.title) === focusedSkillSlug).map(({ title, description, choices, correctIndex, index }) => { const answer = skillAnswers[index]; const answered = typeof answer === "number"; return <GameCard key={title} title={title} description={description}><div className="grid gap-2">{choices.map((choice, choiceIndex) => <Button key={choice} variant={answered && answer === choiceIndex ? (answer === correctIndex ? "default" : "destructive") : "outline"} onClick={() => setSkillAnswers(current => ({ ...current, [index]: choiceIndex }))}>{choice}</Button>)}</div><p className="text-sm text-muted-foreground">{answered ? (answer === correctIndex ? "Correct — useful decision recorded." : `Not quite. Best answer: ${choices[correctIndex]}`) : "Choose the strongest answer to start this mode."}</p></GameCard>; })}</div></TabsContent>
+          <TabsContent value="skills"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div className="min-w-56 flex-1"><div className="flex items-center justify-between text-sm text-muted-foreground"><span>{focusedSkillSlug ? "Focused challenge · one decision at a time" : "Choose from 33 practical decision labs."}</span><span>{skillAnswered}/33 answered · {skillCorrect} correct</span></div><Progress className="mt-2" value={(skillAnswered / skillLibrary.length) * 100} /></div><div className="flex gap-2">{skillAnswered > 0 ? <Button variant="ghost" onClick={() => setSkillAnswers({})}>Reset progress</Button> : null}{focusedSkillSlug ? <Button variant="outline" onClick={() => setFocusedSkillSlug("")}>Show all skill labs</Button> : null}</div></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{skillLibrary.map(([title, description, choices, correctIndex], index) => ({ title, description, choices, correctIndex, index })).filter(skill => !focusedSkillSlug || skillSlug(skill.title) === focusedSkillSlug).map(({ title, description, choices, correctIndex, index }) => { const answer = skillAnswers[index]; const answered = typeof answer === "number"; return <GameCard key={title} title={title} description={description}><div className="grid gap-2">{choices.map((choice, choiceIndex) => <Button key={choice} variant={answered && answer === choiceIndex ? (answer === correctIndex ? "default" : "destructive") : "outline"} onClick={() => setSkillAnswers(current => ({ ...current, [index]: choiceIndex }))}>{choice}</Button>)}</div><p className="text-sm text-muted-foreground">{answered ? (answer === correctIndex ? "Correct — useful decision recorded." : `Not quite. Best answer: ${choices[correctIndex]}`) : "Choose the strongest answer to start this mode."}</p></GameCard>; })}</div></TabsContent>
 
           <TabsContent value="legacy">
             <div className="grid gap-4 lg:grid-cols-2">
