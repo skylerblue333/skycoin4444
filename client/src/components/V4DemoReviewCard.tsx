@@ -32,6 +32,7 @@ const improvementPrompts: Record<V4DemoReviewDimensionId, string> = {
 };
 
 function readReview() {
+  if (typeof window === "undefined") return normalizeV4DemoReview(null);
   try {
     return normalizeV4DemoReview(
       JSON.parse(localStorage.getItem(V4_DEMO_REVIEW_KEY) ?? "null")
@@ -50,14 +51,11 @@ function persistReview(review: V4DemoReview) {
 }
 
 export default function V4DemoReviewCard() {
-  const [review, setReview] = useState<V4DemoReview>(() =>
-    normalizeV4DemoReview(null)
-  );
+  const [review, setReview] = useState<V4DemoReview>(readReview);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
     "idle"
   );
 
-  useEffect(() => setReview(readReview()), []);
   useEffect(() => persistReview(review), [review]);
 
   const average = getV4DemoReviewAverage(review);
@@ -200,12 +198,19 @@ export default function V4DemoReviewCard() {
                     ? "Copy unavailable"
                     : "Copy review"}
               </Button>
-              <Link href="/beta-feedback?route=%2Fbeta-workspace">
-                <Button disabled={!complete}>
+              {complete ? (
+                <Link href="/beta-feedback?route=%2Fbeta-workspace">
+                  <Button>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Send structured feedback
+                  </Button>
+                </Link>
+              ) : (
+                <Button type="button" disabled>
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  Send structured feedback
+                  Rate all five to send feedback
                 </Button>
-              </Link>
+              )}
             </div>
           </div>
         </CardContent>
