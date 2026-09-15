@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
@@ -231,6 +231,7 @@ function latestPlayed(passport: ArcadePassport): ArcadeGameId | null {
 export default function Gaming() {
   const [filter, setFilter] = useState<GameCategory>("all");
   const [catalogQuery, setCatalogQuery] = useState("");
+  const catalogSearchRef = useRef<HTMLInputElement>(null);
   const {
     passport,
     syncStatus,
@@ -255,6 +256,20 @@ export default function Gaming() {
     const matchesQuery = !normalizedCatalogQuery || `${name} ${detail} ${category}`.toLowerCase().includes(normalizedCatalogQuery);
     return matchesFilter && matchesQuery;
   });
+  useEffect(() => {
+    const handleCatalogShortcut = (event: KeyboardEvent) => {
+      if (event.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes((event.target as HTMLElement).tagName)) {
+        event.preventDefault();
+        catalogSearchRef.current?.focus();
+      }
+      if (event.key === "Escape" && document.activeElement === catalogSearchRef.current) {
+        setCatalogQuery("");
+        catalogSearchRef.current?.blur();
+      }
+    };
+    window.addEventListener("keydown", handleCatalogShortcut);
+    return () => window.removeEventListener("keydown", handleCatalogShortcut);
+  }, []);
   const dailyGame =
     games.find(game => game.id === passport.daily.gameId) ?? games[0];
   const recentGameId = latestPlayed(passport);
@@ -609,8 +624,8 @@ export default function Gaming() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">These are individually named deterministic practice games, not filler tiles. Each opens the Arcade Lab, where the mode runs locally with immediate feedback and no monetary value.</p>
             </div>
             <div className="w-full max-w-sm">
-              <Input value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)} placeholder="Search the 50-game catalog…" aria-label="Search the 50-game catalog" className="border-cyan-200/15 bg-white/[0.04] text-white placeholder:text-white/35" />
-              <p className="mt-2 text-right text-xs text-white/35">Showing {visibleGames.length + visibleAdditionalGames.length} matching games</p>
+              <Input ref={catalogSearchRef} value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)} placeholder="Search the 50-game catalog…" aria-label="Search the 50-game catalog" className="border-cyan-200/15 bg-white/[0.04] text-white placeholder:text-white/35" />
+              <p className="mt-2 text-right text-xs text-white/35">Press / to search · Showing {visibleGames.length + visibleAdditionalGames.length} matching games</p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
