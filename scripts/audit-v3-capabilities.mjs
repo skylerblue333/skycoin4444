@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+// V3 beta quality gate: keep the registry honest and searchable.\nimport { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
