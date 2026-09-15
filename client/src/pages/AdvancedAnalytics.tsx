@@ -35,7 +35,7 @@ const platformMetrics = [
 const conversionFunnelData = [
   { stage: 'Visitors', count: 10000, percentage: 100 },
   { stage: 'Signups', count: 7500, percentage: 75 },
-  { stage: 'Active Users', count: 5000, percentage: 50 },
+  { stage: 'Verified users', count: 5000, percentage: 50 },
   { stage: 'Paid Users', count: 2500, percentage: 25 },
   { stage: 'Premium', count: 1000, percentage: 10 },
 ];
@@ -48,7 +48,7 @@ export default function AdvancedAnalytics() {
 
   const stats = [
     { label: 'Total Revenue', value: '$18,060', change: '+12.5%', positive: true },
-    { label: 'Active Users', value: '24,398', change: '+8.2%', positive: true },
+    { label: 'Verified users', value: '24,398', change: '+8.2%', positive: true },
     { label: 'Conversion Rate', value: '3.24%', change: '-0.5%', positive: false },
     { label: 'Avg. Session', value: '4m 32s', change: '+2.1%', positive: true },
   ];

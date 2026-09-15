@@ -344,7 +344,7 @@ export default function UnifiedWallet() {
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <p className="text-gray-400 text-sm mb-1">Total Transactions</p>
+                      <p className="text-gray-400 text-sm mb-1">Persisted records</p>
                       <p className="text-2xl font-bold text-white">47</p>
                     </div>
                     <div>

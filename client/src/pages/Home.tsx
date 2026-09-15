@@ -169,27 +169,48 @@ const dailyMissions = [
   { id: "create", label: "Visit a Live room or start one", detail: "See the real-time creator path.", href: "/live", icon: Radio },
 ] as const;
 
+const localDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function Home() {
   const [completedMissions, setCompletedMissions] = useState<string[]>([]);
   const [showReset, setShowReset] = useState(false);
   const [missionDate, setMissionDate] = useState("");
+  const [missionsHydrated, setMissionsHydrated] = useState(false);
 
   useEffect(() => {
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = localDateKey(new Date());
       const saved = localStorage.getItem("sky4444.daily-missions");
       const savedDate = localStorage.getItem("sky4444.daily-missions-date");
       setMissionDate(today);
-      if (saved && savedDate === today) setCompletedMissions(JSON.parse(saved) as string[]);
+      if (saved && savedDate === today) {
+        const parsed: unknown = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          const validMissionIds = new Set<string>(dailyMissions.map(mission => mission.id));
+          setCompletedMissions(parsed.filter((item): item is string => typeof item === "string" && validMissionIds.has(item)));
+        }
+      }
     } catch {
       setCompletedMissions([]);
+    } finally {
+      setMissionsHydrated(true);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("sky4444.daily-missions", JSON.stringify(completedMissions));
-    if (missionDate) localStorage.setItem("sky4444.daily-missions-date", missionDate);
-  }, [completedMissions, missionDate]);
+    if (!missionsHydrated || !missionDate) return;
+    try {
+      localStorage.setItem("sky4444.daily-missions", JSON.stringify(completedMissions));
+      localStorage.setItem("sky4444.daily-missions-date", missionDate);
+    } catch {
+      // Private browsing and quota-restricted contexts should not break the launchpad.
+    }
+  }, [completedMissions, missionDate, missionsHydrated]);
 
   const completion = Math.round((completedMissions.length / dailyMissions.length) * 100);
   const dayLabel = useMemo(() => new Intl.DateTimeFormat("en-US", { weekday: "long", month: "short", day: "numeric" }).format(new Date()), []);

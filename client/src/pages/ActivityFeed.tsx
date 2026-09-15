@@ -43,6 +43,7 @@ export default function ActivityFeed() {
   const { user, isAuthenticated, loading } = useAuth();
   const [content, setContent] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaError, setMediaError] = useState("");
   const [query, setQuery] = useState("");
   const [activePostId, setActivePostId] = useState<string>();
   const [commentDraft, setCommentDraft] = useState("");
@@ -141,7 +142,11 @@ export default function ActivityFeed() {
       const next = current.includes(postId)
         ? current.filter(id => id !== postId)
         : [...current, postId];
-      localStorage.setItem("sky4444.social.saved-posts", JSON.stringify(next));
+      try {
+        localStorage.setItem("sky4444.social.saved-posts", JSON.stringify(next));
+      } catch {
+        // Saved-post UI remains usable when browser storage is unavailable.
+      }
       return next;
     });
   }
@@ -156,6 +161,34 @@ export default function ActivityFeed() {
   function completeTipPractice(postId: string) {
     if (!tipChecks.recipient || !tipChecks.irreversible) return;
     setTipReceipt(`Practice complete: ${tipAmount} SKY demo units reviewed for post ${postId.slice(0, 8)}. No value moved.`);
+  }
+
+  async function sharePost(postId: string) {
+    const url = `${window.location.origin}/activity-feed#post-${postId}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "SKYCOIN4444 community post", url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      // Share cancellation and clipboard restrictions should not disrupt the feed.
+    }
+  }
+
+  function publishUpdate() {
+    const trimmedMediaUrl = mediaUrl.trim();
+    if (trimmedMediaUrl) {
+      try {
+        const parsed = new URL(trimmedMediaUrl);
+        if (parsed.protocol !== "http:" && parsed.protocol !== "https:") throw new Error("Unsupported protocol");
+      } catch {
+        setMediaError("Use a complete http:// or https:// image or video URL.");
+        return;
+      }
+    }
+    setMediaError("");
+    createPost.mutate({ content: content.trim(), media: trimmedMediaUrl || null });
   }
 
   return (
@@ -263,24 +296,23 @@ export default function ActivityFeed() {
               </div>
               <Input
                 value={mediaUrl}
-                onChange={event => setMediaUrl(event.target.value)}
+                onChange={event => {
+                  setMediaUrl(event.target.value);
+                  setMediaError("");
+                }}
                 maxLength={255}
                 placeholder="Optional image/video URL (https://…)"
                 aria-label="Optional post media URL"
                 className="border-white/10 bg-black/25 text-white placeholder:text-white/25"
               />
+              {mediaError ? <p className="text-xs text-rose-200" role="alert">{mediaError}</p> : null}
               <div className="flex items-center justify-between gap-3">
                 <span className="text-xs text-white/35">
                   {content.length}/255
                 </span>
                 <Button
                   disabled={!content.trim() || createPost.isPending}
-                  onClick={() =>
-                    createPost.mutate({
-                      content: content.trim(),
-                      media: mediaUrl.trim() || null,
-                    })
-                  }
+                  onClick={publishUpdate}
                 >
                   {createPost.isPending ? "Publishing…" : "Publish update"}
                 </Button>

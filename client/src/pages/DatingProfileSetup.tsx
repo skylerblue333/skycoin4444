@@ -131,9 +131,13 @@ export default function DatingProfileSetup() {
   const totalSteps = 5;
 
   useEffect(() => {
-    const restored = parseSavedDatingProfile(
-      sessionStorage.getItem(STORAGE_KEY)
-    );
+    let storedValue: string | null = null;
+    try {
+      storedValue = sessionStorage.getItem(STORAGE_KEY);
+    } catch {
+      // Private browsing and blocked storage should not prevent profile setup.
+    }
+    const restored = parseSavedDatingProfile(storedValue);
     if (!restored) return;
     const {
       photoCount,
@@ -192,7 +196,11 @@ export default function DatingProfileSetup() {
     }
 
     const saved = toSavedDatingProfile(formData, restoredPhotoCount);
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    } catch {
+      // Keep the completed profile in memory when browser storage is unavailable.
+    }
     setSavedAt(saved.savedAt);
   };
 

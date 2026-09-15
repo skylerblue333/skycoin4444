@@ -1,20 +1,2 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const ContentUpload = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">ContentUpload</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            ContentUpload feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default ContentUpload;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function ContentUpload() { return <ControlledBetaWorkbench title="Content Intake Lab" description="Prepare content metadata and review an upload checklist without sending files to an external service." boundary="No file is uploaded, published, scanned, stored remotely, or shared by this controlled local lab." steps={["Describe the content and intended audience", "Check format, accessibility, and rights", "Review privacy and safety considerations", "Record what a future upload integration must verify"]} recovery={[{ label: "Social Feed", href: "/activity-feed" }, { label: "Content Library", href: "/content-library" }, { label: "Route Health", href: "/route-health" }]} />; }

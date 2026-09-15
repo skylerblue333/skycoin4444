@@ -109,11 +109,11 @@ export function VoiceCommandsPage() {
               </Card>
               <Card className="bg-black/50 border-gold/30 p-6 text-center">
                 <div className="text-3xl font-bold text-gold">98.5%</div>
-                <div className="text-sm text-gray-300">Success Rate</div>
+                <div className="text-sm text-gray-300">Verified success</div>
               </Card>
               <Card className="bg-black/50 border-gold/30 p-6 text-center">
                 <div className="text-3xl font-bold text-gold">342ms</div>
-                <div className="text-sm text-gray-300">Avg Response Time</div>
+                <div className="text-sm text-gray-300">Measured latency</div>
               </Card>
             </div>
 

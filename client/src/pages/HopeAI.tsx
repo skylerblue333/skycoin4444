@@ -106,11 +106,20 @@ export default function HopeAI() {
   }, []);
 
   useEffect(() => {
-    if (plan) localStorage.setItem("sky4444.hopeai.plan", JSON.stringify(plan));
+    if (!plan) return;
+    try {
+      localStorage.setItem("sky4444.hopeai.plan", JSON.stringify(plan));
+    } catch {
+      // The coach remains usable when browser storage is unavailable.
+    }
   }, [plan]);
 
   useEffect(() => {
-    localStorage.setItem("sky4444.hopeai.completed-steps", JSON.stringify(completedSteps));
+    try {
+      localStorage.setItem("sky4444.hopeai.completed-steps", JSON.stringify(completedSteps));
+    } catch {
+      // Keep progress in memory when storage is blocked or full.
+    }
   }, [completedSteps]);
 
   const summary = useMemo(
@@ -183,8 +192,12 @@ export default function HopeAI() {
   }
 
   function clearSavedSprint() {
-    localStorage.removeItem("sky4444.hopeai.plan");
-    localStorage.removeItem("sky4444.hopeai.completed-steps");
+    try {
+      localStorage.removeItem("sky4444.hopeai.plan");
+      localStorage.removeItem("sky4444.hopeai.completed-steps");
+    } catch {
+      // There may be nothing to clear in a storage-restricted context.
+    }
     setPlan(null);
     setCompletedSteps([]);
     setGoal("");

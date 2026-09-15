@@ -155,7 +155,7 @@ export default function ActionPanel() {
               {[
                 { label: "Actions Today", value: "2,847", icon: Zap, color: "text-yellow-400" },
                 { label: "Total Volume", value: "142K SKY", icon: TrendingUp, color: "text-green-400" },
-                { label: "Active Users", value: "8,291", icon: Users, color: "text-blue-400" },
+                { label: "Verified users", value: "8,291", icon: Users, color: "text-blue-400" },
               ].map(stat => (
                 <div key={stat.label} className="card p-3 text-center">
                   <stat.icon className={`w-4 h-4 ${stat.color} mx-auto mb-1`} />

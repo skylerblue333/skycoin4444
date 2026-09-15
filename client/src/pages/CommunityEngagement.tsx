@@ -1,20 +1,2 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const CommunityEngagement = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">CommunityEngagement</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            CommunityEngagement feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default CommunityEngagement;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function CommunityEngagement() { return <ControlledBetaWorkbench title="Community Engagement Lab" description="Plan a safe community activity and capture tester feedback without inventing participation metrics." boundary="No audience size, engagement count, notification, broadcast, or moderation outcome is fabricated by this controlled lab." steps={["Choose a clear community goal", "Draft a welcoming prompt", "Review accessibility and safety language", "Record an observation from a real test"]} recovery={[{ label: "Social Feed", href: "/activity-feed" }, { label: "Community Hub", href: "/community-hub" }, { label: "Route Health", href: "/route-health" }]} />; }

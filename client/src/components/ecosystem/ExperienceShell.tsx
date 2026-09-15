@@ -11,8 +11,8 @@ const NAV_ITEMS = [
   { href: "/live", label: "Live", icon: Radio },
   { href: "/dating-home", label: "Dating", icon: Heart },
   { href: "/marketplace", label: "Marketplace", icon: ShoppingBag },
-  { href: "/a-i-assistant", label: "HopeAI", icon: Sparkles },
-  { href: "/education", label: "Education", icon: GraduationCap },
+  { href: "/hope-a-i", label: "HopeAI", icon: Sparkles },
+  { href: "/course-catalog", label: "Education", icon: GraduationCap },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 
@@ -24,9 +24,10 @@ const ACCENTS: Record<ExperienceAccent, { pill: string; icon: string; glow: stri
   orange: { pill: "bg-orange-600 text-white shadow-orange-500/20", icon: "bg-orange-100 text-orange-700", glow: "from-orange-500/10 via-transparent to-transparent" },
 };
 
-interface ExperienceShellProps { title: string; subtitle: string; icon: LucideIcon; accent: ExperienceAccent; badge?: string; actions?: ReactNode; children: ReactNode; }
+interface ExperienceQuickLink { href: string; label: string; detail: string; icon: LucideIcon; }
+interface ExperienceShellProps { title: string; subtitle: string; icon: LucideIcon; accent: ExperienceAccent; badge?: string; actions?: ReactNode; quickLinks?: ExperienceQuickLink[]; children: ReactNode; }
 
-export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, actions, children }: ExperienceShellProps) {
+export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, actions, quickLinks = [], children }: ExperienceShellProps) {
   const [location] = useLocation();
   const palette = ACCENTS[accent];
 
@@ -34,7 +35,7 @@ export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, ac
     const ItemIcon = item.icon;
     const active = location === item.href;
     return (
-      <Link key={item.href} href={item.href} className={`${compact ? "shrink-0" : ""} flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${active ? `${palette.pill} shadow-lg` : compact ? "border border-slate-200 bg-white text-slate-600" : "hover:bg-slate-900 hover:text-white"}`}>
+      <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={`${compact ? "shrink-0" : ""} flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${active ? `${palette.pill} shadow-lg` : compact ? "border border-slate-200 bg-white text-slate-600" : "hover:bg-slate-900 hover:text-white"}`}>
         <ItemIcon className="h-4 w-4" aria-hidden="true" />{item.label}
       </Link>
     );
@@ -46,7 +47,7 @@ export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, ac
         <aside className="hidden w-64 shrink-0 border-r border-slate-800 bg-slate-950 px-3 py-5 text-slate-300 lg:block">
           <Link href="/" className="mb-7 flex items-center gap-3 px-3 text-white"><span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 text-sm font-black shadow-lg shadow-blue-950/40">S</span><div><div className="text-sm font-black tracking-wide">SKYCOIN4444</div><div className="text-[10px] uppercase tracking-[0.22em] text-slate-500">Ecosystem</div></div></Link>
           <nav className="space-y-1" aria-label="Ecosystem navigation">{nav()}</nav>
-          <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-4"><div className="text-xs font-semibold text-white">Engineering beta</div><p className="mt-1 text-[11px] leading-5 text-slate-500">Service availability is shown explicitly. Preview data is never presented as live production activity.</p></div>
+          <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/70 p-4"><div className="text-xs font-semibold text-white">Engineering beta</div><p className="mt-1 text-[11px] leading-5 text-slate-500">Service availability is shown explicitly. Preview data is never presented as live production activity.</p><Link href="/route-health" className="mt-3 inline-flex items-center text-[11px] font-bold text-sky-300 hover:text-white">Open route health <span aria-hidden="true" className="ml-1">→</span></Link></div>
         </aside>
 
         <main className="relative min-w-0 flex-1 overflow-hidden">
@@ -57,8 +58,9 @@ export function ExperienceShell({ title, subtitle, icon: Icon, accent, badge, ac
               <div className="hidden items-center gap-3 md:flex"><div className="relative w-56 xl:w-72"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" /><Input disabled aria-label="Experience search preview unavailable" placeholder="Search integration pending" className="h-9 rounded-xl border-slate-200 bg-slate-50 pl-9" /></div>{actions}</div>
             </div>
             <nav className="mx-auto mt-4 flex max-w-[1500px] gap-2 overflow-x-auto pb-1 lg:hidden" aria-label="Mobile ecosystem navigation">{nav(true)}</nav>
+            {quickLinks.length > 0 ? <div className="mx-auto mt-4 max-w-[1500px] border-t border-slate-200 pt-3"><div className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Platform tools</div><div className="flex gap-2 overflow-x-auto pb-1">{quickLinks.map(({ href, label, detail, icon: QuickIcon }) => <Link key={href} href={href} className="group flex min-w-[170px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 transition-colors hover:border-indigo-300 hover:bg-indigo-50"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700"><QuickIcon className="h-3.5 w-3.5" aria-hidden="true" /></span><span className="min-w-0"><span className="block text-xs font-bold text-slate-700">{label}</span><span className="block truncate text-[10px] text-slate-400">{detail}</span></span></Link>)}</div></div> : null}
           </header>
-          <div className="relative z-10 mx-auto max-w-[1500px] p-4 md:p-7">{children}</div>
+          <div className="relative z-10 mx-auto max-w-[1500px] p-4 md:p-7">{children}<div className="mt-6 flex justify-end border-t border-slate-200 pt-4"><Link href="/route-health" className="text-xs font-bold text-slate-500 hover:text-indigo-700">Route health &amp; recovery <span aria-hidden="true">→</span></Link></div></div>
         </main>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary, ScreenLoadingFallback } from "@/components/ErrorBoundary";
@@ -2159,13 +2159,20 @@ function Router() {
   );
 }
 
+function GlobalNavigation() {
+  const [location] = useLocation();
+  // Live owns the developed ecosystem shell (sidebar plus responsive nav).
+  // Do not render the generic beta chrome on top of that surface.
+  return location === "/live" ? null : <BetaNavigation />;
+}
+
 function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
           <Toaster />
-          <BetaNavigation />
+          <GlobalNavigation />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

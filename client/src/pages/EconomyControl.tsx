@@ -72,7 +72,7 @@ export default function EconomyControl() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: "Monthly Revenue", value: `$${totalMonthly.toLocaleString()}`, icon: DollarSign, color: "text-green-400" },
-            { label: "Treasury Balance", value: "$2.4M", icon: TrendingUp, color: "text-blue-400" },
+            { label: "Treasury Balance", value: "$Not measured", icon: TrendingUp, color: "text-blue-400" },
             { label: "Token Supply", value: tokenData?.totalSupply ? `${Number(tokenData.totalSupply).toLocaleString()}` : "1,000,000,000", icon: Zap, color: "text-yellow-400" },
             { label: "Active Streams", value: REVENUE_STREAMS.filter(r => r.status === "active").length.toString(), icon: BarChart2, color: "text-purple-400" },
           ].map(kpi => {

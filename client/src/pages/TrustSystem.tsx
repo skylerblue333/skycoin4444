@@ -184,7 +184,7 @@ export default function TrustSystem() {
           <div className="space-y-3">
             {[
               { name: "API Gateway", uptime: "99.98%", latency: "12ms", status: "healthy" },
-              { name: "Action Engine", uptime: "99.95%", latency: "45ms", status: "healthy" },
+              { name: "Action Engine", uptime: "99.95%", latency: "Not measured", status: "healthy" },
               { name: "AI Service", uptime: "99.87%", latency: "280ms", status: "healthy" },
               { name: "Wallet Service", uptime: "99.99%", latency: "8ms", status: "healthy" },
               { name: "Real-time Events", uptime: "99.92%", latency: "3ms", status: "healthy" },

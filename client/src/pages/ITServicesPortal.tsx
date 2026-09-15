@@ -76,7 +76,7 @@ export default function ITServicesPortal() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-slate-400 text-sm">Uptime</p>
-                    <p className="text-3xl font-bold text-white">99.9%</p>
+                    <p className="text-3xl font-bold text-white">Not measured</p>
                   </div>
                   <CheckCircle2 className="h-8 w-8 text-green-400" />
                 </div>

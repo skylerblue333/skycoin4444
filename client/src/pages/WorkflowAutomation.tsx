@@ -1,20 +1,2 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-
-const WorkflowAutomation = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-4xl font-bold text-white">WorkflowAutomation</h1>
-        <Card className="border-purple-600 bg-slate-800 p-6">
-          <p className="text-gray-300">
-            WorkflowAutomation feature coming soon...
-          </p>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default WorkflowAutomation;
+import ControlledBetaWorkbench from "@/components/ControlledBetaWorkbench";
+export default function WorkflowAutomation() { return <ControlledBetaWorkbench title="Workflow Automation Lab" description="Map a repeatable workflow, inspect its steps, and record tester observations without executing external automations." boundary="No external API, webhook, scheduled job, message, purchase, or account change is executed by this lab." steps={["Define the workflow trigger", "List inputs and expected output", "Review failure and retry handling", "Record a manual verification note"]} recovery={[{ label: "Home", href: "/" }, { label: "Route Health", href: "/route-health" }, { label: "HopeAI", href: "/hope-ai" }]} />; }

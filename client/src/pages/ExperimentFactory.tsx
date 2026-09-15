@@ -130,7 +130,7 @@ export default function ExperimentFactory() {
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="pt-6">
               <div className="space-y-2">
-                <p className="text-sm text-gray-400">Success Rate</p>
+                <p className="text-sm text-gray-400">Verified success</p>
                 <p className="text-3xl font-bold text-white">86%</p>
                 <p className="text-xs text-green-400">12 deployed, 1 failed</p>
               </div>

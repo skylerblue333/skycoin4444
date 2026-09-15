@@ -69,7 +69,7 @@ const CITIZENSHIP_TIERS = [
 ];
 
 const NATION_ZONES = [
-  { name: "HOPE AI District", type: "AI", status: "active", population: 12400, gdp: "2.4M SKY" },
+  { name: "HOPE AI District", type: "AI", status: "active", population: 12400, gdp: "Not measured SKY" },
   { name: "ShadowChat Quarter", type: "Communication", status: "active", population: 8900, gdp: "1.8M SKY" },
   { name: "SKY Wallet Exchange", type: "Finance", status: "active", population: 6200, gdp: "5.1M SKY" },
   { name: "Governance Plaza", type: "Government", status: "active", population: 3100, gdp: "0.9M SKY" },

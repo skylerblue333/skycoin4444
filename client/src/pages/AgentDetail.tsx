@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const AGENTS: Record<string, { name: string; desc: string; color: string; tasks: number; uptime: string; category: string }> = {
-  "hope-ai": { name: "HOPE AI", desc: "Your personal AI companion with voice, chat, and autonomous task execution", color: "from-teal-500 to-cyan-600", tasks: 1247, uptime: "99.9%", category: "Social" },
+  "hope-ai": { name: "HOPE AI", desc: "Your personal AI companion with voice, chat, and autonomous task execution", color: "from-teal-500 to-cyan-600", tasks: 1247, uptime: "Not measured", category: "Social" },
   "oracle": { name: "Oracle", desc: "Real-time price oracle and market signal generator for all major crypto pairs", color: "from-amber-500 to-orange-600", tasks: 8934, uptime: "...", category: "Trading" },
   "shield": { name: "Shield", desc: "Security monitoring, fraud detection, and threat prevention across the platform", color: "from-red-500 to-rose-600", tasks: 3421, uptime: "100%", category: "Security" },
 };

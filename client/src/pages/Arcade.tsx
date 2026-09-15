@@ -29,6 +29,42 @@ const trivia = [
   { id: "hash", prompt: "What does a cryptographic hash help verify?", choices: ["Data integrity", "Market price", "Identity automatically"], correctIndex: 0 },
 ];
 const assemblyTarget = ["frame", "engine", "wheels"];
+const skillLibrary = [
+  ["Signal Sort", "Classify a message by signal before reacting.", ["Check source and context", "Forward instantly", "Assume intent"], 0],
+  ["Privacy Triage", "Choose the safest first response to a data request.", ["Grant all access", "Ask what is needed", "Hide the purpose"], 1],
+  ["Threat Model", "Identify the highest-risk security boundary.", ["A decorative icon", "A signing key", "A page color"], 1],
+  ["Budget Builder", "Pick the first step in a responsible budget.", ["List income and fixed costs", "Buy first", "Ignore recurring costs"], 0],
+  ["Source Check", "Select the strongest evidence for a product claim.", ["A rumor", "A dated primary record", "A slogan"], 1],
+  ["Consent Compass", "Choose the correct behavior before sharing someone else's media.", ["Ask permission", "Assume public means consent", "Remove context"], 0],
+  ["Debug Ladder", "Choose the first move when a bug is reported.", ["Reproduce and capture steps", "Rewrite everything", "Close the report"], 0],
+  ["API Contract", "Select the safest response to an unknown API field.", ["Validate and handle absence", "Trust the cast", "Render raw input"], 0],
+  ["Inbox Zero", "Pick a useful first pass for a crowded queue.", ["Group by urgency", "Delete randomly", "Answer the newest only"], 0],
+  ["Meeting Maker", "Choose the artifact that makes a meeting useful.", ["An agenda and decision owner", "More attendees", "No notes"], 0],
+  ["Feedback Loop", "Identify feedback that is easiest to act on.", ["It is bad", "The save button fails after these steps", "Everyone hates it"], 1],
+  ["Risk Register", "Select the most useful risk entry.", ["Risk, trigger, owner, mitigation", "A vague fear", "A hidden concern"], 0],
+  ["Test Case", "Choose a strong boundary test.", ["Only the happy path", "Empty, invalid, and retry states", "A screenshot once"], 1],
+  ["Data Minimizer", "Choose the privacy-preserving data collection rule.", ["Collect everything", "Collect only what the task needs", "Keep data forever"], 1],
+  ["Source of Truth", "Choose where a catalog price should come from.", ["A verified inventory service", "A placeholder constant", "A random fixture"], 0],
+  ["Queue Logic", "Choose how to avoid duplicate job processing.", ["Idempotency key", "Retry forever", "Ignore status"], 0],
+  ["Cache Sense", "Choose what requires freshness over speed.", ["A security permission", "A logo", "A static heading"], 0],
+  ["Release Gate", "Choose evidence required before promoting a risky change.", ["Passing checks and reviewed behavior", "A confident message", "More placeholders"], 0],
+  ["UX Focus", "Choose the clearest empty state.", ["Nothing", "What is absent plus the next action", "A disabled wall"], 1],
+  ["Error Copy", "Choose useful error language.", ["Something failed", "What happened and what to try next", "Hide the error"], 1],
+  ["Search Craft", "Choose a safe search behavior for user input.", ["Render as HTML", "Escape and bound the query", "Execute the query as code"], 1],
+  ["Auth Boundary", "Choose where authorization must be enforced.", ["Only in the button", "On the server and in the UI", "In a comment"], 1],
+  ["Wallet Sense", "Choose what must never be requested by support.", ["Recovery phrase", "Public address", "Network name"], 0],
+  ["Marketplace Trust", "Choose the strongest seller signal.", ["Verified record and clear returns", "Urgency banner", "Unreviewed claim"], 0],
+  ["Live Safety", "Choose the honest streaming claim.", ["Small-room peer beta", "Guaranteed global scale", "Automatic moderation"], 0],
+  ["Learning Design", "Choose a strong lesson assessment.", ["Recall plus explanation", "A decorative badge", "No feedback"], 0],
+  ["Match Quality", "Choose a responsible dating filter.", ["Consent and intent", "Guaranteed compatibility", "Hidden ranking"], 0],
+  ["Team Handoff", "Choose what another engineer needs.", ["Context, acceptance criteria, and evidence", "A title only", "A private assumption"], 0],
+  ["Incident First Aid", "Choose the first response to suspected compromise.", ["Preserve evidence and isolate safely", "Continue signing", "Delete logs"], 0],
+  ["Decision Matrix", "Choose a useful comparison dimension.", ["Criteria and tradeoffs", "The loudest opinion", "A hidden score"], 0],
+  ["Accessibility Check", "Choose an inclusive interaction requirement.", ["Keyboard and screen-reader path", "Color alone", "Hover only"], 0],
+  ["Sustainable Pace", "Choose a reliable delivery habit.", ["Small verifiable slices", "Rush without checks", "Hide unfinished work"], 0],
+  ["Product Truth", "Choose the right label for an unconnected integration.", ["Available", "Controlled beta / unavailable", "Live at scale"], 1],
+  ["Recovery Route", "Choose what every important surface should offer.", ["A safe retry or route-health path", "A dead end", "A hidden reset"], 0],
+] as const;
 
 export default function Arcade() {
   const [currentCard, setCurrentCard] = useState(7);
@@ -61,6 +97,7 @@ export default function Arcade() {
   const [colorMessage, setColorMessage] = useState("Pick the color named by the prompt.");
   const [mathInput, setMathInput] = useState("");
   const [mathMessage, setMathMessage] = useState("Solve 7 × 6.");
+  const [skillAnswers, setSkillAnswers] = useState<Record<number, number>>({});
   const [plinkoSeed, setPlinkoSeed] = useState(44);
   const plinkoDrop = useMemo(() => dropPlinko(plinkoSeed), [plinkoSeed]);
 
@@ -172,7 +209,7 @@ export default function Arcade() {
 
         <Tabs defaultValue="high-low">
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start">
-            {[["plinko","Plinko"],["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
+            {[["plinko","Plinko"],["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"],["skills","33 Skill Labs"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
           </TabsList>
 
           <TabsContent value="plinko"><GameCard title="Plinko Lab" description="Drop a deterministic practice chip through six peg rows. Multipliers are labels for game feel only—there is no wager, token, payout, or cash value."><div className="space-y-2 rounded-2xl border bg-muted/30 p-5"><div className="flex justify-center gap-2 font-mono text-lg">{plinkoDrop.path.map((direction, index) => <span key={`${plinkoSeed}-${index}`} className="grid h-9 w-9 place-items-center rounded-full border bg-background">{direction === "left" ? "↙" : "↘"}</span>)}</div><div className="grid grid-cols-7 gap-1 text-center text-xs">{["3×","1.5×","1×","0.5×","1×","1.5×","3×"].map((label, index) => <span key={`${label}-${index}`} className={`rounded-lg border px-1 py-2 ${Math.round((plinkoDrop.bucket / plinkoDrop.rows) * 6) === index ? "border-primary bg-primary/15 font-bold" : "text-muted-foreground"}`}>{label}</span>)}</div></div><p className="font-medium">Bucket {plinkoDrop.bucket + 1}/{plinkoDrop.rows + 1} · practice score {plinkoDrop.score} · label {plinkoDrop.multiplierLabel}</p><Button onClick={() => setPlinkoSeed(value => value + 1)}>Drop again</Button></GameCard></TabsContent>
@@ -200,6 +237,8 @@ export default function Arcade() {
           <TabsContent value="color"><GameCard title="Color Match" description="Choose the color named by the prompt as quickly as you can."><p className="text-2xl font-bold">Prompt: blue</p><div className="flex flex-wrap gap-2">{["red", "blue", "green", "yellow"].map(color => <Button key={color} variant={colorChoice === color ? "default" : "outline"} onClick={() => chooseColor(color)}>{color}</Button>)}</div><p className="text-sm text-muted-foreground">{colorMessage}</p></GameCard></TabsContent>
 
           <TabsContent value="math"><GameCard title="Math Sprint" description="Solve a bounded mental-math challenge and build accuracy."><p className="text-3xl font-black">7 × 6 = ?</p><div className="flex gap-2"><Input value={mathInput} onChange={(event) => setMathInput(event.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="Answer" inputMode="numeric" /><Button onClick={checkMath}>Check</Button></div><p className="text-sm text-muted-foreground">{mathMessage}</p></GameCard></TabsContent>
+
+          <TabsContent value="skills"><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{skillLibrary.map(([title, description, choices, correctIndex], index) => { const answer = skillAnswers[index]; const answered = typeof answer === "number"; return <GameCard key={title} title={title} description={description}><div className="grid gap-2">{choices.map((choice, choiceIndex) => <Button key={choice} variant={answered && answer === choiceIndex ? (answer === correctIndex ? "default" : "destructive") : "outline"} onClick={() => setSkillAnswers(current => ({ ...current, [index]: choiceIndex }))}>{choice}</Button>)}</div><p className="text-sm text-muted-foreground">{answered ? (answer === correctIndex ? "Correct — useful decision recorded." : `Not quite. Best answer: ${choices[correctIndex]}`) : "Choose the strongest answer to start this mode."}</p></GameCard>; })}</div></TabsContent>
 
           <TabsContent value="legacy">
             <div className="grid gap-4 lg:grid-cols-2">

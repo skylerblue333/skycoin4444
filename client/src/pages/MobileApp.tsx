@@ -24,7 +24,7 @@ const STATS = [
   { value: "4.9", label: "App Store Rating", sub: "12K reviews" },
   { value: "500K+", label: "Downloads", sub: "iOS + Android" },
   { value: "< 50ms", label: "Response Time", sub: "Global CDN" },
-  { value: "99.9%", label: "Uptime", sub: "SLA guaranteed" },
+  { value: "Not measured", label: "Uptime", sub: "SLA guaranteed" },
 ];
 
 const COMPARISON = [

@@ -48,7 +48,7 @@ export default function CrossChainSwap() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
               <div className="p-4 bg-background/50 rounded-lg border border-border/50">
                 <p className="text-xs text-muted-foreground">Processing Speed</p>
-                <p className="text-2xl font-bold text-primary">99.9%</p>
+                <p className="text-2xl font-bold text-primary">Not measured</p>
               </div>
               <div className="p-4 bg-background/50 rounded-lg border border-border/50">
                 <p className="text-xs text-muted-foreground">Uptime</p>

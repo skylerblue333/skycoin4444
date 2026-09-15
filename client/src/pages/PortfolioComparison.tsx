@@ -60,26 +60,26 @@ export default function PortfolioComparison() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4 bg-card border border-border/50">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Active Users</p>
-              <p className="text-2xl font-bold">802K+</p>
+              <p className="text-sm text-muted-foreground">Verified users</p>
+              <p className="text-2xl font-bold">Not measured</p>
             </div>
           </Card>
           <Card className="p-4 bg-card border border-border/50">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Total Transactions</p>
-              <p className="text-2xl font-bold">2.4M</p>
+              <p className="text-sm text-muted-foreground">Persisted records</p>
+              <p className="text-2xl font-bold">Not measured</p>
             </div>
           </Card>
           <Card className="p-4 bg-card border border-border/50">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Success Rate</p>
-              <p className="text-2xl font-bold">99.9%</p>
+              <p className="text-sm text-muted-foreground">Verified success</p>
+              <p className="text-2xl font-bold">Not measured</p>
             </div>
           </Card>
           <Card className="p-4 bg-card border border-border/50">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Avg Response Time</p>
-              <p className="text-2xl font-bold">45ms</p>
+              <p className="text-sm text-muted-foreground">Measured latency</p>
+              <p className="text-2xl font-bold">Not measured</p>
             </div>
           </Card>
         </div>

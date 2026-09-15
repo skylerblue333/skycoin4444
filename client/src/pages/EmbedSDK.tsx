@@ -204,7 +204,7 @@ export default function EmbedSDK() {
             {[
               { name: "Free", price: "$0", limit: "10K API calls/mo", features: ["Wallet widget", "Price chart", "Basic AI", "Community support"] },
               { name: "Pro", price: "$49/mo", limit: "500K API calls/mo", features: ["All widgets", "Custom branding", "Webhooks", "Priority support", "Analytics"], highlight: true },
-              { name: "Scalable", price: "Custom", limit: "Unlimited", features: ["White-label", "SLA 99.9%", "Dedicated infra", "Custom AI training", "Revenue share"] },
+              { name: "Scalable", price: "Custom", limit: "Unlimited", features: ["White-label", "SLA Not measured", "Dedicated infra", "Custom AI training", "Revenue share"] },
             ].map(p => (
               <div key={p.name} className={`rounded-2xl border p-6 ${p.highlight ? "border-purple-500/50 bg-purple-900/20" : "border-white/10 bg-white/2"}`}>
                 {p.highlight && <Badge className="mb-3 bg-purple-500/20 text-purple-300 border-purple-500/30 text-xs">Most Popular</Badge>}
