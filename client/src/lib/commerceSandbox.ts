@@ -58,7 +58,7 @@ export const commerceSandboxPromoFixtures = [
   },
 ] as const;
 
-export const commerceSandboxDeliveryScenarios: readonly Array<{
+export const commerceSandboxDeliveryScenarios: ReadonlyArray<{
   id: CommerceSandboxDeliveryScenario;
   label: string;
   description: string;
