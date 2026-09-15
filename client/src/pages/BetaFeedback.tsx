@@ -9,6 +9,13 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
+import {
+  V4_DEMO_REVIEW_KEY,
+  buildV4DemoReviewSummary,
+  getV4DemoReviewAverage,
+  isV4DemoReviewComplete,
+  normalizeV4DemoReview,
+} from "@/lib/v4DemoReview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +38,12 @@ type FeedbackCategory =
   | "other";
 type FeedbackSeverity = "low" | "medium" | "high" | "critical";
 
+type FeedbackDraft = Readonly<{
+  fromV4DemoReview: boolean;
+  summary: string;
+  details: string;
+}>;
+
 function initialRoute() {
   if (typeof window === "undefined") return "";
   const fromQuery = new URLSearchParams(window.location.search)
@@ -42,14 +55,45 @@ function initialRoute() {
   return "";
 }
 
+function initialFeedbackDraft(): FeedbackDraft {
+  if (typeof window === "undefined") {
+    return { fromV4DemoReview: false, summary: "", details: "" };
+  }
+
+  const source = new URLSearchParams(window.location.search).get("source");
+  if (source !== "v4-demo-review") {
+    return { fromV4DemoReview: false, summary: "", details: "" };
+  }
+
+  try {
+    const review = normalizeV4DemoReview(
+      JSON.parse(localStorage.getItem(V4_DEMO_REVIEW_KEY) ?? "null")
+    );
+    if (!isV4DemoReviewComplete(review)) {
+      return { fromV4DemoReview: true, summary: "", details: "" };
+    }
+    const average = getV4DemoReviewAverage(review);
+    return {
+      fromV4DemoReview: true,
+      summary: `V4 demo review — ${average?.toFixed(1) ?? "—"}/10`,
+      details: buildV4DemoReviewSummary(review),
+    };
+  } catch {
+    return { fromV4DemoReview: true, summary: "", details: "" };
+  }
+}
+
 export default function BetaFeedback() {
   const { isAuthenticated, loading } = useAuth();
   const utils = trpc.useUtils();
-  const [category, setCategory] = useState<FeedbackCategory>("bug");
+  const [draft] = useState<FeedbackDraft>(initialFeedbackDraft);
+  const [category, setCategory] = useState<FeedbackCategory>(
+    draft.fromV4DemoReview ? "other" : "bug"
+  );
   const [severity, setSeverity] = useState<FeedbackSeverity>("medium");
   const [route, setRoute] = useState(initialRoute);
-  const [summary, setSummary] = useState("");
-  const [details, setDetails] = useState("");
+  const [summary, setSummary] = useState(draft.summary);
+  const [details, setDetails] = useState(draft.details);
   const [expected, setExpected] = useState("");
   const [actual, setActual] = useState("");
 
@@ -116,6 +160,14 @@ export default function BetaFeedback() {
               >
                 Persisted + audited
               </Badge>
+              {draft.fromV4DemoReview ? (
+                <Badge
+                  variant="outline"
+                  className="border-violet-300/25 bg-violet-300/[0.04] text-violet-100"
+                >
+                  V4 demo review handoff
+                </Badge>
+              ) : null}
             </div>
             <h1 className="mt-4 text-4xl font-black tracking-tight">
               Report what happened
@@ -136,6 +188,19 @@ export default function BetaFeedback() {
             </Button>
           </Link>
         </header>
+
+        {draft.fromV4DemoReview ? (
+          <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
+            <CardContent className="p-5">
+              <p className="font-semibold text-violet-100">
+                Local V4 ratings carried into this report
+              </p>
+              <p className="mt-1 text-sm leading-6 text-white/45">
+                The summary and details were prefilled from your browser-local scorecard when a complete review was available. Expected and actual are intentionally left for you to describe so a subjective score does not become fabricated reproduction evidence.
+              </p>
+            </CardContent>
+          </Card>
+        ) : null}
 
         {!isAuthenticated ? (
           <Card className="border-amber-300/20 bg-amber-300/[0.04] text-white">
