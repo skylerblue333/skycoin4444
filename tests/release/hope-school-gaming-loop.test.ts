@@ -82,7 +82,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
 
   it("routes navigation and app entry points into the canonical fun loop", () => {
     expect(navigation).toMatch(
-      /label: "Learn", route: "\/sky-school"/
+      /label: "School", route: "\/sky-school"/
     );
     expect(navigation).toMatch(
       /label: "Gaming", route: "\/gaming"/
