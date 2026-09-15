@@ -162,6 +162,8 @@ describe("competitive ecosystem beta", () => {
   });
 
   it("protects the 50-game catalog discovery and recovery contract", () => {
+    expect(gamingSource.match(/\["[^"]+", "[^"]+", "(?:arcade|knowledge|strategy)", "[^"]+"\]/g)).toHaveLength(42);
+    expect(arcadeSource.match(/^  \["[^"]+",/gm)).toHaveLength(34);
     expect(gamingSource).toMatch(/50 games visible/);
     expect(gamingSource).toMatch(/Search the 50-game catalog/);
     expect(gamingSource).toMatch(/No games match that search/);
