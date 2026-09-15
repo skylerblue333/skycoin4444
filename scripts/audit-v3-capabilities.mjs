@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import {
@@ -32,8 +32,7 @@ async function resolveSource(moduleReference) {
 
   for (const candidate of candidates) {
     try {
-      await access(candidate);
-      return candidate;
+      if ((await stat(candidate)).isFile()) return candidate;
     } catch {
       // Continue until a source candidate resolves.
     }
