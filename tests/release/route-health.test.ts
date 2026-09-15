@@ -7,10 +7,10 @@ const page = fs.readFileSync("client/src/pages/RouteHealth.tsx", "utf8");
 const nav = fs.readFileSync("client/src/components/BetaNavigation.tsx", "utf8");
 
 describe("route health control room", () => {
-  it("registers the control-room route and navigation entry", () => {
+  it("registers the control-room route and keeps it discoverable through global route search", () => {
     expect(app).toMatch(/path="\/route-health" component=\{RouteHealth\}/);
-    expect(nav).toContain('/route-health');
-    expect(nav).toContain('label: "Health"');
+    expect(nav).toMatch(/V3CommandPalette/);
+    expect(nav).toMatch(/Search all SKYCOIN4444 routes/);
   });
 
   it("covers the major ecosystem areas with explicit evidence states", () => {

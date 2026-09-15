@@ -57,7 +57,7 @@ describe("canonical entry-flow UI", () => {
   it("makes account entry discoverable from the persistent beta navigation", () => {
     expect(navigation).toMatch(/useAuth\(\)/);
     expect(navigation).toMatch(/isAuthenticated \? "\/dashboard" : "\/signin"/);
-    expect(navigation).toMatch(/Open invitation sign in/);
+    expect(navigation).toMatch(/Open account sign in/);
     expect(navigation).toMatch(/Open account dashboard/);
   });
 });
