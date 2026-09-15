@@ -21,7 +21,10 @@ import {
   type V4DemoSession,
 } from "@/lib/v4Demo";
 
-const hiddenRoutes = new Set(["/beta-workspace", "/signin", "/beta-feedback"]);
+function isHiddenRoute(location: string) {
+  const path = location.split(/[?#]/, 1)[0];
+  return path === "/beta-workspace" || path === "/signin" || path === "/beta-feedback";
+}
 
 function readSession(): V4DemoSession {
   if (typeof window === "undefined") return normalizeV4DemoSession(null);
@@ -44,6 +47,7 @@ function persistSession(session: V4DemoSession) {
 
 export default function V4DemoCompanion() {
   const [location] = useLocation();
+  const path = location.split(/[?#]/, 1)[0];
   const [session, setSession] = useState<V4DemoSession>(readSession);
   const [expanded, setExpanded] = useState(true);
 
@@ -63,11 +67,11 @@ export default function V4DemoCompanion() {
   const steps = getV4DemoTrackSteps(session.trackId);
   const progress = getV4DemoProgress(session);
   const currentStep = useMemo(
-    () => steps.find(step => step.route === location) ?? null,
-    [location, steps]
+    () => steps.find(step => step.route === path) ?? null,
+    [path, steps]
   );
 
-  if (!session.visitedStepIds.length || hiddenRoutes.has(location)) return null;
+  if (!session.visitedStepIds.length || isHiddenRoute(location)) return null;
 
   function openNext() {
     if (!progress.nextStep) return;
@@ -78,7 +82,7 @@ export default function V4DemoCompanion() {
 
   return (
     <aside
-      className="fixed bottom-4 right-4 z-[45] w-[min(26rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-cyan-300/25 bg-[#070713]/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl"
+      className="fixed bottom-32 right-4 z-[45] w-[min(26rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-cyan-300/25 bg-[#070713]/95 text-white shadow-2xl shadow-black/50 backdrop-blur-xl"
       aria-label="V4 demo companion"
     >
       <div className="flex items-center gap-3 border-b border-white/[0.08] px-4 py-3">
