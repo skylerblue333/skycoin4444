@@ -151,49 +151,60 @@ const games: readonly GameDefinition[] = [
 ];
 
 const additionalGames = [
-  ["High-Low", "Predict the deterministic next card.", "arcade"],
-  ["Memory Match", "Match symbol pairs under a bounded board.", "arcade"],
-  ["Word Chain", "Build a valid chain one word at a time.", "knowledge"],
-  ["Crypto Trivia", "Recall practical security and blockchain concepts.", "knowledge"],
-  ["Tower Stack", "Place blocks with precision and recover from misses.", "strategy"],
-  ["Mines Logic", "Read a deterministic grid without wagering.", "strategy"],
-  ["Chess Geometry", "Practice legal piece movement geometry.", "strategy"],
-  ["Checkers Steps", "Validate bounded diagonal movement.", "strategy"],
-  ["Reaction Sprint", "Tap after the signal and measure your run.", "arcade"],
-  ["Signal Sort", "Classify a message by signal before reacting.", "knowledge"],
-  ["Privacy Triage", "Choose the safest response to a data request.", "knowledge"],
-  ["Threat Model", "Identify the highest-risk security boundary.", "strategy"],
-  ["Budget Builder", "Start a responsible budget from real constraints.", "strategy"],
-  ["Source Check", "Select the strongest evidence for a product claim.", "knowledge"],
-  ["Consent Compass", "Practice responsible media-sharing decisions.", "knowledge"],
-  ["Debug Ladder", "Choose the first useful move on a bug report.", "strategy"],
-  ["API Contract", "Handle unknown fields without unsafe assumptions.", "strategy"],
-  ["Inbox Zero", "Prioritize a crowded queue with clear rules.", "strategy"],
-  ["Meeting Maker", "Build the artifact that makes a meeting useful.", "strategy"],
-  ["Feedback Loop", "Turn vague feedback into an actionable report.", "knowledge"],
-  ["Risk Register", "Capture risk, trigger, owner, and mitigation.", "strategy"],
-  ["Test Case", "Find the boundary states a feature must survive.", "strategy"],
-  ["Data Minimizer", "Choose privacy-preserving collection rules.", "knowledge"],
-  ["Source of Truth", "Select the verified system behind a catalog claim.", "strategy"],
-  ["Queue Logic", "Prevent duplicate processing with idempotency.", "strategy"],
-  ["Cache Sense", "Decide what needs freshness over speed.", "strategy"],
-  ["Release Gate", "Choose evidence for a safe promotion.", "strategy"],
-  ["UX Focus", "Design a useful empty state and next action.", "knowledge"],
-  ["Error Copy", "Write recovery-oriented error guidance.", "knowledge"],
-  ["Search Craft", "Bound and escape user search input.", "strategy"],
-  ["Auth Boundary", "Place authorization where it cannot be bypassed.", "strategy"],
-  ["Wallet Sense", "Protect recovery material from social engineering.", "knowledge"],
-  ["Marketplace Trust", "Evaluate seller evidence without hype.", "knowledge"],
-  ["Live Safety", "Make honest claims about a small-room stream.", "knowledge"],
-  ["Learning Design", "Choose an assessment that proves understanding.", "knowledge"],
-  ["Match Quality", "Practice consent-first matching decisions.", "knowledge"],
-  ["Team Handoff", "Package context and acceptance criteria clearly.", "strategy"],
-  ["Incident First Aid", "Isolate safely while preserving evidence.", "strategy"],
-  ["Decision Matrix", "Compare options by criteria and tradeoffs.", "strategy"],
-  ["Accessibility Check", "Select inclusive keyboard and reader paths.", "knowledge"],
-  ["Sustainable Pace", "Choose a reliable, verifiable delivery habit.", "strategy"],
-  ["Product Truth", "Label an unconnected integration honestly.", "knowledge"],
+  ["High-Low", "Predict the deterministic next card.", "arcade", "high-low"],
+  ["Memory Match", "Match symbol pairs under a bounded board.", "arcade", "memory"],
+  ["Word Chain", "Build a valid chain one word at a time.", "knowledge", "word"],
+  ["Crypto Trivia", "Recall practical security and blockchain concepts.", "knowledge", "trivia"],
+  ["Tower Stack", "Place blocks with precision and recover from misses.", "strategy", "tower"],
+  ["Mines Logic", "Read a deterministic grid without wagering.", "strategy", "mines"],
+  ["Chess Geometry", "Practice legal piece movement geometry.", "strategy", "chess"],
+  ["Checkers Steps", "Validate bounded diagonal movement.", "strategy", "checkers"],
+  ["Reaction Sprint", "Tap after the signal and measure your run.", "arcade", "reaction"],
+  ["Signal Sort", "Classify a message by signal before reacting.", "knowledge", "signal-sort"],
+  ["Privacy Triage", "Choose the safest response to a data request.", "knowledge", "privacy-triage"],
+  ["Threat Model", "Identify the highest-risk security boundary.", "strategy", "threat-model"],
+  ["Budget Builder", "Start a responsible budget from real constraints.", "strategy", "budget-builder"],
+  ["Source Check", "Select the strongest evidence for a product claim.", "knowledge", "source-check"],
+  ["Consent Compass", "Practice responsible media-sharing decisions.", "knowledge", "consent-compass"],
+  ["Debug Ladder", "Choose the first useful move on a bug report.", "strategy", "debug-ladder"],
+  ["API Contract", "Handle unknown fields without unsafe assumptions.", "strategy", "api-contract"],
+  ["Inbox Zero", "Prioritize a crowded queue with clear rules.", "strategy", "inbox-zero"],
+  ["Meeting Maker", "Build the artifact that makes a meeting useful.", "strategy", "meeting-maker"],
+  ["Feedback Loop", "Turn vague feedback into an actionable report.", "knowledge", "feedback-loop"],
+  ["Risk Register", "Capture risk, trigger, owner, and mitigation.", "strategy", "risk-register"],
+  ["Test Case", "Find the boundary states a feature must survive.", "strategy", "test-case"],
+  ["Data Minimizer", "Choose privacy-preserving collection rules.", "knowledge", "data-minimizer"],
+  ["Source of Truth", "Select the verified system behind a catalog claim.", "strategy", "source-of-truth"],
+  ["Queue Logic", "Prevent duplicate processing with idempotency.", "strategy", "queue-logic"],
+  ["Cache Sense", "Decide what needs freshness over speed.", "strategy", "cache-sense"],
+  ["Release Gate", "Choose evidence for a safe promotion.", "strategy", "release-gate"],
+  ["UX Focus", "Design a useful empty state and next action.", "knowledge", "ux-focus"],
+  ["Error Copy", "Write recovery-oriented error guidance.", "knowledge", "error-copy"],
+  ["Search Craft", "Bound and escape user search input.", "strategy", "search-craft"],
+  ["Auth Boundary", "Place authorization where it cannot be bypassed.", "strategy", "auth-boundary"],
+  ["Wallet Sense", "Protect recovery material from social engineering.", "knowledge", "wallet-sense"],
+  ["Marketplace Trust", "Evaluate seller evidence without hype.", "knowledge", "marketplace-trust"],
+  ["Live Safety", "Make honest claims about a small-room stream.", "knowledge", "live-safety"],
+  ["Learning Design", "Choose an assessment that proves understanding.", "knowledge", "learning-design"],
+  ["Match Quality", "Practice consent-first matching decisions.", "knowledge", "match-quality"],
+  ["Team Handoff", "Package context and acceptance criteria clearly.", "strategy", "team-handoff"],
+  ["Incident First Aid", "Isolate safely while preserving evidence.", "strategy", "incident-first-aid"],
+  ["Decision Matrix", "Compare options by criteria and tradeoffs.", "strategy", "decision-matrix"],
+  ["Accessibility Check", "Select inclusive keyboard and reader paths.", "knowledge", "accessibility-check"],
+  ["Sustainable Pace", "Choose a reliable, verifiable delivery habit.", "strategy", "sustainable-pace"],
+  ["Product Truth", "Label an unconnected integration honestly.", "knowledge", "product-truth"],
 ] as const;
+const directArcadeModes = new Set([
+  "high-low",
+  "memory",
+  "word",
+  "trivia",
+  "tower",
+  "mines",
+  "chess",
+  "checkers",
+  "reaction",
+]);
 
 const filters: ReadonlyArray<{ id: GameCategory; label: string }> = [
   { id: "all", label: "All" },
@@ -585,7 +596,7 @@ export default function Gaming() {
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">These are individually named deterministic practice games, not filler tiles. Each opens the Arcade Lab, where the mode runs locally with immediate feedback and no monetary value.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {additionalGames.map(([name, detail, category], index) => (
+            {additionalGames.map(([name, detail, category, mode], index) => (
               <Card key={name} className="border-cyan-300/10 bg-white/[0.03] text-white transition hover:-translate-y-1 hover:border-cyan-300/30">
                 <CardContent className="flex min-h-44 flex-col justify-between gap-5 p-5">
                   <div>
@@ -596,7 +607,7 @@ export default function Gaming() {
                     <h3 className="mt-4 text-xl font-black">{name}</h3>
                     <p className="mt-2 text-sm leading-6 text-white/45">{detail}</p>
                   </div>
-                  <Link href="/arcade"><Button variant="outline" className="w-full border-cyan-200/15 bg-cyan-200/[0.04] text-white hover:bg-cyan-200/[0.1]">Open {name}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+                  <Link href={`/arcade#${directArcadeModes.has(mode) ? mode : "skills"}`}><Button variant="outline" className="w-full border-cyan-200/15 bg-cyan-200/[0.04] text-white hover:bg-cyan-200/[0.1]">Open {name}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
                 </CardContent>
               </Card>
             ))}
