@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import LearningContinuityPanel from "@/components/LearningContinuityPanel";
 import { trpc } from "@/lib/trpc";
 import { gapCourses } from "@/data/gapCourses";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,7 @@ export default function CourseCatalog() {
         utils.learningProgress.get.invalidate({
           courseId: activeCourseId,
         }),
+        utils.learningProgress.listAll.invalidate(),
         utils.activation.status.invalidate(),
       ]);
     },
@@ -200,6 +202,16 @@ export default function CourseCatalog() {
           </div>
         ) : null}
 
+        <LearningContinuityPanel
+          selectedCourseId={activeCourseId}
+          answers={answers}
+          isAuthenticated={isAuthenticated}
+          onSelectCourse={courseId => {
+            setSearchQuery("");
+            setSelectedCourseId(courseId);
+          }}
+        />
+
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <aside className="space-y-3" aria-label="Course list">
             <div className="flex items-center justify-between gap-3 px-1">
@@ -299,9 +311,10 @@ export default function CourseCatalog() {
 
                   return (
                     <Card
+                      id={`lesson-${selected.id}-${lesson.id}`}
                       key={lesson.id}
                       className={
-                        "text-white " +
+                        "scroll-mt-24 text-white " +
                         (completed
                           ? "border-emerald-300/20 bg-emerald-300/[0.035]"
                           : "border-white/10 bg-black/20")
