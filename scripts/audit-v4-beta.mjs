@@ -74,8 +74,8 @@ const [appSource, manifestSource, pageSource, workspaceSource] = await Promise.a
 const staticRoutes = new Set(parseStaticRoutes(appSource).map(route => route.path));
 const failures = [];
 
-if (!workspaceSource.includes('export { default } from "./V4Beta"')) {
-  failures.push("/beta-workspace is not routed through the V4 command center component");
+if (!workspaceSource.includes('import V4Beta from "./V4Beta"') || !workspaceSource.includes("<V4Beta />")) {
+  failures.push("/beta-workspace does not render the V4 command center component");
 }
 
 for (const phrase of [
