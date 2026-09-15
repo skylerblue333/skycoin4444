@@ -41,6 +41,8 @@ jobs:
         run: pnpm run audit:markers
       - name: V3 capability quality audit
         run: pnpm run audit:v3-capabilities
+      - name: V4 flagship release audit
+        run: node scripts/audit-v4-beta.mjs
       - name: Unit and package tests
         run: pnpm test
       - name: Engineering-beta integration tests
