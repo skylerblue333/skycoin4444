@@ -19,6 +19,7 @@ import {
   Sparkles,
   UserRound,
   ShoppingBag,
+  Video,
   X,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -27,18 +28,18 @@ import V3CommandPalette from "@/components/V3CommandPalette";
 
 const links = [
   { label: "Home", route: "/", icon: Home },
-  { label: "V4", route: "/beta-workspace", icon: LayoutDashboard },
+  { label: "V5", route: "/beta-workspace", icon: LayoutDashboard },
   { label: "Explore", route: "/platform-map", icon: Compass },
   { label: "Social", route: "/activity-feed", icon: Activity },
-  { label: "Learn", route: "/sky-school", icon: GraduationCap },
-  { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "Live", route: "/live", icon: Radio },
-  { label: "Shop", route: "/beta-commerce", icon: ShoppingBag },
-  { label: "Language", route: "/language-partner-discovery", icon: Languages },
-  { label: "Dating", route: "/dating-profile-setup", icon: Heart },
-  { label: "Web3", route: "/beta-web3", icon: Boxes },
+  { label: "Gaming", route: "/gaming", icon: Gamepad2 },
+  { label: "Market", route: "/beta-commerce", icon: ShoppingBag },
+  { label: "School", route: "/sky-school", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
-  { label: "Health", route: "/route-health", icon: Activity },
+  { label: "Web3", route: "/beta-web3", icon: Boxes },
+  { label: "Dating", route: "/dating-home", icon: Heart },
+  { label: "Global", route: "/translation-enabled-community", icon: Languages },
+  { label: "Creator", route: "/creator-dashboard", icon: Video },
 ] as const;
 
 const fourFoursTrail = [
@@ -92,7 +93,9 @@ export default function BetaNavigation() {
   const keyRun = useRef(0);
 
   function startVoiceNavigation() {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setVoiceMessage("Voice navigation is not supported in this browser.");
       return;
@@ -108,17 +111,33 @@ export default function BetaNavigation() {
     recognition.maxAlternatives = 1;
     recognition.onstart = () => {
       setVoiceListening(true);
-      setVoiceMessage("Listening… say Home, V4, Explore, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, or HopeAI.");
+      setVoiceMessage(
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+      );
     };
     recognition.onresult = (event: any) => {
-      const spoken = String(event.results?.[0]?.[0]?.transcript ?? "").toLowerCase().trim();
-      const command = links.find(item => spoken === item.label.toLowerCase() || spoken.includes(item.label.toLowerCase()));
-      setVoiceMessage(command ? `Opening ${command.label}.` : `I heard “${spoken}”. Try a main navigation name.`);
+      const spoken = String(
+        event.results?.[0]?.[0]?.transcript ?? ""
+      )
+        .toLowerCase()
+        .trim();
+      const command = links.find(
+        item =>
+          spoken === item.label.toLowerCase() ||
+          spoken.includes(item.label.toLowerCase())
+      );
+      setVoiceMessage(
+        command
+          ? `Opening ${command.label}.`
+          : `I heard “${spoken}”. Try a main navigation name.`
+      );
       if (command) setLocation(command.route);
     };
     recognition.onerror = () => {
       setVoiceListening(false);
-      setVoiceMessage("Voice input was unavailable. You can use the navigation links instead.");
+      setVoiceMessage(
+        "Voice input was unavailable. You can use the navigation links instead."
+      );
     };
     recognition.onend = () => setVoiceListening(false);
     voiceRecognition.current = recognition;
@@ -186,7 +205,7 @@ export default function BetaNavigation() {
               SKYCOIN4444
             </strong>
             <span className="block text-[10px] uppercase tracking-[0.18em] text-white/40">
-              V4 engineering beta
+              V5 engineering beta
             </span>
           </span>
         </Link>
@@ -223,17 +242,32 @@ export default function BetaNavigation() {
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Search</span>
-            <span className="hidden rounded-md border border-white/10 bg-black/20 px-1.5 py-0.5 text-[9px] text-white/35 lg:inline">⌘K</span>
+            <span className="hidden rounded-md border border-white/10 bg-black/20 px-1.5 py-0.5 text-[9px] text-white/35 lg:inline">
+              ⌘K
+            </span>
           </button>
           <button
             type="button"
             onClick={startVoiceNavigation}
-            aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
+            aria-label={
+              voiceListening ? "Stop voice navigation" : "Start voice navigation"
+            }
             title={voiceMessage || "Voice navigation"}
-            className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition " + (voiceListening ? "border-rose-300/35 bg-rose-300/10 text-rose-100" : "border-white/10 bg-white/[0.05] text-white/70 hover:border-sky-300/30 hover:bg-white/10 hover:text-white")}
+            className={
+              "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition " +
+              (voiceListening
+                ? "border-rose-300/35 bg-rose-300/10 text-rose-100"
+                : "border-white/10 bg-white/[0.05] text-white/70 hover:border-sky-300/30 hover:bg-white/10 hover:text-white")
+            }
           >
-            {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-            <span className="hidden lg:inline">{voiceListening ? "Stop" : "Voice"}</span>
+            {voiceListening ? (
+              <MicOff className="h-4 w-4" />
+            ) : (
+              <Mic className="h-4 w-4" />
+            )}
+            <span className="hidden lg:inline">
+              {voiceListening ? "Stop" : "Voice"}
+            </span>
           </button>
           <Link
             href={`/beta-feedback?route=${encodeURIComponent(location)}`}
@@ -250,7 +284,7 @@ export default function BetaNavigation() {
                 ? "Checking beta account"
                 : isAuthenticated
                   ? "Open account dashboard"
-                  : "Open invitation sign in"
+                  : "Open account sign in"
             }
             className={
               "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 " +
