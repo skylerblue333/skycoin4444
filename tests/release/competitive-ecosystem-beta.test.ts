@@ -36,8 +36,9 @@ const auditSource = fs.readFileSync(
 const evidenceRegistry = JSON.parse(
   fs.readFileSync("catalogs/beta-route-evidence.json", "utf8")
 );
-const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
-const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
+  const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
+  const gamingSource = fs.readFileSync("client/src/pages/Gaming.tsx", "utf8");
+  const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
 
 describe("competitive ecosystem beta", () => {
   it("defines eight truthful ecosystem areas", () => {
@@ -158,5 +159,19 @@ describe("competitive ecosystem beta", () => {
     expect(arcadeSource).toMatch(/Plinko Lab/);
     expect(arcadeSource).toMatch(/No real-money wagering/);
     expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
+  });
+
+  it("protects the 50-game catalog discovery and recovery contract", () => {
+    expect(gamingSource).toMatch(/50 games visible/);
+    expect(gamingSource).toMatch(/Search the 50-game catalog/);
+    expect(gamingSource).toMatch(/No games match that search/);
+    expect(gamingSource).toMatch(/Show all 50 games/);
+    expect(gamingSource).toMatch(/directArcadeModes/);
+    expect(gamingSource).toMatch(/skills-\$\{mode\}/);
+    expect(gamingSource).toMatch(/Press \/ to search/);
+    expect(arcadeSource).toMatch(/SKILL_PROGRESS_KEY/);
+    expect(arcadeSource).toMatch(/focusedSkillSlug/);
+    expect(arcadeSource).toMatch(/skillCorrect/);
+    expect(arcadeSource).toMatch(/Reset progress/);
   });
 });
