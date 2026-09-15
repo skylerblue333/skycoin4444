@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, Clock3, Command, CornerDownLeft, Search, X } from "lucide-react";
 import { useLocation } from "wouter";
 import routeCatalog from "@/data/routeCatalog.json";
+import HopeAISprintClosure from "@/components/HopeAISprintClosure";
 import V3JourneyNavigator from "@/components/V3JourneyNavigator";
 import V3JourneyEvidenceCompanion from "@/components/V3JourneyEvidenceCompanion";
 import {
@@ -88,6 +89,7 @@ export default function V3CommandPalette({ open, onOpenChange }: { open: boolean
     <>
       <V3JourneyNavigator />
       <V3JourneyEvidenceCompanion />
+      <HopeAISprintClosure />
       {open ? (
         <div
           className="fixed inset-0 z-[120] bg-[#020208]/82 p-3 backdrop-blur-md sm:p-6"
