@@ -116,7 +116,9 @@ describe("competitive ecosystem beta", () => {
       })
     ).toEqual({ "FIXTURE-CREATOR-KIT": 10 });
     expect(commerceSource).toMatch(/Payment unavailable in beta/);
-    expect(commerceSource).toMatch(/does not enable[\s\S]*illicit trade/);
+    expect(commerceSource).toMatch(
+      /No address, card, bank,[\s\S]*wallet, carrier, shipment, settlement/
+    );
     expect(commerceSource).toMatch(/buildCommerceSandboxQuotePlan/);
     expect(commerceSource).toMatch(/quote\.contract/);
     expect(commerceSource).toMatch(/Your quote breakdown will appear after you add the first fixture/);
