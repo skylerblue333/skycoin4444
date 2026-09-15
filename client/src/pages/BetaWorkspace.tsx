@@ -82,7 +82,7 @@ export default function BetaWorkspace() {
                   Advanced evidence · V5
                 </p>
                 <strong className="mt-1 block text-lg text-white/80">
-                  Open the V4 mission &amp; evidence command center
+                  {"Open the V4 mission & evidence command center"}
                 </strong>
                 <p className="mt-1 max-w-3xl text-xs leading-5 text-white/35">
                   This remains available for testers and engineers, but it no longer dominates the product experience.
