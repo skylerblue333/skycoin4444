@@ -24,6 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Link } from "wouter";
+import routeCatalog from "@/data/routeCatalog.json";
 import ThreeLightsEasterEgg from "@/components/ThreeLightsEasterEgg";
 import KayleeQuietStar from "@/components/KayleeQuietStar";
 import { Badge } from "@/components/ui/badge";
@@ -121,7 +122,7 @@ const experiences = [
 ] as const;
 
 const stats = [
-  { value: "67", label: "launchable beta routes" },
+  { value: routeCatalog.routes.length.toLocaleString(), label: "indexed product routes" },
   { value: "9", label: "headline journeys" },
   { value: "1", label: "unified workspace" },
   { value: "0", label: "missing routed source files" },
@@ -277,13 +278,14 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/advanced-search">
+              <Link href="/platform-map">
                 <Button
                   size="lg"
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Browse wider labs · 67 beta routes
+                  Explore {routeCatalog.routes.length.toLocaleString()} routes · 67 beta routes
+                  <Compass className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
