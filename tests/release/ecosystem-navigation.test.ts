@@ -21,10 +21,11 @@ describe("ecosystem navigation and visual foundation", () => {
       "/gaming",
       "/live",
       "/beta-commerce",
-      "/language-partner-discovery",
-      "/dating-profile-setup",
+      "/translation-enabled-community",
+      "/dating-home",
       "/beta-web3",
       "/hope-a-i",
+      "/creator-dashboard",
       "/beta-feedback",
     ]) {
       expect(nav).toContain(route);
