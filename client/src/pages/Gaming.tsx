@@ -259,6 +259,7 @@ export default function Gaming() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge className="bg-white/15 text-white">Games Center</Badge>
+                <Badge className="bg-cyan-300/15 text-cyan-100">50 games visible</Badge>
                 <Badge
                   variant="outline"
                   className="border-white/20 text-white/70"
