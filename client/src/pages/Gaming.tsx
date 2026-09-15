@@ -607,7 +607,7 @@ export default function Gaming() {
                     <h3 className="mt-4 text-xl font-black">{name}</h3>
                     <p className="mt-2 text-sm leading-6 text-white/45">{detail}</p>
                   </div>
-                  <Link href={`/arcade#${directArcadeModes.has(mode) ? mode : "skills"}`}><Button variant="outline" className="w-full border-cyan-200/15 bg-cyan-200/[0.04] text-white hover:bg-cyan-200/[0.1]">Open {name}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
+                  <Link href={`/arcade#${directArcadeModes.has(mode) ? mode : `skills-${mode}`}`}><Button variant="outline" className="w-full border-cyan-200/15 bg-cyan-200/[0.04] text-white hover:bg-cyan-200/[0.1]">Open {name}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
                 </CardContent>
               </Card>
             ))}
