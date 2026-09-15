@@ -1,6 +1,6 @@
 {
   "name": "skycoin_upgrade",
-  "version": "1.0.0",
+  "version": "3.0.0-beta.1",
   "type": "module",
   "license": "MIT",
   "workspaces": [
@@ -8,6 +8,8 @@
     "tools/*"
   ],
   "scripts": {
+    "generate:route-catalog": "node scripts/generate-route-catalog.mjs",
+    "prebuild": "pnpm generate:route-catalog",
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "start": "NODE_ENV=production node dist/index.js",
