@@ -9,7 +9,8 @@ const workflowSource = fs.readFileSync(".github/workflows/ci.yml", "utf8");
 
 describe("V4 engineering-beta release contract", () => {
   it("launches V4 through the existing beta workspace without a duplicate router surface", () => {
-    expect(workspaceSource).toContain('export { default } from "./V4Beta"');
+    expect(workspaceSource).toContain('import V4Beta from "./V4Beta"');
+    expect(workspaceSource).toContain("<V4Beta />");
     expect(pageSource).toContain("V4 engineering beta");
     expect(pageSource).toContain("Stop counting screens. Ship complete loops.");
     expect(pageSource).toContain("seven flagship experiences");
