@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  betaDeploymentIdentity,
   createBetaReadinessHandler,
   createCoordinatedBetaReadinessHandler,
   registerBetaRoutes,
@@ -44,6 +45,31 @@ function createResponse() {
 }
 
 describe("beta status routes", () => {
+  it("prefers Railway's injected commit SHA for deployed release identity", () => {
+    expect(
+      betaDeploymentIdentity({
+        RAILWAY_GIT_COMMIT_SHA: "  railway-sha  ",
+        SKYCOIN_RELEASE_SHA: "configured-sha",
+      })
+    ).toEqual({
+      releaseSha: "railway-sha",
+      releaseSource: "railway",
+    });
+  });
+
+  it("falls back to configured release identity outside Railway", () => {
+    expect(
+      betaDeploymentIdentity({ SKYCOIN_RELEASE_SHA: " configured-sha " })
+    ).toEqual({
+      releaseSha: "configured-sha",
+      releaseSource: "configured",
+    });
+    expect(betaDeploymentIdentity({})).toEqual({
+      releaseSha: null,
+      releaseSource: "unknown",
+    });
+  });
+
   it("reports the invitation-only channel and non-live execution boundary", () => {
     const app = createFakeApp();
     registerBetaRoutes(app as never);

@@ -14,6 +14,36 @@ const RELEASE_CHANNEL = "invitation-only-engineering-beta" as const;
 type DatabaseProbe = () => Promise<unknown>;
 type ConfigProbe = () => ReturnType<typeof inspectProductionBetaConfig>;
 
+export type BetaDeploymentIdentity = Readonly<{
+  releaseSha: string | null;
+  releaseSource: "railway" | "configured" | "unknown";
+}>;
+
+export function betaDeploymentIdentity(
+  env: NodeJS.ProcessEnv = process.env
+): BetaDeploymentIdentity {
+  const railwaySha = env.RAILWAY_GIT_COMMIT_SHA?.trim();
+  if (railwaySha) {
+    return Object.freeze({
+      releaseSha: railwaySha,
+      releaseSource: "railway" as const,
+    });
+  }
+
+  const configuredSha = env.SKYCOIN_RELEASE_SHA?.trim();
+  if (configuredSha) {
+    return Object.freeze({
+      releaseSha: configuredSha,
+      releaseSource: "configured" as const,
+    });
+  }
+
+  return Object.freeze({
+    releaseSha: null,
+    releaseSource: "unknown" as const,
+  });
+}
+
 function runtimeSnapshot() {
   const admission = betaAdmissionSnapshot();
   const authMode = betaAuthMode();
@@ -29,6 +59,7 @@ function runtimeSnapshot() {
 
   return {
     releaseChannel: RELEASE_CHANNEL,
+    ...betaDeploymentIdentity(),
     admissionMode: admission.mode,
     admissionConfigured: admission.configured,
     authMode,
