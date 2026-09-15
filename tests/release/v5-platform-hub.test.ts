@@ -59,8 +59,8 @@ describe("V5 ten-platform product hub", () => {
     expect(workspaceSource).toMatch(/<V5PlatformHub\s*\/>/);
     expect(workspaceSource).toMatch(/Reality checks, not platform locks/);
     expect(hubSource).toMatch(/10 flagship platforms/);
-    expect(hubSource).toMatch(/30.*direct quick actions/);
-    expect(hubSource).toMatch(/0.*platform demo locks/);
+    expect(hubSource).toMatch(/"30",\s*"direct quick actions"/);
+    expect(hubSource).toMatch(/"0",\s*"platform demo locks"/);
     expect(hubSource).toMatch(/Open demo, protected actions/);
     expect(hubSource).toMatch(/Browse every public demo surface immediately/);
   });
