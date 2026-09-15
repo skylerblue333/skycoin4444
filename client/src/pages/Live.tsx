@@ -43,6 +43,12 @@ function peerConfig(): RTCConfiguration {
 }
 
 function messageFrom(error: unknown): string {
+  if (error instanceof DOMException && error.name === "NotAllowedError") {
+    return "Camera or microphone access is blocked. Allow both for this site in your browser settings, then try again.";
+  }
+  if (error instanceof DOMException && error.name === "NotFoundError") {
+    return "No usable camera or microphone was found. Connect a device and try again.";
+  }
   return error instanceof Error ? error.message : "SkyLive request failed";
 }
 

@@ -26,7 +26,10 @@ export function securityHeadersFor(
   const headers: Record<string, string> = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+    // SkyLive captures media only after an authenticated creator explicitly
+    // starts a broadcast. Keep device access limited to this origin while
+    // preventing embedded third-party frames from inheriting it.
+    "Permissions-Policy": "camera=(self), microphone=(self), geolocation=(), payment=()",
     "X-Frame-Options": "DENY",
     "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     "Cross-Origin-Resource-Policy": "same-origin",
