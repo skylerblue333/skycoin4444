@@ -67,6 +67,11 @@ const skillLibrary = [
 ] as const;
 
 export default function Arcade() {
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === "undefined") return "high-low";
+    const requested = window.location.hash.slice(1);
+    return requested || "high-low";
+  });
   const [currentCard, setCurrentCard] = useState(7);
   const [highLowResult, setHighLowResult] = useState("Choose higher or lower.");
   const memoryDeck = useMemo(() => createMemoryDeck(["SKY", "AI", "WEB3", "CODE"]), []);
@@ -207,7 +212,7 @@ export default function Arcade() {
           <Card className="p-4 border-primary/30"><strong>Plinko</strong><p className="text-sm text-muted-foreground">New tested local lab below</p></Card>
         </div>
 
-        <Tabs defaultValue="high-low">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start">
             {[["plinko","Plinko"],["high-low","High-Low"],["memory","Memory"],["word","Word Chain"],["trivia","Trivia"],["tower","Tower"],["mines","Mines"],["chess","Chess"],["checkers","Checkers"],["reaction","Reaction"],["sequence","Sequence"],["color","Color Match"],["math","Math Sprint"],["legacy","5 More"],["skills","33 Skill Labs"]].map(([value,label]) => <TabsTrigger key={value} value={value}>{label}</TabsTrigger>)}
           </TabsList>
