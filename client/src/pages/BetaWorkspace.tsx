@@ -4,6 +4,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Circle,
+  Compass,
   FileWarning,
   Gauge,
   ShieldCheck,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import SkyMarkEasterEgg from "@/components/SkyMarkEasterEgg";
+import routeCatalog from "@/data/routeCatalog.json";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,11 +31,18 @@ import {
   type EcosystemProgress,
 } from "@/lib/ecosystemBeta";
 
+const routeCount = routeCatalog.routes.length;
+
 const sharedTools = [
+  {
+    name: "Full V3 explorer",
+    route: "/platform-map",
+    detail: `Search the complete generated registry of ${routeCount.toLocaleString()} static routes.`,
+  },
   {
     name: "Beta route search",
     route: "/advanced-search",
-    detail: "Search all evidence-backed launchable routes and boundaries.",
+    detail: "Search evidence-backed launchable routes and documented boundaries.",
   },
   {
     name: "Help center",
@@ -111,7 +120,7 @@ export default function BetaWorkspace() {
               </Link>
               <div className="h-4 w-px bg-white/15" />
               <h1 className="font-black tracking-tight">
-                Competitive Ecosystem Beta
+                V3 Beta Workspace
               </h1>
               <Badge
                 variant="outline"
@@ -121,14 +130,15 @@ export default function BetaWorkspace() {
               </Badge>
             </div>
             <p className="mt-1 text-xs text-white/40">
-              Connected, evidence-led product journeys with explicit boundaries
+              Nine guided journeys backed by a {routeCount.toLocaleString()}-route registry
             </p>
           </div>
           <Link
-            href="/beta-catalog"
-            className="hidden text-sm text-amber-200 hover:text-amber-100 sm:block"
+            href="/platform-map"
+            className="hidden items-center gap-2 text-sm font-semibold text-sky-200 hover:text-sky-100 sm:inline-flex"
           >
-            67 launchable routes →
+            <Compass className="h-4 w-4" />
+            Explore {routeCount.toLocaleString()} routes →
           </Link>
         </div>
       </header>
@@ -137,16 +147,19 @@ export default function BetaWorkspace() {
         <section className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200/70">
-              One coherent test surface
+              Guided core · searchable breadth
             </p>
             <h2 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">
-              Social, creator, asset, commerce, language, dating, learning, and gaming journeys.
+              Test the strongest product loops without getting lost in the ecosystem.
             </h2>
             <p className="mt-5 max-w-3xl text-base leading-7 text-white/60">
-              Competitor-inspired interaction quality, implemented only where
-              evidence exists. This is not a claim of traffic, scale, custody,
-              streaming delivery, or feature parity.
+              Start with social, creator, asset, commerce, language, dating, learning, and gaming journeys. Use the global search or full V3 explorer when you want the wider registry. Competitor-inspired interaction quality is implemented only where evidence exists; this is not a claim of traffic, scale, custody, streaming delivery, or feature parity.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-xs text-white/45">
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">Ctrl/⌘ K · search anywhere</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">{routeCount.toLocaleString()} generated static routes</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5">9 guided headline journeys</span>
+            </div>
           </div>
           <Card className="border-amber-400/25 bg-amber-400/[0.06] text-white">
             <CardHeader>
@@ -269,7 +282,7 @@ export default function BetaWorkspace() {
               <Sparkles className="h-5 w-5 text-violet-200" />
               <CardTitle className="mt-2">Shared platform tools</CardTitle>
               <CardDescription className="text-white/50">
-                Use these across the headline test journeys.
+                Use these across the headline test journeys. The full explorer is generated from the application router so discovery does not depend on a hand-maintained menu.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -277,7 +290,7 @@ export default function BetaWorkspace() {
                 <Link
                   key={tool.route}
                   href={tool.route}
-                  className="rounded-lg border border-white/10 bg-black/20 p-3 hover:border-amber-300/40"
+                  className="rounded-lg border border-white/10 bg-black/20 p-3 transition hover:border-amber-300/40 hover:bg-white/[0.04]"
                 >
                   <strong className="text-sm text-white">{tool.name}</strong>
                   <p className="mt-1 text-xs leading-5 text-white/45">
@@ -324,7 +337,7 @@ export default function BetaWorkspace() {
                 generate a language plan, save an adult dating-profile draft,
                 complete a learning step, play deterministic arcade games, then
                 submit feedback. Refresh after each save to verify the
-                documented persistence model.
+                documented persistence model. Use Ctrl/⌘ K whenever you need to jump directly to another registered screen.
               </p>
             </div>
           </div>
