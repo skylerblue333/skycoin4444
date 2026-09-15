@@ -15,7 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
+  V3_JOURNEY_PROGRESS_KEY,
   getV3JourneyCompletionPercent,
+  normalizeV3JourneyProgress,
   type V3JourneyProgress,
 } from "@/lib/v3Journeys";
 import {
@@ -32,13 +34,11 @@ import {
   type V4DemoTrackId,
 } from "@/lib/v4Demo";
 
-function readSession() {
+function readJson(key: string): unknown {
   try {
-    return normalizeV4DemoSession(
-      JSON.parse(localStorage.getItem(V4_DEMO_SESSION_KEY) ?? "null")
-    );
+    return JSON.parse(localStorage.getItem(key) ?? "null");
   } catch {
-    return normalizeV4DemoSession(null);
+    return null;
   }
 }
 
@@ -50,16 +50,18 @@ function persistSession(session: V4DemoSession) {
   }
 }
 
-export default function V4DemoDirector({
-  journeyProgress,
-}: {
-  journeyProgress: V3JourneyProgress;
-}) {
+export default function V4DemoDirector() {
   const [session, setSession] = useState<V4DemoSession>(() =>
     normalizeV4DemoSession(null)
   );
+  const [journeyProgress, setJourneyProgress] = useState<V3JourneyProgress>({});
 
-  useEffect(() => setSession(readSession()), []);
+  useEffect(() => {
+    setSession(normalizeV4DemoSession(readJson(V4_DEMO_SESSION_KEY)));
+    setJourneyProgress(
+      normalizeV3JourneyProgress(readJson(V3_JOURNEY_PROGRESS_KEY))
+    );
+  }, []);
   useEffect(() => persistSession(session), [session]);
 
   const track = getV4DemoTrack(session.trackId);
