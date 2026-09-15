@@ -36,9 +36,9 @@ const auditSource = fs.readFileSync(
 const evidenceRegistry = JSON.parse(
   fs.readFileSync("catalogs/beta-route-evidence.json", "utf8")
 );
-  const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
-  const gamingSource = fs.readFileSync("client/src/pages/Gaming.tsx", "utf8");
-  const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
+const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
+const gamingSource = fs.readFileSync("client/src/pages/Gaming.tsx", "utf8");
+const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
 
 describe("competitive ecosystem beta", () => {
   it("defines eight truthful ecosystem areas", () => {
@@ -116,9 +116,12 @@ describe("competitive ecosystem beta", () => {
       })
     ).toEqual({ "FIXTURE-CREATOR-KIT": 10 });
     expect(commerceSource).toMatch(/Payment unavailable in beta/);
-    expect(commerceSource).toMatch(/does not enable[\s\S]*illicit trade/);
-    expect(commerceSource).toMatch(/const quote = cartLines\.length/);
-    expect(commerceSource).toMatch(/Your quote will appear after you add the first fixture/);
+    expect(commerceSource).toMatch(
+      /No address, card, bank,[\s\S]*wallet, carrier, shipment, settlement/
+    );
+    expect(commerceSource).toMatch(/buildCommerceSandboxQuotePlan/);
+    expect(commerceSource).toMatch(/quote\.contract/);
+    expect(commerceSource).toMatch(/Your quote breakdown will appear after you add the first fixture/);
   });
 
   it("restores dating drafts and cleans up local photo URLs", () => {
