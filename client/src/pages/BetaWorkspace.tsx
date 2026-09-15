@@ -79,10 +79,10 @@ export default function BetaWorkspace() {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-100/40">
-                  Engineering evidence
+                  Advanced evidence · V5
                 </p>
                 <strong className="mt-1 block text-lg text-white/80">
-                  Open the seven-loop mission and evidence command center
+                  Open the V4 mission &amp; evidence command center
                 </strong>
                 <p className="mt-1 max-w-3xl text-xs leading-5 text-white/35">
                   This remains available for testers and engineers, but it no longer dominates the product experience.
@@ -114,8 +114,7 @@ export default function BetaWorkspace() {
             </div>
             <p className="mt-2 text-xs leading-6 text-white/40">
               V5 promotes ten recognizable platforms without deleting the larger catalog.
-              Use Ctrl/⌘ K or the full explorer for social, creator, asset, commerce,
-              language, dating, learning, and gaming surfaces beyond the flagship paths.
+              Use Ctrl/⌘ K or the full explorer for social, creator, asset, commerce, language, dating, learning, and gaming surfaces beyond the flagship paths.
               The route breadth is not a claim of traffic, scale, custody, feature parity,
               or production readiness.
             </p>
