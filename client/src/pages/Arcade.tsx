@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,7 @@ const trivia = [
   { id: "hash", prompt: "What does a cryptographic hash help verify?", choices: ["Data integrity", "Market price", "Identity automatically"], correctIndex: 0 },
 ];
 const assemblyTarget = ["frame", "engine", "wheels"];
+const SKILL_PROGRESS_KEY = "skycoin4444.arcade.skill-progress.v1";
 function skillSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
@@ -108,9 +109,27 @@ export default function Arcade() {
   const [colorMessage, setColorMessage] = useState("Pick the color named by the prompt.");
   const [mathInput, setMathInput] = useState("");
   const [mathMessage, setMathMessage] = useState("Solve 7 × 6.");
-  const [skillAnswers, setSkillAnswers] = useState<Record<number, number>>({});
+  const [skillAnswers, setSkillAnswers] = useState<Record<number, number>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const parsed: unknown = JSON.parse(localStorage.getItem(SKILL_PROGRESS_KEY) ?? "{}");
+      if (!parsed || typeof parsed !== "object") return {};
+      return Object.fromEntries(
+        Object.entries(parsed).filter(([, value]) => typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 2)
+      );
+    } catch {
+      return {};
+    }
+  });
   const [plinkoSeed, setPlinkoSeed] = useState(44);
   const plinkoDrop = useMemo(() => dropPlinko(plinkoSeed), [plinkoSeed]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(SKILL_PROGRESS_KEY, JSON.stringify(skillAnswers));
+    } catch {
+      // Private browsing and quota limits must not interrupt gameplay.
+    }
+  }, [skillAnswers]);
 
   const playHighLow = (guess: "higher" | "lower") => {
     const next = ((currentCard * 7 + 3) % 13) + 1;
@@ -249,7 +268,7 @@ export default function Arcade() {
 
           <TabsContent value="math"><GameCard title="Math Sprint" description="Solve a bounded mental-math challenge and build accuracy."><p className="text-3xl font-black">7 × 6 = ?</p><div className="flex gap-2"><Input value={mathInput} onChange={(event) => setMathInput(event.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="Answer" inputMode="numeric" /><Button onClick={checkMath}>Check</Button></div><p className="text-sm text-muted-foreground">{mathMessage}</p></GameCard></TabsContent>
 
-          <TabsContent value="skills"><div className="mb-4 flex items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{focusedSkillSlug ? "Focused challenge · one decision at a time" : "Choose from 33 practical decision labs."}</p>{focusedSkillSlug ? <Button variant="outline" onClick={() => setFocusedSkillSlug("")}>Show all skill labs</Button> : null}</div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{skillLibrary.map(([title, description, choices, correctIndex], index) => ({ title, description, choices, correctIndex, index })).filter(skill => !focusedSkillSlug || skillSlug(skill.title) === focusedSkillSlug).map(({ title, description, choices, correctIndex, index }) => { const answer = skillAnswers[index]; const answered = typeof answer === "number"; return <GameCard key={title} title={title} description={description}><div className="grid gap-2">{choices.map((choice, choiceIndex) => <Button key={choice} variant={answered && answer === choiceIndex ? (answer === correctIndex ? "default" : "destructive") : "outline"} onClick={() => setSkillAnswers(current => ({ ...current, [index]: choiceIndex }))}>{choice}</Button>)}</div><p className="text-sm text-muted-foreground">{answered ? (answer === correctIndex ? "Correct — useful decision recorded." : `Not quite. Best answer: ${choices[correctIndex]}`) : "Choose the strongest answer to start this mode."}</p></GameCard>; })}</div></TabsContent>
+          <TabsContent value="skills"><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted-foreground">{focusedSkillSlug ? "Focused challenge · one decision at a time" : "Choose from 33 practical decision labs."} · {Object.keys(skillAnswers).length}/33 answered</p><div className="flex gap-2">{Object.keys(skillAnswers).length > 0 ? <Button variant="ghost" onClick={() => setSkillAnswers({})}>Reset progress</Button> : null}{focusedSkillSlug ? <Button variant="outline" onClick={() => setFocusedSkillSlug("")}>Show all skill labs</Button> : null}</div></div><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{skillLibrary.map(([title, description, choices, correctIndex], index) => ({ title, description, choices, correctIndex, index })).filter(skill => !focusedSkillSlug || skillSlug(skill.title) === focusedSkillSlug).map(({ title, description, choices, correctIndex, index }) => { const answer = skillAnswers[index]; const answered = typeof answer === "number"; return <GameCard key={title} title={title} description={description}><div className="grid gap-2">{choices.map((choice, choiceIndex) => <Button key={choice} variant={answered && answer === choiceIndex ? (answer === correctIndex ? "default" : "destructive") : "outline"} onClick={() => setSkillAnswers(current => ({ ...current, [index]: choiceIndex }))}>{choice}</Button>)}</div><p className="text-sm text-muted-foreground">{answered ? (answer === correctIndex ? "Correct — useful decision recorded." : `Not quite. Best answer: ${choices[correctIndex]}`) : "Choose the strongest answer to start this mode."}</p></GameCard>; })}</div></TabsContent>
 
           <TabsContent value="legacy">
             <div className="grid gap-4 lg:grid-cols-2">
