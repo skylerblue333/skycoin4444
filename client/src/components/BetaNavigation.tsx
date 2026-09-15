@@ -3,6 +3,7 @@ import {
   Activity,
   Bot,
   Boxes,
+  Compass,
   GraduationCap,
   Gamepad2,
   Heart,
@@ -14,6 +15,7 @@ import {
   Mic,
   MicOff,
   Radio,
+  Search,
   Sparkles,
   UserRound,
   ShoppingBag,
@@ -21,10 +23,12 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
+import V3CommandPalette from "@/components/V3CommandPalette";
 
 const links = [
   { label: "Home", route: "/", icon: Home },
   { label: "Workspace", route: "/beta-workspace", icon: LayoutDashboard },
+  { label: "Explore", route: "/platform-map", icon: Compass },
   { label: "Social", route: "/activity-feed", icon: Activity },
   { label: "Learn", route: "/sky-school", icon: GraduationCap },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
@@ -79,6 +83,7 @@ function isActive(location: string, route: string) {
 export default function BetaNavigation() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
+  const [commandOpen, setCommandOpen] = useState(false);
   const [fourFoursOpen, setFourFoursOpen] = useState(false);
   const [voiceListening, setVoiceListening] = useState(false);
   const [voiceMessage, setVoiceMessage] = useState("");
@@ -103,7 +108,7 @@ export default function BetaNavigation() {
     recognition.maxAlternatives = 1;
     recognition.onstart = () => {
       setVoiceListening(true);
-      setVoiceMessage("Listening… say Home, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, HopeAI, or Workspace.");
+      setVoiceMessage("Listening… say Home, Workspace, Explore, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, or HopeAI.");
     };
     recognition.onresult = (event: any) => {
       const spoken = String(event.results?.[0]?.[0]?.transcript ?? "").toLowerCase().trim();
@@ -165,6 +170,7 @@ export default function BetaNavigation() {
       className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/90 text-white shadow-[0_12px_30px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl"
       aria-label="SKYCOIN4444 beta navigation"
     >
+      <V3CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Link
           href="/"
@@ -180,13 +186,13 @@ export default function BetaNavigation() {
               SKYCOIN4444
             </strong>
             <span className="block text-[10px] uppercase tracking-[0.18em] text-white/40">
-              Engineering beta
+              V3 engineering beta
             </span>
           </span>
         </Link>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
-          {links.slice(1).map(({ label, route, icon: Icon }) => {
+          {links.slice(1, 8).map(({ label, route, icon: Icon }) => {
             const active = isActive(location, route);
             return (
               <Link
@@ -210,20 +216,31 @@ export default function BetaNavigation() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <button
             type="button"
+            onClick={() => setCommandOpen(true)}
+            aria-label="Search all SKYCOIN4444 routes"
+            title="Search all routes (Ctrl/⌘ K)"
+            className="inline-flex items-center gap-2 rounded-xl border border-sky-300/20 bg-sky-300/[0.07] px-3 py-2 text-xs font-semibold text-sky-100 transition hover:border-sky-300/35 hover:bg-sky-300/[0.11]"
+          >
+            <Search className="h-4 w-4" />
+            <span className="hidden md:inline">Search</span>
+            <span className="hidden rounded-md border border-white/10 bg-black/20 px-1.5 py-0.5 text-[9px] text-white/35 lg:inline">⌘K</span>
+          </button>
+          <button
+            type="button"
             onClick={startVoiceNavigation}
             aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
             title={voiceMessage || "Voice navigation"}
             className={"inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition " + (voiceListening ? "border-rose-300/35 bg-rose-300/10 text-rose-100" : "border-white/10 bg-white/[0.05] text-white/70 hover:border-sky-300/30 hover:bg-white/10 hover:text-white")}
           >
             {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-            <span className="hidden md:inline">{voiceListening ? "Stop" : "Voice"}</span>
+            <span className="hidden lg:inline">{voiceListening ? "Stop" : "Voice"}</span>
           </button>
           <Link
             href={`/beta-feedback?route=${encodeURIComponent(location)}`}
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
           >
             <MessageSquare className="h-4 w-4" />
-            <span className="hidden md:inline">Feedback</span>
+            <span className="hidden lg:inline">Feedback</span>
           </Link>
 
           <Link
@@ -258,12 +275,12 @@ export default function BetaNavigation() {
         <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             type="button"
-            onClick={startVoiceNavigation}
-            aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
-            className={"inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold " + (voiceListening ? "bg-rose-300/15 text-rose-100" : "bg-sky-400/10 text-sky-100")}
+            onClick={() => setCommandOpen(true)}
+            aria-label="Search all routes"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-sky-400/12 px-3 py-2 text-xs font-semibold text-sky-100"
           >
-            {voiceListening ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-            Voice
+            <Search className="h-3.5 w-3.5" />
+            Search
           </button>
           {links.map(({ label, route, icon: Icon }) => {
             const active = isActive(location, route);
