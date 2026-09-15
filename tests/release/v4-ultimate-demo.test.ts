@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { describe, expect, it } from "vitest";
 import { v4Flagships } from "../../client/src/lib/v4Beta";
 import {
+  getV4DemoTrack,
   getV4DemoTrackSteps,
   v4DemoSteps,
   v4DemoTracks,
@@ -31,7 +32,22 @@ describe("V4 ultimate demo", () => {
     expect(new Set(ultimate.map(step => step.flagshipId))).toEqual(
       new Set(v4Flagships.map(flagship => flagship.id))
     );
-    expect(v4DemoTracks).toHaveLength(4);
+    expect(v4DemoTracks).toHaveLength(5);
+  });
+
+  it("offers a no-account guest preview without weakening the full demo", () => {
+    expect(getV4DemoTrack("ultimate").requiresAccount).toBe(true);
+    expect(getV4DemoTrack("guest").requiresAccount).toBe(false);
+    expect(getV4DemoTrackSteps("guest").map(step => step.flagshipId)).toEqual([
+      "gaming",
+      "commerce",
+      "web3",
+    ]);
+    expect(directorSource).toContain("Choose the demo depth before you start");
+    expect(directorSource).toContain("Sign in for");
+    expect(directorSource).toContain("Try guest preview instead");
+    expect(directorSource).toContain("Guest-ready");
+    expect(directorSource).toContain('onClick={() => chooseTrack("guest")}');
   });
 
   it("keeps every demo route anchored to its flagship entry route", () => {
