@@ -49,4 +49,16 @@ describe("browser security headers", () => {
     expect(headers["Cross-Origin-Resource-Policy"]).toBe("same-origin");
     expect(headers["Origin-Agent-Cluster"]).toBe("?1");
   });
+
+  it("permits first-party SkyLive capture without granting embedded origins device access", () => {
+    const headers = securityHeadersFor({
+      NODE_ENV: "production",
+    } as NodeJS.ProcessEnv);
+
+    expect(headers["Permissions-Policy"]).toBe(
+      "camera=(self), microphone=(self), geolocation=(), payment=()"
+    );
+    expect(headers["Permissions-Policy"]).not.toContain("camera=*");
+    expect(headers["Permissions-Policy"]).not.toContain("microphone=*");
+  });
 });
