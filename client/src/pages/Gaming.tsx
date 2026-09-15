@@ -630,6 +630,16 @@ export default function Gaming() {
               </Card>
             ))}
           </div>
+          {visibleGames.length + visibleAdditionalGames.length === 0 ? (
+            <Card className="border-dashed border-cyan-200/20 bg-white/[0.03] text-center text-white">
+              <CardContent className="flex flex-col items-center gap-3 p-10">
+                <Gamepad2 className="h-8 w-8 text-cyan-200/60" />
+                <h3 className="text-xl font-black">No games match that search</h3>
+                <p className="max-w-md text-sm leading-6 text-white/45">Try a different title or category, or reset the catalog to see all 50 games again.</p>
+                <Button variant="outline" onClick={() => { setCatalogQuery(""); setFilter("all"); }}>Show all 50 games</Button>
+              </CardContent>
+            </Card>
+          ) : null}
         </section>
 
         <section className="grid gap-5 lg:grid-cols-3">
