@@ -4,12 +4,15 @@ import {
   CheckCircle2,
   Circle,
   Eye,
+  LogIn,
   PlayCircle,
   RotateCcw,
   ShieldCheck,
   Sparkles,
+  UserCheck,
 } from "lucide-react";
 import { Link } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -63,6 +66,7 @@ function persistSession(session: V4DemoSession) {
 }
 
 export default function V4DemoDirector() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [session, setSession] = useState<V4DemoSession>(initialDemoSession);
   const [journeyProgress] = useState<V3JourneyProgress>(initialJourneyProgress);
 
@@ -71,6 +75,7 @@ export default function V4DemoDirector() {
   const track = getV4DemoTrack(session.trackId);
   const steps = getV4DemoTrackSteps(session.trackId);
   const demoProgress = getV4DemoProgress(session);
+  const accountRequired = track.requiresAccount && !isAuthenticated;
   const evidenceAverage = useMemo(() => {
     if (!steps.length) return 0;
     const total = steps.reduce(
@@ -108,6 +113,29 @@ export default function V4DemoDirector() {
                 <Badge variant="outline" className="border-white/10 text-white/55">
                   {steps.length} product moments
                 </Badge>
+                <Badge
+                  variant="outline"
+                  className={
+                    isAuthenticated
+                      ? "border-emerald-300/25 text-emerald-100/70"
+                      : track.requiresAccount
+                        ? "border-amber-300/25 text-amber-100/70"
+                        : "border-cyan-300/25 text-cyan-100/70"
+                  }
+                >
+                  {isAuthenticated ? (
+                    <UserCheck className="mr-1 h-3.5 w-3.5" />
+                  ) : (
+                    <ShieldCheck className="mr-1 h-3.5 w-3.5" />
+                  )}
+                  {authLoading
+                    ? "Checking account"
+                    : isAuthenticated
+                      ? "Account ready"
+                      : track.requiresAccount
+                        ? "Sign-in needed"
+                        : "Guest-ready"}
+                </Badge>
               </div>
 
               <h2 id="v4-demo-title" className="mt-5 max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">
@@ -120,8 +148,48 @@ export default function V4DemoDirector() {
                 went, while real journey evidence remains separate.
               </p>
 
+              {!authLoading && !isAuthenticated ? (
+                <div className="mt-5 rounded-2xl border border-amber-300/15 bg-amber-300/[0.04] p-4">
+                  <div className="flex gap-3">
+                    <LogIn className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+                    <div>
+                      <strong className="text-sm text-amber-100/85">
+                        Choose the demo depth before you start
+                      </strong>
+                      <p className="mt-1 text-xs leading-5 text-white/40">
+                        Social publishing, live rooms, account learning continuity, and
+                        account evidence require the invitation sign-in. The Guest preview
+                        stays within local/no-account Gaming, Commerce, and Web3 rehearsal
+                        loops so you can still judge product quality before signing in.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               <div className="mt-6 flex flex-wrap gap-3">
-                {nextStep ? (
+                {authLoading ? (
+                  <Button size="lg" disabled>
+                    Checking demo access…
+                  </Button>
+                ) : accountRequired ? (
+                  <>
+                    <Link href="/signin">
+                      <Button size="lg" className="shadow-lg shadow-cyan-950/30">
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Sign in for {track.name}
+                      </Button>
+                    </Link>
+                    <Button
+                      type="button"
+                      size="lg"
+                      variant="outline"
+                      onClick={() => chooseTrack("guest")}
+                    >
+                      Try guest preview instead
+                    </Button>
+                  </>
+                ) : nextStep ? (
                   <Link href={nextStep.route} onClick={() => recordVisit(nextStep.id)}>
                     <Button size="lg" className="shadow-lg shadow-cyan-950/30">
                       {demoProgress.visitedCount ? "Resume" : "Run"} {track.name}
@@ -209,9 +277,10 @@ export default function V4DemoDirector() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {v4DemoTracks.map(item => {
           const active = item.id === session.trackId;
+          const unavailableWithoutAccount = item.requiresAccount && !isAuthenticated;
           return (
             <button
               key={item.id}
@@ -225,12 +294,15 @@ export default function V4DemoDirector() {
                   : "border-white/10 bg-white/[0.025] hover:border-white/20")
               }
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-start justify-between gap-2">
                 <strong className="text-sm text-white/85">{item.name}</strong>
-                <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/30">
-                  {item.duration}
+                <span className="text-right text-[9px] font-black uppercase tracking-[0.12em] text-white/30">
+                  {unavailableWithoutAccount ? "account" : "ready"}
                 </span>
               </div>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white/25">
+                {item.duration}
+              </p>
               <p className="mt-2 text-xs leading-5 text-white/40">{item.description}</p>
             </button>
           );
@@ -292,12 +364,21 @@ export default function V4DemoDirector() {
                         </div>
                       </div>
                     </div>
-                    <Link href={step.route} onClick={() => recordVisit(step.id)}>
-                      <Button size="sm" variant={nextStep?.id === step.id ? "default" : "outline"} className="mt-4">
-                        {step.actionLabel}
-                        <ArrowRight className="ml-2 h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
+                    {accountRequired ? (
+                      <Link href="/signin">
+                        <Button size="sm" variant="outline" className="mt-4">
+                          <LogIn className="mr-2 h-3.5 w-3.5" />
+                          Sign in to open
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link href={step.route} onClick={() => recordVisit(step.id)}>
+                        <Button size="sm" variant={nextStep?.id === step.id ? "default" : "outline"} className="mt-4">
+                          {step.actionLabel}
+                          <ArrowRight className="ml-2 h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </CardContent>

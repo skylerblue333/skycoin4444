@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   getV4DemoProgress,
+  getV4DemoTrack,
   getV4DemoTrackSteps,
   markV4DemoStepVisited,
   normalizeV4DemoSession,
@@ -18,6 +19,17 @@ describe("V4 demo story model", () => {
     expect(steps).toHaveLength(7);
     expect(new Set(steps.map(step => step.flagshipId))).toEqual(flagshipIds);
     expect(flagshipIds.size).toBe(7);
+    expect(getV4DemoTrack("ultimate").requiresAccount).toBe(true);
+  });
+
+  it("provides a bounded no-account guest preview", () => {
+    const guest = getV4DemoTrack("guest");
+    expect(guest.requiresAccount).toBe(false);
+    expect(getV4DemoTrackSteps("guest").map(step => step.flagshipId)).toEqual([
+      "gaming",
+      "commerce",
+      "web3",
+    ]);
   });
 
   it("normalizes corrupted local demo state without inventing visits", () => {
