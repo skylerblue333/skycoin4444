@@ -14,3 +14,4 @@ if (duplicates.length) throw new Error(`V3 catalog contains duplicate paths: ${[
 if (invalid.length) throw new Error(`V3 catalog contains ${invalid.length} invalid entries.`);
 
 console.log(`V3 capability audit passed: ${routes.length} unique, labeled, absolute routes.`);
+
