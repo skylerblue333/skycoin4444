@@ -5,6 +5,7 @@
  */
 import { useState } from "react";
 import { Link } from "wouter";
+import routeCatalog from "@/data/routeCatalog.json";
 import {
   Rocket, Heart, Gamepad2, GraduationCap, Radio, Globe, Newspaper,
   Compass, Sparkles, Coins, ShoppingBag, Star, Brain, Shield,
@@ -253,9 +254,27 @@ const PLATFORM_GROUPS: FeatureGroup[] = [
   },
 ];
 
-const ALL_FEATURES = PLATFORM_GROUPS.flatMap(g =>
+const CURATED_FEATURES = PLATFORM_GROUPS.flatMap(g =>
   g.features.map(f => ({ ...f, group: g.label, groupId: g.id, accentText: g.accentText }))
 );
+
+const CURATED_PATHS = new Set(CURATED_FEATURES.map(feature => feature.href));
+const ROUTE_FEATURES = routeCatalog.routes
+  .filter(route => !CURATED_PATHS.has(route.path))
+  .map(route => ({
+    label: route.label,
+    href: route.path,
+    icon: Compass,
+    desc: `Registered interface route · ${route.component}. Capability depth varies by module.`,
+    value: 5,
+    rarity: "common" as const,
+    live: true,
+    group: "Route Registry",
+    groupId: "route-registry",
+    accentText: "text-cyan-400",
+  }));
+
+const ALL_FEATURES = [...CURATED_FEATURES, ...ROUTE_FEATURES];
 
 export default function PlatformMap() {
   const [search, setSearch] = useState("");
@@ -288,15 +307,15 @@ export default function PlatformMap() {
             </div>
             <div>
               <h1 className="text-2xl font-extrabold text-white">Platform Map</h1>
-              <p className="text-sm text-slate-400">Every feature, every route — organized by group</p>
+              <p className="text-sm text-slate-400">V3 capability explorer — every registered route in one searchable index</p>
             </div>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             {[
-              { label: "Total Features", value: totalFeatures, color: "text-cyan-400" },
-              { label: "Live Now",        value: liveFeatures,  color: "text-green-400" },
+              { label: "Routes Indexed", value: totalFeatures, color: "text-cyan-400" },
+              { label: "Routable",        value: liveFeatures,  color: "text-green-400" },
               { label: "Groups",          value: PLATFORM_GROUPS.length, color: "text-purple-400" },
               { label: "Legendary",       value: legendaryCount, color: "text-amber-400" },
             ].map(stat => (
@@ -314,7 +333,7 @@ export default function PlatformMap() {
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Search features…"
+                placeholder="Search every route, module, or capability…"
                 className="w-full pl-9 pr-4 py-2 bg-slate-800/70 border border-slate-700/50 rounded-xl text-sm text-white placeholder-slate-600 outline-none focus:border-purple-500/50 transition-colors"
               />
             </div>
@@ -367,6 +386,16 @@ export default function PlatformMap() {
           >
             All Groups
           </button>
+          <button
+            onClick={() => setActiveGroup("route-registry")}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              activeGroup === "route-registry"
+                ? "bg-cyan-400 text-slate-950"
+                : "bg-slate-800/60 text-slate-400 hover:text-white border border-slate-700/40"
+            }`}
+          >
+            Route Registry ({ROUTE_FEATURES.length})
+          </button>
           {PLATFORM_GROUPS.map(g => {
             const Icon = g.icon;
             return (
@@ -387,7 +416,7 @@ export default function PlatformMap() {
         </div>
 
         {/* Results count */}
-        <p className="text-xs text-slate-600 mb-4">{filtered.length} features</p>
+        <p className="text-xs text-slate-600 mb-4">{filtered.length} indexed capabilities</p>
 
         {/* Feature grid — grouped */}
         {search || filterRarity !== "all" || filterLive !== "all" || activeGroup ? (
