@@ -27,7 +27,7 @@ import V3CommandPalette from "@/components/V3CommandPalette";
 
 const links = [
   { label: "Home", route: "/", icon: Home },
-  { label: "Workspace", route: "/beta-workspace", icon: LayoutDashboard },
+  { label: "V4", route: "/beta-workspace", icon: LayoutDashboard },
   { label: "Explore", route: "/platform-map", icon: Compass },
   { label: "Social", route: "/activity-feed", icon: Activity },
   { label: "Learn", route: "/sky-school", icon: GraduationCap },
@@ -108,7 +108,7 @@ export default function BetaNavigation() {
     recognition.maxAlternatives = 1;
     recognition.onstart = () => {
       setVoiceListening(true);
-      setVoiceMessage("Listening… say Home, Workspace, Explore, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, or HopeAI.");
+      setVoiceMessage("Listening… say Home, V4, Explore, Social, Learn, Gaming, Live, Shop, Language, Dating, Web3, or HopeAI.");
     };
     recognition.onresult = (event: any) => {
       const spoken = String(event.results?.[0]?.[0]?.transcript ?? "").toLowerCase().trim();
@@ -186,7 +186,7 @@ export default function BetaNavigation() {
               SKYCOIN4444
             </strong>
             <span className="block text-[10px] uppercase tracking-[0.18em] text-white/40">
-              V3 engineering beta
+              V4 engineering beta
             </span>
           </span>
         </Link>
