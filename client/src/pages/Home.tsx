@@ -284,7 +284,7 @@ export default function Home() {
                   variant="ghost"
                   className="text-white/65 hover:bg-white/[0.06] hover:text-white"
                 >
-                  Explore {routeCatalog.routes.length.toLocaleString()} routes
+                  Explore {routeCatalog.routes.length.toLocaleString()} routes · 67 beta routes
                   <Compass className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
