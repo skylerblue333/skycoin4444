@@ -30,6 +30,7 @@
     "check:secrets": "node scripts/check-credential-patterns.mjs",
     "audit:markers": "node scripts/audit-beta-markers.mjs",
     "audit:screens": "node scripts/audit-screen-portfolio.mjs",
+    "audit:v3-capabilities": "node scripts/audit-v3-capabilities.mjs",
     "beta:db:bootstrap": "node scripts/bootstrap-beta-db.mjs",
     "beta:smoke:hosted": "node scripts/hosted-beta-smoke.mjs",
     "beta:db:migrate:arcade-progress": "node scripts/migrate-arcade-progress.mjs",
