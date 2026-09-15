@@ -30,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 
 type GameCategory =
@@ -229,6 +230,7 @@ function latestPlayed(passport: ArcadePassport): ArcadeGameId | null {
 
 export default function Gaming() {
   const [filter, setFilter] = useState<GameCategory>("all");
+  const [catalogQuery, setCatalogQuery] = useState("");
   const {
     passport,
     syncStatus,
@@ -237,12 +239,22 @@ export default function Gaming() {
   } = useArcadePassportSync();
 
   const visibleGames = useMemo(
-    () =>
-      filter === "all"
-        ? games
-        : games.filter(game => game.category === filter),
-    [filter]
+    () => {
+      const query = catalogQuery.trim().toLowerCase();
+      return games.filter(game => {
+        const matchesFilter = filter === "all" || game.category === filter;
+        const matchesQuery = !query || `${game.name} ${game.detail} ${game.category}`.toLowerCase().includes(query);
+        return matchesFilter && matchesQuery;
+      });
+    },
+    [catalogQuery, filter]
   );
+  const normalizedCatalogQuery = catalogQuery.trim().toLowerCase();
+  const visibleAdditionalGames = additionalGames.filter(([name, detail, category]) => {
+    const matchesFilter = filter === "all" || category === filter;
+    const matchesQuery = !normalizedCatalogQuery || `${name} ${detail} ${category}`.toLowerCase().includes(normalizedCatalogQuery);
+    return matchesFilter && matchesQuery;
+  });
   const dailyGame =
     games.find(game => game.id === passport.daily.gameId) ?? games[0];
   const recentGameId = latestPlayed(passport);
@@ -590,13 +602,19 @@ export default function Gaming() {
         </section>
 
         <section className="space-y-5">
-          <div>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-200/60">Arcade Lab expanded</p>
             <h2 className="mt-2 text-3xl font-black">42 more games to play</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">These are individually named deterministic practice games, not filler tiles. Each opens the Arcade Lab, where the mode runs locally with immediate feedback and no monetary value.</p>
+            </div>
+            <div className="w-full max-w-sm">
+              <Input value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)} placeholder="Search the 50-game catalog…" aria-label="Search the 50-game catalog" className="border-cyan-200/15 bg-white/[0.04] text-white placeholder:text-white/35" />
+              <p className="mt-2 text-right text-xs text-white/35">Showing {visibleGames.length + visibleAdditionalGames.length} matching games</p>
+            </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {additionalGames.map(([name, detail, category, mode], index) => (
+            {visibleAdditionalGames.map(([name, detail, category, mode], index) => (
               <Card key={name} className="border-cyan-300/10 bg-white/[0.03] text-white transition hover:-translate-y-1 hover:border-cyan-300/30">
                 <CardContent className="flex min-h-44 flex-col justify-between gap-5 p-5">
                   <div>
