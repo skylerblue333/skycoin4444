@@ -199,7 +199,7 @@ export default function V4DemoReviewCard() {
                     : "Copy review"}
               </Button>
               {complete ? (
-                <Link href="/beta-feedback?route=%2Fbeta-workspace">
+                <Link href="/beta-feedback?route=%2Fbeta-workspace&source=v4-demo-review">
                   <Button>
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Send structured feedback
