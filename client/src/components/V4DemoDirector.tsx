@@ -42,6 +42,18 @@ function readJson(key: string): unknown {
   }
 }
 
+function initialDemoSession() {
+  return typeof window === "undefined"
+    ? normalizeV4DemoSession(null)
+    : normalizeV4DemoSession(readJson(V4_DEMO_SESSION_KEY));
+}
+
+function initialJourneyProgress() {
+  return typeof window === "undefined"
+    ? ({} as V3JourneyProgress)
+    : normalizeV3JourneyProgress(readJson(V3_JOURNEY_PROGRESS_KEY));
+}
+
 function persistSession(session: V4DemoSession) {
   try {
     localStorage.setItem(V4_DEMO_SESSION_KEY, JSON.stringify(session));
@@ -51,17 +63,9 @@ function persistSession(session: V4DemoSession) {
 }
 
 export default function V4DemoDirector() {
-  const [session, setSession] = useState<V4DemoSession>(() =>
-    normalizeV4DemoSession(null)
-  );
-  const [journeyProgress, setJourneyProgress] = useState<V3JourneyProgress>({});
+  const [session, setSession] = useState<V4DemoSession>(initialDemoSession);
+  const [journeyProgress] = useState<V3JourneyProgress>(initialJourneyProgress);
 
-  useEffect(() => {
-    setSession(normalizeV4DemoSession(readJson(V4_DEMO_SESSION_KEY)));
-    setJourneyProgress(
-      normalizeV3JourneyProgress(readJson(V3_JOURNEY_PROGRESS_KEY))
-    );
-  }, []);
   useEffect(() => persistSession(session), [session]);
 
   const track = getV4DemoTrack(session.trackId);
