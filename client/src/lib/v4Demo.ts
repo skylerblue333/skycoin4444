@@ -1,6 +1,11 @@
 import type { V3JourneyId } from "@/lib/v3Journeys";
 
-export type V4DemoTrackId = "ultimate" | "creator" | "learn" | "trust";
+export type V4DemoTrackId =
+  | "ultimate"
+  | "guest"
+  | "creator"
+  | "learn"
+  | "trust";
 
 export type V4DemoStep = Readonly<{
   id: string;
@@ -17,6 +22,7 @@ export type V4DemoTrack = Readonly<{
   name: string;
   duration: string;
   description: string;
+  requiresAccount: boolean;
   stepIds: readonly string[];
 }>;
 
@@ -107,6 +113,7 @@ export const v4DemoTracks: readonly V4DemoTrack[] = [
     duration: "10–15 min",
     description:
       "Seven product moments in one story: connect, communicate, learn, act, play, quote, and verify.",
+    requiresAccount: true,
     stepIds: [
       "social-publish",
       "live-room",
@@ -118,11 +125,21 @@ export const v4DemoTracks: readonly V4DemoTrack[] = [
     ],
   },
   {
+    id: "guest",
+    name: "Guest preview",
+    duration: "4–6 min",
+    description:
+      "No-account preview of the strongest local loops: play an authored game, build a commerce quote, and simulate a safety-gated Web3 intent.",
+    requiresAccount: false,
+    stepIds: ["gaming-replay", "commerce-quote", "web3-simulation"],
+  },
+  {
     id: "creator",
     name: "Creator demo",
     duration: "5–7 min",
     description:
       "Show the strongest creation-to-audience arc: publish, enter a live room, then rehearse commerce discovery and quote planning.",
+    requiresAccount: true,
     stepIds: ["social-publish", "live-room", "commerce-quote"],
   },
   {
@@ -131,6 +148,7 @@ export const v4DemoTracks: readonly V4DemoTrack[] = [
     duration: "5–7 min",
     description:
       "Show continuity from authored learning into a deterministic next-action coach and a replayable practice loop.",
+    requiresAccount: true,
     stepIds: ["learning-continuity", "hope-next-action", "gaming-replay"],
   },
   {
@@ -139,6 +157,7 @@ export const v4DemoTracks: readonly V4DemoTrack[] = [
     duration: "4–6 min",
     description:
       "Show evidence-first product boundaries: account activity, safe commerce math, and Web3 simulation with execution disabled.",
+    requiresAccount: true,
     stepIds: ["social-publish", "commerce-quote", "web3-simulation"],
   },
 ] as const;
