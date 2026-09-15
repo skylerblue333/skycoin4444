@@ -56,6 +56,9 @@ describe("authenticated arcade progress sync", () => {
     expect(router).toMatch(/1_000_000/);
     expect(router).toMatch(/authoritativeLeaderboard: false/);
     expect(router).toMatch(/financialValue: false/);
+    expect(router).toMatch(/ER_NO_SUCH_TABLE/);
+    expect(router).toMatch(/SERVICE_UNAVAILABLE/);
+    expect(router).toMatch(/local game progress is still available/);
     expect(router).not.toMatch(/publicProcedure/);
   });
 

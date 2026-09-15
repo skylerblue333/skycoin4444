@@ -14,7 +14,16 @@
     {"id":"dao-201","title":"DAOs & On-Chain Governance","level":"intermediate","category":"governance","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
     {"id":"crypto-risk-201","title":"Crypto Risk Management","level":"intermediate","category":"risk","lessons":6,"archiveBaseline":false,"authoredGapCore":true},
     {"id":"nft-101","title":"NFTs & Digital Ownership","level":"beginner","category":"digital-assets","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
-    {"id":"layer2-201","title":"Layer 2 Scaling","level":"intermediate","category":"scaling","lessons":6,"archiveBaseline":false,"authoredGapCore":true}
+    {"id":"layer2-201","title":"Layer 2 Scaling","level":"intermediate","category":"scaling","lessons":6,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"product-thinking-101","title":"Product Thinking & Better Decisions","level":"beginner","category":"product","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"web-safety-101","title":"Web Safety & Privacy Basics","level":"beginner","category":"security","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"data-literacy-101","title":"Data Literacy for Everyday Decisions","level":"beginner","category":"data","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"creator-communication-101","title":"Creator Communication Essentials","level":"beginner","category":"creator","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"digital-wellbeing-101","title":"Digital Wellbeing & Boundaries","level":"beginner","category":"wellbeing","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"ai-literacy-101","title":"Practical AI Literacy","level":"beginner","category":"ai","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"crypto-payments-safety-201","title":"Crypto Payments & Tip Safety","level":"intermediate","category":"security","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"social-community-201","title":"Healthy Social Communities","level":"intermediate","category":"social","lessons":5,"archiveBaseline":false,"authoredGapCore":true},
+    {"id":"dating-safety-101","title":"Online Dating Safety & Consent","level":"beginner","category":"safety","lessons":5,"archiveBaseline":false,"authoredGapCore":true}
   ],
   "games": [
     {"id":"blackjack","title":"Blackjack","kind":"card","mode":"single-player","existingSurface":true,"gapDomainCore":false},
@@ -36,6 +45,7 @@
     {"id":"crypto-trivia","title":"Crypto Trivia","kind":"quiz","mode":"single-player","existingSurface":true,"gapDomainCore":true},
     {"id":"tower-stack","title":"Tower Stack","kind":"arcade","mode":"single-player","existingSurface":true,"gapDomainCore":true},
     {"id":"mines","title":"Mines","kind":"puzzle-simulation","mode":"single-player","existingSurface":true,"gapDomainCore":true},
-    {"id":"checkers","title":"Checkers","kind":"board","mode":"two-player","existingSurface":true,"gapDomainCore":true}
+    {"id":"checkers","title":"Checkers","kind":"board","mode":"two-player","existingSurface":true,"gapDomainCore":true},
+    {"id":"plinko","title":"Plinko Lab","kind":"chance-simulation","mode":"single-player","existingSurface":true,"gapDomainCore":true}
   ]
 }

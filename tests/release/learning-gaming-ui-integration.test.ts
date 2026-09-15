@@ -14,19 +14,19 @@ describe('learning and gaming UI gap integration', () => {
     expect(source).not.toContain('No data available. Start by creating a new item.');
   });
 
-  it('exposes all thirteen gap-game experiences through Arcade', () => {
+  it('exposes all fourteen gap-game experiences through Arcade', () => {
     const source = read('client/src/pages/Arcade.tsx');
-    for (const marker of ['High-Low', 'Memory Match', 'Word Chain', 'Crypto Trivia', 'Tower Stack', 'Mines', 'Web3 Chess', 'Checkers', 'Dice', 'Roulette', 'Snake', 'Tic-Tac-Toe', 'Assembly Puzzle']) {
+    for (const marker of ['Plinko Lab', 'High-Low', 'Memory Match', 'Word Chain', 'Crypto Trivia', 'Tower Stack', 'Mines', 'Web3 Chess', 'Checkers', 'Dice', 'Roulette', 'Snake', 'Tic-Tac-Toe', 'Assembly Puzzle']) {
       expect(source).toContain(marker);
     }
     expect(source).not.toContain('SKY444 Wagering');
     expect(source).toContain('No real-money wagering');
   });
 
-  it('keeps the canonical catalog aligned with twenty surfaced games', () => {
+  it('keeps the canonical catalog aligned with twenty-one surfaced games', () => {
     const catalog = JSON.parse(read('catalogs/learning-gaming-gap-fill.json'));
-    expect(catalog.games).toHaveLength(20);
-    expect(catalog.games.filter((game: { existingSurface: boolean }) => game.existingSurface)).toHaveLength(20);
-    expect(catalog.games.filter((game: { gapDomainCore: boolean }) => game.gapDomainCore)).toHaveLength(13);
+    expect(catalog.games).toHaveLength(21);
+    expect(catalog.games.filter((game: { existingSurface: boolean }) => game.existingSurface)).toHaveLength(21);
+    expect(catalog.games.filter((game: { gapDomainCore: boolean }) => game.gapDomainCore)).toHaveLength(14);
   });
 });

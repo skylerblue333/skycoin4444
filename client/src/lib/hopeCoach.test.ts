@@ -58,6 +58,20 @@ describe("HopeAI deterministic coach", () => {
     ).toBe(true);
   });
 
+  it.each([
+    ["make live streaming work", "/live"],
+    ["improve the shop cart", "/beta-commerce-sandbox"],
+    ["make dating consent safer", "/dating-home"],
+    ["review crypto tip transfer safety", "/wallet-overview"],
+  ])("routes %s to the matching verified beta area", (goal, href) => {
+    const plan = createHopePlan({
+      goal,
+      focus: "build",
+      activity: { lessons: 1, posts: 1, feedback: 1, other: 0 },
+    });
+    expect(plan.steps.some(step => step.href === href)).toBe(true);
+  });
+
   it("normalizes and bounds user goals", () => {
     const plan = createHopePlan({
       goal: "   learn    TypeScript   " + "x".repeat(600),

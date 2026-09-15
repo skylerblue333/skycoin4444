@@ -13,10 +13,10 @@ function assertUniqueIds(items, label) {
   assert.equal(new Set(ids).size, ids.length, `${label} ids must be unique`);
 }
 
-test('course catalog has twelve tracks and nine authored gap cores', () => {
-  assert.equal(catalog.courses.length, 12);
+test('course catalog has twenty-one tracks and eighteen authored gap cores', () => {
+  assert.equal(catalog.courses.length, 21);
   assertUniqueIds(catalog.courses, 'course');
-  assert.equal(catalog.courses.filter((course) => course.authoredGapCore).length, 9);
+  assert.equal(catalog.courses.filter((course) => course.authoredGapCore).length, 18);
   assert.equal(catalog.courses.filter((course) => course.archiveBaseline).length, 3);
   for (const course of catalog.courses) {
     assert.match(course.id, /^[a-z0-9-]+$/);
@@ -26,11 +26,11 @@ test('course catalog has twelve tracks and nine authored gap cores', () => {
   }
 });
 
-test('all twenty catalog games now have a live beta surface and thirteen have local gap cores', () => {
-  assert.equal(catalog.games.length, 20);
+test('all twenty-one catalog games now have a live beta surface and fourteen have local gap cores', () => {
+  assert.equal(catalog.games.length, 21);
   assertUniqueIds(catalog.games, 'game');
-  assert.equal(catalog.games.filter((game) => game.gapDomainCore).length, 13);
-  assert.equal(catalog.games.filter((game) => game.existingSurface).length, 20);
+  assert.equal(catalog.games.filter((game) => game.gapDomainCore).length, 14);
+  assert.equal(catalog.games.filter((game) => game.existingSurface).length, 21);
   for (const game of catalog.games) {
     assert.equal(typeof game.existingSurface, 'boolean');
     assert.equal(typeof game.gapDomainCore, 'boolean');

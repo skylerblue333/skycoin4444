@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { Brain, CheckCircle2, ChevronRight, Crown, Heart, MapPin, MessageCircle, RotateCcw, ShieldCheck, Sparkles, Star, X, Zap } from "lucide-react";
+import { Ban, Brain, CheckCircle2, ChevronRight, Crown, Flag, Heart, MapPin, MessageCircle, RotateCcw, ShieldCheck, Sparkles, Star, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExperienceShell, SurfaceCard } from "@/components/ecosystem/ExperienceShell";
 
@@ -15,8 +15,11 @@ const SAMPLE_PROFILES = [
 type DiscoveryItem = { icon: LucideIcon; label: string; value: string };
 
 export default function DatingHome() {
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedIds, setLikedIds] = useState<number[]>([]);
+  const [blockedIds, setBlockedIds] = useState<number[]>([]);
+  const [reportedIds, setReportedIds] = useState<number[]>([]);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const profile = SAMPLE_PROFILES[currentIndex];
   const discoveryItems: DiscoveryItem[] = [
@@ -43,6 +46,38 @@ export default function DatingHome() {
     setLikedIds([]);
     setShowAnalysis(false);
   };
+
+  const block = () => {
+    if (!profile) return;
+    setBlockedIds(ids => ids.includes(profile.id) ? ids : [...ids, profile.id]);
+    toast.success("Sample profile blocked for this session.");
+    advance();
+  };
+
+  const report = () => {
+    if (!profile) return;
+    setReportedIds(ids => ids.includes(profile.id) ? ids : [...ids, profile.id]);
+    toast.success("Sample report recorded locally for safety-flow testing.");
+  };
+
+  if (!ageConfirmed) {
+    return (
+      <ExperienceShell title="SkyLife Dating" subtitle="Adults-only connection design with explicit consent and safety boundaries." icon={Heart} accent="pink" badge="18+ controlled beta">
+        <div className="mx-auto max-w-2xl">
+          <SurfaceCard className="p-7 md:p-10">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-pink-50 text-pink-600"><ShieldCheck className="h-7 w-7" /></div>
+            <h2 className="mt-5 text-3xl font-black tracking-tight text-slate-900">Confirm the adults-only boundary</h2>
+            <p className="mt-3 leading-7 text-slate-600">You must be at least 18 to enter this dating interface. Profiles are fictional fixtures, and this beta does not provide real matching, messaging, identity verification, location tracking, payments, or background checks.</p>
+            <div className="mt-6 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
+              {["Meet in a public place", "Control your own transportation", "Share personal details gradually", "Block and report pressure or threats"].map(item => <div key={item} className="flex items-start gap-2 rounded-xl bg-slate-50 p-3"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />{item}</div>)}
+            </div>
+            <Button onClick={() => setAgeConfirmed(true)} className="mt-7 w-full rounded-xl bg-pink-600 hover:bg-pink-700">I confirm I am 18 or older</Button>
+            <Link href="/beta-workspace"><Button variant="ghost" className="mt-2 w-full rounded-xl">Leave dating</Button></Link>
+          </SurfaceCard>
+        </div>
+      </ExperienceShell>
+    );
+  }
 
   return (
     <ExperienceShell title="SkyLife Dating" subtitle="Discover compatible connections with transparent preview states." icon={Heart} accent="pink" badge="UI preview" actions={<Link href="/dating-matches"><Button variant="outline" className="rounded-xl border-slate-200 bg-white"><MessageCircle className="mr-2 h-4 w-4" /> Matches</Button></Link>}>
@@ -81,6 +116,10 @@ export default function DatingHome() {
                 <button type="button" onClick={() => setShowAnalysis((value) => !value)} className="flex items-center gap-2 text-left text-sm font-semibold text-violet-700 hover:text-violet-900"><Brain className="h-4 w-4" /> {showAnalysis ? "Hide" : "Show"} compatibility preview<ChevronRight className={`h-4 w-4 transition-transform ${showAnalysis ? "rotate-90" : ""}`} /></button>
                 <div className="text-xs text-slate-400">Trust fixture: {profile.trustScore}/100</div>
                 {showAnalysis ? <div className="rounded-xl border border-violet-100 bg-violet-50 p-3 text-sm leading-6 text-violet-800 md:col-span-2">{profile.aiSummary}</div> : null}
+                <div className="flex flex-wrap gap-2 md:col-span-2">
+                  <Button type="button" size="sm" variant="outline" onClick={block} className="rounded-xl"><Ban className="mr-2 h-4 w-4" />Block sample</Button>
+                  <Button type="button" size="sm" variant="outline" onClick={report} disabled={reportedIds.includes(profile.id)} className="rounded-xl"><Flag className="mr-2 h-4 w-4" />{reportedIds.includes(profile.id) ? "Report recorded" : "Report sample"}</Button>
+                </div>
               </div>
             </SurfaceCard>
           ) : (
@@ -91,6 +130,7 @@ export default function DatingHome() {
 
         <div className="space-y-5">
           <SurfaceCard className="p-5"><div className="flex items-center justify-between"><h2 className="font-bold">Profile readiness</h2><span className="text-xs font-semibold text-emerald-600">Preview</span></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full w-3/4 rounded-full bg-emerald-500" /></div><div className="mt-4 space-y-3 text-sm text-slate-600">{["Add clear photos", "Write a useful bio", "Set matching intent", "Review privacy settings"].map((item, index) => <div key={item} className="flex items-center gap-2"><CheckCircle2 className={`h-4 w-4 ${index < 3 ? "text-emerald-500" : "text-slate-300"}`} /> {item}</div>)}</div></SurfaceCard>
+          <SurfaceCard className="p-5"><div className="flex items-center gap-2 text-emerald-700"><ShieldCheck className="h-5 w-5" /><h2 className="font-bold">Safety center</h2></div><p className="mt-2 text-sm leading-6 text-slate-500">Session controls are available on every sample. Blocking removes the card; reporting records a local rehearsal only.</p><div className="mt-4 grid grid-cols-2 gap-2 text-center text-xs"><div className="rounded-xl bg-slate-50 p-3"><strong className="block text-lg text-slate-900">{blockedIds.length}</strong>blocked</div><div className="rounded-xl bg-slate-50 p-3"><strong className="block text-lg text-slate-900">{reportedIds.length}</strong>reported</div></div><Link href="/sky-school"><Button variant="outline" className="mt-4 w-full rounded-xl">Open dating safety course</Button></Link></SurfaceCard>
           <SurfaceCard className="overflow-hidden p-5"><div className="flex items-center gap-2 text-pink-700"><Zap className="h-5 w-5" /><h2 className="font-bold">Visibility tools</h2></div><p className="mt-2 text-sm leading-6 text-slate-500">Boost and premium controls are presentation-only until billing and entitlement services are connected and verified.</p><Button onClick={() => toast("Boost is unavailable in this engineering preview.")} variant="outline" className="mt-4 w-full rounded-xl border-pink-200 text-pink-700 hover:bg-pink-50"><Zap className="mr-2 h-4 w-4" /> Preview boost</Button></SurfaceCard>
           <SurfaceCard className="p-5"><div className="flex items-center gap-2"><Crown className="h-5 w-5 text-amber-500" /><h2 className="font-bold">Premium experience</h2></div><p className="mt-2 text-sm leading-6 text-slate-500">See how premium benefits can be presented without implying an active subscription product.</p><Link href="/dating-premium"><Button variant="ghost" className="mt-2 w-full justify-between rounded-xl text-slate-700">Open premium preview <ChevronRight className="h-4 w-4" /></Button></Link></SurfaceCard>
         </div>

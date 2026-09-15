@@ -116,6 +116,8 @@ describe("competitive ecosystem beta", () => {
     ).toEqual({ "FIXTURE-CREATOR-KIT": 10 });
     expect(commerceSource).toMatch(/Payment unavailable in beta/);
     expect(commerceSource).toMatch(/does not enable[\s\S]*illicit trade/);
+    expect(commerceSource).toMatch(/const quote = cartLines\.length/);
+    expect(commerceSource).toMatch(/Your quote will appear after you add the first fixture/);
   });
 
   it("restores dating drafts and cleans up local photo URLs", () => {
@@ -126,6 +128,17 @@ describe("competitive ecosystem beta", () => {
     expect(datingSource).toMatch(
       /No server[\s\S]*persistence, matching, messaging/
     );
+  });
+
+  it("keeps dating and social-tip expansion safety gated", () => {
+    const datingHome = fs.readFileSync("client/src/pages/DatingHome.tsx", "utf8");
+    const social = fs.readFileSync("client/src/pages/ActivityFeed.tsx", "utf8");
+    expect(datingHome).toMatch(/I confirm I am 18 or older/);
+    expect(datingHome).toMatch(/Block sample/);
+    expect(datingHome).toMatch(/Report sample/);
+    expect(social).toMatch(/Crypto tip safety rehearsal/);
+    expect(social).toMatch(/No value moved/);
+    expect(social).toMatch(/tip practice[\s\S]*never creates a transaction or balance/i);
   });
 
   it("promotes evidenced competitive routes through the shared registry", () => {
@@ -141,7 +154,8 @@ describe("competitive ecosystem beta", () => {
     ]) {
       expect(registryRoutes.has(route)).toBe(true);
     }
-    expect(arcadeSource).toMatch(/Seventeen local game experiences/);
+    expect(arcadeSource).toMatch(/Eighteen local game experiences/);
+    expect(arcadeSource).toMatch(/Plinko Lab/);
     expect(arcadeSource).toMatch(/No real-money wagering/);
     expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
   });

@@ -165,6 +165,33 @@ export const gapCourses: readonly GapCourse[] = [
       lesson('human-loop', 'Keep Human Review', 'Assign responsibility for the final decision.', 'Automation can accelerate work, but a responsible person should review outputs, handle exceptions, and own the decision when stakes are meaningful.', q('A human review loop provides?', ['Accountability and exception handling', 'Guaranteed accuracy', 'Invisible automation'], 0)),
     ]
   },
+  {
+    id: 'crypto-payments-safety-201', title: 'Crypto Payments & Tip Safety', level: 'intermediate', lessons: [
+      lesson('recipient', 'Verify the Recipient', 'Confirm who controls the destination before sending.', 'A display name is not proof of address control. Confirm the recipient and destination through a trusted channel, especially when instructions change unexpectedly.', q('A changed payment address should be?', ['Verified through a trusted channel', 'Accepted immediately', 'Shared publicly'], 0)),
+      lesson('network', 'Match the Network', 'Prevent destination and network mismatches.', 'The same asset label can exist on different networks. Confirm the exact network, address format, memo or tag requirements, and recipient support before authorizing a transfer.', q('Before a transfer, verify?', ['Network and destination format', 'Only the token logo', 'Follower count'], 0)),
+      lesson('test', 'Start With a Test', 'Use a small test when the workflow or destination is new.', 'A small test can catch address, network, memo, and operational mistakes before the full intended amount is exposed.', q('Why send a small test first?', ['To catch setup mistakes', 'To guarantee profit', 'To skip recipient verification'], 0)),
+      lesson('fees', 'Review Amount and Fees', 'Distinguish the intended amount from network and provider costs.', 'Check the asset, amount, fee, final recipient amount, and whether the fee can change. Never treat an estimated quote as completed settlement.', q('A quote is the same as final settlement?', ['Yes', 'No'], 1)),
+      lesson('irreversible', 'Understand Irreversibility', 'Plan for transfers that cannot be reversed.', 'Many blockchain transfers cannot be cancelled after broadcast. Stop when pressured, verify every field, and keep records appropriate to the transaction.', q('Pressure to send immediately is a reason to?', ['Pause and verify', 'Skip checks', 'Reveal a recovery phrase'], 0)),
+    ]
+  },
+  {
+    id: 'social-community-201', title: 'Healthy Social Communities', level: 'intermediate', lessons: [
+      lesson('identity', 'Identity Without Overclaiming', 'Separate profile claims from verified identity.', 'A name, badge, avatar, or biography can be useful context but should not be presented as independent identity proof without a real verification process.', q('A profile badge alone proves identity?', ['Yes', 'No'], 1)),
+      lesson('moderation', 'Moderation Basics', 'Design clear rules and proportionate responses.', 'Healthy moderation defines prohibited behavior, documents decisions, provides reporting tools, and uses escalation paths proportionate to risk.', q('Good moderation needs?', ['Clear rules and escalation', 'Secret punishments', 'No reporting path'], 0)),
+      lesson('media', 'Share Media Responsibly', 'Check consent, context, and rights before posting.', 'Before uploading or linking media, confirm permission, avoid exposing private information, add useful context, and provide captions or descriptions.', q('Before sharing someone else’s media, check?', ['Permission and privacy', 'Only file size', 'Token price'], 0)),
+      lesson('tips', 'Creator Tip Boundaries', 'Distinguish appreciation from financial promises.', 'A tip should never buy guaranteed influence, investment returns, or unsafe access. Platforms need authorization, receipts, disputes, fraud controls, and transparent fees before moving value.', q('A real tip system needs?', ['Authorization and receipts', 'Only an emoji', 'Guaranteed returns'], 0)),
+      lesson('wellbeing', 'Design for Wellbeing', 'Avoid engagement patterns that reward conflict or compulsion.', 'Useful communities support pacing, control over notifications, blocking and reporting, and meaningful goals instead of endless urgency.', q('A wellbeing feature is?', ['Notification control', 'Forced endless scrolling', 'Hidden reporting'], 0)),
+    ]
+  },
+  {
+    id: 'dating-safety-101', title: 'Online Dating Safety & Consent', level: 'beginner', lessons: [
+      lesson('adults', 'Adults-Only Boundaries', 'Keep adult dating spaces restricted to adults.', 'Dating products need a clear 18+ boundary, truthful age information, and escalation procedures for suspected minors or age misrepresentation.', q('An adult dating beta should be?', ['18+ only', 'Open to any age', 'Unlabeled'], 0)),
+      lesson('privacy', 'Protect Personal Information', 'Share identifying details gradually.', 'Avoid publishing home addresses, financial credentials, recovery phrases, identity documents, or routine details that create unnecessary risk.', q('Which should stay private?', ['Financial credentials', 'A favorite movie', 'A public hobby'], 0)),
+      lesson('consent', 'Consent Is Ongoing', 'Recognize specific, voluntary, reversible consent.', 'Consent is not implied by a match, prior conversation, gift, or date. People can change their mind, and pressure is incompatible with consent.', q('A match automatically creates consent?', ['Yes', 'No'], 1)),
+      lesson('meeting', 'Meet More Safely', 'Plan early meetings with practical safeguards.', 'Meet in a public place, control your transportation, tell a trusted person the plan, keep communication options, and leave if something feels unsafe.', q('A safer first meeting is usually?', ['Public with independent transport', 'At an isolated location', 'Without telling anyone'], 0)),
+      lesson('reporting', 'Block and Report', 'Use boundaries and reporting tools without confrontation.', 'Blocking ends unwanted contact. Reporting should preserve the reason and route serious threats or suspected exploitation to an appropriate safety process.', q('If someone pressures or threatens you, a sound action is?', ['Block and report', 'Share more private data', 'Promise payment'], 0)),
+    ]
+  },
 ];
 
 export function gradeCourseQuestion(question: CourseQuestion, selectedIndex: number) {

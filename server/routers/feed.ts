@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { likes, posts, users } from "../../drizzle/schema";
+import { follows, likes, posts, users } from "../../drizzle/schema";
 import { db } from "../db";
 import { publicProcedure } from "../_core/trpc";
 
@@ -47,6 +47,14 @@ export const getSkyFeedProcedure = publicProcedure
           .where(and(eq(likes.userId, ctx.user.id), inArray(likes.postId, postIds)))
       : [];
     const likedPostIds = new Set(likedRows.map(row => row.postId).filter(Boolean));
+    const authorIds = rows.map(row => row.authorId).filter((id): id is string => Boolean(id));
+    const followedRows = ctx.user && authorIds.length
+      ? await db
+          .select({ userId: follows.followingId })
+          .from(follows)
+          .where(and(eq(follows.followerId, ctx.user.id), inArray(follows.followingId, authorIds)))
+      : [];
+    const followedAuthorIds = new Set(followedRows.map(row => row.userId).filter(Boolean));
 
     return rows.map(row => ({
       id: row.id,
@@ -65,6 +73,7 @@ export const getSkyFeedProcedure = publicProcedure
             name: row.authorName,
             avatar: row.authorAvatar,
             verified: row.authorVerified ?? false,
+            followedByMe: followedAuthorIds.has(row.authorId),
           }
         : null,
     }));

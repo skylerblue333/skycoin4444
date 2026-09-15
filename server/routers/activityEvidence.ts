@@ -3,18 +3,32 @@ import { arcadeGameProgress, betaFeedback, courseProgress, creatorEvidenceDrafts
 import { db } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 
+async function readEvidenceRows<T>(label: string, query: Promise<T[]>): Promise<T[]> {
+  try {
+    return await query;
+  } catch (error) {
+    // Activity Evidence is an aggregate view. A newly introduced optional
+    // source must not erase otherwise healthy account-owned records while its
+    // additive migration is being rolled out.
+    console.warn(`[ActivityEvidence] ${label} source unavailable`, {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return [];
+  }
+}
+
 export const activityEvidenceRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user.id;
     const [postRows, courseRows, gameRows, feedbackRows, bookmarkRows, historyRows, creatorRows, privacyRows] = await Promise.all([
-      db.select({ id: posts.id, content: posts.content, createdAt: posts.createdAt }).from(posts).where(eq(posts.userId, userId)).orderBy(desc(posts.createdAt)).limit(25),
-      db.select({ id: courseProgress.id, courseId: courseProgress.courseId, lessonId: courseProgress.lessonId, completedAt: courseProgress.completedAt }).from(courseProgress).where(eq(courseProgress.userId, userId)).orderBy(desc(courseProgress.completedAt)).limit(25),
-      db.select({ id: arcadeGameProgress.id, gameId: arcadeGameProgress.gameId, plays: arcadeGameProgress.plays, bestScore: arcadeGameProgress.bestScore, updatedAt: arcadeGameProgress.updatedAt }).from(arcadeGameProgress).where(eq(arcadeGameProgress.userId, userId)).orderBy(desc(arcadeGameProgress.updatedAt)).limit(25),
-      db.select({ id: betaFeedback.id, route: betaFeedback.route, summary: betaFeedback.summary, status: betaFeedback.status, createdAt: betaFeedback.createdAt }).from(betaFeedback).where(eq(betaFeedback.userId, userId)).orderBy(desc(betaFeedback.createdAt)).limit(25),
-      db.select({ id: discoveryBookmarks.id, title: discoveryBookmarks.title, targetKind: discoveryBookmarks.targetKind, createdAt: discoveryBookmarks.createdAt }).from(discoveryBookmarks).where(eq(discoveryBookmarks.userId, userId)).orderBy(desc(discoveryBookmarks.createdAt)).limit(25),
-      db.select({ id: searchHistory.id, query: searchHistory.query, createdAt: searchHistory.createdAt }).from(searchHistory).where(eq(searchHistory.userId, userId)).orderBy(desc(searchHistory.createdAt)).limit(25),
-      db.select({ id: creatorEvidenceDrafts.id, title: creatorEvidenceDrafts.title, status: creatorEvidenceDrafts.status, updatedAt: creatorEvidenceDrafts.updatedAt }).from(creatorEvidenceDrafts).where(eq(creatorEvidenceDrafts.userId, userId)).orderBy(desc(creatorEvidenceDrafts.updatedAt)).limit(25),
-      db.select({ id: privacyRequests.id, action: privacyRequests.action, status: privacyRequests.status, requestedAt: privacyRequests.requestedAt }).from(privacyRequests).where(eq(privacyRequests.userId, userId)).orderBy(desc(privacyRequests.requestedAt)).limit(25),
+      readEvidenceRows("social", db.select({ id: posts.id, content: posts.content, createdAt: posts.createdAt }).from(posts).where(eq(posts.userId, userId)).orderBy(desc(posts.createdAt)).limit(25)),
+      readEvidenceRows("learning", db.select({ id: courseProgress.id, courseId: courseProgress.courseId, lessonId: courseProgress.lessonId, completedAt: courseProgress.completedAt }).from(courseProgress).where(eq(courseProgress.userId, userId)).orderBy(desc(courseProgress.completedAt)).limit(25)),
+      readEvidenceRows("arcade", db.select({ id: arcadeGameProgress.id, gameId: arcadeGameProgress.gameId, plays: arcadeGameProgress.plays, bestScore: arcadeGameProgress.bestScore, updatedAt: arcadeGameProgress.updatedAt }).from(arcadeGameProgress).where(eq(arcadeGameProgress.userId, userId)).orderBy(desc(arcadeGameProgress.updatedAt)).limit(25)),
+      readEvidenceRows("feedback", db.select({ id: betaFeedback.id, route: betaFeedback.route, summary: betaFeedback.summary, status: betaFeedback.status, createdAt: betaFeedback.createdAt }).from(betaFeedback).where(eq(betaFeedback.userId, userId)).orderBy(desc(betaFeedback.createdAt)).limit(25)),
+      readEvidenceRows("bookmarks", db.select({ id: discoveryBookmarks.id, title: discoveryBookmarks.title, targetKind: discoveryBookmarks.targetKind, createdAt: discoveryBookmarks.createdAt }).from(discoveryBookmarks).where(eq(discoveryBookmarks.userId, userId)).orderBy(desc(discoveryBookmarks.createdAt)).limit(25)),
+      readEvidenceRows("search", db.select({ id: searchHistory.id, query: searchHistory.query, createdAt: searchHistory.createdAt }).from(searchHistory).where(eq(searchHistory.userId, userId)).orderBy(desc(searchHistory.createdAt)).limit(25)),
+      readEvidenceRows("creator", db.select({ id: creatorEvidenceDrafts.id, title: creatorEvidenceDrafts.title, status: creatorEvidenceDrafts.status, updatedAt: creatorEvidenceDrafts.updatedAt }).from(creatorEvidenceDrafts).where(eq(creatorEvidenceDrafts.userId, userId)).orderBy(desc(creatorEvidenceDrafts.updatedAt)).limit(25)),
+      readEvidenceRows("privacy", db.select({ id: privacyRequests.id, action: privacyRequests.action, status: privacyRequests.status, requestedAt: privacyRequests.requestedAt }).from(privacyRequests).where(eq(privacyRequests.userId, userId)).orderBy(desc(privacyRequests.requestedAt)).limit(25)),
     ]);
     const events = [
       ...postRows.map(row => ({ id: `post:${row.id}`, type: "post_created", label: "Published a post", detail: row.content || "Post content is not available", createdAt: row.createdAt ?? new Date(0) })),

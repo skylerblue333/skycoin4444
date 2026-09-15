@@ -105,6 +105,40 @@ export function spinRoulette(seed: number) {
   return { value, color } as const;
 }
 
+export type PlinkoDrop = Readonly<{
+  rows: number;
+  path: readonly ('left' | 'right')[];
+  bucket: number;
+  multiplierLabel: string;
+  score: number;
+}>;
+
+const PLINKO_LABELS = ['3×', '1.5×', '1×', '0.5×', '1×', '1.5×', '3×'] as const;
+
+export function dropPlinko(seed: number, rows = 6): PlinkoDrop {
+  if (!Number.isInteger(seed) || !Number.isInteger(rows) || rows < 4 || rows > 12) {
+    throw new Error('plinko requires an integer seed and 4-12 rows');
+  }
+  let state = Math.abs(seed) + 1;
+  const path: Array<'left' | 'right'> = [];
+  let bucket = 0;
+  for (let row = 0; row < rows; row++) {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    const direction = state % 2 === 0 ? 'left' : 'right';
+    path.push(direction);
+    if (direction === 'right') bucket += 1;
+  }
+  const normalizedBucket = Math.round((bucket / rows) * (PLINKO_LABELS.length - 1));
+  const distanceFromCenter = Math.abs(bucket - rows / 2);
+  return Object.freeze({
+    rows,
+    path: Object.freeze(path),
+    bucket,
+    multiplierLabel: PLINKO_LABELS[normalizedBucket],
+    score: Math.round(100 + distanceFromCenter * 75),
+  });
+}
+
 export function moveSnake(head: { x: number; y: number }, direction: 'up' | 'down' | 'left' | 'right', width: number, height: number) {
   if (width < 2 || height < 2) throw new Error('invalid board');
   const delta = direction === 'up' ? [0,-1] : direction === 'down' ? [0,1] : direction === 'left' ? [-1,0] : [1,0];
@@ -136,6 +170,7 @@ export const gapGameCapabilities = {
   checkers: 'local diagonal step validator; captures/kings can be layered by UI state',
   dice: 'deterministic simulated die roller',
   roulette: 'deterministic simulated 0-36 wheel result',
+  plinko: 'deterministic peg-path and practice-score simulation with no wager or payout',
   snake: 'bounded grid movement and collision detector',
   ticTacToe: 'local winner/draw detector',
   assemblyPuzzle: 'ordered-parts completion validator',

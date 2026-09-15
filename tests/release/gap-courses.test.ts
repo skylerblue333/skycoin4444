@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { courseById, gapCourses, gradeCourseQuestion } from '../../client/src/data/gapCourses';
 
 describe('SkySchool gap course content', () => {
-  it('authors fifteen complete course tracks', () => {
-    expect(gapCourses).toHaveLength(15);
-    expect(new Set(gapCourses.map((course) => course.id)).size).toBe(15);
+  it('authors eighteen complete course tracks', () => {
+    expect(gapCourses).toHaveLength(18);
+    expect(new Set(gapCourses.map((course) => course.id)).size).toBe(18);
   });
 
   it('gives every course meaningful lesson and assessment coverage', () => {

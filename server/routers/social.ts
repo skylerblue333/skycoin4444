@@ -29,12 +29,22 @@ import { protectedProcedure, publicProcedure } from "../_core/trpc";
 import { isMysqlDuplicateEntryFor } from "../_core/dbErrors";
 
 const postIdInput = z.object({ postId: z.string().min(1).max(255) });
+export const socialMediaUrlSchema = z
+  .string()
+  .trim()
+  .max(255)
+  .url()
+  .refine(value => new URL(value).protocol === "https:", {
+    message: "Post media URL must use HTTPS",
+  })
+  .nullable()
+  .optional();
 
 export const createPostProcedure = protectedProcedure
   .input(
     z.object({
       content: z.string().trim().min(1).max(255),
-      media: z.string().trim().max(255).nullable().optional(),
+      media: socialMediaUrlSchema,
     })
   )
   .mutation(async ({ ctx, input }) => {

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { arcadeGameProgress } from "../../drizzle/schema";
@@ -47,30 +48,43 @@ async function findUserGame(userId: string, gameId: string) {
   return rows[0] ?? null;
 }
 
+function isArcadeTableUnavailable(error: unknown): boolean {
+  const candidate = error as { code?: unknown; errno?: unknown; message?: unknown };
+  return candidate?.code === "ER_NO_SUCH_TABLE" ||
+    candidate?.errno === 1146 ||
+    String(candidate?.message ?? "").includes("arcade_game_progress");
+}
+
 export const arcadeProgressRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
-    return db
-      .select({
-        gameId: arcadeGameProgress.gameId,
-        plays: arcadeGameProgress.plays,
-        bestScore: arcadeGameProgress.bestScore,
-        bestCombo: arcadeGameProgress.bestCombo,
-        totalSparks: arcadeGameProgress.totalSparks,
-        totalXp: arcadeGameProgress.totalXp,
-        lastPlayedAt: arcadeGameProgress.lastPlayedAt,
-        updatedAt: arcadeGameProgress.updatedAt,
-      })
-      .from(arcadeGameProgress)
-      .where(eq(arcadeGameProgress.userId, ctx.user.id))
-      .orderBy(desc(arcadeGameProgress.updatedAt));
+    try {
+      return await db
+        .select({
+          gameId: arcadeGameProgress.gameId,
+          plays: arcadeGameProgress.plays,
+          bestScore: arcadeGameProgress.bestScore,
+          bestCombo: arcadeGameProgress.bestCombo,
+          totalSparks: arcadeGameProgress.totalSparks,
+          totalXp: arcadeGameProgress.totalXp,
+          lastPlayedAt: arcadeGameProgress.lastPlayedAt,
+          updatedAt: arcadeGameProgress.updatedAt,
+        })
+        .from(arcadeGameProgress)
+        .where(eq(arcadeGameProgress.userId, ctx.user.id))
+        .orderBy(desc(arcadeGameProgress.updatedAt));
+    } catch (error) {
+      if (isArcadeTableUnavailable(error)) return [];
+      throw error;
+    }
   }),
 
   record: protectedProcedure
     .input(arcadeRunInputSchema)
     .mutation(async ({ ctx, input }) => {
       const now = new Date();
-      await db
-        .insert(arcadeGameProgress)
+      try {
+        await db
+          .insert(arcadeGameProgress)
         .values({
           id: randomUUID(),
           userId: ctx.user.id,
@@ -93,7 +107,16 @@ export const arcadeProgressRouter = router({
             lastPlayedAt: now,
             updatedAt: now,
           },
-        });
+          });
+      } catch (error) {
+        if (isArcadeTableUnavailable(error)) {
+          throw new TRPCError({
+            code: "SERVICE_UNAVAILABLE",
+            message: "Arcade cloud sync is being prepared; local game progress is still available",
+          });
+        }
+        throw error;
+      }
 
       const saved = await findUserGame(ctx.user.id, input.gameId);
       if (!saved) {
