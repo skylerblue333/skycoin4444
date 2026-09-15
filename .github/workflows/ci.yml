@@ -39,6 +39,8 @@ jobs:
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
         run: pnpm run audit:markers
+      - name: V3 capability quality audit
+        run: pnpm run audit:v3-capabilities
       - name: Unit and package tests
         run: pnpm test
       - name: Engineering-beta integration tests
