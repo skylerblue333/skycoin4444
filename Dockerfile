@@ -8,8 +8,11 @@ COPY . .
 
 RUN pnpm install --frozen-lockfile
 RUN pnpm run build
+RUN chown -R node:node /app
 
 ENV NODE_ENV=production
 EXPOSE 3000
+
+USER node
 
 CMD ["pnpm", "start"]
