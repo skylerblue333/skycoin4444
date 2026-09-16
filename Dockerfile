@@ -2,14 +2,14 @@ FROM node:24-bookworm-slim AS prod-deps
 
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile --prod
 
 FROM node:24-bookworm-slim AS build
 
 WORKDIR /app
 RUN corepack enable
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
@@ -21,8 +21,8 @@ ENV NODE_ENV=production \
 WORKDIR /app
 
 # Pull fixed Debian packages into the final image. The release-security workflow
-# rejects fixed CRITICAL vulnerabilities, so the runtime layer must not retain
-# stale base packages from an older image snapshot.
+# rejects fixed HIGH/CRITICAL vulnerabilities, so the runtime layer must not
+# retain stale base packages from an older image snapshot.
 RUN apt-get update \
     && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
