@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Activity,
   Bot,
-  Boxes,
+  ChevronRight,
   Compass,
-  GraduationCap,
   Gamepad2,
-  Heart,
+  Grid2X2,
   Home,
-  Languages,
-  LayoutDashboard,
   LogIn,
+  Menu,
+  MessageCircleMore,
   MessageSquare,
   Mic,
   MicOff,
@@ -18,28 +16,26 @@ import {
   Search,
   Sparkles,
   UserRound,
-  ShoppingBag,
-  Video,
+  Users,
   X,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import V3CommandPalette from "@/components/V3CommandPalette";
+import {
+  betaExperienceAreas,
+  betaExperienceStatusCopy,
+  type BetaExperienceArea,
+} from "@/data/betaExperienceAreas";
 
-const links = [
+const primaryLinks = [
   { label: "Home", route: "/", icon: Home },
-  { label: "V5", route: "/beta-workspace", icon: LayoutDashboard },
   { label: "Explore", route: "/platform-map", icon: Compass },
-  { label: "Social", route: "/activity-feed", icon: Activity },
-  { label: "Live", route: "/live", icon: Radio },
+  { label: "Social", route: "/activity-feed", icon: Users },
+  { label: "Chat", route: "/unified-messaging", icon: MessageCircleMore },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
-  { label: "Market", route: "/beta-commerce", icon: ShoppingBag },
-  { label: "School", route: "/sky-school", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
-  { label: "Web3", route: "/beta-web3", icon: Boxes },
-  { label: "Dating", route: "/dating-home", icon: Heart },
-  { label: "Global", route: "/translation-enabled-community", icon: Languages },
-  { label: "Creator", route: "/creator-dashboard", icon: Video },
+  { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
 const fourFoursTrail = [
@@ -64,7 +60,7 @@ const fourFoursTrail = [
     title: "Help somebody",
     message:
       "Technology is most interesting when it makes another person's day, work, or future a little better.",
-    href: "/hope-a-i",
+    href: "/charity",
     action: "Follow hope",
   },
   {
@@ -77,14 +73,29 @@ const fourFoursTrail = [
   },
 ] as const;
 
-function isActive(location: string, route: string) {
+function routeIsActive(location: string, route: string) {
   return route === "/" ? location === "/" : location === route;
+}
+
+function areaIsActive(location: string, area: BetaExperienceArea) {
+  return (
+    location === area.route ||
+    area.highlights.some(highlight => highlight.route === location)
+  );
+}
+
+function statusDot(area: BetaExperienceArea) {
+  if (area.status === "core_beta") return "bg-emerald-300";
+  if (area.status === "controlled_beta") return "bg-amber-300";
+  return "bg-slate-400";
 }
 
 export default function BetaNavigation() {
   const [location, setLocation] = useLocation();
   const { isAuthenticated, loading } = useAuth();
   const [commandOpen, setCommandOpen] = useState(false);
+  const [areaOpen, setAreaOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [fourFoursOpen, setFourFoursOpen] = useState(false);
   const [voiceListening, setVoiceListening] = useState(false);
   const [voiceMessage, setVoiceMessage] = useState("");
@@ -92,57 +103,43 @@ export default function BetaNavigation() {
   const [, setMarkTaps] = useState(0);
   const keyRun = useRef(0);
 
-  function startVoiceNavigation() {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setVoiceMessage("Voice navigation is not supported in this browser.");
-      return;
+  useEffect(() => {
+    setAreaOpen(false);
+    setMobileOpen(false);
+  }, [location]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const editing =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(true);
+        return;
+      }
+
+      if (event.key === "Escape") {
+        setAreaOpen(false);
+        setMobileOpen(false);
+        setFourFoursOpen(false);
+        return;
+      }
+
+      if (editing) return;
+      keyRun.current = event.key === "4" ? keyRun.current + 1 : 0;
+      if (keyRun.current >= 4) {
+        keyRun.current = 0;
+        setFourFoursOpen(true);
+      }
     }
-    if (voiceListening) {
-      voiceRecognition.current?.stop();
-      setVoiceListening(false);
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onstart = () => {
-      setVoiceListening(true);
-      setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
-      );
-    };
-    recognition.onresult = (event: any) => {
-      const spoken = String(
-        event.results?.[0]?.[0]?.transcript ?? ""
-      )
-        .toLowerCase()
-        .trim();
-      const command = links.find(
-        item =>
-          spoken === item.label.toLowerCase() ||
-          spoken.includes(item.label.toLowerCase())
-      );
-      setVoiceMessage(
-        command
-          ? `Opening ${command.label}.`
-          : `I heard “${spoken}”. Try a main navigation name.`
-      );
-      if (command) setLocation(command.route);
-    };
-    recognition.onerror = () => {
-      setVoiceListening(false);
-      setVoiceMessage(
-        "Voice input was unavailable. You can use the navigation links instead."
-      );
-    };
-    recognition.onend = () => setVoiceListening(false);
-    voiceRecognition.current = recognition;
-    recognition.start();
-  }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => () => voiceRecognition.current?.stop(), []);
 
@@ -157,72 +154,110 @@ export default function BetaNavigation() {
     });
   }
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      if (
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        target?.isContentEditable
-      ) {
-        return;
-      }
+  function startVoiceNavigation() {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
-      if (event.key === "Escape" && fourFoursOpen) {
-        setFourFoursOpen(false);
-        return;
-      }
-
-      keyRun.current = event.key === "4" ? keyRun.current + 1 : 0;
-      if (keyRun.current >= 4) {
-        keyRun.current = 0;
-        setFourFoursOpen(true);
-      }
+    if (!SpeechRecognition) {
+      setVoiceMessage("Voice navigation is not supported in this browser.");
+      return;
     }
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [fourFoursOpen]);
+    if (voiceListening) {
+      voiceRecognition.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => {
+      setVoiceListening(true);
+      setVoiceMessage("Listening for a SKYCOIN4444 area or main navigation destination.");
+    };
+    recognition.onresult = (event: any) => {
+      const spoken = String(event.results?.[0]?.[0]?.transcript ?? "")
+        .toLowerCase()
+        .trim();
+
+      const mainMatch = primaryLinks.find(item =>
+        spoken.includes(item.label.toLowerCase())
+      );
+      const areaMatch = betaExperienceAreas.find(area => {
+        const candidates = [area.name, area.eyebrow, ...area.searchTerms]
+          .join(" ")
+          .toLowerCase();
+        return (
+          spoken.includes(area.name.toLowerCase()) ||
+          area.searchTerms.some(term => spoken.includes(term.toLowerCase())) ||
+          candidates.includes(spoken)
+        );
+      });
+      const destination = mainMatch?.route ?? areaMatch?.route;
+      const label = mainMatch?.label ?? areaMatch?.name;
+
+      if (destination && label) {
+        setVoiceMessage(`Opening ${label}.`);
+        setLocation(destination);
+      } else {
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Wallet, Market, School, Live, Dating, or Explore.`);
+      }
+    };
+    recognition.onerror = () => {
+      setVoiceListening(false);
+      setVoiceMessage("Voice input was unavailable. Use Explore or Search instead.");
+    };
+    recognition.onend = () => setVoiceListening(false);
+    voiceRecognition.current = recognition;
+    recognition.start();
+  }
+
+  const activeArea = betaExperienceAreas.find(area => areaIsActive(location, area));
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/90 text-white shadow-[0_12px_30px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl"
+      className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/92 text-white shadow-[0_16px_40px_-28px_rgba(0,0,0,1)] backdrop-blur-xl"
       aria-label="SKYCOIN4444 beta navigation"
     >
       <V3CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
+      <span className="sr-only" role="status" aria-live="polite">
+        {voiceMessage}
+      </span>
+
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
           aria-label="SKYCOIN4444 home"
           onClick={recordMarkTap}
           className="flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-violet-600 text-xs font-black text-white shadow-lg shadow-blue-950/40">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-violet-600 text-xs font-black text-white shadow-lg shadow-blue-950/40">
             44
           </span>
           <span className="hidden sm:block">
-            <strong className="block text-sm font-black tracking-tight">
-              SKYCOIN4444
-            </strong>
-            <span className="block text-[10px] uppercase tracking-[0.18em] text-white/40">
-              V5 engineering beta
+            <strong className="block text-sm font-black tracking-tight">SKYCOIN4444</strong>
+            <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/35">
+              Engineering beta
             </span>
           </span>
         </Link>
 
         <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
-          {links.slice(1, 8).map(({ label, route, icon: Icon }) => {
-            const active = isActive(location, route);
+          {primaryLinks.slice(1).map(({ label, route, icon: Icon }) => {
+            const active = routeIsActive(location, route);
             return (
               <Link
                 key={route}
                 href={route}
                 aria-current={active ? "page" : undefined}
                 className={
-                  "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-semibold transition-colors " +
+                  "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition " +
                   (active
-                    ? "bg-white/12 text-white"
-                    : "text-white/55 hover:bg-white/[0.07] hover:text-white")
+                    ? "bg-white/10 text-white shadow-inner"
+                    : "text-white/48 hover:bg-white/[0.055] hover:text-white/85")
                 }
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -235,10 +270,29 @@ export default function BetaNavigation() {
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <button
             type="button"
+            onClick={() => {
+              setAreaOpen(open => !open);
+              setMobileOpen(false);
+            }}
+            aria-expanded={areaOpen}
+            aria-controls="beta-area-launcher"
+            className={
+              "hidden items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition md:inline-flex " +
+              (areaOpen
+                ? "border-sky-300/30 bg-sky-300/10 text-sky-100"
+                : "border-white/10 bg-white/[0.035] text-white/65 hover:border-sky-300/20 hover:text-white")
+            }
+          >
+            <Grid2X2 className="h-4 w-4" />
+            Areas
+          </button>
+
+          <button
+            type="button"
             onClick={() => setCommandOpen(true)}
             aria-label="Search all SKYCOIN4444 routes"
             title="Search all routes (Ctrl/⌘ K)"
-            className="inline-flex items-center gap-2 rounded-xl border border-sky-300/20 bg-sky-300/[0.07] px-3 py-2 text-xs font-semibold text-sky-100 transition hover:border-sky-300/35 hover:bg-sky-300/[0.11]"
+            className="inline-flex items-center gap-2 rounded-xl border border-sky-300/20 bg-sky-300/[0.07] px-3 py-2 text-xs font-bold text-sky-100 transition hover:border-sky-300/35 hover:bg-sky-300/[0.11]"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Search</span>
@@ -246,35 +300,30 @@ export default function BetaNavigation() {
               ⌘K
             </span>
           </button>
+
           <button
             type="button"
             onClick={startVoiceNavigation}
-            aria-label={
-              voiceListening ? "Stop voice navigation" : "Start voice navigation"
-            }
+            aria-label={voiceListening ? "Stop voice navigation" : "Start voice navigation"}
             title={voiceMessage || "Voice navigation"}
             className={
-              "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition " +
+              "hidden items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition lg:inline-flex " +
               (voiceListening
                 ? "border-rose-300/35 bg-rose-300/10 text-rose-100"
-                : "border-white/10 bg-white/[0.05] text-white/70 hover:border-sky-300/30 hover:bg-white/10 hover:text-white")
+                : "border-white/10 bg-white/[0.035] text-white/55 hover:border-sky-300/20 hover:text-white")
             }
           >
-            {voiceListening ? (
-              <MicOff className="h-4 w-4" />
-            ) : (
-              <Mic className="h-4 w-4" />
-            )}
-            <span className="hidden lg:inline">
-              {voiceListening ? "Stop" : "Voice"}
-            </span>
+            {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {voiceListening ? "Stop" : "Voice"}
           </button>
+
           <Link
             href={`/beta-feedback?route=${encodeURIComponent(location)}`}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs font-semibold text-white/70 transition hover:border-sky-300/30 hover:bg-white/10 hover:text-white"
+            aria-label="Send beta feedback"
+            className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-bold text-white/55 transition hover:border-sky-300/20 hover:text-white lg:inline-flex"
           >
             <MessageSquare className="h-4 w-4" />
-            <span className="hidden lg:inline">Feedback</span>
+            Feedback
           </Link>
 
           <Link
@@ -287,64 +336,141 @@ export default function BetaNavigation() {
                   : "Open account sign in"
             }
             className={
-              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 " +
+              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 " +
               (isAuthenticated
                 ? "border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-100 hover:bg-emerald-300/[0.13]"
                 : "bg-white text-[#050510] hover:bg-white/90")
             }
           >
-            {isAuthenticated ? (
-              <UserRound className="h-4 w-4" />
-            ) : (
-              <LogIn className="h-4 w-4" />
-            )}
+            {isAuthenticated ? <UserRound className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
             <span className="hidden sm:inline">
               {loading ? "Account" : isAuthenticated ? "Dashboard" : "Sign in"}
             </span>
           </Link>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMobileOpen(open => !open);
+              setAreaOpen(false);
+            }}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={mobileOpen}
+            className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.035] text-white/65 md:hidden"
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
-      <div className="border-t border-white/[0.06] xl:hidden">
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <button
-            type="button"
-            onClick={() => setCommandOpen(true)}
-            aria-label="Search all routes"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-sky-400/12 px-3 py-2 text-xs font-semibold text-sky-100"
-          >
-            <Search className="h-3.5 w-3.5" />
-            Search
-          </button>
-          {links.map(({ label, route, icon: Icon }) => {
-            const active = isActive(location, route);
-            return (
+      {activeArea ? (
+        <div className="border-t border-white/[0.055] bg-white/[0.018]">
+          <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 text-[11px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-6 lg:px-8">
+            <span className="shrink-0 font-black text-white/55">{activeArea.name}</span>
+            <span className="h-1 w-1 shrink-0 rounded-full bg-white/20" />
+            {activeArea.highlights.map(link => (
+              <Link
+                key={link.route}
+                href={link.route}
+                className={
+                  "shrink-0 rounded-lg px-2.5 py-1.5 font-semibold transition " +
+                  (location === link.route
+                    ? "bg-white/10 text-white"
+                    : "text-white/35 hover:bg-white/[0.05] hover:text-white/70")
+                }
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {areaOpen ? (
+        <div id="beta-area-launcher" className="absolute left-0 right-0 top-full hidden border-b border-white/10 bg-[#070712]/98 shadow-2xl shadow-black/50 backdrop-blur-xl md:block">
+          <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-200/50">Ecosystem areas</p>
+                <h2 className="mt-1 text-lg font-black tracking-tight">Go somewhere useful</h2>
+              </div>
+              <Link href="/platform-map" className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-200/75 hover:text-sky-100">
+                Full Explore <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-5 grid gap-2 md:grid-cols-3 lg:grid-cols-4">
+              {betaExperienceAreas.map(area => {
+                const active = areaIsActive(location, area);
+                return (
+                  <Link
+                    key={area.id}
+                    href={area.route}
+                    className={
+                      "group flex items-center gap-3 rounded-2xl border p-3 transition " +
+                      (active
+                        ? "border-sky-300/25 bg-sky-300/[0.08]"
+                        : "border-white/[0.07] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.045]")
+                    }
+                  >
+                    <span className={`h-2 w-2 shrink-0 rounded-full ${statusDot(area)}`} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-bold text-white/85">{area.name}</span>
+                      <span className="mt-0.5 block truncate text-[10px] text-white/32">{area.eyebrow}</span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-white/15 transition group-hover:translate-x-0.5 group-hover:text-white/40" />
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/[0.06] pt-4 text-[10px] text-white/35">
+              {(["core_beta", "controlled_beta", "preview"] as const).map(status => (
+                <span key={status} className="inline-flex items-center gap-2">
+                  <span className={`h-1.5 w-1.5 rounded-full ${status === "core_beta" ? "bg-emerald-300" : status === "controlled_beta" ? "bg-amber-300" : "bg-slate-400"}`} />
+                  {betaExperienceStatusCopy[status].label}
+                </span>
+              ))}
+              <span className="text-white/25">Status describes the beta surface, not production certification.</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {mobileOpen ? (
+        <div className="border-t border-white/[0.06] bg-[#070712] md:hidden">
+          <div className="grid grid-cols-2 gap-2 p-3">
+            {primaryLinks.map(({ label, route, icon: Icon }) => (
               <Link
                 key={route}
                 href={route}
-                aria-current={active ? "page" : undefined}
                 className={
-                  "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors " +
-                  (active
-                    ? "bg-sky-400/15 text-sky-100"
-                    : "text-white/50 hover:bg-white/[0.06] hover:text-white")
+                  "flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-bold " +
+                  (routeIsActive(location, route) ? "bg-sky-300/10 text-sky-100" : "bg-white/[0.03] text-white/55")
                 }
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-4 w-4" />
                 {label}
               </Link>
-            );
-          })}
+            ))}
+            <Link href="/platform-map" className="flex items-center gap-2 rounded-xl bg-white/[0.03] px-3 py-3 text-sm font-bold text-white/55">
+              <Grid2X2 className="h-4 w-4" />
+              All areas
+            </Link>
+            <button type="button" onClick={startVoiceNavigation} className="flex items-center gap-2 rounded-xl bg-white/[0.03] px-3 py-3 text-left text-sm font-bold text-white/55">
+              {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              Voice
+            </button>
+            <Link href={`/beta-feedback?route=${encodeURIComponent(location)}`} className="col-span-2 flex items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-3 text-sm font-bold text-white/60">
+              <MessageSquare className="h-4 w-4" />
+              Send beta feedback
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {fourFoursOpen ? (
-        <div
-          className="fixed inset-0 z-[100] grid place-items-center bg-[#020208]/90 p-4 backdrop-blur-md"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="four-fours-title"
-        >
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-[#020208]/92 p-4 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="four-fours-title">
           <div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-sky-300/20 bg-[#080817] p-5 shadow-2xl shadow-blue-950/50 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -352,67 +478,26 @@ export default function BetaNavigation() {
                   <Sparkles className="h-3.5 w-3.5" />
                   44 · 44
                 </div>
-                <h2
-                  id="four-fours-title"
-                  className="mt-4 text-2xl font-black tracking-tight text-white sm:text-3xl"
-                >
-                  You found the Four Fours.
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">
-                  Four notes hidden behind the mark. They are not achievements,
-                  rewards, credentials, or tracked progress—just a small trail
-                  through the ecosystem.
-                </p>
+                <h2 id="four-fours-title" className="mt-4 text-2xl font-black tracking-tight text-white sm:text-3xl">You found the Four Fours.</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/45">Four small notes hidden behind the mark. No score, no reward, no tracking—just something worth leaving in the ecosystem.</p>
               </div>
-              <button
-                type="button"
-                aria-label="Close Four Fours Easter egg"
-                onClick={() => setFourFoursOpen(false)}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/55 transition hover:bg-white/[0.08] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/60"
-              >
+              <button type="button" aria-label="Close Four Fours Easter egg" onClick={() => setFourFoursOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/55 hover:bg-white/[0.08] hover:text-white">
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {fourFoursTrail.map(item => (
-                <div
-                  key={item.number}
-                  className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5"
-                >
-                  <span className="text-[10px] font-black tracking-[0.24em] text-sky-200/45">
-                    {item.number} / 04
-                  </span>
-                  <h3 className="mt-2 text-base font-black text-white/85">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-xs leading-6 text-white/40">
-                    {item.message}
-                  </p>
-                  <Link
-                    href={item.href}
-                    onClick={() => setFourFoursOpen(false)}
-                    className="mt-4 inline-flex text-xs font-bold text-sky-200 transition hover:text-white"
-                  >
-                    {item.action}
+                <article key={item.number} className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
+                  <span className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-200/45">{item.number}</span>
+                  <h3 className="mt-2 text-base font-black text-white">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-white/45">{item.message}</p>
+                  <Link href={item.href} onClick={() => setFourFoursOpen(false)} className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-sky-200/75 hover:text-sky-100">
+                    {item.action} <ChevronRight className="h-4 w-4" />
                   </Link>
-                </div>
+                </article>
               ))}
             </div>
-
-            <div className="mt-5 rounded-2xl border border-white/[0.07] bg-black/20 p-4 text-center">
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-white/25">
-                The old engineering rule
-              </p>
-              <p className="mt-2 text-sm font-semibold text-white/55">
-                No fake progress. Build it. Test it. Integrate it. Prove it.
-              </p>
-            </div>
-
-            <p className="mt-4 text-center text-[10px] leading-5 text-white/20">
-              Unlocks in memory only. No analytics event, cookie, account field,
-              local storage, or server record is created.
-            </p>
           </div>
         </div>
       ) : null}
