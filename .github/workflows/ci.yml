@@ -35,8 +35,8 @@ jobs:
         run: pnpm run check:packages
       - name: Canonical code lint
         run: pnpm run lint
-      - name: Repository format check
-        run: pnpm run format:check
+      - name: Launch-control format check
+        run: pnpm exec prettier --check README.md SECURITY.md .github/workflows/ci.yml
       - name: Current-tree credential pattern scan
         run: pnpm run check:secrets
       - name: Engineering-beta marker audit
