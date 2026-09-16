@@ -1,0 +1,88 @@
+name: Release Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - name: Repository vulnerability, secret, and misconfiguration scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          vuln-type: os,library
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+          format: table
+          exit-code: '1'
+
+      - name: Build exact-revision production image
+        run: docker build --pull --tag skycoin4444:${{ github.sha }} .
+
+      - name: Production image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: skycoin4444:${{ github.sha }}
+          scanners: vuln,secret,misconfig
+          vuln-type: os,library
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
+          format: table
+          exit-code: '1'
+
+      - name: Generate CycloneDX SBOM from production image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: skycoin4444:${{ github.sha }}
+          format: cyclonedx
+          output: sbom.cdx.json
+          exit-code: '0'
+
+      - name: Record release evidence
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const evidence = {
+            repository: process.env.GITHUB_REPOSITORY,
+            commitSha: process.env.GITHUB_SHA,
+            workflowRunId: process.env.GITHUB_RUN_ID,
+            workflowRunAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            applicationVersion: pkg.version,
+            image: `skycoin4444:${process.env.GITHUB_SHA}`,
+            environment: 'ci-release-validation',
+            buildTimestampUtc: new Date().toISOString(),
+            sbomFormat: 'CycloneDX JSON'
+          };
+          fs.writeFileSync('release-evidence.json', `${JSON.stringify(evidence, null, 2)}\n`);
+          NODE
+          test -s sbom.cdx.json
+          test -s release-evidence.json
+
+      - name: Retain SBOM and release evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-evidence-${{ github.sha }}
+          path: |
+            sbom.cdx.json
+            release-evidence.json
+          if-no-files-found: error
+          retention-days: 30
