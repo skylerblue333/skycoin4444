@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { completionPercent, resolveNextSteps, validateLearningPath } from "./index";
+import {
+  completionPercent,
+  resolveNextSteps,
+  validateLearningPath,
+} from "./index";
 
 const path = {
   id: "path-1",
@@ -13,8 +17,16 @@ const path = {
 
 describe("SkyLearningPaths", () => {
   it("exposes only unblocked next steps", () => {
-    expect(resolveNextSteps(path, { completedStepIds: [] }).available.map(step => step.id)).toEqual(["a"]);
-    expect(resolveNextSteps(path, { completedStepIds: ["a"] }).available.map(step => step.id)).toEqual(["b"]);
+    expect(
+      resolveNextSteps(path, { completedStepIds: [] }).available.map(
+        step => step.id,
+      ),
+    ).toEqual(["a"]);
+    expect(
+      resolveNextSteps(path, { completedStepIds: ["a"] }).available.map(
+        step => step.id,
+      ),
+    ).toEqual(["b"]);
   });
 
   it("reports missing prerequisites", () => {
@@ -25,7 +37,9 @@ describe("SkyLearningPaths", () => {
   });
 
   it("computes completion using only known steps", () => {
-    expect(completionPercent(path, { completedStepIds: ["a", "unknown"] })).toBe(33.33);
+    expect(
+      completionPercent(path, { completedStepIds: ["a", "unknown"] }),
+    ).toBe(33.33);
   });
 
   it("validates duplicate and missing prerequisite references", () => {
@@ -34,7 +48,12 @@ describe("SkyLearningPaths", () => {
       title: "Bad",
       steps: [
         { id: "a", title: "A", prerequisites: [], estimatedMinutes: 1 },
-        { id: "a", title: "Again", prerequisites: ["missing"], estimatedMinutes: 1 },
+        {
+          id: "a",
+          title: "Again",
+          prerequisites: ["missing"],
+          estimatedMinutes: 1,
+        },
       ],
     });
     expect(errors).toContain("duplicate step id: a");
@@ -53,5 +72,22 @@ describe("SkyLearningPaths", () => {
     });
 
     expect(errors).toContain("prerequisite graph contains a cycle");
+  });
+
+  it("validates long acyclic prerequisite chains without recursion", () => {
+    const steps = Array.from({ length: 5_000 }, (_, index) => ({
+      id: `step-${index}`,
+      title: `Step ${index}`,
+      prerequisites: index === 0 ? [] : [`step-${index - 1}`],
+      estimatedMinutes: 1,
+    }));
+
+    expect(
+      validateLearningPath({
+        id: "long-chain",
+        title: "Long chain",
+        steps,
+      }),
+    ).not.toContain("prerequisite graph contains a cycle");
   });
 });
