@@ -22,9 +22,16 @@ const sourcePriority: Record<ConfigEntry["source"], number> = {
   runtime: 2,
 };
 
+const configSources = new Set<string>(["default", "environment", "runtime"]);
+
+function isConfigSource(value: unknown): value is ConfigEntry["source"] {
+  return typeof value === "string" && configSources.has(value);
+}
+
 export function validateConfigEntry(entry: ConfigEntry): string[] {
   const errors: string[] = [];
   if (!/^[A-Z][A-Z0-9_]*$/.test(entry.key)) errors.push("key must be upper snake case");
+  if (!isConfigSource(entry.source)) errors.push("source must be default, environment, or runtime");
   if (typeof entry.value === "number" && !Number.isFinite(entry.value)) errors.push("numeric value must be finite");
   return errors;
 }
