@@ -63,3 +63,25 @@ describe("unavailable feature API contracts", () => {
     );
   });
 });
+
+
+describe("provider health API contract", () => {
+  it("denies unauthenticated provider inventory reads", async () => {
+    const caller = appRouter.createCaller(createContext());
+    await expect(caller.system.providerHealth.list()).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+  });
+
+  it("returns a truthful secret-free provider inventory to authenticated users", async () => {
+    const caller = appRouter.createCaller(createContext(true));
+    const result = await caller.system.providerHealth.list();
+
+    expect(result.providers.length).toBeGreaterThan(0);
+    expect(result.summary.total).toBe(result.providers.length);
+    expect(result.providers.every(provider => provider.liveCallable === false)).toBe(
+      true
+    );
+    expect(JSON.stringify(result)).not.toContain("BUILT_IN_FORGE_API_KEY");
+  });
+});
