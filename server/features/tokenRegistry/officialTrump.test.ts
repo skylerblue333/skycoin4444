@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createOfficialTrumpRegistry,
   createOfficialTrumpTransferIntent,
   OFFICIAL_TRUMP_MINT,
   OFFICIAL_TRUMP_TOKEN,
@@ -23,6 +24,15 @@ describe('Official TRUMP Solana transfer boundary', () => {
       network: 'solana',
       decimals: 6,
       contractAddress: OFFICIAL_TRUMP_MINT,
+    });
+  });
+
+  it('registers the verified asset in a fresh ecosystem registry', () => {
+    const snapshot = createOfficialTrumpRegistry().snapshot();
+    expect(snapshot).toEqual({
+      type: 'sky.token-registry.snapshot.v1',
+      tokenCount: 1,
+      tokens: [OFFICIAL_TRUMP_TOKEN],
     });
   });
 

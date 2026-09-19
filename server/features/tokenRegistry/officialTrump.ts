@@ -1,3 +1,4 @@
+import { SkyTokenRegistry } from './index';
 import type { TokenDefinition } from './index';
 
 /** Official TRUMP SPL mint, verified against public token listings on 2026-09-19. */
@@ -12,6 +13,13 @@ export const OFFICIAL_TRUMP_TOKEN: Readonly<TokenDefinition> = Object.freeze({
   decimals: 6,
   contractAddress: OFFICIAL_TRUMP_MINT,
 });
+
+/** Creates a fresh registry containing only the explicitly verified TRUMP asset. */
+export function createOfficialTrumpRegistry(): SkyTokenRegistry {
+  const registry = new SkyTokenRegistry();
+  registry.register(OFFICIAL_TRUMP_TOKEN);
+  return registry;
+}
 
 export type TrumpTransferAcknowledgements = Readonly<{
   mint: boolean;
