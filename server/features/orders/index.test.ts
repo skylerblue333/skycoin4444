@@ -22,6 +22,15 @@ describe("SkyOrders", () => {
     expect(orderTotalMinor(order)).toBe(1250);
   });
 
+  it("rejects invalid numeric lines in direct total calculation", () => {
+    expect(() =>
+      orderTotalMinor({
+        ...order,
+        lines: [{ sku: "sku-a", quantity: 0.5, unitPriceMinor: 2 }],
+      }),
+    ).toThrow("quantity must be positive for sku-a");
+  });
+
   it("accepts placement when inventory is sufficient", () => {
     expect(
       evaluatePlacement(order, [
@@ -50,7 +59,9 @@ describe("SkyOrders", () => {
     ]);
 
     expect(decision.accepted).toBe(false);
-    expect(decision.reason).toContain("availability must be a non-negative safe integer for sku-a");
+    expect(decision.reason).toContain(
+      "availability must be a non-negative safe integer for sku-a",
+    );
   });
 
   it("rejects duplicate inventory availability rows", () => {
@@ -66,19 +77,25 @@ describe("SkyOrders", () => {
     const errors = validateOrder({
       ...order,
       lines: [
-        { sku: "sku-a", quantity: Number.MAX_SAFE_INTEGER, unitPriceMinor: 0 },
+        {
+          sku: "sku-a",
+          quantity: Number.MAX_SAFE_INTEGER,
+          unitPriceMinor: 0,
+        },
         { sku: "sku-a", quantity: 2, unitPriceMinor: 0 },
       ],
     });
 
-    expect(errors).toContain("total quantity exceeds safe integer range for sku-a");
+    expect(errors).toContain(
+      "total quantity exceeds safe integer range for sku-a",
+    );
   });
 
   it("enforces lifecycle transitions", () => {
     expect(transitionOrder(order, "placed").status).toBe("placed");
-    expect(() => transitionOrder({ ...order, status: "cancelled" }, "placed")).toThrow(
-      "invalid order transition",
-    );
+    expect(() =>
+      transitionOrder({ ...order, status: "cancelled" }, "placed"),
+    ).toThrow("invalid order transition");
     expect(() =>
       transitionOrder(
         { ...order, status: "unknown" as "draft" },
