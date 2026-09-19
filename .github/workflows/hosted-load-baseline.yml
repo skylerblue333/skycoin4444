@@ -1,0 +1,51 @@
+name: Hosted Load Baseline
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/hosted-load-baseline.mjs"
+      - ".github/workflows/hosted-load-baseline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hosted-load-baseline
+  cancel-in-progress: false
+
+jobs:
+  hosted-load-baseline:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HOSTED_BETA_ORIGIN: https://skycoin4444-beta-v5-production.up.railway.app
+      LOAD_TOTAL_REQUESTS: "180"
+      LOAD_CONCURRENCY: "6"
+      LOAD_WARMUP_REQUESTS: "12"
+      LOAD_MAX_ERROR_RATE: "0"
+      LOAD_P95_LIMIT_MS: "1500"
+      LOAD_P99_LIMIT_MS: "3000"
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Run bounded hosted load baseline
+        run: node scripts/hosted-load-baseline.mjs
+
+      - name: Retain load evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-load-baseline
+          path: artifacts/hosted-load-baseline.json
+          if-no-files-found: ignore
+          retention-days: 30
