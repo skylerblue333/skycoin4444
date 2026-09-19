@@ -40,4 +40,18 @@ describe("SkyLearningPaths", () => {
     expect(errors).toContain("duplicate step id: a");
     expect(errors).toContain("unknown prerequisite missing for a");
   });
+
+  it("rejects indirect prerequisite cycles", () => {
+    const errors = validateLearningPath({
+      id: "cyclic",
+      title: "Cyclic",
+      steps: [
+        { id: "a", title: "A", prerequisites: ["c"], estimatedMinutes: 1 },
+        { id: "b", title: "B", prerequisites: ["a"], estimatedMinutes: 1 },
+        { id: "c", title: "C", prerequisites: ["b"], estimatedMinutes: 1 },
+      ],
+    });
+
+    expect(errors).toContain("prerequisite graph contains a cycle");
+  });
 });
