@@ -17,13 +17,24 @@ export interface ModelSelectionRequest {
   includeDeprecated?: boolean;
 }
 
+const modelLifecycles = new Set<string>(["draft", "approved", "deprecated", "disabled"]);
+
+function isModelLifecycle(value: unknown): value is ModelLifecycle {
+  return typeof value === "string" && modelLifecycles.has(value);
+}
+
 export function validateModelRecord(record: ModelRecord): string[] {
   const errors: string[] = [];
   if (!record.id.trim()) errors.push("id is required");
   if (!record.provider.trim()) errors.push("provider is required");
   if (!record.model.trim()) errors.push("model is required");
   if (!record.version.trim()) errors.push("version is required");
-  if (record.capabilities.length === 0) errors.push("at least one capability is required");
+  if (!isModelLifecycle(record.lifecycle)) errors.push("lifecycle is invalid");
+  if (record.capabilities.length === 0) {
+    errors.push("at least one capability is required");
+  } else if (record.capabilities.some(capability => typeof capability !== "string" || !capability.trim())) {
+    errors.push("capabilities must be non-empty strings");
+  }
   if (record.maxInputTokens !== undefined && (!Number.isSafeInteger(record.maxInputTokens) || record.maxInputTokens <= 0)) {
     errors.push("maxInputTokens must be a positive safe integer");
   }
@@ -31,6 +42,7 @@ export function validateModelRecord(record: ModelRecord): string[] {
 }
 
 export function selectModels(records: readonly ModelRecord[], request: ModelSelectionRequest): ModelRecord[] {
+  if (!request.capability.trim()) return [];
   const allowedProviders = request.providerAllowlist ? new Set(request.providerAllowlist) : null;
   return records
     .filter(record => record.lifecycle === "approved" || (request.includeDeprecated && record.lifecycle === "deprecated"))
@@ -54,6 +66,12 @@ export function transitionModel(record: ModelRecord, next: ModelLifecycle): Mode
     deprecated: ["approved", "disabled"],
     disabled: [],
   };
+  if (!isModelLifecycle(record.lifecycle)) {
+    throw new Error(`invalid current lifecycle: ${String(record.lifecycle)}`);
+  }
+  if (!isModelLifecycle(next)) {
+    throw new Error(`invalid target lifecycle: ${String(next)}`);
+  }
   if (!allowed[record.lifecycle].includes(next)) {
     throw new Error(`invalid lifecycle transition: ${record.lifecycle} -> ${next}`);
   }
