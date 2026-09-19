@@ -4,14 +4,15 @@ Engineering-beta deterministic wallet planning/accounting core tracked by Issue 
 
 ## Capability
 
-- validates bounded account IDs, public-key encoding, balances and nonces;
+- validates runtime account objects, bounded account IDs, public-key encoding, bigint balances and nonces;
 - plans transfers deterministically with explicit fee and nonce handling;
-- rejects self-transfers, overdrafts and stale transfer plans;
+- validates transfer-plan shape and SHA-256 integrity before local debit accounting;
+- rejects self-transfers, overdrafts, stale nonces, malformed numeric types and tampered/negative transfer plans;
 - applies local debit accounting without mutating the caller's wallet object.
 
 ## Integration contract
 
-Import `validateWalletAccount`, `planTransfer`, and `applyPlannedDebit` from `src/index.ts`. Amounts and fees use `bigint` smallest units. Callers must provide signing, broadcast, persistence and denomination policies.
+Import `validateWalletAccount`, `validateTransferPlan`, `planTransfer`, and `applyPlannedDebit` from `src/index.ts`. Amounts and fees use `bigint` smallest units. Callers must provide signing, broadcast, persistence and denomination policies.
 
 ## Security and product boundary
 
