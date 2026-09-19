@@ -28,6 +28,22 @@ FROM node:24-bookworm-slim AS runtime
 
 WORKDIR /app
 
+# Apply available Debian security fixes and remove package-manager tooling that
+# the runtime never executes. This reduces both the installed attack surface
+# and scanner-visible dependencies without weakening security gates.
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    && rm -f \
+      /usr/local/bin/npm \
+      /usr/local/bin/npx \
+      /usr/local/bin/corepack \
+      /usr/local/bin/pnpm \
+      /usr/local/bin/pnpx \
+      /usr/local/bin/yarn \
+      /usr/local/bin/yarnpkg
+
 ENV NODE_ENV=production
 
 COPY --from=build --chown=node:node /app/dist ./dist
