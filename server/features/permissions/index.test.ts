@@ -64,11 +64,72 @@ describe("SkyPermissions", () => {
     expect(decision.allowed).toBe(true);
   });
 
+  it("fails closed when context conflicts with subject attributes", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "tenant-reader",
+          resource: "reports/*",
+          action: "read",
+          effect: "allow",
+          conditions: { tenantId: "tenant-b" },
+        },
+      ],
+      {
+        subject: {
+          id: "user-2",
+          roles: ["analyst"],
+          attributes: { tenantId: "tenant-a" },
+        },
+        resource: "reports/monthly",
+        action: "read",
+        context: { tenantId: "tenant-b" },
+      },
+    );
+
+    expect(decision).toEqual({
+      allowed: false,
+      matchedRuleIds: [],
+      reason: "default-deny",
+    });
+  });
+
+  it("handles adversarial wildcard patterns without regex backtracking", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "adversarial-pattern",
+          resource: "*a*a*a*a*a*a*a*a*a*a*b",
+          action: "read",
+          effect: "allow",
+        },
+      ],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "a".repeat(10_000),
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(false);
+  });
+
   it("validates required rule fields", () => {
     expect(validatePermissionRule({ id: "", resource: "", action: "", effect: "allow" })).toEqual([
       "id is required",
       "resource is required",
       "action is required",
     ]);
+  });
+
+  it("rejects unsupported effects at the runtime boundary", () => {
+    expect(
+      validatePermissionRule({
+        id: "rule-1",
+        resource: "*",
+        action: "*",
+        effect: "audit" as "allow",
+      }),
+    ).toContain("effect must be allow or deny");
   });
 });
