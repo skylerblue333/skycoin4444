@@ -42,6 +42,54 @@ describe("SkyLearningPaths", () => {
     ).toBe(33.33);
   });
 
+  it("validates malformed runtime path shapes without throwing", () => {
+    expect(
+      validateLearningPath(null as unknown as typeof path),
+    ).toEqual(["learning path is required"]);
+
+    expect(
+      validateLearningPath({
+        ...path,
+        steps: null as unknown as typeof path.steps,
+      }),
+    ).toContain("steps must be an array");
+
+    expect(
+      validateLearningPath({
+        ...path,
+        steps: [
+          null as unknown as (typeof path.steps)[number],
+          {
+            id: "b",
+            title: "B",
+            prerequisites: null as unknown as string[],
+            estimatedMinutes: 1,
+          },
+        ],
+      }),
+    ).toEqual([
+      "step is required at index 0",
+      "prerequisites must be an array: b",
+    ]);
+  });
+
+  it("rejects invalid progress snapshots at public decision boundaries", () => {
+    expect(() =>
+      resolveNextSteps(
+        path,
+        null as unknown as { completedStepIds: string[] },
+      ),
+    ).toThrow("progress completedStepIds must be an array");
+
+    expect(() =>
+      completionPercent(path, {
+        completedStepIds: ["a", ""],
+      }),
+    ).toThrow(
+      "progress completedStepIds must contain non-empty strings",
+    );
+  });
+
   it("validates duplicate and missing prerequisite references", () => {
     const errors = validateLearningPath({
       id: "p",
@@ -89,5 +137,24 @@ describe("SkyLearningPaths", () => {
         steps,
       }),
     ).not.toContain("prerequisite graph contains a cycle");
+  });
+
+  it("throws controlled errors rather than dereferencing invalid paths", () => {
+    expect(() =>
+      resolveNextSteps(
+        {
+          ...path,
+          steps: [
+            {
+              id: "broken",
+              title: "Broken",
+              prerequisites: null as unknown as string[],
+              estimatedMinutes: 1,
+            },
+          ],
+        },
+        { completedStepIds: [] },
+      ),
+    ).toThrow("invalid learning path");
   });
 });

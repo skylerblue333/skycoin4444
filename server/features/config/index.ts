@@ -28,6 +28,10 @@ const configSources = new Set<string>([
   "runtime",
 ]);
 
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 function isConfigSource(value: unknown): value is ConfigEntry["source"] {
   return typeof value === "string" && configSources.has(value);
 }
@@ -41,8 +45,10 @@ function isConfigPrimitive(value: unknown): value is ConfigPrimitive {
 }
 
 export function validateConfigEntry(entry: ConfigEntry): string[] {
+  if (!isObjectRecord(entry)) return ["config entry is required"];
+
   const errors: string[] = [];
-  if (!/^[A-Z][A-Z0-9_]*$/.test(entry.key)) {
+  if (typeof entry.key !== "string" || !/^[A-Z][A-Z0-9_]*$/.test(entry.key)) {
     errors.push("key must be upper snake case");
   }
   if (!isConfigSource(entry.source)) {
@@ -57,13 +63,28 @@ export function validateConfigEntry(entry: ConfigEntry): string[] {
   return errors;
 }
 
-export function resolveConfig(snapshot: ConfigSnapshot): ConfigResolution {
-  const selected = new Map<string, ConfigEntry>();
-  for (const entry of snapshot.entries) {
+function validatedEntries(snapshot: ConfigSnapshot): readonly ConfigEntry[] {
+  if (!isObjectRecord(snapshot) || !Array.isArray(snapshot.entries)) {
+    throw new Error("config snapshot entries must be an array");
+  }
+
+  for (const [index, entry] of snapshot.entries.entries()) {
     const errors = validateConfigEntry(entry);
     if (errors.length > 0) {
-      throw new Error(`${entry.key || "<empty>"}: ${errors.join("; ")}`);
+      const key =
+        isObjectRecord(entry) && typeof entry.key === "string"
+          ? entry.key || "<empty>"
+          : `<index:${index}>`;
+      throw new Error(`${key}: ${errors.join("; ")}`);
     }
+  }
+  return snapshot.entries;
+}
+
+export function resolveConfig(snapshot: ConfigSnapshot): ConfigResolution {
+  const entries = validatedEntries(snapshot);
+  const selected = new Map<string, ConfigEntry>();
+  for (const entry of entries) {
     const current = selected.get(entry.key);
     if (
       !current ||
@@ -90,20 +111,13 @@ export function redactConfig(
   value: ConfigPrimitive | "[REDACTED]";
   source: ConfigEntry["source"];
 }> {
-  for (const entry of snapshot.entries) {
-    const errors = validateConfigEntry(entry);
-    if (errors.length > 0) {
-      throw new Error(`${entry.key || "<empty>"}: ${errors.join("; ")}`);
-    }
-  }
+  const entries = validatedEntries(snapshot);
 
   const sensitiveKeys = new Set(
-    snapshot.entries
-      .filter(entry => entry.sensitive === true)
-      .map(entry => entry.key),
+    entries.filter(entry => entry.sensitive === true).map(entry => entry.key),
   );
 
-  return snapshot.entries
+  return entries
     .map(entry => ({
       key: entry.key,
       value: sensitiveKeys.has(entry.key)
@@ -111,13 +125,30 @@ export function redactConfig(
         : entry.value,
       source: entry.source,
     }))
-    .sort((a, b) => a.key.localeCompare(b.key));
+    .sort((a, b) =>
+      a.key === b.key
+        ? sourcePriority[a.source] - sourcePriority[b.source]
+        : a.key < b.key
+          ? -1
+          : 1,
+    );
 }
 
 export function diffConfig(
   previous: ConfigResolution,
   next: ConfigResolution,
 ): string[] {
+  if (
+    !isObjectRecord(previous) ||
+    !isObjectRecord(previous.values) ||
+    !isObjectRecord(previous.sources) ||
+    !isObjectRecord(next) ||
+    !isObjectRecord(next.values) ||
+    !isObjectRecord(next.sources)
+  ) {
+    throw new Error("config resolutions must contain values and sources");
+  }
+
   const keys = new Set([
     ...Object.keys(previous.values),
     ...Object.keys(next.values),

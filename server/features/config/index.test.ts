@@ -19,6 +19,38 @@ describe("SkyConfig", () => {
     expect(result.sources.API_URL).toBe("runtime");
   });
 
+  it("rejects malformed entries and snapshots without dereferencing them", () => {
+    expect(
+      validateConfigEntry(
+        null as unknown as {
+          key: string;
+          value: string;
+          source: "runtime";
+        },
+      ),
+    ).toEqual(["config entry is required"]);
+
+    expect(() =>
+      resolveConfig(
+        null as unknown as {
+          entries: [];
+        },
+      ),
+    ).toThrow("config snapshot entries must be an array");
+
+    expect(() =>
+      redactConfig({
+        entries: [
+          null as unknown as {
+            key: string;
+            value: string;
+            source: "runtime";
+          },
+        ],
+      }),
+    ).toThrow("<index:0>: config entry is required");
+  });
+
   it("redacts sensitive values without mutating metadata", () => {
     expect(
       redactConfig({
@@ -73,6 +105,18 @@ describe("SkyConfig", () => {
       ],
     });
     expect(diffConfig(before, after)).toEqual(["A"]);
+  });
+
+  it("rejects malformed config resolutions", () => {
+    expect(() =>
+      diffConfig(
+        null as unknown as {
+          values: Record<string, string>;
+          sources: Record<string, "default">;
+        },
+        { values: {}, sources: {} },
+      ),
+    ).toThrow("config resolutions must contain values and sources");
   });
 
   it("validates keys, sources, primitive values, and sensitivity metadata", () => {
