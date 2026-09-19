@@ -15,14 +15,12 @@ FROM node:24-bookworm-slim AS production-deps
 
 WORKDIR /app
 
-# Install only runtime dependencies in a disposable stage. Keeping pnpm and
-# workspace/build tooling out of the final image prevents dev-only binaries
-# (including old esbuild Go binaries) from shipping to production.
+# Resolve only the root application's production dependency graph. The root
+# importer is self-contained in pnpm-lock.yaml, so workspace source/packages
+# and build tooling never enter this stage or the final runtime image.
 RUN npm install --global pnpm@11.20.0
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages ./packages
-COPY tools ./tools
+COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --prod --frozen-lockfile
 
