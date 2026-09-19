@@ -40,6 +40,13 @@ describe("all-area beta registry", () => {
     expect(getBetaArea("bridge")?.betaAvailability).toBe("gated_unavailable");
   });
 
+  it("surfaces the verified token boundary in the affected areas", () => {
+    expect(getBetaArea("wallet")?.notes).toMatch(/Official TRUMP Solana metadata/i);
+    expect(getBetaArea("wallet")?.notes).toMatch(/custody, signing, and broadcast remain disabled/i);
+    expect(getBetaArea("skychain")?.notes).toMatch(/metadata-only integration evidence/i);
+    expect(getBetaArea("skychain")?.notes).toMatch(/live chain execution remains disabled/i);
+  });
+
   it("keeps live side effects fail-closed in engineering beta", () => {
     expect(() =>
       assertBetaSideEffectAllowed("controlled_test_beta", "read_only")

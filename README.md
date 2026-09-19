@@ -2,6 +2,10 @@
 
 SKYCOIN4444 is a large TypeScript/React engineering project that combines a flagship application runtime with many independently testable domain packages and integration contracts. The current release target is an **engineering beta**, not a production certification.
 
+> **One-time Genesis Milestone:** this ecosystem is dedicated to the person who kept building through impossible circumstances. The milestone is a permanent engineering record—not a token, reward, claim, or promise of financial value. Read the [Genesis Milestone](./GENESIS_MILESTONE.md).
+
+The milestone records the first verified Official TRUMP Solana integration boundary: tested metadata, exact amount handling, recipient validation, and unsigned transfer-intent safety controls. Wallet signing, broadcasting, custody, and automated trading remain outside the repository's authority.
+
 ## Current engineering-beta status
 
 The default branch has a reproducible pnpm workspace and a real CI pipeline. Current required CI covers:
