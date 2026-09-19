@@ -1,547 +1,416 @@
-/**
- * PlatformMap — Full platform feature directory
- * All 246+ routes organized by group with value scores and rarity badges.
- * The definitive "what is this platform" overview.
- */
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
+import type { LucideIcon } from "lucide-react";
+import {
+  Accessibility,
+  BarChart3,
+  Bot,
+  BriefcaseBusiness,
+  ChevronRight,
+  CircleDollarSign,
+  Gamepad2,
+  Globe2,
+  GraduationCap,
+  HeartHandshake,
+  Landmark,
+  MessageCircleMore,
+  Radio,
+  Search,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Users,
+  Video,
+  WalletCards,
+  X,
+} from "lucide-react";
 import routeCatalog from "@/data/routeCatalog.json";
 import {
-  Rocket, Heart, Gamepad2, GraduationCap, Radio, Globe, Newspaper,
-  Compass, Sparkles, Coins, ShoppingBag, Star, Brain, Shield,
-  Search, Filter, ExternalLink, TrendingUp, Zap, Crown, Target,
-  BarChart3, Code2, Users, MessageSquare, Camera, Video, Wallet,
-  PieChart, Layers, Building2, Activity, Lock, Gauge, BookOpen,
-  Pickaxe, ArrowLeftRight, Swords, Gift, Hash, Home, Bot, Cpu,
-  GitBranch, Webhook, Database, Package, Settings, Mic, CalendarDays,
-  Flame, Scissors, UserCircle2, ArrowRight,
-} from "lucide-react";
+  betaExperienceAreas,
+  betaExperienceStatusCopy,
+  type BetaExperienceArea,
+  type BetaExperienceCategory,
+  type BetaExperienceStatus,
+} from "@/data/betaExperienceAreas";
 
-type Rarity = "legendary" | "epic" | "rare" | "uncommon" | "common";
-
-interface Feature {
+const categoryOptions: readonly {
+  id: "all" | BetaExperienceCategory;
   label: string;
-  href: string;
-  icon: React.ElementType;
-  desc: string;
-  value: number;      // 1-10
-  rarity: Rarity;
-  live: boolean;
-}
+}[] = [
+  { id: "all", label: "All areas" },
+  { id: "connect", label: "Connect" },
+  { id: "create", label: "Create" },
+  { id: "learn", label: "Learn" },
+  { id: "play", label: "Play" },
+  { id: "money", label: "Money & commerce" },
+  { id: "work", label: "Work & operations" },
+  { id: "impact", label: "Impact" },
+] as const;
 
-interface FeatureGroup {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  gradient: string;
-  accentText: string;
-  features: Feature[];
-}
-
-const RARITY_CONFIG: Record<Rarity, { label: string; color: string; bg: string }> = {
-  legendary: { label: "Legendary", color: "text-amber-300", bg: "bg-amber-500/20 border-amber-500/40" },
-  epic:      { label: "Epic",      color: "text-fuchsia-300", bg: "bg-fuchsia-500/20 border-fuchsia-500/40" },
-  rare:      { label: "Rare",      color: "text-blue-300", bg: "bg-blue-500/20 border-blue-500/40" },
-  uncommon:  { label: "Uncommon",  color: "text-green-300", bg: "bg-green-500/20 border-green-500/40" },
-  common:    { label: "Common",    color: "text-slate-400", bg: "bg-slate-700/50 border-slate-600/40" },
+const iconByArea: Record<string, LucideIcon> = {
+  social: Users,
+  "chat-calls": MessageCircleMore,
+  gaming: Gamepad2,
+  hopeai: Bot,
+  "wallet-web3": WalletCards,
+  marketplace: ShoppingBag,
+  "school-language": GraduationCap,
+  live: Radio,
+  dating: HeartHandshake,
+  global: Globe2,
+  creator: Video,
+  enterprise: BriefcaseBusiness,
+  investor: Landmark,
+  impact: HeartHandshake,
+  "trust-safety": ShieldCheck,
+  analytics: BarChart3,
 };
 
-const PLATFORM_GROUPS: FeatureGroup[] = [
-  {
-    id: "investors",
-    label: "Investors / ICO",
-    icon: Rocket,
-    gradient: "from-amber-500 to-orange-600",
-    accentText: "text-amber-400",
-    features: [
-      { label: "Investor Portal",    href: "/investor-portal",   icon: Rocket,     desc: "Full ICO hub — raise meter, tiers, Stripe checkout", value: 10, rarity: "legendary", live: true },
-      { label: "ICO Launchpad",      href: "/ico",               icon: Coins,      desc: "Token sale entry point",                             value: 10, rarity: "legendary", live: true },
-      { label: "Token Metrics",      href: "/token-metrics",     icon: BarChart3,  desc: "SKY444 live price, supply, burn stats",              value: 9,  rarity: "epic",      live: true },
-      { label: "Whitepaper",         href: "/whitepaper",        icon: BookOpen,   desc: "SKY444 technical white paper v2.0",                  value: 8,  rarity: "epic",      live: true },
-      { label: "Vesting Schedule",   href: "/vesting",           icon: CalendarDays,desc: "Token unlock timeline",                             value: 7,  rarity: "rare",      live: true },
-      { label: "Governance",         href: "/governance",        icon: Building2,  desc: "Vote on proposals with SKY444",                      value: 8,  rarity: "rare",      live: true },
-      { label: "Economic Layer",     href: "/economic-layer",    icon: Coins,      desc: "SKY444 ledger, fee schedule, treasury",              value: 9,  rarity: "epic",      live: true },
-      { label: "Whale Monitor",      href: "/whale-monitor",     icon: Activity,   desc: "Large transaction surveillance",                     value: 7,  rarity: "rare",      live: true },
-    ],
-  },
-  {
-    id: "charity",
-    label: "Charity",
-    icon: Heart,
-    gradient: "from-rose-500 to-pink-600",
-    accentText: "text-rose-400",
-    features: [
-      { label: "Charity Hub",        href: "/charity",           icon: Heart,      desc: "All active charity campaigns",                       value: 9,  rarity: "epic",      live: true },
-      { label: "Charity Leaderboard",href: "/charity-leaderboard",icon: Crown,     desc: "Top donors and impact rankings",                     value: 8,  rarity: "rare",      live: true },
-      { label: "Proof Vault",        href: "/proof-vault",       icon: Shield,     desc: "On-chain donation receipts",                         value: 8,  rarity: "rare",      live: true },
-      { label: "Impact Analytics",   href: "/charity-analytics", icon: BarChart3,  desc: "Donation impact metrics",                            value: 7,  rarity: "rare",      live: true },
-    ],
-  },
-  {
-    id: "gaming",
-    label: "Gaming",
-    icon: Gamepad2,
-    gradient: "from-green-500 to-emerald-600",
-    accentText: "text-green-400",
-    features: [
-      { label: "Gaming Hub",         href: "/gaming",            icon: Gamepad2,   desc: "Play-to-earn game center",                           value: 9,  rarity: "epic",      live: true },
-      { label: "Arcade",             href: "/arcade",            icon: Gamepad2,   desc: "Casino-style arcade games",                          value: 8,  rarity: "rare",      live: true },
-      { label: "Tournaments",        href: "/tournaments",       icon: Swords,     desc: "Compete for SKY444 prizes",                          value: 9,  rarity: "epic",      live: true },
-      { label: "Quest Board",        href: "/quests",            icon: Target,     desc: "Daily quests + rewards",                             value: 7,  rarity: "rare",      live: true },
-      { label: "Achievements",       href: "/achievements",      icon: Crown,      desc: "Unlock platform badges",                             value: 6,  rarity: "uncommon",  live: true },
-      { label: "Leaderboard",        href: "/leaderboard",       icon: Crown,      desc: "Top players by score",                               value: 7,  rarity: "uncommon",  live: true },
-    ],
-  },
-  {
-    id: "school",
-    label: "SkySchool",
-    icon: GraduationCap,
-    gradient: "from-blue-500 to-indigo-600",
-    accentText: "text-blue-400",
-    features: [
-      { label: "SkySchool",          href: "/school",            icon: GraduationCap,desc: "Learn and earn SKY444 coins",                     value: 9,  rarity: "epic",      live: true },
-      { label: "Sky School Alt",     href: "/sky-school",        icon: GraduationCap,desc: "SkySchool entry alias",                           value: 9,  rarity: "epic",      live: true },
-      { label: "Courses",            href: "/courses",           icon: BookOpen,   desc: "Structured learning paths",                          value: 8,  rarity: "rare",      live: true },
-      { label: "Certifications",     href: "/certifications",    icon: Star,       desc: "Earn platform certificates",                         value: 7,  rarity: "rare",      live: true },
-      { label: "Study Groups",       href: "/study-groups",      icon: Users,      desc: "Collaborative learning rooms",                       value: 6,  rarity: "uncommon",  live: false },
-    ],
-  },
-  {
-    id: "live",
-    label: "Live Streaming",
-    icon: Radio,
-    gradient: "from-red-500 to-rose-600",
-    accentText: "text-red-400",
-    features: [
-      { label: "Live Streaming",     href: "/streaming",         icon: Radio,      desc: "Go live with WebRTC + HLS",                          value: 10, rarity: "legendary", live: true },
-      { label: "Live Hub",           href: "/live",              icon: Radio,      desc: "Live stream browser",                                value: 9,  rarity: "epic",      live: true },
-      { label: "Stream Settings",    href: "/stream-settings",   icon: Settings,   desc: "Configure your stream",                              value: 7,  rarity: "rare",      live: true },
-      { label: "VOD Archive",        href: "/vod-archive",       icon: Video,      desc: "Recorded stream library",                            value: 8,  rarity: "rare",      live: true },
-      { label: "Live Reactions",     href: "/live-reactions",    icon: Zap,        desc: "Real-time emoji reactions",                          value: 6,  rarity: "uncommon",  live: true },
-      { label: "Creator Gifting",    href: "/creator-gifting",   icon: Gift,       desc: "Send gifts during streams",                          value: 7,  rarity: "rare",      live: false },
-    ],
-  },
-  {
-    id: "social",
-    label: "Social",
-    icon: Globe,
-    gradient: "from-cyan-500 to-blue-600",
-    accentText: "text-cyan-400",
-    features: [
-      { label: "Social Feed",        href: "/social",            icon: Home,       desc: "Your personalized social feed",                      value: 10, rarity: "legendary", live: true },
-      { label: "Feed",               href: "/feed",              icon: Newspaper,  desc: "Chronological content feed",                         value: 9,  rarity: "epic",      live: true },
-      { label: "Explore",            href: "/explore",           icon: Hash,       desc: "Discover trending content",                          value: 8,  rarity: "rare",      live: true },
-      { label: "Messages",           href: "/messages",          icon: MessageSquare,desc: "Direct messages",                                  value: 9,  rarity: "epic",      live: true },
-      { label: "Communities",        href: "/community",         icon: Users,      desc: "Topic-based communities",                            value: 8,  rarity: "rare",      live: true },
-      { label: "Reels",              href: "/reels",             icon: Video,      desc: "Short-form video reels",                             value: 9,  rarity: "epic",      live: true },
-      { label: "Stories",            href: "/stories",           icon: Camera,     desc: "24-hour ephemeral stories",                          value: 8,  rarity: "rare",      live: true },
-      { label: "Channels",           href: "/channels",          icon: Newspaper,  desc: "Broadcast channels",                                 value: 7,  rarity: "rare",      live: true },
-      { label: "Trending",           href: "/trending",          icon: TrendingUp, desc: "What's hot right now",                               value: 7,  rarity: "uncommon",  live: true },
-      { label: "Tip Jar",            href: "/tip-jar",           icon: Gift,       desc: "Send tips to creators",                              value: 6,  rarity: "uncommon",  live: true },
-      { label: "Creator Spotlight",  href: "/creator-spotlight", icon: Flame,      desc: "Featured creator showcase",                          value: 6,  rarity: "uncommon",  live: true },
-    ],
-  },
-  {
-    id: "hope-ai",
-    label: "HOPE AI",
-    icon: Sparkles,
-    gradient: "from-fuchsia-500 to-pink-600",
-    accentText: "text-fuchsia-400",
-    features: [
-      { label: "HOPE AI",            href: "/hope-ai",           icon: Sparkles,   desc: "AI ethics, control & companion",                     value: 10, rarity: "legendary", live: true },
-      { label: "AI Brain",           href: "/ai-brain",          icon: Brain,      desc: "AI command center",                                  value: 9,  rarity: "epic",      live: true },
-      { label: "AI Agent",           href: "/ai-agent",          icon: Bot,        desc: "24/7 autonomous agent",                              value: 9,  rarity: "epic",      live: true },
-      { label: "AI Intelligence Hub",href: "/ai-intelligence-hub",icon: BarChart3, desc: "Trending detection, engagement prediction",          value: 9,  rarity: "epic",      live: true },
-      { label: "Code Intelligence",  href: "/code-intelligence", icon: Code2,      desc: "AI code review, security analysis",                  value: 9,  rarity: "epic",      live: true },
-      { label: "AI Code Studio",     href: "/ai-code-studio",    icon: Code2,      desc: "AI coding assistant with streaming",                 value: 8,  rarity: "rare",      live: true },
-      { label: "AI Copy Studio",     href: "/ai-copy-studio",    icon: Mic,        desc: "AI content generation",                              value: 8,  rarity: "rare",      live: true },
-      { label: "AI Persona Feed",    href: "/ai-persona-feed",   icon: Sparkles,   desc: "AI-generated social personas",                       value: 7,  rarity: "rare",      live: true },
-      { label: "AI Tools",           href: "/ai-tools",          icon: Cpu,        desc: "12-tool AI suite",                                   value: 8,  rarity: "rare",      live: true },
-      { label: "Sentiment Engine",   href: "/sentiment",         icon: Activity,   desc: "NLP sentiment analysis pipeline",                    value: 7,  rarity: "rare",      live: true },
-      { label: "Anomaly Detection",  href: "/anomaly-detection", icon: Shield,     desc: "ML anomaly detection",                               value: 7,  rarity: "rare",      live: true },
-      { label: "World Brain",        href: "/world-brain",       icon: Globe,      desc: "Global knowledge graph",                             value: 8,  rarity: "epic",      live: false },
-      { label: "Notification Intel", href: "/notification-intelligence",icon: Zap, desc: "Smart notification engine",                         value: 7,  rarity: "rare",      live: true },
-    ],
-  },
-  {
-    id: "crypto",
-    label: "Crypto",
-    icon: Coins,
-    gradient: "from-yellow-500 to-amber-600",
-    accentText: "text-yellow-400",
-    features: [
-      { label: "Crypto Hub",         href: "/crypto-hub",        icon: Coins,      desc: "SKY444 crypto command center",                       value: 10, rarity: "legendary", live: true },
-      { label: "Wallet",             href: "/wallet",            icon: Wallet,     desc: "Your crypto wallet",                                 value: 9,  rarity: "epic",      live: true },
-      { label: "Mine SKY444",        href: "/mining",            icon: Pickaxe,    desc: "Proof-of-engagement mining",                         value: 9,  rarity: "epic",      live: true },
-      { label: "Token Swap",         href: "/token-swap",        icon: ArrowLeftRight,desc: "Swap tokens instantly",                           value: 8,  rarity: "rare",      live: true },
-      { label: "Staking",            href: "/staking",           icon: Zap,        desc: "Earn staking rewards",                               value: 8,  rarity: "rare",      live: true },
-      { label: "Portfolio",          href: "/portfolio",         icon: PieChart,   desc: "Asset allocation overview",                          value: 7,  rarity: "rare",      live: true },
-      { label: "NFT Gallery",        href: "/nft-gallery",       icon: Sparkles,   desc: "Your NFT collection",                                value: 7,  rarity: "rare",      live: true },
-      { label: "DeFi",               href: "/defi",              icon: Layers,     desc: "Decentralized finance hub",                          value: 8,  rarity: "rare",      live: false },
-      { label: "Yield Farming",      href: "/yield-farming",     icon: Target,     desc: "Liquidity farming pools",                            value: 7,  rarity: "rare",      live: false },
-      { label: "Trading Terminal",   href: "/trading",           icon: TrendingUp, desc: "Advanced trading interface",                         value: 8,  rarity: "rare",      live: true },
-      { label: "Crypto Mine",        href: "/crypto-mine",       icon: Pickaxe,    desc: "Gamified mining experience",                         value: 8,  rarity: "rare",      live: true },
-    ],
-  },
-  {
-    id: "marketplace",
-    label: "Marketplace",
-    icon: ShoppingBag,
-    gradient: "from-teal-500 to-cyan-600",
-    accentText: "text-teal-400",
-    features: [
-      { label: "Marketplace",        href: "/marketplace",       icon: ShoppingBag,desc: "Buy & sell goods",                                   value: 9,  rarity: "epic",      live: true },
-      { label: "Digital Art Store",  href: "/art-store",         icon: Sparkles,   desc: "Signed prints & digital art",                        value: 8,  rarity: "rare",      live: true },
-      { label: "Subscriptions",      href: "/subscriptions",     icon: Star,       desc: "Creator subscription tiers",                         value: 8,  rarity: "rare",      live: true },
-      { label: "Payout Hub",         href: "/payout",            icon: Coins,      desc: "Creator earnings & payouts",                         value: 7,  rarity: "rare",      live: true },
-      { label: "Affiliate",          href: "/affiliate",         icon: Gift,       desc: "Earn commissions",                                   value: 6,  rarity: "uncommon",  live: true },
-      { label: "Referrals",          href: "/referrals",         icon: Users,      desc: "Invite & earn SKY444",                               value: 6,  rarity: "uncommon",  live: true },
-      { label: "Payment Infra",      href: "/payment-infra",     icon: Coins,      desc: "Stripe + crypto payment rails",                      value: 8,  rarity: "rare",      live: true },
-    ],
-  },
-  {
-    id: "creator",
-    label: "Creator",
-    icon: Star,
-    gradient: "from-purple-500 to-violet-600",
-    accentText: "text-purple-400",
-    features: [
-      { label: "Creator Studio",     href: "/creator-studio",    icon: Star,       desc: "Full creator toolkit",                               value: 9,  rarity: "epic",      live: true },
-      { label: "Creator Dashboard",  href: "/creator",           icon: BarChart3,  desc: "Creator analytics & earnings",                       value: 8,  rarity: "rare",      live: true },
-      { label: "Creator Analytics",  href: "/creator-analytics", icon: PieChart,   desc: "Deep creator stats",                                 value: 8,  rarity: "rare",      live: true },
-      { label: "Creator Profile",    href: "/creator-profile",   icon: UserCircle2,desc: "Public creator profile",                             value: 7,  rarity: "rare",      live: true },
-      { label: "Content Scheduler",  href: "/content-scheduler", icon: CalendarDays,desc: "Schedule posts & content",                         value: 7,  rarity: "uncommon",  live: true },
-      { label: "Content Vault",      href: "/content-vault",     icon: Lock,       desc: "Premium locked content",                             value: 7,  rarity: "rare",      live: true },
-      { label: "NSFW Feed",          href: "/nsfw-feed",         icon: Shield,     desc: "Age-gated content feed",                             value: 6,  rarity: "uncommon",  live: true },
-      { label: "The Book",           href: "/book",              icon: BookOpen,   desc: "The Chosen One — creator lore",                      value: 7,  rarity: "epic",      live: true },
-    ],
-  },
-  {
-    id: "platform",
-    label: "Platform & Dev",
-    icon: Gauge,
-    gradient: "from-slate-500 to-slate-600",
-    accentText: "text-slate-400",
-    features: [
-      { label: "Dashboard",          href: "/dashboard",         icon: Gauge,      desc: "Personal dashboard",                                 value: 8,  rarity: "rare",      live: true },
-      { label: "Ecosystem",          href: "/ecosystem",         icon: Globe,      desc: "Platform ecosystem overview",                        value: 7,  rarity: "uncommon",  live: true },
-      { label: "Analytics",          href: "/analytics",         icon: BarChart3,  desc: "Platform-wide analytics",                            value: 8,  rarity: "rare",      live: true },
-      { label: "Server Health",      href: "/server-health",     icon: Activity,   desc: "Live system status",                                 value: 7,  rarity: "uncommon",  live: true },
-      { label: "API Docs",           href: "/api-docs",          icon: BookOpen,   desc: "tRPC endpoint catalog",                              value: 7,  rarity: "uncommon",  live: true },
-      { label: "Webhooks",           href: "/webhooks",          icon: Webhook,    desc: "Webhook manager",                                    value: 6,  rarity: "uncommon",  live: true },
-      { label: "DevOps Hub",         href: "/devops",            icon: Database,   desc: "Infra & operations",                                 value: 7,  rarity: "uncommon",  live: true },
-      { label: "AI Engineer",        href: "/ai-engineer",       icon: GitBranch,  desc: "AI dev tools",                                       value: 8,  rarity: "rare",      live: true },
-      { label: "Scalable",         href: "/enterprise",        icon: Package,    desc: "Scalable features",                                value: 7,  rarity: "uncommon",  live: false },
-    ],
-  },
-  {
-    id: "security",
-    label: "Security & Privacy",
-    icon: Shield,
-    gradient: "from-emerald-500 to-green-600",
-    accentText: "text-emerald-400",
-    features: [
-      { label: "Security Dashboard", href: "/security",          icon: Shield,     desc: "Security monitoring",                                value: 8,  rarity: "rare",      live: true },
-      { label: "Trust & Safety",     href: "/trust-safety",      icon: Shield,     desc: "Moderation & trust scores",                          value: 8,  rarity: "rare",      live: true },
-      { label: "Compliance Center",  href: "/compliance-center", icon: Lock,       desc: "KYC & GDPR controls",                                value: 8,  rarity: "rare",      live: true },
-      { label: "Shadow Identity",    href: "/shadow-identity",   icon: UserCircle2,desc: "Manage your shadow persona",                         value: 7,  rarity: "rare",      live: true },
-      { label: "Ghost Mode",         href: "/ghost-mode",        icon: UserCircle2,desc: "Anonymous browsing",                                 value: 7,  rarity: "rare",      live: true },
-      { label: "Privacy Vault",      href: "/privacy",           icon: Lock,       desc: "Encrypted data vault",                               value: 7,  rarity: "rare",      live: true },
-      { label: "Audit Log",          href: "/audit-log",         icon: Activity,   desc: "Platform audit trail",                               value: 6,  rarity: "uncommon",  live: true },
-      { label: "2FA Setup",          href: "/2fa",               icon: Lock,       desc: "Two-factor authentication",                          value: 6,  rarity: "uncommon",  live: true },
-      { label: "Rate Limit Dashboard",href: "/rate-limit-dashboard",icon: Gauge,   desc: "API rate limit monitoring",                          value: 6,  rarity: "uncommon",  live: true },
-    ],
-  },
-];
+const accentByArea: Record<string, string> = {
+  social: "from-sky-400/25 to-cyan-400/5 border-sky-300/20",
+  "chat-calls": "from-violet-400/25 to-fuchsia-400/5 border-violet-300/20",
+  gaming: "from-emerald-400/25 to-lime-400/5 border-emerald-300/20",
+  hopeai: "from-fuchsia-400/25 to-pink-400/5 border-fuchsia-300/20",
+  "wallet-web3": "from-amber-400/25 to-yellow-400/5 border-amber-300/20",
+  marketplace: "from-orange-400/25 to-rose-400/5 border-orange-300/20",
+  "school-language": "from-indigo-400/25 to-blue-400/5 border-indigo-300/20",
+  live: "from-rose-400/25 to-red-400/5 border-rose-300/20",
+  dating: "from-pink-400/25 to-rose-400/5 border-pink-300/20",
+  global: "from-cyan-400/25 to-blue-400/5 border-cyan-300/20",
+  creator: "from-purple-400/25 to-violet-400/5 border-purple-300/20",
+  enterprise: "from-slate-300/20 to-blue-400/5 border-slate-300/15",
+  investor: "from-yellow-300/20 to-amber-400/5 border-yellow-300/15",
+  impact: "from-teal-400/25 to-emerald-400/5 border-teal-300/20",
+  "trust-safety": "from-blue-400/20 to-slate-400/5 border-blue-300/15",
+  analytics: "from-cyan-300/20 to-violet-400/5 border-cyan-300/15",
+};
 
-const CURATED_FEATURES = PLATFORM_GROUPS.flatMap(g =>
-  g.features.map(f => ({ ...f, group: g.label, groupId: g.id, accentText: g.accentText }))
-);
+const statusClasses: Record<BetaExperienceStatus, string> = {
+  core_beta: "border-emerald-300/25 bg-emerald-300/[0.08] text-emerald-100",
+  controlled_beta: "border-amber-300/25 bg-amber-300/[0.08] text-amber-100",
+  preview: "border-slate-300/20 bg-slate-300/[0.06] text-slate-200",
+};
 
-const CURATED_PATHS = new Set(CURATED_FEATURES.map(feature => feature.href));
-const ROUTE_FEATURES = routeCatalog.routes
-  .filter(route => !CURATED_PATHS.has(route.path))
-  .map(route => ({
-    label: route.label,
-    href: route.path,
-    icon: Compass,
-    desc: `Registered interface route · ${route.component}. Capability depth varies by module.`,
-    value: 5,
-    rarity: "common" as const,
-    live: true,
-    group: "Route Registry",
-    groupId: "route-registry",
-    accentText: "text-cyan-400",
-  }));
+const featuredIds = new Set([
+  "social",
+  "chat-calls",
+  "gaming",
+  "hopeai",
+  "marketplace",
+  "school-language",
+]);
 
-const ALL_FEATURES = [...CURATED_FEATURES, ...ROUTE_FEATURES];
+function AreaIcon({ area, className = "h-5 w-5" }: { area: BetaExperienceArea; className?: string }) {
+  const Icon = iconByArea[area.id] ?? Sparkles;
+  return <Icon className={className} aria-hidden="true" />;
+}
 
-export default function PlatformMap() {
-  const [search, setSearch] = useState("");
-  const [filterRarity, setFilterRarity] = useState<Rarity | "all">("all");
-  const [filterLive, setFilterLive] = useState<"all" | "live" | "coming">("all");
-  const [activeGroup, setActiveGroup] = useState<string | null>(null);
-  const [sortMode, setSortMode] = useState<"value" | "alpha">("value");
-  const [shortlist, setShortlist] = useState<string[]>([]);
-  const [shortlistOnly, setShortlistOnly] = useState(false);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("sky4444.feature-shortlist") ?? "[]");
-      if (Array.isArray(saved)) setShortlist(saved.filter((href): href is string => typeof href === "string"));
-    } catch {
-      setShortlist([]);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("sky4444.feature-shortlist", JSON.stringify(shortlist));
-    } catch {
-      // Local-only preferences should never block browsing.
-    }
-  }, [shortlist]);
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "/" && document.activeElement?.tagName !== "INPUT") {
-        event.preventDefault();
-        document.getElementById("platform-map-search")?.focus();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
-  const toggleShortlist = (href: string) => {
-    setShortlist(current => current.includes(href) ? current.filter(item => item !== href) : [...current, href]);
-  };
-
-  const filtered = ALL_FEATURES.filter(f => {
-    const matchSearch = !search || f.label.toLowerCase().includes(search.toLowerCase()) || f.desc.toLowerCase().includes(search.toLowerCase());
-    const matchRarity = filterRarity === "all" || f.rarity === filterRarity;
-    const matchLive = filterLive === "all" || (filterLive === "live" ? f.live : !f.live);
-    const matchGroup = !activeGroup || f.groupId === activeGroup;
-    const matchShortlist = !shortlistOnly || shortlist.includes(f.href);
-    return matchSearch && matchRarity && matchLive && matchGroup && matchShortlist;
-  }).sort((a, b) => sortMode === "alpha" ? a.label.localeCompare(b.label) : b.value - a.value || a.label.localeCompare(b.label));
-
-  const totalFeatures = ALL_FEATURES.length;
-  const liveFeatures = ALL_FEATURES.filter(f => f.live).length;
-  const legendaryCount = ALL_FEATURES.filter(f => f.rarity === "legendary").length;
-
+function StatusPill({ status }: { status: BetaExperienceStatus }) {
+  const copy = betaExperienceStatusCopy[status];
   return (
-    <div className="min-h-screen bg-[#07050f] text-white">
-      {/* Hero */}
-      <div className="relative overflow-hidden border-b border-slate-800/60">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-cyan-900/20" />
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, oklch(0.45 0.25 305 / 0.08) 0%, transparent 60%), radial-gradient(circle at 80% 50%, oklch(0.45 0.25 200 / 0.08) 0%, transparent 60%)" }} />
-        <div className="relative max-w-7xl mx-auto px-4 py-12">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-extrabold text-white">Platform Map</h1>
-              <p className="text-sm text-slate-400">V3 capability explorer — every registered route in one searchable index</p>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-            {[
-              { label: "Routes Indexed", value: totalFeatures, color: "text-cyan-400" },
-              { label: "Routable",        value: liveFeatures,  color: "text-green-400" },
-              { label: "Groups",          value: PLATFORM_GROUPS.length, color: "text-purple-400" },
-              { label: "Legendary",       value: legendaryCount, color: "text-amber-400" },
-            ].map(stat => (
-              <div key={stat.label} className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3">
-                <p className={`text-2xl font-extrabold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-slate-500">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Search + Filters */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="relative flex-1 min-w-48">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-              <input
-                id="platform-map-search"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search every route, module, or capability…"
-                className="w-full pl-9 pr-16 py-2 bg-slate-800/70 border border-slate-700/50 rounded-xl text-sm text-white placeholder-slate-600 outline-none focus:border-purple-500/50 transition-colors"
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-white/10 px-1.5 py-0.5 text-[10px] text-slate-500">/</span>
-            </div>
-
-            {/* Rarity filter */}
-            <div className="flex gap-1.5">
-              {(["all", "legendary", "epic", "rare", "uncommon"] as const).map(r => (
-                <button
-                  key={r}
-                  onClick={() => setFilterRarity(r)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    filterRarity === r
-                      ? "bg-purple-500/30 text-purple-300 border border-purple-500/50"
-                      : "bg-slate-800/60 text-slate-500 border border-slate-700/40 hover:text-slate-300"
-                  }`}
-                >
-                  {r === "all" ? "All" : r.charAt(0).toUpperCase() + r.slice(1)}
-                </button>
-              ))}
-            </div>
-
-            {/* Live filter */}
-            <div className="flex gap-1.5">
-              {(["all", "live", "coming"] as const).map(l => (
-                <button
-                  key={l}
-                  onClick={() => setFilterLive(l)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                    filterLive === l
-                      ? "bg-green-500/20 text-green-300 border border-green-500/40"
-                      : "bg-slate-800/60 text-slate-500 border border-slate-700/40 hover:text-slate-300"
-                  }`}
-                >
-                  {l === "all" ? "All Status" : l === "live" ? "● Live" : "Coming Soon"}
-                </button>
-              ))}
-              <div className="flex gap-1.5"><button type="button" onClick={() => setSortMode("value")} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${sortMode === "value" ? "border-cyan-400/50 bg-cyan-400/15 text-cyan-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>Value</button><button type="button" onClick={() => setSortMode("alpha")} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${sortMode === "alpha" ? "border-cyan-400/50 bg-cyan-400/15 text-cyan-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>A–Z</button></div><button type="button" onClick={() => setShortlistOnly(current => !current)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border ${shortlistOnly ? "border-amber-400/50 bg-amber-400/15 text-amber-200" : "border-slate-700/40 bg-slate-800/60 text-slate-500"}`}>★ Shortlist ({shortlist.length})</button>
-          </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Group filter pills */}
-        <div className="flex gap-2 flex-wrap mb-6">
-          <button
-            onClick={() => setActiveGroup(null)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              !activeGroup ? "bg-slate-600 text-white" : "bg-slate-800/60 text-slate-500 hover:text-slate-300 border border-slate-700/40"
-            }`}
-          >
-            All Groups
-          </button>
-          <button
-            onClick={() => setActiveGroup("route-registry")}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              activeGroup === "route-registry"
-                ? "bg-cyan-400 text-slate-950"
-                : "bg-slate-800/60 text-slate-400 hover:text-white border border-slate-700/40"
-            }`}
-          >
-            Route Registry ({ROUTE_FEATURES.length})
-          </button>
-          {PLATFORM_GROUPS.map(g => {
-            const Icon = g.icon;
-            return (
-              <button
-                key={g.id}
-                onClick={() => setActiveGroup(activeGroup === g.id ? null : g.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                  activeGroup === g.id
-                    ? `bg-gradient-to-r ${g.gradient} text-white`
-                    : "bg-slate-800/60 text-slate-400 hover:text-white border border-slate-700/40"
-                }`}
-              >
-                <Icon className="w-3 h-3" />
-                {g.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Results count */}
-        <p className="text-xs text-slate-600 mb-4">{filtered.length} indexed capabilities</p>
-
-        {/* Feature grid — grouped */}
-        {search || filterRarity !== "all" || filterLive !== "all" || activeGroup || shortlistOnly ? (
-          /* Flat search results */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {filtered.map(f => (
-              <FeatureCard key={f.href} feature={f} accentText={f.accentText} shortlisted={shortlist.includes(f.href)} onToggleShortlist={toggleShortlist} />
-            ))}
-          </div>
-        ) : (
-          /* Grouped view */
-          <div className="space-y-10">
-            {PLATFORM_GROUPS.map(group => {
-              const Icon = group.icon;
-              return (
-                <div key={group.id}>
-                  {/* Group header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${group.gradient} flex items-center justify-center`}>
-                      <Icon className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-base font-bold text-white">{group.label}</h2>
-                    <span className="text-xs text-slate-600">{group.features.length} features</span>
-                    <div className="flex-1 h-px bg-slate-800/60" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                    {group.features.map(f => (
-                      <FeatureCard key={f.href} feature={f} accentText={group.accentText} shortlisted={shortlist.includes(f.href)} onToggleShortlist={toggleShortlist} />
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${statusClasses[status]}`}
+      title={copy.detail}
+    >
+      {copy.label}
+    </span>
   );
 }
 
-function FeatureCard({ feature, accentText, shortlisted, onToggleShortlist }: { feature: Feature; accentText: string; shortlisted: boolean; onToggleShortlist: (href: string) => void }) {
-  const rarity = RARITY_CONFIG[feature.rarity];
-  const Icon = feature.icon;
+function AreaCard({ area }: { area: BetaExperienceArea }) {
+  return (
+    <article
+      className={`group flex h-full flex-col overflow-hidden rounded-3xl border bg-gradient-to-br ${accentByArea[area.id] ?? "from-white/10 to-white/[0.02] border-white/10"}`}
+    >
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-black/25 text-white shadow-inner">
+            <AreaIcon area={area} />
+          </span>
+          <StatusPill status={area.status} />
+        </div>
+
+        <p className="mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+          {area.eyebrow}
+        </p>
+        <h2 className="mt-2 text-xl font-black tracking-tight text-white">
+          {area.name}
+        </h2>
+        <p className="mt-2 flex-1 text-sm leading-6 text-white/58">
+          {area.description}
+        </p>
+
+        <div className="mt-5 space-y-2">
+          {area.highlights.map(item => (
+            <Link
+              key={item.route}
+              href={item.route}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-white/[0.07] bg-black/15 px-3.5 py-3 transition hover:border-white/15 hover:bg-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/60"
+            >
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold text-white/85">
+                  {item.label}
+                </span>
+                <span className="mt-0.5 block truncate text-[11px] text-white/38">
+                  {item.note}
+                </span>
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-white/25" />
+            </Link>
+          ))}
+        </div>
+
+        <Link
+          href={area.route}
+          className="mt-5 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-black text-[#050510] transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70"
+        >
+          {area.action}
+          <ChevronRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+export default function PlatformMap() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<"all" | BetaExperienceCategory>("all");
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const registeredRouteCount = routeCatalog.routes.length;
+  const coreCount = betaExperienceAreas.filter(area => area.status === "core_beta").length;
+  const controlledCount = betaExperienceAreas.filter(
+    area => area.status === "controlled_beta"
+  ).length;
+
+  const filteredAreas = useMemo(() => {
+    return betaExperienceAreas.filter(area => {
+      const categoryMatch = category === "all" || area.category === category;
+      if (!categoryMatch) return false;
+      if (!normalizedQuery) return true;
+
+      const searchText = [
+        area.name,
+        area.eyebrow,
+        area.description,
+        ...area.searchTerms,
+        ...area.highlights.flatMap(item => [item.label, item.note]),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchText.includes(normalizedQuery);
+    });
+  }, [category, normalizedQuery]);
+
+  const featuredAreas = betaExperienceAreas.filter(area => featuredIds.has(area.id));
 
   return (
-    <Link href={feature.href}>
-      <div className="group relative bg-slate-900/60 border border-slate-800/60 rounded-xl p-3.5 hover:bg-slate-800/70 hover:border-slate-700/60 transition-all duration-200 cursor-pointer hover:scale-[1.02] hover:shadow-lg">
-        <button type="button" aria-label={shortlisted ? `Remove ${feature.label} from shortlist` : `Add ${feature.label} to shortlist`} onClick={event => { event.preventDefault(); event.stopPropagation(); onToggleShortlist(feature.href); }} className={`absolute right-3 top-3 z-10 text-sm transition-colors ${shortlisted ? "text-amber-300" : "text-slate-600 hover:text-amber-200"}`}>{shortlisted ? "★" : "☆"}</button>
-        {/* Value bar */}
-        <div className="absolute top-0 left-0 h-0.5 rounded-t-xl bg-gradient-to-r from-transparent via-slate-600 to-transparent" style={{ width: `${feature.value * 10}%` }} />
-
-        <div className="flex items-start gap-2.5">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${rarity.bg}`}>
-            <Icon className={`w-4 h-4 ${accentText}`} />
+    <div className="min-h-screen bg-[#050510] text-white">
+      <main className="mx-auto w-full max-w-7xl px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
+        <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.16),transparent_34%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.14),transparent_30%),linear-gradient(145deg,#0b1022,#070711_60%)] p-6 shadow-2xl shadow-black/25 sm:p-9 lg:p-11">
+          <div className="absolute right-6 top-6 hidden rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white/45 sm:block">
+            V6 area experience
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <p className="text-xs font-semibold text-white truncate group-hover:text-white">{feature.label}</p>
-              {feature.live ? (
-                <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-green-500/20 text-green-400 shrink-0">LIVE</span>
-              ) : (
-                <span className="text-[8px] font-bold px-1 py-0.5 rounded bg-slate-700/60 text-slate-500 shrink-0">SOON</span>
-              )}
+
+          <div className="max-w-4xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-sky-300/[0.07] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-sky-100/80">
+              <Globe2 className="h-3.5 w-3.5" />
+              Explore SKYCOIN4444
             </div>
-            <p className="text-[10px] text-slate-500 leading-tight line-clamp-2">{feature.desc}</p>
+            <h1 className="mt-5 text-4xl font-black tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl">
+              One ecosystem. Clear places to start.
+            </h1>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-white/58 sm:text-lg">
+              The beta has a large screen library, but testers should not have to
+              understand the repository to use the product. Start with a real area,
+              follow a focused flow. Every registered screen keeps global Search and a parent-area breadcrumb; use the deeper route library only when you
+              need it.
+            </p>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between mt-2.5">
-          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${rarity.bg} ${rarity.color}`}>
-            {rarity.label}
-          </span>
-          <div className="flex items-center gap-1">
-            <span className="text-[9px] text-slate-600">Value</span>
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-1.5 h-1.5 rounded-full ${i < Math.ceil(feature.value / 2) ? accentText.replace("text-", "bg-") : "bg-slate-700"}`}
-                />
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-2xl font-black">{betaExperienceAreas.length}</p>
+              <p className="mt-1 text-xs text-white/40">user-facing beta areas</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-2xl font-black">{registeredRouteCount.toLocaleString()}</p>
+              <p className="mt-1 text-xs text-white/40">registered routes underneath</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <p className="text-2xl font-black">{coreCount} + {controlledCount}</p>
+              <p className="mt-1 text-xs text-white/40">core + controlled beta areas</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-7 rounded-3xl border border-white/10 bg-white/[0.025] p-4 sm:p-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <label className="relative block min-w-0 flex-1">
+              <span className="sr-only">Search platform areas</span>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+              <input
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+                placeholder="Search chat, gaming, wallet, school, creators…"
+                className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-11 text-sm text-white outline-none placeholder:text-white/28 focus:border-sky-300/35 focus:ring-2 focus:ring-sky-300/10"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-lg text-white/35 transition hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              ) : null}
+            </label>
+
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:max-w-[58%]">
+              {categoryOptions.map(option => {
+                const active = category === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setCategory(option.id)}
+                    className={
+                      "shrink-0 rounded-xl border px-3.5 py-2.5 text-xs font-bold transition " +
+                      (active
+                        ? "border-sky-300/30 bg-sky-300/10 text-sky-100"
+                        : "border-white/[0.08] bg-black/10 text-white/45 hover:border-white/15 hover:text-white/75")
+                    }
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {!query && category === "all" ? (
+          <section className="mt-10">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-200/55">
+                  Recommended starting points
+                </p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
+                  Start with what you came here to do
+                </h2>
+              </div>
+              <Link
+                href="/beta-workspace"
+                className="inline-flex items-center gap-2 text-sm font-bold text-sky-200/80 hover:text-sky-100"
+              >
+                Open beta workspace <ChevronRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {featuredAreas.map(area => (
+                <Link
+                  key={area.id}
+                  href={area.route}
+                  className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 transition hover:-translate-y-0.5 hover:border-sky-300/20 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/60"
+                >
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/[0.06] text-white/80">
+                    <AreaIcon area={area} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-black text-white">{area.name}</span>
+                    <span className="mt-1 block truncate text-xs text-white/38">{area.eyebrow}</span>
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-white/20 transition group-hover:translate-x-0.5 group-hover:text-sky-200" />
+                </Link>
               ))}
             </div>
+          </section>
+        ) : null}
+
+        <section className="mt-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/32">
+                Ecosystem directory
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
+                {filteredAreas.length === betaExperienceAreas.length
+                  ? "All beta areas"
+                  : `${filteredAreas.length} matching area${filteredAreas.length === 1 ? "" : "s"}`}
+              </h2>
+            </div>
+            <Link
+              href="/beta-catalog"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3.5 py-2.5 text-xs font-bold text-white/60 transition hover:bg-white/[0.07] hover:text-white"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Engineering readiness catalog
+            </Link>
           </div>
-          <ArrowRight className="w-3 h-3 text-slate-700 group-hover:text-slate-400 transition-colors" />
-        </div>
-      </div>
-    </Link>
+
+          {filteredAreas.length ? (
+            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {filteredAreas.map(area => (
+                <AreaCard key={area.id} area={area} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-3xl border border-dashed border-white/12 bg-white/[0.02] px-6 py-14 text-center">
+              <Search className="mx-auto h-7 w-7 text-white/20" />
+              <h3 className="mt-4 text-lg font-black">No area matches that search.</h3>
+              <p className="mt-2 text-sm text-white/40">
+                Try a capability such as chat, games, wallet, school, live, AI, or shopping.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setCategory("all");
+                }}
+                className="mt-5 rounded-xl bg-white px-4 py-2.5 text-sm font-black text-[#050510]"
+              >
+                Show every area
+              </button>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-10 grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+          <div className="rounded-3xl border border-amber-300/15 bg-amber-300/[0.045] p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <CircleDollarSign className="mt-0.5 h-5 w-5 shrink-0 text-amber-200/75" />
+              <div>
+                <h2 className="font-black text-amber-50">Beta boundary is part of the product.</h2>
+                <p className="mt-2 text-sm leading-6 text-white/50">
+                  Wallet, Web3, commerce, investor, AI, and other provider-dependent areas may expose test interfaces without enabling live custody, settlement, blockchain execution, identity verification, regulated activity, or production provider guarantees. The readiness catalog remains the engineering source for those gates.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <Accessibility className="mt-0.5 h-5 w-5 shrink-0 text-sky-200/70" />
+              <div>
+                <h2 className="font-black">Need another way in?</h2>
+                <p className="mt-2 text-sm leading-6 text-white/45">
+                  Use global Search in the top navigation for the full route library, or open accessibility preferences for display and interaction controls.
+                </p>
+                <Link
+                  href="/accessibility-settings"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-sky-200/80 hover:text-sky-100"
+                >
+                  Accessibility settings <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }
