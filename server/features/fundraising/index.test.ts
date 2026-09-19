@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { completionPercent, evaluateContribution, validateCampaign } from "./index";
+import {
+  completionPercent,
+  evaluateContribution,
+  validateCampaign,
+} from "./index";
 
 const campaign = {
   id: "camp-1",
@@ -88,6 +92,38 @@ describe("SkyFundraising", () => {
       reason: "invalid-campaign",
       projectedRaisedMinor: 0,
     });
+  });
+
+  it("handles malformed runtime campaign strings without throwing", () => {
+    expect(
+      validateCampaign({
+        ...campaign,
+        id: null as unknown as string,
+        title: 42 as unknown as string,
+      }),
+    ).toEqual(["id is required", "title is required"]);
+  });
+
+  it("handles malformed runtime contribution identifiers without throwing", () => {
+    expect(
+      evaluateContribution(campaign, {
+        campaignId: "camp-1",
+        contributorId: null as unknown as string,
+        amountMinor: 100,
+        currency: "USD",
+        idempotencyKey: "idem-malformed",
+      }).reason,
+    ).toBe("contributor-id-required");
+
+    expect(
+      evaluateContribution(campaign, {
+        campaignId: "camp-1",
+        contributorId: "user-1",
+        amountMinor: 100,
+        currency: "USD",
+        idempotencyKey: null as unknown as string,
+      }).reason,
+    ).toBe("idempotency-key-required");
   });
 
   it("computes bounded completion percentage", () => {
