@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import routeCatalog from "../client/src/data/routeCatalog.json";
-import { betaExperienceAreas, resolveBetaRouteContext } from "../client/src/data/betaExperienceAreas";
+import {
+  betaExperienceAreas,
+  resolveBetaRouteContext,
+} from "../client/src/data/betaExperienceAreas";
 
 const registeredRoutes = new Set(routeCatalog.routes.map(route => route.path));
 
@@ -47,5 +50,35 @@ describe("beta experience areas", () => {
       .map(area => area.id);
 
     expect(misclassified).toEqual([]);
+  });
+
+  it("gives representative deep routes a coherent parent area", () => {
+    expect(resolveBetaRouteContext("/wallet-overview", "Wallet Overview").parentLabel).toBe(
+      "Wallet & Web3"
+    );
+    expect(resolveBetaRouteContext("/video-editor", "Video Editor").parentLabel).toBe(
+      "Creator Studio"
+    );
+    expect(resolveBetaRouteContext("/security-dashboard", "Security Dashboard").parentLabel).toBe(
+      "Trust, Safety & Accessibility"
+    );
+    expect(resolveBetaRouteContext("/campaign-analytics", "Campaign Analytics").parentLabel).toBe(
+      "Analytics"
+    );
+  });
+
+  it("gives every registered route a safe parent destination", () => {
+    const invalid = routeCatalog.routes
+      .map(route => ({
+        route: route.path,
+        context: resolveBetaRouteContext(route.path, route.label),
+      }))
+      .filter(
+        item =>
+          !registeredRoutes.has(item.context.parentRoute) &&
+          item.context.parentRoute !== "/platform-map"
+      );
+
+    expect(invalid).toEqual([]);
   });
 });
