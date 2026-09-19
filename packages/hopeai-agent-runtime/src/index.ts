@@ -14,30 +14,142 @@ export type AgentPlan = Readonly<{
 }>;
 
 const ID_RE = /^[a-zA-Z0-9:_-]{2,128}$/;
+const STEP_KINDS = new Set<AgentStep['kind']>(['prompt', 'tool', 'decision']);
 
-export function buildAgentPlan(agentId: string, steps: readonly AgentStep[]): AgentPlan {
-  if (!ID_RE.test(agentId)) throw new Error('invalid agent id');
-  if (steps.length === 0 || steps.length > 1000) throw new Error('step count must be 1-1000');
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function requireId(value: unknown, field: string): string {
+  if (typeof value !== 'string' || !ID_RE.test(value)) {
+    throw new Error(`invalid ${field}`);
+  }
+  return value;
+}
+
+function requireStepKind(value: unknown): AgentStep['kind'] {
+  if (typeof value !== 'string' || !STEP_KINDS.has(value as AgentStep['kind'])) {
+    throw new Error('invalid step kind');
+  }
+  return value as AgentStep['kind'];
+}
+
+function requireStepInput(value: unknown): string {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 16_000) {
+    throw new Error('step input length must be 1-16000');
+  }
+  return value;
+}
+
+function normalizeDependencies(value: unknown): readonly string[] {
+  if (value === undefined) return Object.freeze([]);
+  if (!Array.isArray(value)) throw new Error('step dependencies must be an array');
+
+  const dependencies = value.map((dependency) =>
+    requireId(dependency, 'step dependency id'),
+  );
+  if (new Set(dependencies).size !== dependencies.length) {
+    throw new Error('duplicate step dependency');
+  }
+  return Object.freeze(dependencies);
+}
+
+function createPlanId(agentId: string, steps: readonly AgentStep[]): string {
+  const canonical = JSON.stringify({ agentId, steps });
+  return createHash('sha256').update(canonical, 'utf8').digest('hex');
+}
+
+export function buildAgentPlan(
+  agentId: string,
+  steps: readonly AgentStep[],
+): AgentPlan {
+  const normalizedAgentId = requireId(agentId, 'agent id');
+  if (!Array.isArray(steps)) throw new Error('steps must be an array');
+  if (steps.length === 0 || steps.length > 1000) {
+    throw new Error('step count must be 1-1000');
+  }
+
   const seen = new Set<string>();
   const completed = new Set<string>();
   const normalized: AgentStep[] = [];
-  for (const step of steps) {
-    if (!ID_RE.test(step.id)) throw new Error('invalid step id');
-    if (seen.has(step.id)) throw new Error('duplicate step id');
-    seen.add(step.id);
-    if (step.input.length === 0 || step.input.length > 16_000) throw new Error('step input length must be 1-16000');
-    const dependencies = [...(step.dependsOn ?? [])];
-    if (dependencies.some((dependency) => !completed.has(dependency))) throw new Error('step dependency must reference an earlier step');
-    completed.add(step.id);
-    normalized.push(Object.freeze({ ...step, dependsOn: Object.freeze(dependencies) }));
+
+  for (const [index, rawStep] of steps.entries()) {
+    if (!isObjectRecord(rawStep)) {
+      throw new Error(`invalid step at index ${index}`);
+    }
+
+    const id = requireId(rawStep.id, 'step id');
+    if (seen.has(id)) throw new Error('duplicate step id');
+    seen.add(id);
+
+    const kind = requireStepKind(rawStep.kind);
+    const input = requireStepInput(rawStep.input);
+    const dependencies = normalizeDependencies(rawStep.dependsOn);
+    if (dependencies.some((dependency) => !completed.has(dependency))) {
+      throw new Error('step dependency must reference an earlier step');
+    }
+
+    completed.add(id);
+    normalized.push(
+      Object.freeze({
+        id,
+        kind,
+        input,
+        dependsOn: dependencies,
+      }),
+    );
   }
-  const canonical = JSON.stringify({ agentId, steps: normalized });
-  const planId = createHash('sha256').update(canonical, 'utf8').digest('hex');
-  return Object.freeze({ agentId, steps: Object.freeze(normalized), planId });
+
+  const frozenSteps = Object.freeze(normalized);
+  const planId = createPlanId(normalizedAgentId, frozenSteps);
+  return Object.freeze({
+    agentId: normalizedAgentId,
+    steps: frozenSteps,
+    planId,
+  });
 }
 
-export function nextReadySteps(plan: AgentPlan, completedStepIds: ReadonlySet<string>): readonly AgentStep[] {
-  return Object.freeze(plan.steps.filter((step) =>
-    !completedStepIds.has(step.id) && (step.dependsOn ?? []).every((dependency) => completedStepIds.has(dependency)),
-  ));
+function validatePlanIntegrity(plan: AgentPlan): AgentPlan {
+  if (!isObjectRecord(plan)) throw new Error('agent plan is required');
+  if (!Array.isArray(plan.steps)) throw new Error('agent plan steps must be an array');
+
+  const rebuilt = buildAgentPlan(plan.agentId, plan.steps);
+  if (typeof plan.planId !== 'string' || plan.planId !== rebuilt.planId) {
+    throw new Error('agent plan integrity check failed');
+  }
+  return rebuilt;
+}
+
+function normalizeCompletedStepIds(
+  completedStepIds: ReadonlySet<string>,
+): ReadonlySet<string> {
+  if (
+    completedStepIds === null ||
+    typeof completedStepIds !== 'object' ||
+    typeof completedStepIds.has !== 'function' ||
+    typeof completedStepIds[Symbol.iterator] !== 'function'
+  ) {
+    throw new Error('completedStepIds must be a set-like iterable');
+  }
+
+  const normalized = new Set<string>();
+  for (const stepId of completedStepIds) {
+    normalized.add(requireId(stepId, 'completed step id'));
+  }
+  return normalized;
+}
+
+export function nextReadySteps(
+  plan: AgentPlan,
+  completedStepIds: ReadonlySet<string>,
+): readonly AgentStep[] {
+  const validatedPlan = validatePlanIntegrity(plan);
+  const completed = normalizeCompletedStepIds(completedStepIds);
+  return Object.freeze(
+    validatedPlan.steps.filter(
+      (step) =>
+        !completed.has(step.id) &&
+        (step.dependsOn ?? []).every((dependency) => completed.has(dependency)),
+    ),
+  );
 }
