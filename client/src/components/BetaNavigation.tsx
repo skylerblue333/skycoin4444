@@ -21,7 +21,8 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
-import V3CommandPalette from "@/components/V3CommandPalette";\nimport routeCatalog from "@/data/routeCatalog.json";
+import V3CommandPalette from "@/components/V3CommandPalette";
+import routeCatalog from "@/data/routeCatalog.json";
 import {
   betaExperienceAreas,
   betaExperienceStatusCopy,
