@@ -25,6 +25,8 @@ export interface ContributionResult {
   projectedRaisedMinor: number;
 }
 
+const campaignStatuses = new Set<string>(["draft", "active", "paused", "completed", "cancelled"]);
+
 export function validateCampaign(campaign: Campaign): string[] {
   const errors: string[] = [];
   if (!campaign.id.trim()) errors.push("id is required");
@@ -32,15 +34,24 @@ export function validateCampaign(campaign: Campaign): string[] {
   if (!Number.isSafeInteger(campaign.goalMinor) || campaign.goalMinor <= 0) errors.push("goalMinor must be a positive safe integer");
   if (!Number.isSafeInteger(campaign.raisedMinor) || campaign.raisedMinor < 0) errors.push("raisedMinor must be a non-negative safe integer");
   if (!/^[A-Z]{3}$/.test(campaign.currency)) errors.push("currency must be a 3-letter uppercase code");
+  if (!campaignStatuses.has(campaign.status)) errors.push("status is invalid");
   return errors;
 }
 
 export function evaluateContribution(campaign: Campaign, intent: ContributionIntent): ContributionResult {
+  const safeRaised = Number.isSafeInteger(campaign.raisedMinor) && campaign.raisedMinor >= 0 ? campaign.raisedMinor : 0;
+  const campaignErrors = validateCampaign(campaign);
+  if (campaignErrors.length > 0) {
+    return { accepted: false, reason: "invalid-campaign", projectedRaisedMinor: safeRaised };
+  }
   if (campaign.status !== "active") {
     return { accepted: false, reason: "campaign-not-active", projectedRaisedMinor: campaign.raisedMinor };
   }
   if (campaign.id !== intent.campaignId) {
     return { accepted: false, reason: "campaign-mismatch", projectedRaisedMinor: campaign.raisedMinor };
+  }
+  if (!intent.contributorId.trim()) {
+    return { accepted: false, reason: "contributor-id-required", projectedRaisedMinor: campaign.raisedMinor };
   }
   if (campaign.currency !== intent.currency) {
     return { accepted: false, reason: "currency-mismatch", projectedRaisedMinor: campaign.raisedMinor };
@@ -59,6 +70,13 @@ export function evaluateContribution(campaign: Campaign, intent: ContributionInt
 }
 
 export function completionPercent(campaign: Campaign): number {
-  if (campaign.goalMinor <= 0) return 0;
-  return Math.min(100, Math.round((campaign.raisedMinor / campaign.goalMinor) * 10000) / 100);
+  if (
+    !Number.isSafeInteger(campaign.goalMinor) ||
+    campaign.goalMinor <= 0 ||
+    !Number.isSafeInteger(campaign.raisedMinor) ||
+    campaign.raisedMinor < 0
+  ) {
+    return 0;
+  }
+  return Math.min(100, Math.max(0, Math.round((campaign.raisedMinor / campaign.goalMinor) * 10000) / 100));
 }
