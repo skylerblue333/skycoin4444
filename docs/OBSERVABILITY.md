@@ -95,6 +95,17 @@ Likewise, hosting providers, reverse proxies, database drivers, cloud agents, or
 
 Those external logging systems require separate configuration and evidence.
 
+## Hosted engineering-beta monitoring
+
+The canonical V5 beta is additionally observed through two provider/external layers:
+
+- Railway exposes deployment logs, HTTP request signals, and CPU/memory/network resource metrics for the hosted service; the managed MySQL service exposes CPU/memory/disk/network resource metrics.
+- `.github/workflows/hosted-beta-health-monitor.yml` performs an independent public smoke every 15 minutes from GitHub Actions. It checks the home/sign-in surfaces plus beta health, beta readiness, runtime readiness, authentication configuration, database/configuration state, and the explicit no-live-financial-or-chain-execution safety boundary.
+
+A failing scheduled health workflow is an engineering alert signal through GitHub Actions. It is intentionally credential-free and therefore does not exercise authenticated user persistence.
+
+This monitor complements, but does not replace, the bounded hosted load baseline in `scripts/hosted-load-baseline.mjs`.
+
 ## Verification
 
 Focused tests cover:
@@ -107,17 +118,22 @@ Focused tests cover:
 - whitespace flattening and output bounds;
 - existing fatal/startup redaction compatibility.
 
+Hosted verification additionally requires the scheduled smoke workflow to execute successfully against the canonical V5 origin.
+
 Canonical exact-head CI remains required before merge.
 
 ## Limitations
 
 This work does not establish:
 
-- a deployed logging/SIEM provider;
-- centralized log retention;
+- a centralized logging/SIEM provider independent of Railway;
+- guaranteed centralized log retention;
 - tamper-proof logging;
 - distributed trace propagation;
 - OpenTelemetry export;
+- paging/on-call escalation or a formal SLO alert policy;
 - complete secret detection;
 - external proxy/header trust configuration;
 - production security certification.
+
+The scheduled GitHub Actions monitor is a basic external availability/configuration signal, not an uptime SLA, incident-management platform, or production observability certification.
