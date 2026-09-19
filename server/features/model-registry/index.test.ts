@@ -44,6 +44,18 @@ describe("SkyModelRegistry", () => {
     ).toEqual([]);
   });
 
+  it("rejects malformed selection requests without throwing", () => {
+    expect(
+      selectModels([approved], null as unknown as { capability: string }),
+    ).toEqual([]);
+    expect(
+      selectModels([approved], {
+        capability: "chat",
+        providerAllowlist: "local" as unknown as string[],
+      }),
+    ).toEqual([]);
+  });
+
   it("rejects blank selection capabilities", () => {
     expect(selectModels([approved], { capability: "   " })).toEqual([]);
   });
@@ -55,9 +67,10 @@ describe("SkyModelRegistry", () => {
       lifecycle: "retired" as "approved",
     };
     expect(
-      selectModels([malformed, approved], { capability: "chat" }).map(
-        model => model.id,
-      ),
+      selectModels(
+        [null as unknown as typeof approved, malformed, approved],
+        { capability: "chat" },
+      ).map(model => model.id),
     ).toEqual(["model-a"]);
   });
 
@@ -66,6 +79,15 @@ describe("SkyModelRegistry", () => {
     expect(() => registerModel([approved], approved)).toThrow(
       "model id already exists",
     );
+  });
+
+  it("rejects malformed existing registry state", () => {
+    expect(() =>
+      registerModel(
+        [null as unknown as typeof approved],
+        approved,
+      ),
+    ).toThrow("existing model records are invalid");
   });
 
   it("rejects unsupported lifecycle values during registration", () => {
@@ -86,13 +108,22 @@ describe("SkyModelRegistry", () => {
     ).toThrow("capabilities must be non-empty strings");
   });
 
-  it("validates malformed runtime string fields without throwing", () => {
+  it("validates malformed runtime records without throwing", () => {
+    expect(
+      validateModelRecord(null as unknown as typeof approved),
+    ).toEqual(["model record is required"]);
     expect(
       validateModelRecord({
         ...approved,
         provider: null as unknown as string,
       }),
     ).toContain("provider is required");
+    expect(
+      validateModelRecord({
+        ...approved,
+        metadata: { region: 42 as unknown as string },
+      }),
+    ).toContain("metadata must contain non-empty keys and string values");
   });
 
   it("enforces lifecycle transitions with controlled runtime errors", () => {
@@ -108,6 +139,12 @@ describe("SkyModelRegistry", () => {
         "disabled",
       ),
     ).toThrow("invalid current lifecycle: retired");
+    expect(() =>
+      transitionModel(
+        null as unknown as typeof approved,
+        "disabled",
+      ),
+    ).toThrow("model record is required");
   });
 
   it("validates required fields and token limits", () => {

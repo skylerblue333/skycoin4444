@@ -33,30 +33,51 @@ const orderStatuses = new Set<string>([
   "fulfilled",
 ]);
 
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isNonBlankString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 function isOrderStatus(value: unknown): value is OrderStatus {
   return typeof value === "string" && orderStatuses.has(value);
 }
 
 function validateOrderLineNumbers(line: OrderLine): string[] {
+  if (!isObjectRecord(line)) return ["order line is required"];
+
   const errors: string[] = [];
-  if (!Number.isSafeInteger(line.quantity) || line.quantity <= 0) {
-    errors.push(`quantity must be positive for ${line.sku || "<empty>"}`);
+  const sku = isNonBlankString(line.sku) ? line.sku : "<empty>";
+  if (!Number.isSafeInteger(line.quantity) || (line.quantity as number) <= 0) {
+    errors.push(`quantity must be positive for ${sku}`);
   }
-  if (!Number.isSafeInteger(line.unitPriceMinor) || line.unitPriceMinor < 0) {
-    errors.push(
-      `unitPriceMinor must be non-negative for ${line.sku || "<empty>"}`,
-    );
+  if (
+    !Number.isSafeInteger(line.unitPriceMinor) ||
+    (line.unitPriceMinor as number) < 0
+  ) {
+    errors.push(`unitPriceMinor must be non-negative for ${sku}`);
   }
   return errors;
 }
 
 export function validateOrder(order: Order): string[] {
+  if (!isObjectRecord(order)) return ["order is required"];
+
   const errors: string[] = [];
-  if (!order.id.trim()) errors.push("id is required");
-  if (!/^[A-Z]{3}$/.test(order.currency)) {
+  if (!isNonBlankString(order.id)) errors.push("id is required");
+  if (
+    typeof order.currency !== "string" ||
+    !/^[A-Z]{3}$/.test(order.currency)
+  ) {
     errors.push("currency must be a 3-letter uppercase code");
   }
   if (!isOrderStatus(order.status)) errors.push("status is invalid");
+  if (!Array.isArray(order.lines)) {
+    errors.push("lines must be an array");
+    return errors;
+  }
   if (order.lines.length === 0) {
     errors.push("at least one order line is required");
   }
@@ -64,25 +85,30 @@ export function validateOrder(order: Order): string[] {
   const quantityBySku = new Map<string, number>();
   const overflowedSkus = new Set<string>();
 
-  for (const line of order.lines) {
-    if (!line.sku.trim()) errors.push("sku is required");
-    const lineErrors = validateOrderLineNumbers(line);
+  for (const [index, line] of order.lines.entries()) {
+    if (!isObjectRecord(line)) {
+      errors.push(`order line is required at index ${index}`);
+      continue;
+    }
+
+    const sku = isNonBlankString(line.sku) ? line.sku : "";
+    if (!sku) errors.push("sku is required");
+
+    const lineErrors = validateOrderLineNumbers(line as unknown as OrderLine);
     errors.push(...lineErrors);
 
-    const validQuantity = lineErrors.every(
-      error => !error.startsWith("quantity must be positive"),
-    );
+    const validQuantity =
+      Number.isSafeInteger(line.quantity) && (line.quantity as number) > 0;
 
-    if (line.sku.trim() && validQuantity && !overflowedSkus.has(line.sku)) {
-      const combined = (quantityBySku.get(line.sku) ?? 0) + line.quantity;
+    if (sku && validQuantity && !overflowedSkus.has(sku)) {
+      const combined =
+        (quantityBySku.get(sku) ?? 0) + (line.quantity as number);
       if (!Number.isSafeInteger(combined)) {
-        errors.push(
-          `total quantity exceeds safe integer range for ${line.sku}`,
-        );
-        overflowedSkus.add(line.sku);
-        quantityBySku.delete(line.sku);
+        errors.push(`total quantity exceeds safe integer range for ${sku}`);
+        overflowedSkus.add(sku);
+        quantityBySku.delete(sku);
       } else {
-        quantityBySku.set(line.sku, combined);
+        quantityBySku.set(sku, combined);
       }
     }
   }
@@ -92,30 +118,45 @@ export function validateOrder(order: Order): string[] {
 export function validateAvailability(
   availability: readonly InventoryAvailability[],
 ): string[] {
+  if (!Array.isArray(availability)) {
+    return ["availability must be an array"];
+  }
+
   const errors: string[] = [];
   const seen = new Set<string>();
 
-  for (const item of availability) {
-    if (!item.sku.trim()) errors.push("availability sku is required");
-    if (!Number.isSafeInteger(item.available) || item.available < 0) {
+  for (const [index, item] of availability.entries()) {
+    if (!isObjectRecord(item)) {
+      errors.push(`availability item is required at index ${index}`);
+      continue;
+    }
+
+    const sku = isNonBlankString(item.sku) ? item.sku : "";
+    if (!sku) errors.push("availability sku is required");
+    if (
+      !Number.isSafeInteger(item.available) ||
+      (item.available as number) < 0
+    ) {
       errors.push(
-        `availability must be a non-negative safe integer for ${item.sku || "<empty>"}`,
+        `availability must be a non-negative safe integer for ${sku || "<empty>"}`,
       );
     }
-    if (seen.has(item.sku)) {
-      errors.push(`duplicate availability sku: ${item.sku}`);
+    if (sku && seen.has(sku)) {
+      errors.push(`duplicate availability sku: ${sku}`);
     }
-    seen.add(item.sku);
+    if (sku) seen.add(sku);
   }
 
   return errors;
 }
 
 export function orderTotalMinor(order: Order): number {
-  return order.lines.reduce((total, line) => {
-    const errors = validateOrderLineNumbers(line);
-    if (errors.length > 0) throw new Error(errors.join("; "));
+  const errors = validateOrder(order);
+  if (errors.length > 0) {
+    throw new Error(`invalid order: ${errors.join("; ")}`);
+  }
 
+  return order.lines.reduce((total, line) => {
     const lineTotal = line.quantity * line.unitPriceMinor;
     if (
       !Number.isSafeInteger(lineTotal) ||
@@ -132,15 +173,16 @@ export function evaluatePlacement(
   availability: readonly InventoryAvailability[],
 ): PlacementDecision {
   const errors = validateOrder(order);
-  const totalMinor = errors.length === 0 ? orderTotalMinor(order) : 0;
   if (errors.length > 0) {
     return {
       accepted: false,
       reason: errors.join("; "),
-      totalMinor,
+      totalMinor: 0,
       shortages: [],
     };
   }
+
+  const totalMinor = orderTotalMinor(order);
   if (order.status !== "draft") {
     return {
       accepted: false,
@@ -182,7 +224,7 @@ export function evaluatePlacement(
       available: bySku.get(sku) ?? 0,
     }))
     .filter(item => item.available < item.requested)
-    .sort((a, b) => a.sku.localeCompare(b.sku));
+    .sort((a, b) => (a.sku < b.sku ? -1 : a.sku > b.sku ? 1 : 0));
 
   if (shortages.length > 0) {
     return {
@@ -202,6 +244,10 @@ export function transitionOrder(order: Order, next: OrderStatus): Order {
     cancelled: [],
     fulfilled: [],
   };
+
+  if (!isObjectRecord(order)) {
+    throw new Error("order is required");
+  }
   if (!isOrderStatus(order.status)) {
     throw new Error(`invalid current order status: ${String(order.status)}`);
   }
@@ -213,5 +259,5 @@ export function transitionOrder(order: Order, next: OrderStatus): Order {
       `invalid order transition: ${order.status} -> ${next}`,
     );
   }
-  return { ...order, status: next };
+  return { ...order, status: next } as Order;
 }

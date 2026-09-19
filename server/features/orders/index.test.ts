@@ -22,6 +22,46 @@ describe("SkyOrders", () => {
     expect(orderTotalMinor(order)).toBe(1250);
   });
 
+  it("rejects malformed orders without dereferencing them", () => {
+    expect(
+      validateOrder(null as unknown as typeof order),
+    ).toEqual(["order is required"]);
+
+    expect(
+      evaluatePlacement(
+        null as unknown as typeof order,
+        [],
+      ),
+    ).toEqual({
+      accepted: false,
+      reason: "order is required",
+      totalMinor: 0,
+      shortages: [],
+    });
+  });
+
+  it("rejects malformed order lines", () => {
+    expect(
+      validateOrder({
+        ...order,
+        lines: [null as unknown as (typeof order.lines)[number]],
+      }),
+    ).toContain("order line is required at index 0");
+
+    expect(
+      validateOrder({
+        ...order,
+        lines: [
+          {
+            sku: null as unknown as string,
+            quantity: 1,
+            unitPriceMinor: 100,
+          },
+        ],
+      }),
+    ).toContain("sku is required");
+  });
+
   it("rejects invalid numeric lines in direct total calculation", () => {
     expect(() =>
       orderTotalMinor({
@@ -50,6 +90,20 @@ describe("SkyOrders", () => {
         { sku: "sku-b", requested: 1, available: 0 },
       ],
     });
+  });
+
+  it("rejects malformed availability snapshots", () => {
+    expect(
+      validateAvailability(
+        null as unknown as Array<{ sku: string; available: number }>,
+      ),
+    ).toEqual(["availability must be an array"]);
+
+    expect(
+      validateAvailability([
+        null as unknown as { sku: string; available: number },
+      ]),
+    ).toContain("availability item is required at index 0");
   });
 
   it("rejects invalid inventory availability before placement", () => {
@@ -102,6 +156,12 @@ describe("SkyOrders", () => {
         "placed",
       ),
     ).toThrow("invalid current order status: unknown");
+    expect(() =>
+      transitionOrder(
+        null as unknown as typeof order,
+        "placed",
+      ),
+    ).toThrow("order is required");
   });
 
   it("validates currency and line invariants", () => {
