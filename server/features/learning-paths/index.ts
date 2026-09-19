@@ -20,6 +20,32 @@ export interface NextStepResult {
   blocked: Array<{ stepId: string; missingPrerequisites: string[] }>;
 }
 
+function hasPrerequisiteCycle(path: LearningPath): boolean {
+  const stepsById = new Map(path.steps.filter(step => step.id.trim()).map(step => [step.id, step]));
+  const state = new Map<string, "visiting" | "visited">();
+
+  const visit = (stepId: string): boolean => {
+    const current = state.get(stepId);
+    if (current === "visiting") return true;
+    if (current === "visited") return false;
+
+    const step = stepsById.get(stepId);
+    if (!step) return false;
+
+    state.set(stepId, "visiting");
+    for (const prerequisite of step.prerequisites) {
+      if (stepsById.has(prerequisite) && visit(prerequisite)) return true;
+    }
+    state.set(stepId, "visited");
+    return false;
+  };
+
+  for (const stepId of stepsById.keys()) {
+    if (visit(stepId)) return true;
+  }
+  return false;
+}
+
 export function validateLearningPath(path: LearningPath): string[] {
   const errors: string[] = [];
   if (!path.id.trim()) errors.push("id is required");
@@ -40,6 +66,7 @@ export function validateLearningPath(path: LearningPath): string[] {
       if (prerequisite === step.id) errors.push(`step cannot depend on itself: ${step.id}`);
     }
   }
+  if (hasPrerequisiteCycle(path)) errors.push("prerequisite graph contains a cycle");
   return errors;
 }
 
