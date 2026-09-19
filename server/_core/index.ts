@@ -12,7 +12,7 @@ import { registerLiveRoomRoutes } from "./liveRoomRoutes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { closeDatabasePool } from "../db";
-import { serveStatic, setupVite } from "./vite";
+import { serveStatic } from "./staticAssets";
 import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
@@ -125,6 +125,11 @@ async function startServer() {
   );
 
   if (process.env.NODE_ENV === "development") {
+    // A variable import specifier is intentional. The production esbuild command
+    // bundles literal relative dynamic imports, which would pull Vite and its
+    // development-only dependency graph into dist/index.js.
+    const developmentServerModule = "./vite";
+    const { setupVite } = await import(developmentServerModule);
     await setupVite(app, server);
   } else {
     serveStatic(app);
