@@ -8,12 +8,23 @@ describe("SkyPermissions", () => {
       resource: "orders/1",
       action: "read",
     });
-    expect(decision).toEqual({ allowed: false, matchedRuleIds: [], reason: "default-deny" });
+    expect(decision).toEqual({
+      allowed: false,
+      matchedRuleIds: [],
+      reason: "default-deny",
+    });
   });
 
   it("allows a matching wildcard rule", () => {
     const decision = evaluatePermissions(
-      [{ id: "allow-orders", resource: "orders/*", action: "read", effect: "allow" }],
+      [
+        {
+          id: "allow-orders",
+          resource: "orders/*",
+          action: "read",
+          effect: "allow",
+        },
+      ],
       {
         subject: { id: "user-1", roles: ["member"] },
         resource: "orders/42",
@@ -27,8 +38,18 @@ describe("SkyPermissions", () => {
   it("gives explicit deny precedence over allow", () => {
     const decision = evaluatePermissions(
       [
-        { id: "allow-all", resource: "orders/*", action: "*", effect: "allow" },
-        { id: "deny-delete", resource: "orders/*", action: "delete", effect: "deny" },
+        {
+          id: "allow-all",
+          resource: "orders/*",
+          action: "*",
+          effect: "allow",
+        },
+        {
+          id: "deny-delete",
+          resource: "orders/*",
+          action: "delete",
+          effect: "deny",
+        },
       ],
       {
         subject: { id: "user-1", roles: ["member"] },
@@ -64,11 +85,129 @@ describe("SkyPermissions", () => {
     expect(decision.allowed).toBe(true);
   });
 
+  it("fails closed when context conflicts with subject attributes", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "tenant-reader",
+          resource: "reports/*",
+          action: "read",
+          effect: "allow",
+          conditions: { tenantId: "tenant-b" },
+        },
+      ],
+      {
+        subject: {
+          id: "user-2",
+          roles: ["analyst"],
+          attributes: { tenantId: "tenant-a" },
+        },
+        resource: "reports/monthly",
+        action: "read",
+        context: { tenantId: "tenant-b" },
+      },
+    );
+
+    expect(decision).toEqual({
+      allowed: false,
+      matchedRuleIds: [],
+      reason: "default-deny",
+    });
+  });
+
+  it("handles adversarial wildcard patterns without regex backtracking", () => {
+    const decision = evaluatePermissions(
+      [
+        {
+          id: "adversarial-pattern",
+          resource: "*a*a*a*a*a*a*a*a*a*a*b",
+          action: "read",
+          effect: "allow",
+        },
+      ],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "a".repeat(4_000),
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(false);
+  });
+
+  it("fails closed on oversized request values", () => {
+    const decision = evaluatePermissions(
+      [{ id: "allow-all", resource: "*", action: "*", effect: "allow" }],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "x".repeat(4_097),
+        action: "read",
+      },
+    );
+
+    expect(decision).toEqual({
+      allowed: false,
+      matchedRuleIds: [],
+      reason: "default-deny",
+    });
+  });
+
+  it("fails closed when any policy rule is malformed", () => {
+    const decision = evaluatePermissions(
+      [
+        { id: "allow-all", resource: "*", action: "*", effect: "allow" },
+        {
+          id: "",
+          resource: "*",
+          action: "*",
+          effect: "deny",
+        },
+      ],
+      {
+        subject: { id: "user-1", roles: ["member"] },
+        resource: "orders/42",
+        action: "read",
+      },
+    );
+
+    expect(decision.allowed).toBe(false);
+    expect(decision.reason).toBe("default-deny");
+  });
+
   it("validates required rule fields", () => {
-    expect(validatePermissionRule({ id: "", resource: "", action: "", effect: "allow" })).toEqual([
+    expect(
+      validatePermissionRule({
+        id: "",
+        resource: "",
+        action: "",
+        effect: "allow",
+      }),
+    ).toEqual([
       "id is required",
       "resource is required",
       "action is required",
     ]);
+  });
+
+  it("rejects unsupported effects at the runtime boundary", () => {
+    expect(
+      validatePermissionRule({
+        id: "rule-1",
+        resource: "*",
+        action: "*",
+        effect: "audit" as "allow",
+      }),
+    ).toContain("effect must be allow or deny");
+  });
+
+  it("rejects oversized policy patterns", () => {
+    expect(
+      validatePermissionRule({
+        id: "rule-1",
+        resource: "x".repeat(513),
+        action: "read",
+        effect: "allow",
+      }),
+    ).toContain("resource pattern must be at most 512 characters");
   });
 });
