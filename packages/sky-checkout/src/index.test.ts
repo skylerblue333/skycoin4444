@@ -28,14 +28,93 @@ describe("quoteCheckout", () => {
   });
 
   it("rejects invalid money, quantity, and excessive discounts", () => {
-    expect(() => quoteCheckout({ checkoutId: "x", currency: "USD", lines: [] })).toThrow("lines are required");
-    expect(() => quoteCheckout({ checkoutId: "x", currency: "USD", lines: [{ sku: "a", quantity: 0, unitAmountMinor: 1 }] })).toThrow("quantity");
-    expect(() => quoteCheckout({ checkoutId: "x", currency: "USD", lines: [{ sku: "a", quantity: 1, unitAmountMinor: -1 }] })).toThrow("unitAmountMinor");
-    expect(() => quoteCheckout({ checkoutId: "x", currency: "USD", lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }], discountAmountMinor: 101 })).toThrow("cannot exceed gross");
+    expect(() =>
+      quoteCheckout({ checkoutId: "x", currency: "USD", lines: [] }),
+    ).toThrow("lines are required");
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "USD",
+        lines: [{ sku: "a", quantity: 0, unitAmountMinor: 1 }],
+      }),
+    ).toThrow("quantity");
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "USD",
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: -1 }],
+      }),
+    ).toThrow("unitAmountMinor");
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "USD",
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }],
+        discountAmountMinor: 101,
+      }),
+    ).toThrow("cannot exceed gross");
   });
 
   it("rejects malformed identifiers and currency codes", () => {
-    expect(() => quoteCheckout({ checkoutId: " ", currency: "USD", lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }] })).toThrow("checkoutId");
-    expect(() => quoteCheckout({ checkoutId: "x", currency: "US", lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }] })).toThrow("3-letter");
+    expect(() =>
+      quoteCheckout({
+        checkoutId: " ",
+        currency: "USD",
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }],
+      }),
+    ).toThrow("checkoutId");
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "US",
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }],
+      }),
+    ).toThrow("3-letter");
+  });
+
+  it("fails closed on malformed runtime request and line shapes", () => {
+    expect(() =>
+      quoteCheckout(
+        null as unknown as Parameters<typeof quoteCheckout>[0],
+      ),
+    ).toThrow("checkout request is required");
+
+    expect(() =>
+      quoteCheckout({
+        checkoutId: 42 as unknown as string,
+        currency: "USD",
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }],
+      }),
+    ).toThrow("checkoutId is required");
+
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: null as unknown as string,
+        lines: [{ sku: "a", quantity: 1, unitAmountMinor: 100 }],
+      }),
+    ).toThrow("currency is required");
+
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "USD",
+        lines: [null as unknown as { sku: string; quantity: number; unitAmountMinor: number }],
+      }),
+    ).toThrow("lines[0] must be an object");
+
+    expect(() =>
+      quoteCheckout({
+        checkoutId: "x",
+        currency: "USD",
+        lines: [
+          {
+            sku: 7 as unknown as string,
+            quantity: 1,
+            unitAmountMinor: 100,
+          },
+        ],
+      }),
+    ).toThrow("lines[0].sku is required");
   });
 });
