@@ -22,7 +22,13 @@ RUN npm install --global pnpm@11.20.0
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile \
+    && rm -rf \
+      node_modules/typescript \
+      node_modules/.pnpm/typescript@* \
+      node_modules/.pnpm/@typescript+typescript-* \
+    && find node_modules -type l -xtype l -delete \
+    && node --input-type=module -e "await import('@trpc/server/adapters/express'); await import('express');"
 
 FROM node:24-bookworm-slim AS runtime
 
