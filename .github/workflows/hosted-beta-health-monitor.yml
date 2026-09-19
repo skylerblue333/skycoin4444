@@ -1,0 +1,38 @@
+name: Hosted Beta Health Monitor
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/hosted-beta-health-monitor.yml"
+      - "scripts/hosted-beta-smoke.mjs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hosted-beta-health-monitor
+  cancel-in-progress: true
+
+jobs:
+  hosted-health:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HOSTED_BETA_ORIGIN: https://skycoin4444-beta-v5-production.up.railway.app
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Verify hosted beta public contracts
+        run: node scripts/hosted-beta-smoke.mjs
