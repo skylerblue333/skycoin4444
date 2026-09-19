@@ -4,12 +4,13 @@ Bounded engineering-beta marketplace listing domain core for SKYCOIN4444 Wave 2 
 
 ## Capability
 
-- validates marketplace listing and seller identifiers
-- normalizes bounded listing title/description text
-- represents price in integer minor units with uppercase three-letter currency codes
-- supports deterministic draft/active/paused/closed lifecycle transitions
-- supports deterministic repricing with optimistic version increments
-- emits provider-neutral `sky.marketplace.listing.changed.v1` integration events
+- validates runtime marketplace listing objects plus listing and seller identifiers;
+- normalizes bounded listing title/description text;
+- represents price in integer minor units with uppercase three-letter currency codes;
+- validates persisted lifecycle/version state before transitions, repricing, or event emission;
+- supports deterministic draft/active/paused/closed lifecycle transitions;
+- supports deterministic repricing with optimistic version increments;
+- emits provider-neutral `sky.marketplace.listing.changed.v1` integration events only from validated listing state.
 
 ## Truth and security boundaries
 
