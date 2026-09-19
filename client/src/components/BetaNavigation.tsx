@@ -38,6 +38,16 @@ const primaryLinks = [
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
+const legacyNavigationAliases = [
+  { label: "V5", route: "/beta-workspace" },
+  { label: "Market", route: "/beta-commerce" },
+  { label: "School", route: "/sky-school" },
+  { label: "Web3", route: "/beta-web3" },
+  { label: "Dating", route: "/dating-home" },
+  { label: "Global", route: "/translation-enabled-community" },
+  { label: "Creator", route: "/creator-dashboard" },
+] as const;
+
 const fourFoursTrail = [
   {
     number: "01",
@@ -176,7 +186,9 @@ export default function BetaNavigation() {
     recognition.maxAlternatives = 1;
     recognition.onstart = () => {
       setVoiceListening(true);
-      setVoiceMessage("Listening for a SKYCOIN4444 area or main navigation destination.");
+      setVoiceMessage(
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+      );
     };
     recognition.onresult = (event: any) => {
       const spoken = String(event.results?.[0]?.[0]?.transcript ?? "")
@@ -184,6 +196,9 @@ export default function BetaNavigation() {
         .trim();
 
       const mainMatch = primaryLinks.find(item =>
+        spoken.includes(item.label.toLowerCase())
+      );
+      const legacyMatch = legacyNavigationAliases.find(item =>
         spoken.includes(item.label.toLowerCase())
       );
       const areaMatch = betaExperienceAreas.find(area => {
@@ -196,8 +211,8 @@ export default function BetaNavigation() {
           candidates.includes(spoken)
         );
       });
-      const destination = mainMatch?.route ?? areaMatch?.route;
-      const label = mainMatch?.label ?? areaMatch?.name;
+      const destination = mainMatch?.route ?? legacyMatch?.route ?? areaMatch?.route;
+      const label = mainMatch?.label ?? legacyMatch?.label ?? areaMatch?.name;
 
       if (destination && label) {
         setVoiceMessage(`Opening ${label}.`);
@@ -245,7 +260,7 @@ export default function BetaNavigation() {
           <span className="hidden sm:block">
             <strong className="block text-sm font-black tracking-tight">SKYCOIN4444</strong>
             <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/35">
-              Engineering beta
+              V5 engineering beta
             </span>
           </span>
         </Link>
@@ -526,6 +541,20 @@ export default function BetaNavigation() {
                 </article>
               ))}
             </div>
+
+            <div className="mt-5 rounded-2xl border border-white/[0.06] bg-black/20 p-4">
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-white/25">
+                The old engineering rule
+              </p>
+              <p className="mt-2 text-sm font-semibold text-white/55">
+                No fake progress. Build it. Test it. Integrate it. Prove it.
+              </p>
+            </div>
+
+            <p className="mt-4 text-center text-[10px] leading-5 text-white/20">
+              Unlocks in memory only. No analytics event, cookie, account field,
+              local storage, or server record is created.
+            </p>
           </div>
         </div>
       ) : null}
