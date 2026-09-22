@@ -1,26 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
-  BookOpen,
-  Brain,
+  CircleDot,
+  Coins,
   Gamepad2,
-  Heart,
+  Gauge,
+  Layers3,
   ShieldCheck,
   Sparkles,
-  Star,
-  Target,
-  Trophy,
-  Zap,
+  Spade,
+  TrendingUp,
 } from "lucide-react";
-import {
-  arcadePassportBadges,
-  arcadePassportLevel,
-  dailyArcadeGameIds,
-  type ArcadeGameId,
-  type ArcadePassport,
-} from "@/lib/arcadePassport";
-import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,702 +20,231 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 
-type GameCategory =
-  | "all"
-  | "favorites"
-  | "arcade"
-  | "knowledge"
-  | "strategy"
-  | "simulation";
-
-type GameDefinition = Readonly<{
-  id: ArcadeGameId;
-  name: string;
-  detail: string;
-  href: string;
-  category: Exclude<GameCategory, "all">;
-  duration: string;
-  tag: string;
-  gradient: string;
-  icon: typeof Gamepad2;
-}>;
-
-const games: readonly GameDefinition[] = [
+const flagshipGames = [
   {
-    id: "sky-rush",
-    name: "Sky Rush",
-    detail:
-      "Three-lane reflex runner with escalating speed, shields, combos, and no-value Sparks.",
-    href: "/game-sky-rush",
-    category: "arcade",
-    duration: "3–6 min",
-    tag: "FEATURED",
-    gradient: "from-violet-600 via-fuchsia-600 to-sky-600",
-    icon: Zap,
-  },
-  {
-    id: "crypto-quiz",
-    name: "Crypto Quiz Blitz",
-    detail:
-      "Fast blockchain recall with Study XP and no token payout or financial reward.",
-    href: "/game-crypto-quiz",
-    category: "knowledge",
-    duration: "~4 min",
-    tag: "LEARN + PLAY",
-    gradient: "from-cyan-600 via-blue-700 to-violet-700",
-    icon: Brain,
-  },
-  {
-    id: "spark-tap",
-    name: "Spark Tap",
-    detail:
-      "Thirty-second speed/combo challenge with device-local Sparks and XP only.",
-    href: "/game-token-tap",
-    category: "arcade",
-    duration: "30 sec",
-    tag: "COMBO",
-    gradient: "from-emerald-600 via-teal-700 to-cyan-800",
-    icon: Sparkles,
-  },
-  {
-    id: "block-builder",
-    name: "Block Builder",
-    detail:
-      "Timing/stacking puzzle with local scores, perfect-drop chains, and no-value Sparks.",
-    href: "/game-block-builder",
-    category: "strategy",
-    duration: "Short run",
-    tag: "PUZZLE",
-    gradient: "from-amber-600 via-orange-700 to-rose-800",
-    icon: Target,
-  },
-  {
-    id: "arcade-lab",
-    name: "Arcade Lab",
-    detail:
-      "A library of deterministic memory, word, logic, board, snake, and puzzle mini-games.",
-    href: "/arcade",
-    category: "arcade",
-    duration: "Pick a mode",
-    tag: "13 MODES",
-    gradient: "from-sky-600 via-blue-700 to-indigo-800",
-    icon: Gamepad2,
-  },
-  {
-    id: "blackjack-lab",
-    name: "Blackjack Strategy Lab",
-    detail:
-      "Card-decision practice scored for strategy quality only—no chips, wagers, payouts, or balance.",
-    href: "/game-blackjack",
-    category: "simulation",
-    duration: "Practice",
-    tag: "SKILL LAB",
-    gradient: "from-emerald-700 via-green-800 to-slate-900",
-    icon: Star,
-  },
-  {
-    id: "crash-lab",
-    name: "Multiplier Reflex Lab",
-    detail:
-      "Timing/reflex practice against a deterministic rising curve with score only and no cashout value.",
+    name: "Crash",
+    eyebrow: "MULTIPLIER",
+    detail: "Ride a rising multiplier and lock before the deterministic demo crash point.",
     href: "/game-crash",
-    category: "simulation",
-    duration: "Practice",
-    tag: "REFLEX LAB",
-    gradient: "from-fuchsia-700 via-violet-800 to-slate-950",
-    icon: Zap,
+    icon: TrendingUp,
+    accent: "from-fuchsia-500/25 via-violet-500/10 to-transparent",
+    metric: "Live timing",
   },
   {
-    id: "pattern-lab",
-    name: "Pattern Match Lab",
-    detail:
-      "Short reel-pattern recognition rounds scored for matches—no betting, auto-spin, balance, RTP, or payout.",
-    href: "/game-slots",
-    category: "simulation",
-    duration: "Short rounds",
-    tag: "PATTERN LAB",
-    gradient: "from-yellow-600 via-orange-700 to-red-800",
-    icon: Star,
+    name: "Plinko",
+    eyebrow: "DROP",
+    detail: "Drop a demo chip through a 10-row board and watch the seeded path resolve.",
+    href: "/arcade#plinko",
+    icon: Layers3,
+    accent: "from-cyan-500/25 via-blue-500/10 to-transparent",
+    metric: "10 rows",
   },
-];
-
-const additionalGames = [
-  ["High-Low", "Predict the deterministic next card.", "arcade", "high-low"],
-  ["Memory Match", "Match symbol pairs under a bounded board.", "arcade", "memory"],
-  ["Word Chain", "Build a valid chain one word at a time.", "knowledge", "word"],
-  ["Crypto Trivia", "Recall practical security and blockchain concepts.", "knowledge", "trivia"],
-  ["Tower Stack", "Place blocks with precision and recover from misses.", "strategy", "tower"],
-  ["Mines Logic", "Read a deterministic grid without wagering.", "strategy", "mines"],
-  ["Chess Geometry", "Practice legal piece movement geometry.", "strategy", "chess"],
-  ["Checkers Steps", "Validate bounded diagonal movement.", "strategy", "checkers"],
-  ["Reaction Sprint", "Tap after the signal and measure your run.", "arcade", "reaction"],
-  ["Signal Sort", "Classify a message by signal before reacting.", "knowledge", "signal-sort"],
-  ["Privacy Triage", "Choose the safest response to a data request.", "knowledge", "privacy-triage"],
-  ["Threat Model", "Identify the highest-risk security boundary.", "strategy", "threat-model"],
-  ["Budget Builder", "Start a responsible budget from real constraints.", "strategy", "budget-builder"],
-  ["Source Check", "Select the strongest evidence for a product claim.", "knowledge", "source-check"],
-  ["Consent Compass", "Practice responsible media-sharing decisions.", "knowledge", "consent-compass"],
-  ["Debug Ladder", "Choose the first useful move on a bug report.", "strategy", "debug-ladder"],
-  ["API Contract", "Handle unknown fields without unsafe assumptions.", "strategy", "api-contract"],
-  ["Inbox Zero", "Prioritize a crowded queue with clear rules.", "strategy", "inbox-zero"],
-  ["Meeting Maker", "Build the artifact that makes a meeting useful.", "strategy", "meeting-maker"],
-  ["Feedback Loop", "Turn vague feedback into an actionable report.", "knowledge", "feedback-loop"],
-  ["Risk Register", "Capture risk, trigger, owner, and mitigation.", "strategy", "risk-register"],
-  ["Test Case", "Find the boundary states a feature must survive.", "strategy", "test-case"],
-  ["Data Minimizer", "Choose privacy-preserving collection rules.", "knowledge", "data-minimizer"],
-  ["Source of Truth", "Select the verified system behind a catalog claim.", "strategy", "source-of-truth"],
-  ["Queue Logic", "Prevent duplicate processing with idempotency.", "strategy", "queue-logic"],
-  ["Cache Sense", "Decide what needs freshness over speed.", "strategy", "cache-sense"],
-  ["Release Gate", "Choose evidence for a safe promotion.", "strategy", "release-gate"],
-  ["UX Focus", "Design a useful empty state and next action.", "knowledge", "ux-focus"],
-  ["Error Copy", "Write recovery-oriented error guidance.", "knowledge", "error-copy"],
-  ["Search Craft", "Bound and escape user search input.", "strategy", "search-craft"],
-  ["Auth Boundary", "Place authorization where it cannot be bypassed.", "strategy", "auth-boundary"],
-  ["Wallet Sense", "Protect recovery material from social engineering.", "knowledge", "wallet-sense"],
-  ["Marketplace Trust", "Evaluate seller evidence without hype.", "knowledge", "marketplace-trust"],
-  ["Live Safety", "Make honest claims about a small-room stream.", "knowledge", "live-safety"],
-  ["Learning Design", "Choose an assessment that proves understanding.", "knowledge", "learning-design"],
-  ["Match Quality", "Practice consent-first matching decisions.", "knowledge", "match-quality"],
-  ["Team Handoff", "Package context and acceptance criteria clearly.", "strategy", "team-handoff"],
-  ["Incident First Aid", "Isolate safely while preserving evidence.", "strategy", "incident-first-aid"],
-  ["Decision Matrix", "Compare options by criteria and tradeoffs.", "strategy", "decision-matrix"],
-  ["Accessibility Check", "Select inclusive keyboard and reader paths.", "knowledge", "accessibility-check"],
-  ["Sustainable Pace", "Choose a reliable, verifiable delivery habit.", "strategy", "sustainable-pace"],
-  ["Product Truth", "Label an unconnected integration honestly.", "knowledge", "product-truth"],
+  {
+    name: "High-Low",
+    eyebrow: "CARDS",
+    detail: "Call higher or lower against the next seeded card and build a streak.",
+    href: "/arcade#high-low",
+    icon: Gauge,
+    accent: "from-amber-500/25 via-orange-500/10 to-transparent",
+    metric: "Streak play",
+  },
+  {
+    name: "Blackjack",
+    eyebrow: "TABLE",
+    detail: "Play full dealer hands with Hit, Stand, and Double using demo chips only.",
+    href: "/game-blackjack",
+    icon: Spade,
+    accent: "from-emerald-500/25 via-green-500/10 to-transparent",
+    metric: "Dealer rules",
+  },
+  {
+    name: "Roulette",
+    eyebrow: "WHEEL",
+    detail: "Pick color, parity, or a straight number and spin the seeded demo wheel.",
+    href: "/arcade#roulette",
+    icon: CircleDot,
+    accent: "from-rose-500/25 via-red-500/10 to-transparent",
+    metric: "0–36 wheel",
+  },
 ] as const;
-const directArcadeModes = new Set([
-  "high-low",
-  "memory",
-  "word",
-  "trivia",
-  "tower",
-  "mines",
-  "chess",
-  "checkers",
-  "reaction",
-]);
 
-const filters: ReadonlyArray<{ id: GameCategory; label: string }> = [
-  { id: "all", label: "All" },
-  { id: "favorites", label: "Favorites" },
-  { id: "arcade", label: "Arcade" },
-  { id: "knowledge", label: "Knowledge" },
-  { id: "strategy", label: "Strategy" },
-  { id: "simulation", label: "Skill simulations" },
-];
-
-function latestPlayed(passport: ArcadePassport): ArcadeGameId | null {
-  let latest: { id: ArcadeGameId; time: number } | null = null;
-
-  for (const game of games) {
-    const raw = passport.games[game.id].lastPlayedAt;
-    const time = raw ? Date.parse(raw) : Number.NaN;
-    if (!Number.isFinite(time)) continue;
-    if (!latest || time > latest.time) latest = { id: game.id, time };
-  }
-
-  return latest?.id ?? null;
-}
+const cryptoGames = [
+  {
+    name: "Hash Hunt",
+    detail: "Spot the candidate hash that matches the requested leading nibble.",
+    href: "/arcade#crypto",
+  },
+  {
+    name: "Wallet Defense",
+    detail: "Fast security decisions around seed phrases, addresses, signatures, and confirmations.",
+    href: "/arcade#crypto",
+  },
+] as const;
 
 export default function Gaming() {
-  const [filter, setFilter] = useState<GameCategory>("all");
-  const [catalogQuery, setCatalogQuery] = useState("");
-  const catalogSearchRef = useRef<HTMLInputElement>(null);
-  const {
-    passport,
-    syncStatus,
-    refresh: refreshPassport,
-    toggleFavorite,
-  } = useArcadePassportSync();
-
-  const visibleGames = useMemo(
-    () => {
-      const query = catalogQuery.trim().toLowerCase();
-      return games.filter(game => {
-        const matchesFilter = filter === "all" || (filter === "favorites" ? passport.favorites.includes(game.id) : game.category === filter);
-        const matchesQuery = !query || `${game.name} ${game.detail} ${game.category}`.toLowerCase().includes(query);
-        return matchesFilter && matchesQuery;
-      });
-    },
-    [catalogQuery, filter, passport.favorites]
-  );
-  const normalizedCatalogQuery = catalogQuery.trim().toLowerCase();
-  const visibleAdditionalGames = additionalGames.filter(([name, detail, category]) => {
-    const matchesFilter = filter !== "favorites" && (filter === "all" || category === filter);
-    const matchesQuery = !normalizedCatalogQuery || `${name} ${detail} ${category}`.toLowerCase().includes(normalizedCatalogQuery);
-    return matchesFilter && matchesQuery;
-  });
-  useEffect(() => {
-    const handleCatalogShortcut = (event: KeyboardEvent) => {
-      if (event.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes((event.target as HTMLElement).tagName)) {
-        event.preventDefault();
-        catalogSearchRef.current?.focus();
-      }
-      if (event.key === "Escape" && document.activeElement === catalogSearchRef.current) {
-        setCatalogQuery("");
-        catalogSearchRef.current?.blur();
-      }
-    };
-    window.addEventListener("keydown", handleCatalogShortcut);
-    return () => window.removeEventListener("keydown", handleCatalogShortcut);
-  }, []);
-  const dailyGame =
-    games.find(game => game.id === passport.daily.gameId) ?? games[0];
-  const recentGameId = latestPlayed(passport);
-  const recentGame = recentGameId
-    ? games.find(game => game.id === recentGameId)
-    : null;
-  const unlockedBadges = arcadePassportBadges(passport).filter(
-    badge => badge.unlocked
-  ).length;
-  const uniqueGamesPlayed = dailyArcadeGameIds.filter(
-    gameId => passport.games[gameId].plays > 0
-  ).length;
-
   return (
-    <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
+    <main className="min-h-screen overflow-hidden bg-[#05060a] text-white">
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute left-[-14rem] top-[-10rem] h-[34rem] w-[34rem] rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="absolute right-[-12rem] top-52 h-[30rem] w-[30rem] rounded-full bg-cyan-500/12 blur-3xl" />
+        <div className="absolute left-[-12rem] top-[-10rem] h-[36rem] w-[36rem] rounded-full bg-fuchsia-600/15 blur-3xl" />
+        <div className="absolute right-[-10rem] top-20 h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="absolute bottom-[-16rem] left-1/3 h-[30rem] w-[30rem] rounded-full bg-emerald-500/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl space-y-8 px-4 py-10">
-        <section className="relative overflow-hidden rounded-[2rem] border border-violet-300/20 bg-gradient-to-br from-violet-700/80 via-fuchsia-800/55 to-sky-900/70 p-6 shadow-2xl shadow-violet-950/30 sm:p-9">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(255,255,255,.18),transparent_28%)]" />
-          <div className="relative grid gap-7 lg:grid-cols-[1fr_380px] lg:items-end">
+      <div className="relative mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
+        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(24,24,38,.96),rgba(7,9,16,.96))] shadow-2xl shadow-black/40">
+          <div className="grid gap-8 p-6 sm:p-9 lg:grid-cols-[1.25fr_.75fr] lg:p-12">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className="bg-white/15 text-white">Games Center</Badge>
-                <Badge className="bg-cyan-300/15 text-cyan-100">50 games visible</Badge>
-                <Badge
-                  variant="outline"
-                  className="border-white/20 text-white/70"
-                >
-                  Arcade Passport · no real-money play
+                <Badge className="bg-fuchsia-500/15 text-fuchsia-100">SKY ARCADE</Badge>
+                <Badge variant="outline" className="border-cyan-300/20 text-cyan-100">
+                  Rebuilt flagship beta
                 </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-white/20 text-white/60"
-                >
-                  {syncStatus === "synced"
-                    ? "Account progress synced"
-                    : syncStatus === "syncing"
-                      ? "Syncing account progress"
-                      : syncStatus === "error"
-                        ? "Local progress · sync unavailable"
-                        : "Device-local progress"}
+                <Badge variant="outline" className="border-white/10 text-white/45">
+                  Demo credits only
                 </Badge>
               </div>
-              <h1 className="mt-5 max-w-4xl text-5xl font-black tracking-tight sm:text-6xl">
-                Learn. Play. Build a better run.
+
+              <h1 className="mt-6 max-w-4xl text-5xl font-black tracking-[-0.05em] sm:text-6xl lg:text-7xl">
+                Fewer games.
+                <span className="block bg-gradient-to-r from-fuchsia-300 via-violet-200 to-cyan-200 bg-clip-text text-transparent">
+                  Better games.
+                </span>
               </h1>
-              <p className="mt-4 max-w-3xl text-base leading-7 text-white/65">
-                Replayable arcade, knowledge, strategy, and simulation modes
-                connected by one device-local progression layer. Sparks, Study
-                XP, scores, badges, favorites, and daily challenges have no
-                monetary or token value.
+
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/50 sm:text-lg">
+                The old quantity-first catalog is no longer the main experience.
+                SKYCOIN4444 Gaming now centers on Crash, Plinko, High-Low,
+                Blackjack, Roulette, and a small Crypto Ops arcade.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href={dailyGame.href}>
-                  <Button
-                    size="lg"
-                    className="bg-white text-violet-900 hover:bg-white/90"
-                  >
-                    <Zap className="mr-2 h-5 w-5" />
-                    Play today's challenge
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link href="/game-crash">
+                  <Button size="lg" className="bg-white text-black hover:bg-white/90">
+                    Play Crash
+                    <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/game-fi-quest-board">
+                <Link href="/arcade#plinko">
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white/25 bg-white/10 text-white hover:bg-white/15"
+                    className="border-white/15 bg-white/[0.04] text-white hover:bg-white/[0.08]"
                   >
-                    <Target className="mr-2 h-5 w-5" />
-                    Open Quest Board
+                    Open game floor
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <Card className="border-white/15 bg-black/20 text-white backdrop-blur">
+            <Card className="border-white/10 bg-black/25 text-white backdrop-blur">
               <CardHeader>
-                <CardDescription className="text-white/45">
-                  Arcade Passport
-                </CardDescription>
-                <CardTitle className="text-2xl text-white">
-                  Level {arcadePassportLevel(passport)}
-                </CardTitle>
+                <CardDescription className="text-white/40">Beta rules</CardDescription>
+                <CardTitle className="text-2xl text-white">Play without pretending</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  {[
-                    ["Runs", passport.totalPlays],
-                    ["Sparks", passport.totalSparks],
-                    ["Study XP", passport.totalXp],
-                  ].map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="rounded-xl border border-white/10 bg-white/[0.04] p-3"
-                    >
-                      <p className="text-xl font-black">{value}</p>
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-white/30">
-                        {label}
-                      </p>
-                    </div>
-                  ))}
+              <CardContent className="space-y-4 text-sm leading-6 text-white/45">
+                <div className="flex gap-3">
+                  <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+                  <p>No deposits, withdrawals, wallet wagering, custody, or blockchain settlement.</p>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between text-xs text-white/35">
-                    <span>Games sampled</span>
-                    <span>
-                      {uniqueGamesPlayed}/{dailyArcadeGameIds.length}
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      (uniqueGamesPlayed / dailyArcadeGameIds.length) * 100
-                    }
-                    className="mt-2 h-1.5"
-                  />
+                <div className="flex gap-3">
+                  <Coins className="mt-0.5 h-5 w-5 shrink-0 text-amber-300" />
+                  <p>Credits, chips, multipliers, and payouts are browser-local demo game state with no cash or token value.</p>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full text-white/60"
-                  onClick={refreshPassport}
-                >
-                  Refresh local progress
-                </Button>
+                <div className="flex gap-3">
+                  <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
+                  <p>Seed/proof strings are for repeatable engineering tests; they are not a certified provably-fair system.</p>
+                </div>
               </CardContent>
             </Card>
           </div>
-        </section>
-
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            {
-              label: "Recorded runs",
-              value: passport.totalPlays,
-              icon: Gamepad2,
-            },
-            {
-              label: "Games sampled",
-              value: uniqueGamesPlayed,
-              icon: Trophy,
-            },
-            {
-              label: "Unlocked badges",
-              value: unlockedBadges,
-              icon: Star,
-            },
-            {
-              label: "Favorites",
-              value: passport.favorites.length,
-              icon: Heart,
-            },
-          ].map(({ label, value, icon: Icon }) => (
-            <Card
-              key={label}
-              className="border-white/10 bg-white/[0.035] text-white"
-            >
-              <CardContent className="p-5">
-                <Icon className="h-5 w-5 text-violet-200" />
-                <p className="mt-4 text-3xl font-black">{value}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/30">
-                  {label}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <Card className="border-cyan-300/20 bg-cyan-300/[0.04] text-white">
-            <CardHeader>
-              <CardDescription className="text-cyan-100/55">
-                Daily deterministic pick
-              </CardDescription>
-              <CardTitle className="text-2xl text-white">
-                {dailyGame.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-6 text-white/45">
-                {dailyGame.detail}
-              </p>
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <Badge
-                  variant="outline"
-                  className={
-                    passport.daily.completed
-                      ? "border-emerald-300/25 text-emerald-100"
-                      : "border-cyan-300/25 text-cyan-100"
-                  }
-                >
-                  {passport.daily.completed ? "Cleared today" : "Open today"}
-                </Badge>
-                <Link href={dailyGame.href}>
-                  <Button>Play daily</Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-white/10 bg-white/[0.03] text-white">
-            <CardHeader>
-              <CardDescription className="text-white/45">
-                Continue
-              </CardDescription>
-              <CardTitle className="text-2xl text-white">
-                {recentGame ? recentGame.name : "Start your first run"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-6 text-white/45">
-                {recentGame
-                  ? "Jump back into the most recently recorded Arcade Passport mode."
-                  : "Pick any mode below. The first finished run starts your device-local passport."}
-              </p>
-              <Link href={recentGame?.href ?? "/game-sky-rush"}>
-                <Button
-                  variant="outline"
-                  className="mt-4 border-white/15 bg-white/[0.03] text-white"
-                >
-                  {recentGame ? "Continue" : "Start with Sky Rush"}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
         </section>
 
         <section>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/30">
-                Play now
-              </p>
-              <h2 className="mt-2 text-3xl font-black">Game library</h2>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-200/60">Flagship floor</p>
+              <h2 className="mt-1 text-3xl font-black">Five core games</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {filters.map(item => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setFilter(item.id)}
-                  aria-pressed={filter === item.id}
-                  className={
-                    "rounded-full border px-3 py-2 text-xs font-semibold transition " +
-                    (filter === item.id
-                      ? "border-violet-300/35 bg-violet-300/[0.09] text-violet-100"
-                      : "border-white/10 bg-white/[0.025] text-white/45 hover:border-white/20 hover:text-white")
-                  }
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+            <p className="max-w-xl text-sm leading-6 text-white/35">
+              Every promoted game has its own replay loop, visible state, deterministic demo engine, and a clear no-value boundary.
+            </p>
           </div>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {visibleGames.map(game => {
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {flagshipGames.map(game => {
               const Icon = game.icon;
-              const progress = passport.games[game.id];
-              const favorite = passport.favorites.includes(game.id);
-
               return (
-                <Card
-                  key={game.id}
-                  className="group overflow-hidden border-white/10 bg-white/[0.03] text-white transition hover:-translate-y-1 hover:border-violet-300/25 hover:shadow-2xl hover:shadow-violet-950/20"
-                >
-                  <div
-                    className={
-                      "relative aspect-[16/8] bg-gradient-to-br p-5 " +
-                      game.gradient
-                    }
-                  >
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_15%,rgba(255,255,255,.22),transparent_30%)]" />
-                    <div className="relative flex h-full flex-col justify-between">
-                      <div className="flex items-start justify-between">
-                        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 backdrop-blur">
-                          <Icon className="h-5 w-5" />
+                <Link key={game.name} href={game.href}>
+                  <Card className="group h-full overflow-hidden border-white/10 bg-white/[0.035] text-white transition hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.055]">
+                    <div className={"h-28 bg-gradient-to-br " + game.accent}>
+                      <div className="flex h-full items-end justify-between p-5">
+                        <Icon className="h-9 w-9 text-white/85" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+                          {game.eyebrow}
                         </span>
-                        <button
-                          type="button"
-                          aria-label={
-                            favorite
-                              ? "Remove from favorite games"
-                              : "Add to favorite games"
-                          }
-                          onClick={() => toggleFavorite(game.id)}
-                          className={
-                            "grid h-10 w-10 place-items-center rounded-xl border backdrop-blur transition " +
-                            (favorite
-                              ? "border-rose-200/40 bg-rose-300/20 text-rose-100"
-                              : "border-white/15 bg-black/15 text-white/60 hover:text-white")
-                          }
-                        >
-                          <Heart
-                            className="h-4 w-4"
-                            fill={favorite ? "currentColor" : "none"}
-                          />
-                        </button>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
-                          {game.category} · {game.duration}
-                        </p>
-                        <h3 className="mt-1 text-2xl font-black">{game.name}</h3>
                       </div>
                     </div>
-                  </div>
-
-                  <CardContent className="space-y-4 p-4">
-                    <p className="min-h-12 text-sm leading-6 text-white/45">
-                      {game.detail}
-                    </p>
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      {[
-                        ["Runs", progress.plays],
-                        ["Best", progress.bestScore],
-                        ["Combo", progress.bestCombo],
-                      ].map(([label, value]) => (
-                        <div
-                          key={label}
-                          className="rounded-xl border border-white/[0.07] bg-black/20 p-2"
-                        >
-                          <p className="font-bold text-white">{value}</p>
-                          <p className="text-[10px] uppercase tracking-[0.1em] text-white/25">
-                            {label}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                    <Link href={game.href}>
-                      <Button className="w-full">
-                        Play {game.name}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-2xl text-white">{game.name}</CardTitle>
+                      <CardDescription className="text-xs uppercase tracking-[0.14em] text-white/30">
+                        {game.metric}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="min-h-20 text-sm leading-6 text-white/45">{game.detail}</p>
+                      <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-white/80">
+                        Play
+                        <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               );
             })}
           </div>
         </section>
 
-        <section className="space-y-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-200/60">Arcade Lab expanded</p>
-            <h2 className="mt-2 text-3xl font-black">42 more games to play</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">These are individually named deterministic practice games, not filler tiles. Each opens the Arcade Lab, where the mode runs locally with immediate feedback and no monetary value.</p>
-            </div>
-            <div className="w-full max-w-sm">
-              <Input ref={catalogSearchRef} value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)} placeholder="Search the 50-game catalog…" aria-label="Search the 50-game catalog" className="border-cyan-200/15 bg-white/[0.04] text-white placeholder:text-white/35" />
-              <p className="mt-2 text-right text-xs text-white/35">Press / to search · Showing {visibleGames.length + visibleAdditionalGames.length} matching games</p>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {visibleAdditionalGames.map(([name, detail, category, mode], index) => (
-              <Card key={name} className="border-cyan-300/10 bg-white/[0.03] text-white transition hover:-translate-y-1 hover:border-cyan-300/30">
-                <CardContent className="flex min-h-44 flex-col justify-between gap-5 p-5">
-                  <div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full border border-cyan-200/15 bg-cyan-200/[0.06] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-cyan-100/70">{category} · {String(index + 9).padStart(2, "0")}</span>
-                      <Gamepad2 className="h-4 w-4 text-cyan-200/60" />
-                    </div>
-                    <h3 className="mt-4 text-xl font-black">{name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-white/45">{detail}</p>
-                  </div>
-                  <Link href={`/arcade#${directArcadeModes.has(mode) ? mode : `skills-${mode}`}`}><Button variant="outline" className="w-full border-cyan-200/15 bg-cyan-200/[0.04] text-white hover:bg-cyan-200/[0.1]">Open {name}<ArrowRight className="ml-2 h-4 w-4" /></Button></Link>
-                </CardContent>
-              </Card>
+        <section className="grid gap-4 lg:grid-cols-[.8fr_1.2fr]">
+          <Card className="border-cyan-300/15 bg-cyan-300/[0.035] text-white">
+            <CardHeader>
+              <div className="flex items-center gap-2 text-cyan-200">
+                <Gamepad2 className="h-5 w-5" />
+                <CardDescription className="text-cyan-100/45">Crypto Ops</CardDescription>
+              </div>
+              <CardTitle className="text-3xl text-white">Crypto-themed skill games</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm leading-6 text-white/45">
+                Crypto should add mechanics, not fake money claims. These games use blockchain and wallet concepts as the challenge itself.
+              </p>
+              <Link href="/arcade#crypto">
+                <Button className="mt-5">
+                  Open Crypto Ops
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {cryptoGames.map(game => (
+              <Link key={game.name} href={game.href}>
+                <Card className="h-full border-white/10 bg-white/[0.03] text-white transition hover:border-cyan-300/20">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white">{game.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm leading-6 text-white/40">{game.detail}</p>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
-          {visibleGames.length + visibleAdditionalGames.length === 0 ? (
-            <Card className="border-dashed border-cyan-200/20 bg-white/[0.03] text-center text-white">
-              <CardContent className="flex flex-col items-center gap-3 p-10">
-                <Gamepad2 className="h-8 w-8 text-cyan-200/60" />
-                <h3 className="text-xl font-black">{filter === "favorites" ? "No favorite games yet" : "No games match that search"}</h3>
-                <p className="max-w-md text-sm leading-6 text-white/45">{filter === "favorites" ? "Use the heart button on any core game to build a personal launch set." : "Try a different title or category, or reset the catalog to see all 50 games again."}</p>
-                <Button variant="outline" onClick={() => { setCatalogQuery(""); setFilter("all"); }}>Show all 50 games</Button>
-              </CardContent>
-            </Card>
-          ) : null}
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-3">
-          <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
-            <CardHeader>
-              <Target className="h-5 w-5 text-violet-200" />
-              <CardTitle className="mt-2 text-white">Quest Board</CardTitle>
-              <CardDescription className="text-white/45">
-                Daily challenge, milestones, and badges derived from real local
-                runs instead of unavailable GameFi backend calls.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/game-fi-quest-board">
-                <Button className="w-full">Open Arcade Passport</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="border-blue-300/20 bg-blue-300/[0.04] text-white">
-            <CardHeader>
-              <BookOpen className="h-5 w-5 text-blue-200" />
-              <CardTitle className="mt-2 text-white">Learn → play</CardTitle>
-              <CardDescription className="text-white/45">
-                Move from authored SkySchool lessons into recall and arcade
-                practice.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/sky-school">
-                <Button
-                  variant="outline"
-                  className="w-full border-blue-300/20 bg-blue-300/[0.03] text-white"
-                >
-                  Open SkySchool
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="border-emerald-300/20 bg-emerald-300/[0.04] text-white">
-            <CardHeader>
-              <ShieldCheck className="h-5 w-5 text-emerald-200" />
-              <CardTitle className="mt-2 text-white">Healthy loop</CardTitle>
-              <CardDescription className="text-white/45">
-                Daily play is optional. There is no streak penalty, wager,
-                balance pressure, auto-spin, payout, or notification pressure.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/hope-a-i">
-                <Button
-                  variant="outline"
-                  className="w-full border-emerald-300/20 bg-emerald-300/[0.03] text-white"
-                >
-                  Ask HopeAI for a sprint
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
-          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          Arcade Passport progression is stored only in this browser. Sparks,
-          Study XP, scores, badges, favorites, and daily completion are not
-          transferable assets, wallet balances, prizes, server-backed rankings,
-          financial rewards, or blockchain records. Clearing browser storage
-          removes them.
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-5 text-white/35">
+          <strong className="text-white/60">Engineering beta:</strong> this rebuild intentionally removes the legacy quantity-first positioning from the flagship Games Center. Legacy routes can remain for compatibility, but they are not part of the promoted arcade lineup.
         </section>
       </div>
     </main>

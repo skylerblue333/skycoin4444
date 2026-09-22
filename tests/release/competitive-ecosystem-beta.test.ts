@@ -38,7 +38,8 @@ const evidenceRegistry = JSON.parse(
 );
 const arcadeSource = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
 const gamingSource = fs.readFileSync("client/src/pages/Gaming.tsx", "utf8");
-const gameTests = fs.readFileSync("tests/release/gap-games.test.ts", "utf8");
+const engineSource = fs.readFileSync("client/src/lib/flagshipGameEngine.ts", "utf8");
+const gameTests = fs.readFileSync("tests/gaming/flagship-game-engine.test.ts", "utf8");
 
 describe("competitive ecosystem beta", () => {
   it("defines eight truthful ecosystem areas", () => {
@@ -158,25 +159,28 @@ describe("competitive ecosystem beta", () => {
     ]) {
       expect(registryRoutes.has(route)).toBe(true);
     }
-    expect(arcadeSource).toMatch(/Eighteen local game experiences/);
     expect(arcadeSource).toMatch(/Plinko Lab/);
-    expect(arcadeSource).toMatch(/No real-money wagering/);
-    expect(gameTests).toMatch(/gap game engineering-beta domain cores/);
+    expect(arcadeSource).toMatch(/High-Low/);
+    expect(arcadeSource).toMatch(/Roulette/);
+    expect(arcadeSource).toMatch(/Crypto Ops/);
+    expect(arcadeSource).toMatch(/No cash or token value/);
+    expect(gameTests).toMatch(/flagship game engine/);
   });
 
-  it("protects the 50-game catalog discovery and recovery contract", () => {
-    expect(gamingSource.match(/\["[^"]+", "[^"]+", "(?:arcade|knowledge|strategy)", "[^"]+"\]/g)).toHaveLength(42);
-    expect(arcadeSource.match(/^  \["[^"]+",/gm)).toHaveLength(34);
-    expect(gamingSource).toMatch(/50 games visible/);
-    expect(gamingSource).toMatch(/Search the 50-game catalog/);
-    expect(gamingSource).toMatch(/No games match that search/);
-    expect(gamingSource).toMatch(/Show all 50 games/);
-    expect(gamingSource).toMatch(/directArcadeModes/);
-    expect(gamingSource).toMatch(/skills-\$\{mode\}/);
-    expect(gamingSource).toMatch(/Press \/ to search/);
-    expect(arcadeSource).toMatch(/SKILL_PROGRESS_KEY/);
-    expect(arcadeSource).toMatch(/focusedSkillSlug/);
-    expect(arcadeSource).toMatch(/skillCorrect/);
-    expect(arcadeSource).toMatch(/Reset progress/);
+  it("protects the focused flagship gaming discovery contract", () => {
+    for (const marker of ["Crash", "Plinko", "High-Low", "Blackjack", "Roulette", "Crypto Ops"]) {
+      expect(gamingSource).toContain(marker);
+    }
+    expect(gamingSource).toMatch(/Five core games/);
+    expect(gamingSource).toMatch(/Fewer games/);
+    expect(gamingSource).not.toMatch(/50 games visible/);
+    expect(gamingSource).not.toMatch(/Search the 50-game catalog/);
+    expect(arcadeSource).toMatch(/value="plinko"/);
+    expect(arcadeSource).toMatch(/value="high-low"/);
+    expect(arcadeSource).toMatch(/value="roulette"/);
+    expect(arcadeSource).toMatch(/value="crypto"/);
+    expect(engineSource).toMatch(/simulatePlinko/);
+    expect(engineSource).toMatch(/spinRoulette/);
+    expect(engineSource).toMatch(/crashPoint/);
   });
 });

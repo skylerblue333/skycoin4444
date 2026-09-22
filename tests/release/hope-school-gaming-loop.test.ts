@@ -15,7 +15,7 @@ const navigation = fs.readFileSync(
 );
 const app = fs.readFileSync("client/src/App.tsx", "utf8");
 
-describe("HopeAI + SkySchool + Gaming fun loop", () => {
+describe("HopeAI + SkySchool + focused Gaming loop", () => {
   it("keeps HopeAI useful without fake external-model behavior", () => {
     expect(hope).toMatch(/createHopePlan/);
     expect(hope).toMatch(/activityEvidence\.list\.useQuery/);
@@ -41,16 +41,17 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(school).not.toMatch(/world's best AI teacher/i);
   });
 
-  it("promotes a replayable no-value game loop without fake platform stats", () => {
-    expect(gaming).toMatch(/Sky Rush/);
-    expect(gaming).toMatch(/href: "\/game-sky-rush"/);
-    expect(gaming).toMatch(/Sparks, Study\s+XP, scores, badges, favorites, and daily challenges have no\s+monetary or token value/);
-    expect(gaming).toMatch(/no real-money play/i);
-    expect(gaming).toMatch(/no streak penalty, wager,\s+balance pressure, auto-spin, payout, or notification pressure/i);
-    expect(gaming).toMatch(/not\s+transferable assets, wallet balances, prizes, server-backed rankings,\s+financial rewards, or blockchain records/);
+  it("promotes a focused no-value flagship game loop without fake platform stats", () => {
+    for (const marker of ["Crash", "Plinko", "High-Low", "Blackjack", "Roulette", "Crypto Ops"]) {
+      expect(gaming).toContain(marker);
+    }
+    expect(gaming).toMatch(/Demo credits only/);
+    expect(gaming).toMatch(/No deposits, withdrawals, wallet wagering, custody, or blockchain settlement/);
+    expect(gaming).toMatch(/no cash or token value/i);
     expect(gaming).not.toMatch(/platform\.stats/);
     expect(gaming).not.toMatch(/Active Players/);
     expect(gaming).not.toMatch(/prizePool\s*:/i);
+    expect(gaming).not.toMatch(/href: "\/game-sky-rush"/);
 
     expect(rush).toMatch(/resolveRushTick/);
     expect(rush).toMatch(/dailySeed/);
@@ -60,7 +61,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(rush).not.toMatch(/SKY444/);
   });
 
-  it("removes fake donation/token transfer claims from promoted legacy games", () => {
+  it("keeps removed legacy game routes honest while they remain for compatibility", () => {
     for (const source of [tap, quiz, builder]) {
       expect(source).not.toMatch(/SKY444/);
       expect(source).not.toMatch(/gaming-for-charity/);
@@ -80,7 +81,7 @@ describe("HopeAI + SkySchool + Gaming fun loop", () => {
     expect(impact).not.toMatch(/real SKY444 donations/);
   });
 
-  it("routes navigation and app entry points into the canonical fun loop", () => {
+  it("routes navigation and app entry points into the canonical platform loop", () => {
     expect(navigation).toMatch(
       /label: "School", route: "\/sky-school"/
     );

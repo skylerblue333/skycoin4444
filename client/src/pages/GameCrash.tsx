@@ -1,19 +1,15 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
-  Crosshair,
+  Gauge,
   RotateCcw,
   ShieldCheck,
-  Target,
-  TimerReset,
-  Trophy,
+  TrendingUp,
   Zap,
 } from "lucide-react";
-import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -21,364 +17,293 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { crashPoint, demoProof } from "@/lib/flagshipGameEngine";
 
-type RoundState = "idle" | "running" | "resolved" | "finished";
+type RoundState = "idle" | "running" | "cashed" | "crashed";
+const STAKES = [5, 10, 25, 50, 100] as const;
 
-const SESSION_ROUNDS = 5;
-
-function seededUnit(seed: number): number {
-  const x = Math.sin(seed * 91.73 + 0.417) * 10_000;
-  return x - Math.floor(x);
-}
-
-function roundConfig(seed: number, round: number) {
-  const base = seed + round * 137;
-  const target = 1.4 + seededUnit(base) * 2.6;
-  const breakPoint = target + 0.35 + seededUnit(base + 9) * 1.6;
-  return {
-    target: Number(target.toFixed(2)),
-    breakPoint: Number(breakPoint.toFixed(2)),
-  };
-}
-
-function scoreLock(value: number, target: number): number {
-  const distance = Math.abs(value - target);
-  return Math.max(0, Math.round(1000 - distance * 500));
+function formatCredits(value: number) {
+  return Math.max(0, value).toFixed(2);
 }
 
 export default function GameCrash() {
-  const { recordRun } = useArcadeRunRecorder();
-  const [state, setState] = useState<RoundState>("idle");
-  const [seed, setSeed] = useState(9124);
-  const [round, setRound] = useState(1);
-  const [multiplier, setMultiplier] = useState(1);
-  const [lockedAt, setLockedAt] = useState<number | null>(null);
-  const [roundScore, setRoundScore] = useState(0);
-  const [sessionScore, setSessionScore] = useState(0);
-  const [bestRound, setBestRound] = useState(0);
-  const [demoBalance, setDemoBalance] = useState(1000);
-  const [betAmount, setBetAmount] = useState(25);
+  const [credits, setCredits] = useState(1000);
+  const [stake, setStake] = useState(25);
+  const [roundStake, setRoundStake] = useState(25);
   const [autoCashout, setAutoCashout] = useState(0);
-  const [recentRounds, setRecentRounds] = useState<string[]>([]);
-  const [message, setMessage] = useState(
-    "Track the rising curve and lock as close to the target band as you can."
-  );
-  const recorded = useRef(false);
+  const [seed, setSeed] = useState(4444);
+  const [crashAt, setCrashAt] = useState(() => crashPoint(seed));
+  const [multiplier, setMultiplier] = useState(1);
+  const [state, setState] = useState<RoundState>("idle");
+  const [message, setMessage] = useState("Set a demo stake, start the round, then cash out before the curve breaks.");
+  const [history, setHistory] = useState<number[]>([]);
+  const [trail, setTrail] = useState<number[]>([1]);
 
-  const config = roundConfig(seed, round);
-  const targetLow = Math.max(1, config.target - 0.12);
-  const targetHigh = config.target + 0.12;
+  const proof = useMemo(() => demoProof(seed, "crash"), [seed]);
 
   useEffect(() => {
     if (state !== "running") return;
 
-    const timer = window.setInterval(() => {
-      setMultiplier(current => {
-        const step = 0.018 + Math.min(0.045, (current - 1) * 0.0025);
-        const next = Number((current + step).toFixed(3));
-        if (autoCashout > 0 && next >= autoCashout && next < config.breakPoint) {
-          const score = scoreLock(next, config.target);
-          setLockedAt(next);
-          setRoundScore(score);
-          setSessionScore(value => value + score);
-          setDemoBalance(value => Number((value + betAmount * next).toFixed(2)));
-          setRecentRounds(value => [`${next.toFixed(2)}x · auto +${(betAmount * next).toFixed(2)} demo credits`, ...value].slice(0, 6));
-          setMessage(`Auto cash-out secured at ${next.toFixed(2)}x.`);
-          setState("resolved");
-          return next;
-        }
-        if (next >= config.breakPoint) {
-          window.clearInterval(timer);
-          setRoundScore(0);
-          setLockedAt(null);
-          setMessage(
-            "The curve broke before you locked it. Read the next target and try again."
-          );
-          setState("resolved");
-          return config.breakPoint;
-        }
-        return next;
-      });
-    }, 45);
+    const timer = window.setTimeout(() => {
+      const next = Number((multiplier + 0.025 + multiplier * 0.012).toFixed(2));
 
-    return () => window.clearInterval(timer);
-  }, [autoCashout, betAmount, config.breakPoint, config.target, state]);
-
-  function startSession() {
-    if (!Number.isFinite(betAmount) || betAmount <= 0 || betAmount > demoBalance) {
-      setMessage("Choose a valid demo-credit bet within your available balance.");
-      return;
-    }
-    const nextSeed = seed + 1;
-    setSeed(nextSeed);
-    setRound(1);
-    setMultiplier(1);
-    setLockedAt(null);
-    setRoundScore(0);
-    setSessionScore(0);
-    setBestRound(0);
-    setDemoBalance(value => Number((value - betAmount).toFixed(2)));
-    setMessage("Round one started. Lock inside the highlighted target band.");
-    recorded.current = false;
-    setState("running");
-  }
-
-  function lock() {
-    if (state !== "running") return;
-    const score = scoreLock(multiplier, config.target);
-    setLockedAt(multiplier);
-    setRoundScore(score);
-    setSessionScore(value => value + score);
-    setDemoBalance(value => Number((value + betAmount * multiplier).toFixed(2)));
-    setRecentRounds(value => [`${multiplier.toFixed(2)}x · +${(betAmount * multiplier).toFixed(2)} demo credits`, ...value].slice(0, 6));
-    setBestRound(value => Math.max(value, score));
-
-    if (multiplier >= targetLow && multiplier <= targetHigh) {
-      setMessage("Precision lock! You landed inside the target band.");
-    } else if (score >= 700) {
-      setMessage("Close lock. Tighten the timing on the next round.");
-    } else {
-      setMessage("Safe lock, but far from target. Track the band more closely.");
-    }
-    setState("resolved");
-  }
-
-  function nextRound() {
-    if (state !== "resolved") return;
-
-    if (round >= SESSION_ROUNDS) {
-      setState("finished");
-      if (!recorded.current) {
-        recordRun({
-          gameId: "crash-lab",
-          score: sessionScore,
-          xp: Math.floor(sessionScore / 2),
-          sparks: Math.floor(sessionScore / 250),
-          combo: bestRound >= 900 ? 1 : 0,
-        });
-        recorded.current = true;
+      if (autoCashout > 1 && autoCashout < crashAt && next >= autoCashout) {
+        const locked = Number(autoCashout.toFixed(2));
+        setMultiplier(locked);
+        setTrail(values => [...values, locked].slice(-90));
+        setCredits(value => Number((value + roundStake * locked).toFixed(2)));
+        setHistory(values => [crashAt, ...values].slice(0, 8));
+        setMessage("Auto cash-out locked at " + locked.toFixed(2) + "x.");
+        setState("cashed");
+        return;
       }
+
+      if (next >= crashAt) {
+        setMultiplier(crashAt);
+        setTrail(values => [...values, crashAt].slice(-90));
+        setHistory(values => [crashAt, ...values].slice(0, 8));
+        setMessage("Crashed at " + crashAt.toFixed(2) + "x. The demo stake was consumed.");
+        setState("crashed");
+        return;
+      }
+
+      setMultiplier(next);
+      setTrail(values => [...values, next].slice(-90));
+    }, 42);
+
+    return () => window.clearTimeout(timer);
+  }, [autoCashout, crashAt, multiplier, roundStake, state]);
+
+  function startRound() {
+    if (state === "running") return;
+    if (!Number.isFinite(stake) || stake <= 0 || stake > credits) {
+      setMessage("Choose a valid demo stake within the local credit balance.");
       return;
     }
 
-    setRound(value => value + 1);
-    if (betAmount <= demoBalance) setDemoBalance(value => Number((value - betAmount).toFixed(2)));
+    const nextSeed = seed + 1;
+    const nextCrash = crashPoint(nextSeed);
+    setSeed(nextSeed);
+    setCrashAt(nextCrash);
+    setRoundStake(stake);
+    setCredits(value => Number((value - stake).toFixed(2)));
     setMultiplier(1);
-    setLockedAt(null);
-    setRoundScore(0);
-    setMessage("New target. Lock when the curve reaches the band.");
+    setTrail([1]);
+    setMessage("Round live. Cash out before the curve reaches its hidden break point.");
     setState("running");
   }
 
-  const bandPosition = Math.min(100, (config.target / config.breakPoint) * 100);
-  const cursorPosition = Math.min(
-    100,
-    (multiplier / config.breakPoint) * 100
-  );
-  const average =
-    round > 0 ? Math.round(sessionScore / Math.max(1, round - (state === "running" ? 1 : 0))) : 0;
+  function cashOut() {
+    if (state !== "running") return;
+    const locked = multiplier;
+    setCredits(value => Number((value + roundStake * locked).toFixed(2)));
+    setHistory(values => [crashAt, ...values].slice(0, 8));
+    setMessage("Cashed out at " + locked.toFixed(2) + "x for " + (roundStake * locked).toFixed(2) + " demo credits.");
+    setState("cashed");
+  }
+
+  function resetCredits() {
+    if (state === "running") return;
+    setCredits(1000);
+    setMessage("Demo credits reset to 1,000. No money or token balance is involved.");
+  }
+
+  const chartPoints = trail
+    .map((value, index) => {
+      const x = trail.length <= 1 ? 0 : (index / (trail.length - 1)) * 100;
+      const y = 94 - Math.min(84, Math.log(Math.max(1, value)) * 35);
+      return x.toFixed(1) + "," + y.toFixed(1);
+    })
+    .join(" ");
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
-      <div className="mx-auto max-w-5xl space-y-7 px-4 py-8">
-        <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <main className="min-h-screen bg-[#05060a] text-white">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+        <header className="flex flex-col gap-5 border-b border-white/10 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <Link
-              href="/gaming"
-              className="mb-3 inline-flex items-center gap-2 text-sm text-white/45 hover:text-white"
-            >
+            <Link href="/gaming" className="mb-3 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white">
               <ArrowLeft className="h-4 w-4" />
               Games Center
             </Link>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-fuchsia-500/15 text-fuchsia-100">
-                Reflex lab
-              </Badge>
-              <Badge
-                variant="outline"
-                className="border-white/10 text-white/45"
-              >
-                Score only · no wager · no cashout
+            <div className="flex flex-wrap gap-2">
+              <Badge className="bg-fuchsia-500/15 text-fuchsia-100">CRASH</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/40">
+                Deterministic demo round
               </Badge>
             </div>
-            <h1 className="mt-4 text-4xl font-black sm:text-5xl">
-              Multiplier Reflex Lab
-            </h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-white/45">
-              Track a deterministic rising curve and lock as close as possible
-              to the highlighted target. The multiplier is only a visual timing
-              scale; it has no financial or payout meaning.
+            <h1 className="mt-4 text-5xl font-black tracking-[-0.04em] sm:text-6xl">Ride the curve.</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">
+              Lock the multiplier before the hidden seeded crash point. Demo credits are local game state with no cash or token value.
             </p>
           </div>
 
-          <Link href="/game-fi-quest-board">
-            <Button
-              variant="outline"
-              className="border-white/15 bg-white/[0.03] text-white"
-            >
-              Arcade Passport
-            </Button>
-          </Link>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/30">Demo credits</p>
+            <div className="mt-1 flex items-center gap-3">
+              <span className="text-3xl font-black">{formatCredits(credits)}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-white/10 bg-white/[0.03] text-white"
+                onClick={resetCredits}
+                disabled={state === "running"}
+              >
+                <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                Reset
+              </Button>
+            </div>
+          </div>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-4">
-          {[
-            ["Round", state === "idle" ? "—" : round + "/" + SESSION_ROUNDS],
-            ["Session score", sessionScore],
-            ["Best round", bestRound],
-            ["Average", average || "—"],
-            ["Demo credits", demoBalance.toFixed(2)],
-          ].map(([label, value]) => (
-            <Card
-              key={label}
-              className="border-white/10 bg-white/[0.03] text-white"
-            >
-              <CardContent className="p-4">
-                <p className="text-2xl font-black">{value}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.12em] text-white/30">
-                  {label}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-        {state === "idle" ? (
-          <Card className="border-fuchsia-300/20 bg-fuchsia-300/[0.04] text-white">
-            <CardContent className="grid min-h-96 place-items-center p-8 text-center">
-              <div>
-                <Crosshair className="mx-auto h-12 w-12 text-fuchsia-200" />
-                <h2 className="mt-4 text-3xl font-black">
-                  Five rounds. Five targets.
-                </h2>
-                <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-white/45">
-                  Each round has a deterministic target and break point. Lock
-                  early enough to stay alive, but close enough to the target to
-                  score well.
-                </p>
-                <div className="mx-auto mt-6 grid max-w-sm gap-3 text-left sm:grid-cols-2"><label className="text-xs text-white/45">Demo bet<Input type="number" min="1" value={betAmount} onChange={event => setBetAmount(Math.max(1, Number(event.target.value)))} className="mt-1 border-white/10 bg-black/30 text-white" /></label><label className="text-xs text-white/45">Auto cash-out<Input type="number" min="0" step="0.1" value={autoCashout} onChange={event => setAutoCashout(Math.max(0, Number(event.target.value)))} className="mt-1 border-white/10 bg-black/30 text-white" placeholder="0 = off" /></label></div>
-                <Button size="lg" className="mt-6" onClick={startSession}>
-                  <Zap className="mr-2 h-5 w-5" />
-                  Start reflex session
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : state === "finished" ? (
-          <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
-            <CardContent className="grid min-h-96 place-items-center p-8 text-center">
-              <div>
-                <Trophy className="mx-auto h-12 w-12 text-amber-200" />
-                <h2 className="mt-4 text-3xl font-black">Session complete</h2>
-                <p className="mt-2 text-white/45">
-                  {sessionScore} total timing points · {bestRound} best round.
-                </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button onClick={startSession}>
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Run again
-                  </Button>
-                  <Link href="/game-fi-quest-board">
-                    <Button
-                      variant="outline"
-                      className="border-white/15 bg-white/[0.03] text-white"
-                    >
-                      View passport
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="overflow-hidden border-fuchsia-300/20 bg-gradient-to-br from-fuchsia-950/50 via-slate-950 to-violet-950/50 text-white">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <CardDescription className="text-fuchsia-100/50">
-                    Round {round} of {SESSION_ROUNDS}
-                  </CardDescription>
-                  <CardTitle className="mt-1 text-white">
-                    Target {config.target.toFixed(2)}x
-                  </CardTitle>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="border-fuchsia-300/20 text-fuchsia-100"
-                >
-                  Break point hidden during play
-                </Badge>
-              </div>
-            </CardHeader>
-
-            <CardContent className="space-y-7">
-              <div className="rounded-3xl border border-white/10 bg-black/25 p-6">
-                <div className="flex items-end justify-between gap-3">
+        <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
+          <Card className="overflow-hidden border-fuchsia-300/15 bg-[radial-gradient(circle_at_50%_30%,rgba(192,38,211,.16),rgba(5,6,10,.95)_60%)] text-white">
+            <CardContent className="p-0">
+              <div className="relative min-h-[470px] overflow-hidden p-6 sm:p-8">
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-fuchsia-500/10 to-transparent" />
+                <div className="relative z-10 flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.14em] text-white/30">
-                      Current scale
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/30">
+                      {state === "running" ? "LIVE ROUND" : state === "crashed" ? "ROUND CRASHED" : state === "cashed" ? "CASHED OUT" : "READY"}
                     </p>
-                    <p className="mt-1 text-6xl font-black tracking-tight">
+                    <p
+                      className={
+                        "mt-2 text-7xl font-black tracking-[-0.07em] sm:text-8xl " +
+                        (state === "crashed" ? "text-rose-300" : state === "cashed" ? "text-emerald-300" : "text-white")
+                      }
+                    >
                       {multiplier.toFixed(2)}x
                     </p>
                   </div>
-                  <Target className="h-10 w-10 text-fuchsia-200" />
+                  <Gauge className="h-8 w-8 text-fuchsia-200/60" />
                 </div>
 
-                <div className="relative mt-8 h-8 overflow-hidden rounded-full border border-white/10 bg-white/[0.04]">
-                  <div
-                    className="absolute inset-y-0 w-12 -translate-x-1/2 bg-emerald-300/25"
-                    style={{ left: bandPosition + "%" }}
-                  />
-                  <div
-                    className="absolute inset-y-0 w-1 bg-white shadow-[0_0_16px_rgba(255,255,255,.85)]"
-                    style={{ left: cursorPosition + "%" }}
-                  />
+                <div className="absolute inset-x-5 bottom-28 top-32 rounded-2xl border border-white/10 bg-black/20 p-3">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full overflow-visible">
+                    <defs>
+                      <linearGradient id="crashLine" x1="0%" x2="100%">
+                        <stop offset="0%" stopColor="currentColor" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="currentColor" stopOpacity="1" />
+                      </linearGradient>
+                    </defs>
+                    {[25, 50, 75].map(line => (
+                      <line key={line} x1="0" x2="100" y1={line} y2={line} stroke="rgba(255,255,255,.07)" strokeWidth="0.5" />
+                    ))}
+                    <polyline
+                      points={chartPoints}
+                      fill="none"
+                      stroke="url(#crashLine)"
+                      strokeWidth="2.2"
+                      vectorEffect="non-scaling-stroke"
+                      className="text-fuchsia-300"
+                    />
+                  </svg>
                 </div>
 
-                <div className="mt-2 flex items-center justify-between text-xs text-white/25">
-                  <span>1.00x</span>
-                  <span>target band</span>
-                  <span>unknown break</span>
+                <div className="absolute inset-x-6 bottom-6 sm:inset-x-8">
+                  <div className="mb-3 rounded-xl border border-white/10 bg-black/35 px-4 py-3 text-sm text-white/45">
+                    {message}
+                  </div>
+                  {state === "running" ? (
+                    <Button size="lg" className="w-full bg-emerald-500 text-black hover:bg-emerald-400" onClick={cashOut}>
+                      <Zap className="mr-2 h-5 w-5" />
+                      CASH OUT · {(roundStake * multiplier).toFixed(2)}
+                    </Button>
+                  ) : (
+                    <Button size="lg" className="w-full" onClick={startRound}>
+                      <TrendingUp className="mr-2 h-5 w-5" />
+                      START ROUND · {stake}
+                    </Button>
+                  )}
                 </div>
               </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="font-semibold">{message}</p>
-                {state === "resolved" ? (
-                  <p className="mt-2 text-sm text-white/40">
-                    Round score: {roundScore}
-                    {lockedAt !== null
-                      ? " · locked at " + lockedAt.toFixed(2) + "x"
-                      : " · curve broke before lock"}
-                    {" · hidden break point "}
-                    {config.breakPoint.toFixed(2)}x
-                  </p>
-                ) : null}
-              </div>
-
-              {state === "running" ? (
-                <Button size="lg" className="w-full" onClick={lock}>
-                  <TimerReset className="mr-2 h-5 w-5" />
-                  Lock timing
-                </Button>
-              ) : (
-                <Button size="lg" className="w-full" onClick={nextRound}>
-                  {round >= SESSION_ROUNDS
-                    ? "Finish session"
-                    : "Start next round"}
-                </Button>
-              )}
             </CardContent>
           </Card>
-        )}
 
-        {recentRounds.length > 0 ? <Card className="border-white/10 bg-white/[0.03] text-white"><CardHeader><CardTitle className="text-base">Recent demo rounds</CardTitle><CardDescription className="text-white/40">Local session history only.</CardDescription></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2">{recentRounds.map((result, index) => <div key={`${result}-${index}`} className="rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/65">{result}</div>)}</CardContent></Card> : null}
+          <div className="space-y-4">
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardDescription className="text-white/35">Round setup</CardDescription>
+                <CardTitle className="text-xl text-white">Controls</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div>
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-white/30">Demo stake</p>
+                  <div className="flex flex-wrap gap-2">
+                    {STAKES.map(value => (
+                      <Button
+                        key={value}
+                        size="sm"
+                        variant={stake === value ? "default" : "outline"}
+                        className={stake === value ? "" : "border-white/10 bg-white/[0.025] text-white"}
+                        onClick={() => setStake(value)}
+                        disabled={state === "running"}
+                      >
+                        {value}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
-          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          This route uses demo credits only. Credits have no cash value and cannot be withdrawn, transferred, wagered externally, or represented as cryptocurrency. The session is local and does not create a wallet, settlement, house edge, or real-money outcome.
-        </section>
+                <label className="block text-xs font-bold uppercase tracking-[0.14em] text-white/30">
+                  Auto cash-out
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={autoCashout}
+                    onChange={event => setAutoCashout(Math.max(0, Number(event.target.value) || 0))}
+                    disabled={state === "running"}
+                    className="mt-2 border-white/10 bg-black/20 text-white"
+                  />
+                  <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-white/25">
+                    Set 0 to disable.
+                  </span>
+                </label>
+
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/25">Demo proof</p>
+                  <p className="mt-1 break-all font-mono text-xs text-white/40">{proof}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardDescription className="text-white/35">Recent seeded rounds</CardDescription>
+                <CardTitle className="text-lg text-white">Crash history</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {history.length ? history.map((value, index) => (
+                    <Badge
+                      key={value + "-" + index}
+                      variant="outline"
+                      className={
+                        value >= 3
+                          ? "border-emerald-300/20 text-emerald-100"
+                          : value < 1.5
+                            ? "border-rose-300/20 text-rose-100"
+                            : "border-white/10 text-white/50"
+                      }
+                    >
+                      {value.toFixed(2)}x
+                    </Badge>
+                  )) : (
+                    <p className="text-sm text-white/30">Round history appears after you play.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.025] p-4 text-xs leading-5 text-white/35">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-200/70" />
+              <p>
+                No deposit, wallet, purchase, token reward, payout, or withdrawal is connected to this game. Seed strings support repeatable beta testing only.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
