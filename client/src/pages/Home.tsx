@@ -12,7 +12,6 @@ import {
   Gamepad2,
   GraduationCap,
   Heart,
-  Languages,
   LayoutDashboard,
   MessageCircleMore,
   Radio,
@@ -141,8 +140,8 @@ export default function Home() {
       if (stored && storedDate === today) {
         const parsed: unknown = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          const allowed = new Set(missions.map(mission => mission.id));
-          setCompleted(parsed.filter((value): value is string => typeof value === "string" && allowed.has(value as typeof missions[number]["id"])));
+          const allowed = new Set<string>(missions.map(mission => mission.id));
+          setCompleted(parsed.filter((value): value is string => typeof value === "string" && allowed.has(value)));
         }
       }
     } catch {
