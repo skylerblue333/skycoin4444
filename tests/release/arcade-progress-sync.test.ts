@@ -20,12 +20,13 @@ const hook = fs.readFileSync(
   "utf8"
 );
 const gaming = fs.readFileSync("client/src/pages/Gaming.tsx", "utf8");
+const arcade = fs.readFileSync("client/src/pages/Arcade.tsx", "utf8");
 const quest = fs.readFileSync(
   "client/src/pages/GameFiQuestBoard.tsx",
   "utf8"
 );
 
-describe("authenticated arcade progress sync", () => {
+describe("arcade progress compatibility after flagship gaming rebuild", () => {
   it("uses one additive account-owned table with no financial fields", () => {
     expect(schema).toMatch(/arcadeGameProgress = mysqlTable\("arcade_game_progress"/);
     expect(schema).toMatch(/userGameUnique: uniqueIndex/);
@@ -62,23 +63,29 @@ describe("authenticated arcade progress sync", () => {
     expect(router).not.toMatch(/publicProcedure/);
   });
 
-  it("always keeps local play available and syncs only authenticated runs", () => {
+  it("keeps authenticated passport sync available on the compatibility quest surface", () => {
     expect(hook).toMatch(/recordArcadeRunToStorage/);
     expect(hook).toMatch(/if \(isAuthenticated\)/);
     expect(hook).toMatch(/mutation\.mutate\(\{[\s\S]*\.\.\.normalized[\s\S]*gameId: run\.gameId/);
     expect(hook).toMatch(/mergeArcadeProgress/);
-    expect(gaming).toMatch(/Account progress synced/);
     expect(quest).toMatch(/anti-cheat\s+ranking, or public leaderboard/);
+    expect(gaming).toMatch(/flagship Games Center/i);
   });
 
-  it("wires every promoted recordable game through the shared recorder hook", () => {
+  it("keeps the new flagship wager-like state browser-local and non-authoritative", () => {
+    expect(gaming).toMatch(/browser-local demo game state/);
+    expect(gaming).toMatch(/no cash or token value/i);
+    expect(arcade).toMatch(/Demo credits reset locally/);
+    expect(arcade).toMatch(/cannot be purchased, redeemed, transferred, or withdrawn/);
+    expect(arcade).not.toMatch(/authoritativeLeaderboard/);
+  });
+
+  it("preserves shared recorder wiring on legacy compatibility games", () => {
     for (const file of [
       "client/src/pages/GameSkyRush.tsx",
       "client/src/pages/GameCryptoQuiz.tsx",
       "client/src/pages/GameTokenTap.tsx",
       "client/src/pages/GameBlockBuilder.tsx",
-      "client/src/pages/GameBlackjack.tsx",
-      "client/src/pages/GameCrash.tsx",
       "client/src/pages/GameSlots.tsx",
     ]) {
       const source = fs.readFileSync(file, "utf8");
