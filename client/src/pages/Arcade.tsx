@@ -322,7 +322,7 @@ export default function Arcade() {
           <TabsContent value="plinko" className="mt-5">
             <GameShell
               eyebrow="Seeded drop"
-              title="Plinko"
+              title="Plinko Lab"
               description="Ten rows, eleven landing buckets, and a repeatable demo path. The multiplier controls local demo-credit scoring only."
             >
               <div className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
