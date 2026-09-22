@@ -244,7 +244,7 @@ export default function Gaming() {
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-5 text-white/35">
-          <strong className="text-white/60">Engineering beta:</strong> this rebuild intentionally removes the old “50 games visible” positioning from the flagship Games Center. Legacy routes can remain for compatibility, but they are not part of the promoted arcade lineup.
+          <strong className="text-white/60">Engineering beta:</strong> this rebuild intentionally removes the legacy quantity-first positioning from the flagship Games Center. Legacy routes can remain for compatibility, but they are not part of the promoted arcade lineup.
         </section>
       </div>
     </main>
