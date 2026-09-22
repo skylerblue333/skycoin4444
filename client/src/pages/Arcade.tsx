@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
@@ -64,7 +64,7 @@ function GameShell({
   eyebrow: string;
   title: string;
   description: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <Card className="overflow-hidden border-white/10 bg-[#0b0d14] text-white">
