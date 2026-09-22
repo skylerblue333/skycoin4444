@@ -8,7 +8,7 @@ describe("unified command-center UI/UX", () => {
     const source = read("client/src/pages/Home.tsx");
 
     expect(source).toContain("Make the beta feel like");
-    expect(source).toContain("Nine places worth tapping first.");
+    expect(source).toContain("Ten places worth tapping first.");
     expect(source).toContain('href: "/activity-feed"');
     expect(source).toContain('href: "/unified-messaging"');
     expect(source).toContain('href: "/gaming"');
@@ -18,6 +18,7 @@ describe("unified command-center UI/UX", () => {
     expect(source).toContain('href: "/beta-commerce"');
     expect(source).toContain('href: "/beta-web3"');
     expect(source).toContain('href: "/dating-home"');
+    expect(source).toContain('href: "/language-partner-discovery"');
   });
 
   it("provides a consistent premium design system instead of page-only styling", () => {
