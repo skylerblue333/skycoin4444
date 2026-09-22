@@ -12,6 +12,7 @@ import {
   Gamepad2,
   GraduationCap,
   Heart,
+  Languages,
   LayoutDashboard,
   MessageCircleMore,
   Radio,
@@ -92,6 +93,13 @@ const flagshipAreas = [
     href: "/dating-home",
     icon: Heart,
     status: "Safety-first beta",
+  },
+  {
+    title: "Language Exchange",
+    subtitle: "Practice profile and discovery planning",
+    href: "/language-partner-discovery",
+    icon: Languages,
+    status: "Local beta",
   },
 ] as const;
 
@@ -228,7 +236,7 @@ export default function Home() {
               <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   [routeCatalog.routes.length.toLocaleString(), "indexed routes"],
-                  ["9", "headline areas"],
+                  ["10", "headline areas"],
                   ["6", "flagship games"],
                   ["1", "unified shell"],
                 ].map(([value, label]) => (
@@ -334,7 +342,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="sky-eyebrow">Ecosystem launch grid</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Nine places worth tapping first.</h2>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Ten places worth tapping first.</h2>
           </div>
           <Link href="/platform-map" className="inline-flex items-center gap-2 text-sm font-bold text-amber-100/75 hover:text-amber-50">
             Full product map <ArrowRight className="h-4 w-4" />
