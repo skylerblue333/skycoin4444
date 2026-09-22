@@ -33,7 +33,7 @@ const realityChecks = [
 
 export default function BetaWorkspace() {
   return (
-    <div className="min-h-screen bg-[#04040b] text-white">
+    <div className="min-h-screen bg-[#090404] text-white">
       <V5PlatformHub />
 
       <section
@@ -41,10 +41,10 @@ export default function BetaWorkspace() {
         aria-label="V5 guided demo and product evidence"
       >
         <details className="group overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/[0.025]">
-          <summary className="cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/50 sm:p-6">
+          <summary className="cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/40 sm:p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-100/45">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-amber-100/55">
                   <Sparkles className="h-3.5 w-3.5" />
                   Guided product demo
                 </div>
@@ -55,10 +55,10 @@ export default function BetaWorkspace() {
                   Run the existing cross-page V4/V5 demo story and review card without making it the first thing every visitor has to understand.
                 </p>
               </div>
-              <span className="text-xs font-bold text-cyan-200/60 group-open:hidden">
+              <span className="text-xs font-bold text-amber-200/65 group-open:hidden">
                 Open tour ↓
               </span>
-              <span className="hidden text-xs font-bold text-cyan-200/60 group-open:inline">
+              <span className="hidden text-xs font-bold text-amber-200/65 group-open:inline">
                 Close tour ↑
               </span>
             </div>
@@ -75,10 +75,10 @@ export default function BetaWorkspace() {
         aria-label="Advanced V5 evidence console"
       >
         <details className="group overflow-hidden rounded-[1.7rem] border border-white/10 bg-white/[0.02]">
-          <summary className="cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/50 sm:p-6">
+          <summary className="cursor-pointer list-none p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300/40 sm:p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-violet-100/40">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-100/45">
                   Advanced evidence · V5
                 </p>
                 <strong className="mt-1 block text-lg text-white/80">
@@ -88,10 +88,10 @@ export default function BetaWorkspace() {
                   This remains available for testers and engineers, but it no longer dominates the product experience.
                 </p>
               </div>
-              <span className="text-xs font-bold text-violet-200/60 group-open:hidden">
+              <span className="text-xs font-bold text-red-200/60 group-open:hidden">
                 Expand ↓
               </span>
-              <span className="hidden text-xs font-bold text-violet-200/60 group-open:inline">
+              <span className="hidden text-xs font-bold text-red-200/60 group-open:inline">
                 Collapse ↑
               </span>
             </div>
@@ -109,7 +109,7 @@ export default function BetaWorkspace() {
         <div className="grid gap-4 rounded-[1.7rem] border border-white/10 bg-white/[0.025] p-5 lg:grid-cols-[1fr_1fr]">
           <div>
             <div className="flex items-center gap-2 text-sm font-bold text-white/75">
-              <Compass className="h-4 w-4 text-cyan-200" />
+              <Compass className="h-4 w-4 text-amber-200" />
               The long-tail ecosystem is still one command away
             </div>
             <p className="mt-2 text-xs leading-6 text-white/40">
@@ -123,7 +123,7 @@ export default function BetaWorkspace() {
                 <Link
                   key={item.route}
                   href={item.route}
-                  className="rounded-xl border border-white/10 bg-black/20 p-3 transition hover:border-cyan-300/30"
+                  className="rounded-xl border border-white/10 bg-black/20 p-3 transition hover:border-amber-300/24"
                 >
                   <strong className="text-xs text-white/75">{item.name}</strong>
                   <p className="mt-1 text-[11px] leading-5 text-white/35">{item.detail}</p>

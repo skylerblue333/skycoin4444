@@ -46,9 +46,9 @@ describe("ecosystem navigation and visual foundation", () => {
     ]) {
       expect(home).toContain(route);
     }
-    expect(home).toMatch(/67 beta routes/);
-    expect(home).toMatch(/9.*headline journeys/);
-    expect(home).toMatch(/No invented users, traffic, balances/);
+    expect(home).toMatch(/Ten places worth tapping first/);
+    expect(home).toMatch(/No fake account balance/);
+    expect(home).toMatch(/Premium presentation, careful claims/);
   });
 
   it("modernizes shared controls instead of only one page", () => {
@@ -57,6 +57,6 @@ describe("ecosystem navigation and visual foundation", () => {
     expect(card).toMatch(/rounded-2xl/);
     expect(card).toMatch(/backdrop-blur-xl/);
     expect(input).toMatch(/rounded-xl/);
-    expect(input).toMatch(/focus-visible:ring-ring\/40/);
+    expect(input).toMatch(/focus-visible:ring-amber-300\/20/);
   });
 });

@@ -241,7 +241,7 @@ export default function BetaNavigation() {
 
   return (
     <nav
-      className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/92 text-white shadow-[0_16px_40px_-28px_rgba(0,0,0,1)] backdrop-blur-xl"
+      className="sticky top-0 z-50 border-b border-amber-200/10 bg-[#090404]/94 text-white shadow-[0_18px_46px_-28px_rgba(0,0,0,1)] backdrop-blur-2xl"
       aria-label="SKYCOIN4444 beta navigation"
     >
       <V3CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
@@ -254,15 +254,15 @@ export default function BetaNavigation() {
           href="/"
           aria-label="SKYCOIN4444 home"
           onClick={recordMarkTap}
-          className="flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+          className="flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-violet-600 text-xs font-black text-white shadow-lg shadow-blue-950/40">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl border border-amber-100/30 bg-gradient-to-br from-amber-300 via-yellow-400 to-red-500 text-xs font-black text-[#1a0b04] shadow-lg shadow-red-950/35">
             44
           </span>
           <span className="hidden sm:block">
             <strong className="block text-sm font-black tracking-tight">SKYCOIN4444</strong>
             <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/35">
-              V5 engineering beta
+              V5 engineering beta · unified
             </span>
           </span>
         </Link>
@@ -278,8 +278,8 @@ export default function BetaNavigation() {
                 className={
                   "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition " +
                   (active
-                    ? "bg-white/10 text-white shadow-inner"
-                    : "text-white/48 hover:bg-white/[0.055] hover:text-white/85")
+                    ? "border border-amber-200/16 bg-amber-200/[0.08] text-amber-100 shadow-inner"
+                     : "text-white/48 hover:bg-amber-200/[0.045] hover:text-amber-50")
                 }
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -301,8 +301,8 @@ export default function BetaNavigation() {
             className={
               "hidden items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition md:inline-flex " +
               (areaOpen
-                ? "border-sky-300/30 bg-sky-300/10 text-sky-100"
-                : "border-white/10 bg-white/[0.035] text-white/65 hover:border-sky-300/20 hover:text-white")
+                ? "border-amber-300/30 bg-amber-300/10 text-amber-100"
+                : "border-white/10 bg-white/[0.035] text-white/65 hover:border-amber-300/20 hover:text-white")
             }
           >
             <Grid2X2 className="h-4 w-4" />
@@ -314,7 +314,7 @@ export default function BetaNavigation() {
             onClick={() => setCommandOpen(true)}
             aria-label="Search all SKYCOIN4444 routes"
             title="Search all routes (Ctrl/⌘ K)"
-            className="inline-flex items-center gap-2 rounded-xl border border-sky-300/20 bg-sky-300/[0.07] px-3 py-2 text-xs font-bold text-sky-100 transition hover:border-sky-300/35 hover:bg-sky-300/[0.11]"
+            className="inline-flex items-center gap-2 rounded-xl border border-amber-300/20 bg-amber-300/[0.07] px-3 py-2 text-xs font-bold text-amber-100 transition hover:border-amber-300/35 hover:bg-amber-300/[0.11]"
           >
             <Search className="h-4 w-4" />
             <span className="hidden md:inline">Search</span>
@@ -332,7 +332,7 @@ export default function BetaNavigation() {
               "hidden items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition lg:inline-flex " +
               (voiceListening
                 ? "border-rose-300/35 bg-rose-300/10 text-rose-100"
-                : "border-white/10 bg-white/[0.035] text-white/55 hover:border-sky-300/20 hover:text-white")
+                : "border-white/10 bg-white/[0.035] text-white/55 hover:border-amber-300/20 hover:text-white")
             }
           >
             {voiceListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
@@ -342,7 +342,7 @@ export default function BetaNavigation() {
           <Link
             href={`/beta-feedback?route=${encodeURIComponent(location)}`}
             aria-label="Send beta feedback"
-            className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-bold text-white/55 transition hover:border-sky-300/20 hover:text-white lg:inline-flex"
+            className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2 text-xs font-bold text-white/55 transition hover:border-amber-300/20 hover:text-white lg:inline-flex"
           >
             <MessageSquare className="h-4 w-4" />
             Feedback
@@ -358,10 +358,10 @@ export default function BetaNavigation() {
                   : "Open account sign in"
             }
             className={
-              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 " +
+              "inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 " +
               (isAuthenticated
                 ? "border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-100 hover:bg-emerald-300/[0.13]"
-                : "bg-white text-[#050510] hover:bg-white/90")
+                 : "bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-400 text-[#1a0b04] shadow-[0_10px_28px_-14px_rgba(245,185,66,0.9)] hover:brightness-105")
             }
           >
             {isAuthenticated ? <UserRound className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
@@ -390,7 +390,7 @@ export default function BetaNavigation() {
           <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 text-[11px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-6 lg:px-8">
             <Link
               href={routeContext.parentRoute}
-              className="shrink-0 rounded-lg px-2.5 py-1.5 font-black text-sky-100/75 transition hover:bg-white/[0.05] hover:text-sky-100"
+              className="shrink-0 rounded-lg px-2.5 py-1.5 font-black text-amber-100/75 transition hover:bg-amber-200/[0.05] hover:text-amber-50"
             >
               {routeContext.parentLabel}
             </Link>
@@ -421,7 +421,7 @@ export default function BetaNavigation() {
                 </span>
                 <Link
                   href="/platform-map"
-                  className="shrink-0 rounded-lg bg-sky-300/[0.08] px-2.5 py-1.5 font-bold text-sky-100/75 hover:bg-sky-300/[0.12]"
+                  className="shrink-0 rounded-lg bg-amber-300/[0.08] px-2.5 py-1.5 font-bold text-amber-100/75 hover:bg-amber-300/[0.12]"
                 >
                   Find its product area
                 </Link>
@@ -432,14 +432,14 @@ export default function BetaNavigation() {
       ) : null}
 
       {areaOpen ? (
-        <div id="beta-area-launcher" className="absolute left-0 right-0 top-full hidden border-b border-white/10 bg-[#070712]/98 shadow-2xl shadow-black/50 backdrop-blur-xl md:block">
+        <div id="beta-area-launcher" className="absolute left-0 right-0 top-full hidden border-b border-white/10 bg-[#100706]/98 shadow-2xl shadow-black/50 backdrop-blur-xl md:block">
           <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-200/50">Ecosystem areas</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/60">Ecosystem areas</p>
                 <h2 className="mt-1 text-lg font-black tracking-tight">Go somewhere useful</h2>
               </div>
-              <Link href="/platform-map" className="inline-flex items-center gap-1.5 text-xs font-bold text-sky-200/75 hover:text-sky-100">
+              <Link href="/platform-map" className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-200/75 hover:text-amber-100">
                 Full Explore <ChevronRight className="h-4 w-4" />
               </Link>
             </div>
@@ -454,7 +454,7 @@ export default function BetaNavigation() {
                     className={
                       "group flex items-center gap-3 rounded-2xl border p-3 transition " +
                       (active
-                        ? "border-sky-300/25 bg-sky-300/[0.08]"
+                        ? "border-amber-300/25 bg-amber-300/[0.08]"
                         : "border-white/[0.07] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.045]")
                     }
                   >
@@ -483,7 +483,7 @@ export default function BetaNavigation() {
       ) : null}
 
       {mobileOpen ? (
-        <div className="border-t border-white/[0.06] bg-[#070712] md:hidden">
+        <div className="border-t border-white/[0.06] bg-[#100706] md:hidden">
           <div className="grid grid-cols-2 gap-2 p-3">
             {primaryLinks.map(({ label, route, icon: Icon }) => (
               <Link
@@ -491,7 +491,7 @@ export default function BetaNavigation() {
                 href={route}
                 className={
                   "flex items-center gap-2 rounded-xl px-3 py-3 text-sm font-bold " +
-                  (routeIsActive(location, route) ? "bg-sky-300/10 text-sky-100" : "bg-white/[0.03] text-white/55")
+                  (routeIsActive(location, route) ? "bg-amber-300/10 text-amber-100" : "bg-white/[0.03] text-white/55")
                 }
               >
                 <Icon className="h-4 w-4" />
@@ -514,9 +514,32 @@ export default function BetaNavigation() {
         </div>
       ) : null}
 
+      <div className="fixed inset-x-3 bottom-3 z-[70] grid grid-cols-5 gap-1 rounded-[1.35rem] border border-amber-200/14 bg-[#100706]/95 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-2xl md:hidden">
+        <Link aria-label="Mobile home" href="/" className={"grid min-h-12 place-items-center rounded-xl transition " + (location === "/" ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <Home className="h-4 w-4" />
+          <span className="text-[9px] font-bold">Home</span>
+        </Link>
+        <Link href="/activity-feed" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/activity-feed") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <Users className="h-4 w-4" />
+          <span className="text-[9px] font-bold">Social</span>
+        </Link>
+        <Link href="/gaming" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/gaming") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <Gamepad2 className="h-4 w-4" />
+          <span className="text-[9px] font-bold">Games</span>
+        </Link>
+        <Link href="/unified-messaging" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/unified-messaging") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <MessageCircleMore className="h-4 w-4" />
+          <span className="text-[9px] font-bold">Chat</span>
+        </Link>
+        <button type="button" onClick={() => { setMobileOpen(open => !open); setAreaOpen(false); }} className="grid min-h-12 place-items-center rounded-xl text-white/45 transition hover:bg-amber-200/[0.05] hover:text-amber-100">
+          <Grid2X2 className="h-4 w-4" />
+          <span className="text-[9px] font-bold">More</span>
+        </button>
+      </div>
+
       {fourFoursOpen ? (
         <div className="fixed inset-0 z-[100] grid place-items-center bg-[#020208]/92 p-4 backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="four-fours-title">
-          <div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-sky-300/20 bg-[#080817] p-5 shadow-2xl shadow-blue-950/50 sm:p-7">
+          <div className="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-amber-300/20 bg-[#100706] p-5 shadow-2xl shadow-red-950/40 sm:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full border border-violet-300/15 bg-violet-300/[0.06] px-3 py-1 text-[10px] font-black uppercase tracking-[0.24em] text-violet-100/60">
@@ -534,10 +557,10 @@ export default function BetaNavigation() {
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {fourFoursTrail.map(item => (
                 <article key={item.number} className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
-                  <span className="text-[10px] font-black uppercase tracking-[0.22em] text-sky-200/45">{item.number}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.22em] text-amber-200/50">{item.number}</span>
                   <h3 className="mt-2 text-base font-black text-white">{item.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-white/45">{item.message}</p>
-                  <Link href={item.href} onClick={() => setFourFoursOpen(false)} className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-sky-200/75 hover:text-sky-100">
+                  <Link href={item.href} onClick={() => setFourFoursOpen(false)} className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-amber-200/75 hover:text-amber-100">
                     {item.action} <ChevronRight className="h-4 w-4" />
                   </Link>
                 </article>

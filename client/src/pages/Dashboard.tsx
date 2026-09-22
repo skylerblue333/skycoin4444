@@ -7,11 +7,14 @@ import {
   CheckCircle2,
   Circle,
   Flag,
+  Gamepad2,
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  Radio,
   ShieldCheck,
   Sparkles,
+  Users,
   UserRound,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -77,7 +80,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#050510] text-white">
+      <main className="min-h-screen bg-[#090404] text-white">
         <div className="mx-auto max-w-7xl px-4 py-12">
           <div className="h-8 w-56 animate-pulse rounded-lg bg-white/10" />
           <div className="mt-6 h-56 animate-pulse rounded-3xl border border-white/10 bg-white/[0.03]" />
@@ -88,14 +91,14 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#050510] px-4 py-14 text-white">
+      <main className="min-h-screen bg-[#090404] px-4 py-14 text-white">
         <div className="mx-auto max-w-3xl">
           <Card className="overflow-hidden border-white/10 bg-white/[0.035] text-white">
             <CardHeader className="border-b border-white/[0.07] bg-gradient-to-br from-sky-400/[0.08] via-transparent to-violet-400/[0.08] p-8">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge
                   variant="outline"
-                  className="border-sky-300/30 bg-sky-300/[0.05] text-sky-100"
+                  className="border-sky-300/30 bg-sky-300/[0.05] text-amber-100"
                 >
                   Account command center
                 </Badge>
@@ -161,7 +164,7 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main className="min-h-screen bg-[#090404] text-white">
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-10">
         <header className="flex flex-col gap-5 border-b border-white/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -179,7 +182,7 @@ export default function Dashboard() {
                 Account-owned evidence only
               </Badge>
             </div>
-            <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-sky-200/65">
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-amber-200/65">
               Your command center
             </p>
             <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">
@@ -212,8 +215,42 @@ export default function Dashboard() {
           </div>
         </header>
 
+        <section className="sky-panel rounded-[2rem] p-5 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-200/60">
+                Launch the product
+              </p>
+              <h2 className="mt-2 text-2xl font-black">Jump straight into the core experiences.</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/42">
+                These are the fastest paths through the usable beta. Every card opens a real routed experience instead of a marketing-only placeholder.
+              </p>
+            </div>
+            <Link href="/platform-map" className="inline-flex items-center gap-2 text-sm font-bold text-amber-100/75 hover:text-amber-50">
+              All product areas <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: "Social", detail: "Post, reply, react", href: "/activity-feed", icon: Users },
+              { label: "Gaming", detail: "Six flagship games", href: "/gaming", icon: Gamepad2 },
+              { label: "SkyLive", detail: "Creator room beta", href: "/live", icon: Radio },
+              { label: "SkySchool", detail: "Lessons and progress", href: "/course-catalog", icon: BookOpen },
+            ].map(item => {
+              const Icon = item.icon;
+              return (
+                <Link key={item.label} href={item.href} className="group rounded-2xl border border-white/[0.07] bg-black/20 p-4 transition hover:-translate-y-0.5 hover:border-amber-200/18 hover:bg-amber-200/[0.04]">
+                  <Icon className="h-5 w-5 text-amber-100/80" />
+                  <strong className="mt-3 block text-sm text-white">{item.label}</strong>
+                  <span className="mt-1 block text-xs text-white/35">{item.detail}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="grid gap-4 md:grid-cols-3">
-          <Card className="border-sky-300/20 bg-sky-300/[0.045] text-white">
+          <Card className="border-amber-300/20 bg-amber-300/[0.045] text-white">
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -224,7 +261,7 @@ export default function Dashboard() {
                     {activation.isLoading ? "…" : `${percent}%`}
                   </CardTitle>
                 </div>
-                <CheckCircle2 className="h-6 w-6 text-sky-200" />
+                <CheckCircle2 className="h-6 w-6 text-amber-200" />
               </div>
             </CardHeader>
             <CardContent>
@@ -237,7 +274,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="border-violet-300/20 bg-violet-300/[0.045] text-white">
+          <Card className="border-red-300/20 bg-red-300/[0.045] text-white">
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -248,7 +285,7 @@ export default function Dashboard() {
                     {activity.isLoading ? "…" : events.length}
                   </CardTitle>
                 </div>
-                <Activity className="h-6 w-6 text-violet-200" />
+                <Activity className="h-6 w-6 text-red-200" />
               </div>
             </CardHeader>
             <CardContent>
@@ -294,7 +331,7 @@ export default function Dashboard() {
             </div>
             <Link
               href="/activity-evidence"
-              className="inline-flex items-center text-sm font-semibold text-sky-200 hover:text-sky-100"
+              className="inline-flex items-center text-sm font-semibold text-amber-200 hover:text-amber-100"
             >
               Inspect all evidence
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -322,7 +359,7 @@ export default function Dashboard() {
                           "grid h-10 w-10 place-items-center rounded-xl " +
                           (isComplete
                             ? "bg-emerald-300/10 text-emerald-200"
-                            : "bg-white/[0.06] text-sky-200")
+                            : "bg-white/[0.06] text-amber-200")
                         }
                       >
                         <Icon className="h-5 w-5" />
@@ -364,7 +401,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-white">
-                    <Activity className="h-5 w-5 text-violet-200" />
+                    <Activity className="h-5 w-5 text-red-200" />
                     Recent evidence
                   </CardTitle>
                   <CardDescription className="mt-1 text-white/45">

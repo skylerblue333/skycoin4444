@@ -72,8 +72,8 @@ const platformVisuals: Record<
   },
   hopeai: {
     glow: "from-cyan-500/22 via-blue-400/8 to-transparent",
-    chip: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
-    icon: "bg-cyan-400/15 text-cyan-100",
+    chip: "border-cyan-300/20 bg-cyan-300/10 text-amber-100",
+    icon: "bg-cyan-400/15 text-amber-100",
   },
   web3: {
     glow: "from-blue-500/22 via-indigo-400/8 to-transparent",
@@ -152,19 +152,19 @@ export default function V5PlatformHub() {
   }
 
   return (
-    <main className="relative overflow-hidden bg-[#04040b] text-white">
+    <main className="relative overflow-hidden bg-[#090404] text-white">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-cyan-500/12 blur-[110px]" />
-        <div className="absolute right-[-8rem] top-20 h-[34rem] w-[34rem] rounded-full bg-violet-600/13 blur-[120px]" />
-        <div className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-fuchsia-500/8 blur-[130px]" />
+        <div className="absolute left-[-12rem] top-[-12rem] h-[34rem] w-[34rem] rounded-full bg-red-500/14 blur-[110px]" />
+        <div className="absolute right-[-8rem] top-20 h-[34rem] w-[34rem] rounded-full bg-amber-500/10 blur-[120px]" />
+        <div className="absolute bottom-[-12rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-red-700/8 blur-[130px]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-8 sm:px-6 lg:pt-12">
-        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.035] shadow-2xl shadow-black/30 backdrop-blur-xl">
+        <section className="sky-panel sky-red-glow overflow-hidden rounded-[2rem]">
           <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.25fr_0.75fr] lg:p-10">
             <div>
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-cyan-100">
+                <span className="inline-flex items-center gap-2 rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-100">
                   <Sparkles className="h-3.5 w-3.5" />
                   SKYCOIN4444 V5
                 </span>
@@ -178,7 +178,7 @@ export default function V5PlatformHub() {
 
               <h1 className="mt-6 max-w-4xl text-4xl font-black leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
                 Ten products.
-                <span className="block bg-gradient-to-r from-cyan-200 via-white to-violet-200 bg-clip-text text-transparent">
+                <span className="block bg-gradient-to-r from-amber-100 via-yellow-300 to-orange-300 bg-clip-text text-transparent">
                   One useful ecosystem.
                 </span>
               </h1>
@@ -193,14 +193,14 @@ export default function V5PlatformHub() {
                 <Link
                   href="/activity-feed"
                   onClick={() => recordRecent("social")}
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-black text-[#050510] transition hover:-translate-y-0.5 hover:bg-cyan-50"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-400 px-5 py-3 text-sm font-black text-[#1a0b04] shadow-[0_12px_34px_-16px_rgba(245,185,66,0.9)] transition hover:-translate-y-0.5 hover:brightness-105"
                 >
                   Start with Social
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/platform-map"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-bold text-white/75 transition hover:border-cyan-300/25 hover:bg-white/[0.08] hover:text-white"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 text-sm font-bold text-white/75 transition hover:border-amber-300/25 hover:bg-white/[0.08] hover:text-white"
                 >
                   Explore everything
                   <Search className="h-4 w-4" />
@@ -217,7 +217,7 @@ export default function V5PlatformHub() {
               ].map(([value, label]) => (
                 <div
                   key={label}
-                  className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                  className="sky-kpi rounded-2xl p-4"
                 >
                   <div className="text-3xl font-black tracking-tight text-white">
                     {value}
@@ -248,7 +248,7 @@ export default function V5PlatformHub() {
 
         <section className="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-100/45">
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-100/45">
               Flagship launcher
             </p>
             <h2 className="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
@@ -261,7 +261,7 @@ export default function V5PlatformHub() {
               value={query}
               onChange={event => setQuery(event.target.value)}
               placeholder="Search Social, games, learning, AI…"
-              className="w-full rounded-2xl border border-white/10 bg-white/[0.045] py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-white/25 focus:border-cyan-300/30 focus:ring-2 focus:ring-cyan-300/10"
+              className="w-full rounded-2xl border border-white/10 bg-white/[0.045] py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-white/25 focus:border-amber-300/30 focus:ring-2 focus:ring-amber-300/10"
             />
           </label>
         </section>
@@ -313,7 +313,7 @@ export default function V5PlatformHub() {
                         onClick={() => toggleFavorite(platform.id)}
                         aria-label={favorite ? `Remove ${platform.name} from favorites` : `Favorite ${platform.name}`}
                         aria-pressed={favorite}
-                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-black/20 text-white/35 transition hover:text-amber-100"
+                        className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-black/20 text-white/35 transition hover:text-amber-50"
                       >
                         <Star className={`h-3.5 w-3.5 ${favorite ? "fill-current text-amber-200" : ""}`} />
                       </button>
