@@ -1,13 +1,12 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowLeft,
-  Brain,
+  Coins,
   RotateCcw,
   ShieldCheck,
-  Trophy,
+  Spade,
 } from "lucide-react";
-import { useArcadeRunRecorder } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,486 +16,362 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import {
+  createDeck,
+  handValue,
+  isBlackjack,
+  type PlayingCard,
+} from "@/lib/flagshipGameEngine";
 
-type Suit = "♠" | "♥" | "♦" | "♣";
-type Rank =
-  | "A"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "J"
-  | "Q"
-  | "K";
-type PlayingCard = Readonly<{ suit: Suit; rank: Rank }>;
-type Decision = "hit" | "stand";
-type SessionState = "idle" | "playing" | "finished";
-
-const suits: readonly Suit[] = ["♠", "♥", "♦", "♣"];
-const ranks: readonly Rank[] = [
-  "A",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "J",
-  "Q",
-  "K",
-];
-const SESSION_ROUNDS = 5;
-
-function seededUnit(seed: number): number {
-  const x = Math.sin(seed * 12_989.42 + 78.233) * 43_758.5453;
-  return x - Math.floor(x);
-}
-
-function cardAt(seed: number, offset: number): PlayingCard {
-  const rankIndex = Math.floor(seededUnit(seed + offset * 17) * ranks.length);
-  const suitIndex = Math.floor(seededUnit(seed + offset * 31) * suits.length);
-  return {
-    rank: ranks[rankIndex] ?? "A",
-    suit: suits[suitIndex] ?? "♠",
-  };
-}
-
-function cardValue(rank: Rank): number {
-  if (rank === "A") return 11;
-  if (rank === "K" || rank === "Q" || rank === "J") return 10;
-  return Number(rank);
-}
-
-function handValue(hand: readonly PlayingCard[]): number {
-  let total = hand.reduce((sum, card) => sum + cardValue(card.rank), 0);
-  let aces = hand.filter(card => card.rank === "A").length;
-  while (total > 21 && aces > 0) {
-    total -= 10;
-    aces -= 1;
-  }
-  return total;
-}
-
-function hasSoftAce(hand: readonly PlayingCard[]): boolean {
-  let total = hand.reduce((sum, card) => sum + cardValue(card.rank), 0);
-  let acesCountedAsEleven = hand.filter(card => card.rank === "A").length;
-
-  while (total > 21 && acesCountedAsEleven > 0) {
-    total -= 10;
-    acesCountedAsEleven -= 1;
-  }
-
-  return acesCountedAsEleven > 0;
-}
-
-function recommendedDecision(
-  player: readonly PlayingCard[],
-  dealerUp: PlayingCard
-): Decision {
-  const playerValue = handValue(player);
-  const dealerValue = Math.min(10, cardValue(dealerUp.rank));
-  const soft = hasSoftAce(player);
-
-  if (playerValue <= 11) return "hit";
-  if (playerValue >= 17 && !soft) return "stand";
-
-  if (soft) {
-    if (playerValue <= 17) return "hit";
-    if (playerValue === 18) {
-      return dealerValue >= 9 || dealerUp.rank === "A" ? "hit" : "stand";
-    }
-    return "stand";
-  }
-
-  if (playerValue >= 12 && playerValue <= 16) {
-    return dealerValue >= 2 && dealerValue <= 6 ? "stand" : "hit";
-  }
-
-  return "stand";
-}
-
-function resultLabel(
-  player: readonly PlayingCard[],
-  dealer: readonly PlayingCard[]
-): string {
-  const playerValue = handValue(player);
-  const dealerValue = handValue(dealer);
-  if (playerValue > 21) return "Player bust";
-  if (dealerValue > 21) return "Dealer bust";
-  if (playerValue > dealerValue) return "Player hand wins";
-  if (playerValue < dealerValue) return "Dealer hand wins";
-  return "Push";
-}
+type Phase = "idle" | "player" | "resolved";
+const STAKES = [5, 10, 25, 50, 100] as const;
 
 function CardFace({ card, hidden = false }: { card: PlayingCard; hidden?: boolean }) {
   const red = card.suit === "♥" || card.suit === "♦";
   return (
     <div
       className={
-        "grid h-24 w-16 place-items-center rounded-xl border text-center shadow-lg " +
+        "grid h-28 w-20 place-items-center rounded-2xl border shadow-xl sm:h-32 sm:w-24 " +
         (hidden
-          ? "border-violet-300/20 bg-violet-950 text-violet-200"
-          : "border-white/15 bg-white text-slate-950")
+          ? "border-emerald-300/15 bg-[linear-gradient(135deg,#052e2b,#111827)] text-emerald-200"
+          : "border-white/20 bg-white text-slate-950")
       }
     >
       {hidden ? (
-        <span className="text-2xl">✦</span>
+        <div className="grid h-16 w-12 place-items-center rounded-lg border border-emerald-300/20">
+          <Spade className="h-6 w-6" />
+        </div>
       ) : (
         <div className={red ? "text-rose-600" : "text-slate-950"}>
-          <p className="text-lg font-black">{card.rank}</p>
-          <p className="text-2xl">{card.suit}</p>
+          <p className="text-2xl font-black">{card.rank}</p>
+          <p className="text-4xl leading-none">{card.suit}</p>
         </div>
       )}
     </div>
   );
 }
 
+function formatCredits(value: number) {
+  return Math.max(0, value).toFixed(2);
+}
+
 export default function GameBlackjack() {
-  const { recordRun } = useArcadeRunRecorder();
-  const [sessionState, setSessionState] = useState<SessionState>("idle");
-  const [round, setRound] = useState(0);
-  const [seed, setSeed] = useState(4401);
+  const [credits, setCredits] = useState(1000);
+  const [stake, setStake] = useState(25);
+  const [roundStake, setRoundStake] = useState(25);
+  const [seed, setSeed] = useState(4444);
+  const [deck, setDeck] = useState<PlayingCard[]>(() => createDeck(seed));
+  const [deckIndex, setDeckIndex] = useState(4);
   const [player, setPlayer] = useState<PlayingCard[]>([]);
   const [dealer, setDealer] = useState<PlayingCard[]>([]);
-  const [deckOffset, setDeckOffset] = useState(4);
-  const [roundResolved, setRoundResolved] = useState(false);
-  const [decisionScore, setDecisionScore] = useState(0);
-  const [correctDecisions, setCorrectDecisions] = useState(0);
-  const [totalDecisions, setTotalDecisions] = useState(0);
-  const [message, setMessage] = useState(
-    "Practice hit/stand decisions across five deterministic hands."
-  );
-  const recorded = useRef(false);
-
-  const dealerUp = dealer[0];
-  const recommendation = useMemo(
-    () =>
-      player.length && dealerUp
-        ? recommendedDecision(player, dealerUp)
-        : null,
-    [dealerUp, player]
-  );
-  const accuracy =
-    totalDecisions > 0
-      ? Math.round((correctDecisions / totalDecisions) * 100)
-      : 0;
-
-  function dealRound(nextRound: number, nextSeed = seed) {
-    const base = nextSeed + nextRound * 97;
-    setPlayer([cardAt(base, 0), cardAt(base, 1)]);
-    setDealer([cardAt(base, 2), cardAt(base, 3)]);
-    setDeckOffset(4);
-    setRoundResolved(false);
-    setMessage("Choose the decision you think best fits the visible cards.");
-  }
-
-  function startSession() {
-    const nextSeed = seed + 1;
-    setSeed(nextSeed);
-    setRound(1);
-    setDecisionScore(0);
-    setCorrectDecisions(0);
-    setTotalDecisions(0);
-    setSessionState("playing");
-    recorded.current = false;
-    dealRound(1, nextSeed);
-  }
-
-  function drawDealer(start: PlayingCard[], baseSeed: number, offset: number) {
-    const next = [...start];
-    let nextOffset = offset;
-    while (handValue(next) < 17) {
-      next.push(cardAt(baseSeed, nextOffset));
-      nextOffset += 1;
-    }
-    return { hand: next, offset: nextOffset };
-  }
-
-  function finishRound(finalPlayer: PlayingCard[], nextOffset: number) {
-    const base = seed + round * 97;
-    const dealerResult = drawDealer(dealer, base, nextOffset);
-    setDealer(dealerResult.hand);
-    setDeckOffset(dealerResult.offset);
-    setRoundResolved(true);
-    setMessage(resultLabel(finalPlayer, dealerResult.hand));
-  }
-
-  function choose(decision: Decision) {
-    if (
-      sessionState !== "playing" ||
-      roundResolved ||
-      !recommendation ||
-      !dealerUp
-    ) {
-      return;
-    }
-
-    const correct = decision === recommendation;
-    setTotalDecisions(value => value + 1);
-    if (correct) {
-      setCorrectDecisions(value => value + 1);
-      setDecisionScore(value => value + 100);
-    } else {
-      setDecisionScore(value => Math.max(0, value - 20));
-    }
-
-    const base = seed + round * 97;
-
-    if (decision === "hit") {
-      const nextPlayer = [...player, cardAt(base, deckOffset)];
-      setPlayer(nextPlayer);
-      setDeckOffset(value => value + 1);
-
-      if (handValue(nextPlayer) >= 21) {
-        finishRound(nextPlayer, deckOffset + 1);
-      } else {
-        setMessage(
-          correct
-            ? "Good decision. Re-evaluate after the new card."
-            : "That move differs from this lab's basic-strategy rule. Re-evaluate the new total."
-        );
-      }
-      return;
-    }
-
-    finishRound(player, deckOffset);
-  }
-
-  function nextRound() {
-    if (!roundResolved) return;
-    if (round >= SESSION_ROUNDS) {
-      setSessionState("finished");
-      if (!recorded.current) {
-        recordRun({
-          gameId: "blackjack-lab",
-          score: decisionScore,
-          xp: decisionScore,
-          sparks: Math.floor(correctDecisions * 2),
-          combo: correctDecisions,
-        });
-        recorded.current = true;
-      }
-      return;
-    }
-
-    const next = round + 1;
-    setRound(next);
-    dealRound(next);
-  }
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [message, setMessage] = useState("Deal a hand to start. Demo chips have no cash or token value.");
+  const [history, setHistory] = useState<string[]>([]);
 
   const playerValue = handValue(player);
   const dealerValue = handValue(dealer);
+  const dealerVisibleValue = phase === "resolved" ? dealerValue : dealer[0] ? handValue([dealer[0]]) : 0;
+  const canDouble = phase === "player" && player.length === 2 && credits >= roundStake;
+
+  const statusTone = useMemo(() => {
+    if (phase !== "resolved") return "text-white";
+    if (message.startsWith("Win") || message.startsWith("Blackjack") || message.startsWith("Dealer bust")) return "text-emerald-300";
+    if (message.startsWith("Push")) return "text-amber-200";
+    return "text-rose-300";
+  }, [message, phase]);
+
+  function startRound() {
+    if (phase === "player") return;
+    if (stake <= 0 || stake > credits) {
+      setMessage("Choose a valid demo-chip stake within the local balance.");
+      return;
+    }
+
+    const nextSeed = seed + 1;
+    const nextDeck = createDeck(nextSeed);
+    const playerHand = [nextDeck[0], nextDeck[2]];
+    const dealerHand = [nextDeck[1], nextDeck[3]];
+
+    setSeed(nextSeed);
+    setDeck(nextDeck);
+    setDeckIndex(4);
+    setPlayer(playerHand);
+    setDealer(dealerHand);
+    setRoundStake(stake);
+    setCredits(value => Number((value - stake).toFixed(2)));
+    setPhase("player");
+
+    if (isBlackjack(playerHand)) {
+      setMessage("Blackjack. Stand to reveal the dealer and settle the demo hand.");
+    } else {
+      setMessage("Your move: Hit, Stand, or Double.");
+    }
+  }
+
+  function settle(finalPlayer: PlayingCard[], finalDealer: PlayingCard[], finalStake: number, nextIndex: number) {
+    const playerTotal = handValue(finalPlayer);
+    const dealerTotal = handValue(finalDealer);
+    const playerNatural = isBlackjack(finalPlayer);
+    const dealerNatural = isBlackjack(finalDealer);
+
+    let multiplier = 0;
+    let label = "Dealer wins";
+
+    if (playerTotal > 21) {
+      label = "Player bust";
+    } else if (playerNatural && !dealerNatural) {
+      multiplier = 2.5;
+      label = "Blackjack";
+    } else if (dealerTotal > 21) {
+      multiplier = 2;
+      label = "Dealer bust · player wins";
+    } else if (playerTotal > dealerTotal) {
+      multiplier = 2;
+      label = "Win";
+    } else if (playerTotal === dealerTotal) {
+      multiplier = 1;
+      label = "Push";
+    }
+
+    const returned = finalStake * multiplier;
+    if (returned > 0) {
+      setCredits(value => Number((value + returned).toFixed(2)));
+    }
+    setPlayer(finalPlayer);
+    setDealer(finalDealer);
+    setDeckIndex(nextIndex);
+    setPhase("resolved");
+    setMessage(
+      label + " · " + playerTotal + " vs " + dealerTotal +
+      (returned > 0 ? " · " + returned.toFixed(2) + " demo chips returned" : "")
+    );
+    setHistory(value => [
+      label + " · " + playerTotal + ":" + dealerTotal,
+      ...value,
+    ].slice(0, 7));
+  }
+
+  function dealerPlay(finalPlayer: PlayingCard[], finalStake: number, startIndex: number) {
+    const dealerHand = [...dealer];
+    let index = startIndex;
+
+    while (handValue(dealerHand) < 17 && index < deck.length) {
+      dealerHand.push(deck[index]);
+      index += 1;
+    }
+
+    settle(finalPlayer, dealerHand, finalStake, index);
+  }
+
+  function hit() {
+    if (phase !== "player" || deckIndex >= deck.length) return;
+    const nextPlayer = [...player, deck[deckIndex]];
+    const nextIndex = deckIndex + 1;
+    setPlayer(nextPlayer);
+    setDeckIndex(nextIndex);
+
+    if (handValue(nextPlayer) > 21) {
+      settle(nextPlayer, dealer, roundStake, nextIndex);
+    } else if (handValue(nextPlayer) === 21) {
+      setMessage("21. Stand to reveal the dealer.");
+    } else {
+      setMessage("Card dealt. Hit again or stand.");
+    }
+  }
+
+  function stand() {
+    if (phase !== "player") return;
+    dealerPlay(player, roundStake, deckIndex);
+  }
+
+  function doubleDown() {
+    if (!canDouble || deckIndex >= deck.length) return;
+    const doubledStake = roundStake * 2;
+    const nextPlayer = [...player, deck[deckIndex]];
+    const nextIndex = deckIndex + 1;
+    setCredits(value => Number((value - roundStake).toFixed(2)));
+    setRoundStake(doubledStake);
+
+    if (handValue(nextPlayer) > 21) {
+      settle(nextPlayer, dealer, doubledStake, nextIndex);
+      return;
+    }
+
+    dealerPlay(nextPlayer, doubledStake, nextIndex);
+  }
+
+  function resetCredits() {
+    if (phase === "player") return;
+    setCredits(1000);
+    setMessage("Demo chips reset to 1,000. No deposit or withdrawal occurred.");
+  }
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
-      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
-        <header className="flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <main className="min-h-screen bg-[#04100c] text-white">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+        <header className="flex flex-col gap-5 border-b border-white/10 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <Link
-              href="/gaming"
-              className="mb-3 inline-flex items-center gap-2 text-sm text-white/45 hover:text-white"
-            >
+            <Link href="/gaming" className="mb-3 inline-flex items-center gap-2 text-sm text-white/40 hover:text-white">
               <ArrowLeft className="h-4 w-4" />
               Games Center
             </Link>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-emerald-500/15 text-emerald-100">
-                Strategy lab
-              </Badge>
-              <Badge
-                variant="outline"
-                className="border-white/10 text-white/45"
-              >
-                No wagers · no balance · no payout
+              <Badge className="bg-emerald-500/15 text-emerald-100">BLACKJACK</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/40">
+                Dealer stands on 17
               </Badge>
             </div>
-            <h1 className="mt-4 text-4xl font-black">Blackjack Strategy Lab</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">
-              Practice hit/stand decisions against a deterministic card stream.
-              The score measures how often your choices match this lab's
-              simplified basic-strategy rules—not money won or lost.
+            <h1 className="mt-4 text-5xl font-black tracking-[-0.04em] sm:text-6xl">Blackjack table</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/40">
+              A full local dealer game with Hit, Stand, Double, natural-blackjack payout, and demo chips only.
             </p>
           </div>
-          <Link href="/game-fi-quest-board">
-            <Button
-              variant="outline"
-              className="border-white/15 bg-white/[0.03] text-white"
-            >
-              Arcade Passport
-            </Button>
-          </Link>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/30">Demo chips</p>
+            <div className="mt-1 flex items-center gap-3">
+              <span className="text-3xl font-black">{formatCredits(credits)}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-white/10 bg-white/[0.03] text-white"
+                onClick={resetCredits}
+                disabled={phase === "player"}
+              >
+                <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                Reset
+              </Button>
+            </div>
+          </div>
         </header>
 
-        <section className="grid gap-4 sm:grid-cols-4">
-          {[
-            ["Round", sessionState === "idle" ? "—" : round + "/" + SESSION_ROUNDS],
-            ["Strategy score", decisionScore],
-            ["Decision accuracy", totalDecisions ? accuracy + "%" : "—"],
-            ["Correct choices", correctDecisions],
-          ].map(([label, value]) => (
-            <Card
-              key={label}
-              className="border-white/10 bg-white/[0.03] text-white"
-            >
-              <CardContent className="p-4">
-                <p className="text-2xl font-black">{value}</p>
-                <p className="mt-1 text-xs uppercase tracking-[0.12em] text-white/30">
-                  {label}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </section>
-
-        {sessionState === "idle" ? (
-          <Card className="border-emerald-300/20 bg-emerald-300/[0.04] text-white">
-            <CardContent className="grid min-h-80 place-items-center p-8 text-center">
-              <div>
-                <Brain className="mx-auto h-12 w-12 text-emerald-200" />
-                <h2 className="mt-4 text-2xl font-black">Five-hand practice</h2>
-                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-white/45">
-                  You see both player cards and one dealer card. Choose Hit or
-                  Stand, then compare your choice with the lab rule. The session
-                  is deterministic software practice only.
-                </p>
-                <Button size="lg" className="mt-6" onClick={startSession}>
-                  Start strategy session
-                </Button>
+        <div className="grid gap-5 lg:grid-cols-[1fr_300px]">
+          <Card className="overflow-hidden border-emerald-300/15 bg-[radial-gradient(circle_at_50%_35%,rgba(16,185,129,.13),rgba(3,17,12,.97)_60%)] text-white">
+            <CardContent className="min-h-[560px] p-5 sm:p-8">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/30">Dealer</p>
+                  <p className="mt-1 text-sm text-white/35">
+                    {dealer.length ? "Visible total " + dealerVisibleValue : "Waiting for deal"}
+                  </p>
+                </div>
+                <Spade className="h-7 w-7 text-emerald-200/60" />
               </div>
-            </CardContent>
-          </Card>
-        ) : sessionState === "finished" ? (
-          <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
-            <CardContent className="grid min-h-80 place-items-center p-8 text-center">
+
+              <div className="mt-5 flex min-h-32 flex-wrap gap-2">
+                {dealer.map((card, index) => (
+                  <CardFace key={card.rank + card.suit + index} card={card} hidden={index === 1 && phase !== "resolved"} />
+                ))}
+              </div>
+
+              <div className="my-8 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
               <div>
-                <Trophy className="mx-auto h-12 w-12 text-amber-200" />
-                <h2 className="mt-4 text-3xl font-black">Session complete</h2>
-                <p className="mt-2 text-white/50">
-                  {correctDecisions}/{totalDecisions} decisions matched the lab
-                  rule · {accuracy}% accuracy · {decisionScore} strategy points.
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/30">Player</p>
+                <p className="mt-1 text-sm text-white/35">
+                  {player.length ? "Total " + playerValue : "Choose a demo stake and deal"}
                 </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button onClick={startSession}>
-                    <RotateCcw className="mr-2 h-4 w-4" />
-                    Practice again
-                  </Button>
-                  <Link href="/game-fi-quest-board">
+              </div>
+
+              <div className="mt-5 flex min-h-32 flex-wrap gap-2">
+                {player.map((card, index) => (
+                  <CardFace key={card.rank + card.suit + index} card={card} />
+                ))}
+              </div>
+
+              <div className={"mt-7 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm " + statusTone}>
+                {message}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-3">
+                {phase === "player" ? (
+                  <>
+                    <Button size="lg" onClick={hit}>Hit</Button>
                     <Button
+                      size="lg"
                       variant="outline"
                       className="border-white/15 bg-white/[0.03] text-white"
+                      onClick={stand}
                     >
-                      View passport
+                      Stand
                     </Button>
-                  </Link>
-                </div>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-amber-300/20 bg-amber-300/[0.04] text-amber-100"
+                      onClick={doubleDown}
+                      disabled={!canDouble}
+                    >
+                      Double · {roundStake}
+                    </Button>
+                  </>
+                ) : (
+                  <Button size="lg" onClick={startRound}>
+                    Deal hand · {stake}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
-        ) : (
-          <Card className="overflow-hidden border-emerald-300/20 bg-gradient-to-b from-emerald-950/65 to-slate-950 text-white">
-            <CardHeader>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <CardDescription className="text-emerald-100/50">
-                    Round {round} of {SESSION_ROUNDS}
-                  </CardDescription>
-                  <CardTitle className="text-white">Decision table</CardTitle>
-                </div>
-                <Badge
-                  variant="outline"
-                  className="border-emerald-300/20 text-emerald-100"
-                >
-                  {roundResolved ? "Resolved" : "Your move"}
-                </Badge>
-              </div>
-              <Progress
-                value={(round / SESSION_ROUNDS) * 100}
-                className="mt-3 h-1.5"
-              />
-            </CardHeader>
 
-            <CardContent className="space-y-7">
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.15em] text-white/30">
-                  Dealer
-                </p>
-                <div className="flex gap-3">
-                  {dealer.map((card, index) => (
-                    <CardFace
-                      key={index}
-                      card={card}
-                      hidden={!roundResolved && index > 0}
-                    />
+          <div className="space-y-4">
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardDescription className="text-white/35">Table setup</CardDescription>
+                <CardTitle className="text-xl text-white">Demo stake</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {STAKES.map(value => (
+                    <Button
+                      key={value}
+                      size="sm"
+                      variant={stake === value ? "default" : "outline"}
+                      className={stake === value ? "" : "border-white/10 bg-white/[0.025] text-white"}
+                      onClick={() => setStake(value)}
+                      disabled={phase === "player"}
+                    >
+                      {value}
+                    </Button>
                   ))}
                 </div>
-                <p className="mt-2 text-sm text-white/40">
-                  {roundResolved
-                    ? "Dealer total: " + dealerValue
-                    : "Visible dealer card: " + (dealerUp?.rank ?? "—")}
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-3 text-xs font-bold uppercase tracking-[0.15em] text-white/30">
-                  Player · total {playerValue}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {player.map((card, index) => (
-                    <CardFace key={index} card={card} />
-                  ))}
+                <div className="mt-5 space-y-2 text-xs leading-5 text-white/35">
+                  <p>Blackjack returns 2.5× the demo stake.</p>
+                  <p>Regular win returns 2×. Push returns 1×.</p>
+                  <p>Double is available on the initial two-card hand when enough demo chips remain.</p>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-sm font-semibold text-white">{message}</p>
-                {roundResolved && recommendation ? (
-                  <p className="mt-2 text-xs text-emerald-100/60">
-                    Initial recommended decision: {recommendation.toUpperCase()}
-                  </p>
-                ) : null}
-              </div>
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardDescription className="text-white/35">Recent hands</CardDescription>
+                <CardTitle className="text-lg text-white">Table history</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {history.length ? history.map((item, index) => (
+                  <div key={item + index} className="rounded-xl border border-white/10 bg-black/15 px-3 py-2 text-sm text-white/45">
+                    {item}
+                  </div>
+                )) : (
+                  <p className="text-sm text-white/30">Completed hands appear here.</p>
+                )}
+              </CardContent>
+            </Card>
 
-              {!roundResolved ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Button size="lg" onClick={() => choose("hit")}>
-                    Hit
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => choose("stand")}
-                    className="border-white/15 bg-white/[0.03] text-white"
-                  >
-                    Stand
-                  </Button>
-                </div>
-              ) : (
-                <Button className="w-full" size="lg" onClick={nextRound}>
-                  {round >= SESSION_ROUNDS
-                    ? "Finish session"
-                    : "Deal next practice hand"}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        )}
+            <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.025] p-4 text-xs leading-5 text-white/35">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-200/70" />
+              <p>
+                No real-money wager, payment, wallet connection, custody, token settlement, withdrawal, or redeemable reward is implemented.
+              </p>
+            </div>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
-          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
-          This route is a local card-strategy practice tool. It has no wager,
-          chip balance, payout, wallet, token, real-money settlement, house edge,
-          gambling advice, or claim that the simplified rule set is optimal for
-          every blackjack variation.
-        </section>
+            <div className="flex items-center gap-2 text-xs text-white/25">
+              <Coins className="h-4 w-4" />
+              Local demo bankroll · seed {seed}
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );
