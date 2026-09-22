@@ -94,20 +94,20 @@ export default function Onboarding() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#050510] p-8 text-white">
+      <main className="min-h-screen bg-[#090404] p-8 text-white">
         Loading invitation status…
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main className="min-h-screen bg-[#090404] text-white">
       <div className="mx-auto max-w-6xl px-4 py-10">
         <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
           <div>
             <Badge
               variant="outline"
-              className="border-emerald-400/40 text-emerald-200"
+              className="border-amber-300/30 text-amber-100"
             >
               Durable activation journey
             </Badge>
@@ -122,7 +122,7 @@ export default function Onboarding() {
             </p>
           </div>
 
-          <Card className="border-emerald-400/25 bg-emerald-400/[0.05] text-white">
+          <Card className="border-amber-300/20 bg-amber-300/[0.05] text-white">
             <CardHeader>
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -131,7 +131,7 @@ export default function Onboarding() {
                     {completedCount}/{activationSteps.length} persisted gates complete
                   </CardDescription>
                 </div>
-                <span className="text-3xl font-black text-emerald-200">
+                <span className="text-3xl font-black text-amber-100">
                   {percent}%
                 </span>
               </div>
@@ -183,7 +183,7 @@ export default function Onboarding() {
                 className={
                   "h-full text-white " +
                   (complete
-                    ? "border-emerald-400/25 bg-emerald-400/[0.04]"
+                    ? "border-amber-300/20 bg-amber-300/[0.035]"
                     : "border-white/10 bg-white/[0.025]")
                 }
               >
@@ -193,7 +193,7 @@ export default function Onboarding() {
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     {complete ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-300" />
+                      <CheckCircle2 className="h-5 w-5 text-amber-200" />
                     ) : (
                       <Circle className="h-5 w-5 text-white/20" />
                     )}
@@ -202,7 +202,7 @@ export default function Onboarding() {
                     className={
                       "mt-2 grid h-10 w-10 place-items-center rounded-xl " +
                       (complete
-                        ? "bg-emerald-300/10 text-emerald-200"
+                        ? "bg-amber-300/10 text-amber-100"
                         : "bg-white/[0.05] text-white/55")
                     }
                   >
@@ -248,7 +248,7 @@ export default function Onboarding() {
         <section className="mt-8 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
             <div className="flex items-start gap-3">
-              <Activity className="mt-0.5 h-5 w-5 shrink-0 text-sky-200" />
+              <Activity className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
               <div>
                 <h2 className="font-bold">Inspect the underlying records</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-white/50">
@@ -268,7 +268,7 @@ export default function Onboarding() {
         </section>
 
         <section className="mt-8 rounded-2xl border border-white/10 p-5 text-xs leading-6 text-white/40">
-          <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
+          <ShieldCheck className="mr-2 inline h-4 w-4 text-amber-200" />
           This activation path does not grant token rewards, airdrops,
           certificates, staking rewards, payment capability, wallet custody,
           provider-backed AI, livestream delivery, or blockchain execution.
