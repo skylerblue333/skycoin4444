@@ -262,7 +262,7 @@ export default function BetaNavigation() {
           <span className="hidden sm:block">
             <strong className="block text-sm font-black tracking-tight">SKYCOIN4444</strong>
             <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/35">
-              Unified engineering beta
+              V5 engineering beta · unified
             </span>
           </span>
         </Link>
