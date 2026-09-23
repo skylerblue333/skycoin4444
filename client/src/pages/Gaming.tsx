@@ -104,7 +104,7 @@ export default function Gaming() {
               </h1>
 
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/52 sm:text-lg">
-                The old quantity-first gaming catalog is retired from the flagship experience.
+                The old quantity-first gaming catalog is retired from the flagship Games Center.
                 Five core games now get dedicated mechanics, animation, round state, history, and a consistent premium game shell.
                 Crypto Ops remains a smaller skill arcade instead of pretending token wagering is live.
               </p>
