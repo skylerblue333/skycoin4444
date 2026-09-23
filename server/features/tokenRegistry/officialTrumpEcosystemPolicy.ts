@@ -1,3 +1,5 @@
+import { getOfficialTrumpCapability } from './officialTrumpCapabilities';
+
 export type TrumpEcosystemPurpose =
   | 'asset_discovery'
   | 'portfolio_tracking'
@@ -137,6 +139,78 @@ export function getOfficialTrumpEcosystemSource(
   id: string,
 ): TrumpEcosystemSource | undefined {
   return OFFICIAL_TRUMP_ECOSYSTEM_SOURCES.find(source => source.id === id.trim());
+}
+
+export type TrumpCapabilityUseDecision = Readonly<{
+  capabilityId: string;
+  purpose: TrumpEcosystemPurpose;
+  allowedInEngineeringBeta: boolean;
+  reason: string;
+}>;
+
+/**
+ * Combined activation guard. A capability must be non-side-effecting and
+ * already available as read-only/planning-only, and its intended purpose must
+ * also pass the ecosystem policy.
+ */
+export function evaluateTrumpCapabilityUse(
+  capabilityId: string,
+  purpose: TrumpEcosystemPurpose,
+): TrumpCapabilityUseDecision {
+  const capability = getOfficialTrumpCapability(capabilityId);
+  if (!capability) {
+    return Object.freeze({
+      capabilityId,
+      purpose,
+      allowedInEngineeringBeta: false,
+      reason: 'Unknown capability id.',
+    });
+  }
+
+  const purposeDecision = evaluateTrumpEcosystemPurpose(purpose);
+  if (!purposeDecision.allowed) {
+    return Object.freeze({
+      capabilityId,
+      purpose,
+      allowedInEngineeringBeta: false,
+      reason: purposeDecision.reason,
+    });
+  }
+
+  if (
+    capability.sideEffecting ||
+    capability.availability === 'gated' ||
+    capability.availability === 'external_only'
+  ) {
+    return Object.freeze({
+      capabilityId,
+      purpose,
+      allowedInEngineeringBeta: false,
+      reason:
+        'Capability still requires provider/authority evidence or live side effects that are disabled in the engineering beta.',
+    });
+  }
+
+  return Object.freeze({
+    capabilityId,
+    purpose,
+    allowedInEngineeringBeta: true,
+    reason:
+      'Capability is non-side-effecting, available for read/planning use, and the requested product purpose is permitted.',
+  });
+}
+
+export function assertTrumpCapabilityUseAllowed(
+  capabilityId: string,
+  purpose: TrumpEcosystemPurpose,
+): TrumpCapabilityUseDecision {
+  const decision = evaluateTrumpCapabilityUse(capabilityId, purpose);
+  if (!decision.allowedInEngineeringBeta) {
+    throw new Error(
+      `${capabilityId} is blocked for ${purpose}: ${decision.reason}`,
+    );
+  }
+  return decision;
 }
 
 export const OFFICIAL_TRUMP_ECOSYSTEM_POLICY = Object.freeze({
