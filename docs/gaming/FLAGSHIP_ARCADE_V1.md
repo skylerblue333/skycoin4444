@@ -1,8 +1,8 @@
-# SKYCOIN4444 Flagship Arcade V1
+# SKYCOIN4444 Flagship Arcade V2
 
 ## Product decision
 
-The previous Games Center emphasized catalog size. The flagship beta now emphasizes a smaller set of replayable experiences:
+The quantity-first Games Center has been retired from the flagship experience. The promoted game floor is intentionally smaller and deeper:
 
 - Crash
 - Plinko
@@ -11,11 +11,36 @@ The previous Games Center emphasized catalog size. The flagship beta now emphasi
 - Roulette
 - Crypto Ops (Hash Hunt + Wallet Defense)
 
-Legacy game pages may remain in the repository for route compatibility, but they are no longer promoted from the primary Games Center.
+Legacy game routes may remain for compatibility, but the flagship lobby does not promote them as if route count were product quality.
+
+## V2 quality bar
+
+Each promoted experience now has a dedicated replay loop and visible round state:
+
+- **Crash** — elapsed-time multiplier curve, animated runway, manual cash-out, auto cash-out, seeded round history.
+- **Plinko** — animated ball path across a ten-row board, eleven multiplier buckets, recent-drop history.
+- **High-Low** — animated card reveal, streak state, recent run history.
+- **Blackjack** — animated card dealing, Hit / Stand / Double, dealer draw rules, natural-blackjack payout math, hand history.
+- **Roulette** — 37-pocket European ordering, animated wheel rotation, color/parity/straight-number bets, spin history.
+- **Crypto Ops** — wallet-safety and hash-recognition skill modes without pretending mining income, token rewards, or wallet execution exists.
+
+Shared UI primitives live under `client/src/features/gaming/components`; shared deterministic math lives in `client/src/lib/flagshipGameEngine.ts`.
+
+## Open-source foundation
+
+The rebuild uses the permissive open-source packages already declared by the repository instead of copying an unrelated casino backend:
+
+- React
+- Framer Motion
+- Radix UI
+- Lucide
+- Tailwind CSS
+
+No third-party casino server, payment rail, custody layer, wallet wagering backend, or proprietary game source has been vendored into this change. This keeps licensing, security assumptions, and product boundaries auditable.
 
 ## Engineering boundary
 
-These are engineering-beta entertainment and skill simulations. Demo credits, multipliers, scores, chips, and payouts are browser-local game state with **no monetary or token value**.
+These are engineering-beta entertainment and skill simulations. Demo credits, multipliers, scores, chips, stakes, and payouts are browser-local game state with **no monetary or token value**.
 
 The current implementation does not:
 
@@ -29,14 +54,15 @@ The current implementation does not:
 
 The deterministic seed/proof strings exist for repeatable testing and transparent demo behavior only.
 
-## Quality goals
+## Release requirements
 
-1. One focused Games Center instead of a 50-game quantity claim.
-2. Strong visual hierarchy and mobile-responsive layouts.
-3. Shared, tested game math for cards, Plinko, roulette, crash points, and crypto challenges.
-4. Clear local-demo boundaries everywhere wagering-like UI appears.
-5. Preserve existing public routes such as /gaming, /arcade, /game-crash, and /game-blackjack.
+Before merge:
 
-## Follow-up
+1. TypeScript check passes.
+2. Engine unit tests pass.
+3. Gaming release-contract tests pass.
+4. Production build passes.
+5. Exact-head CI is green.
+6. Default branch contains the merged head.
 
-Before any real-money or token-value gaming work, legal/compliance review, age/region controls, certified RNG/fairness design, wallet/custody boundaries, responsible-gaming controls, and jurisdiction-specific product requirements would need separate implementation and verification.
+Before any future real-money or token-value gaming work, the product would require separate legal/compliance review, age and region controls, certified randomness/fairness design, responsible-gaming controls, wallet/custody boundaries, and jurisdiction-specific implementation.
