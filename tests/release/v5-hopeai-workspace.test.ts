@@ -37,6 +37,12 @@ describe("HopeAI conversation workspace release contract", () => {
     expect(workspace).toMatch(/Add text file/);
     expect(workspace).toMatch(/Provider-backed chat/);
     expect(workspace).toMatch(/localStorage\.setItem/);
+    expect(workspace).toMatch(/storageKeyForUser\(user\.id\)/);
+    expect(workspace).toMatch(/loadedStorageKey !== storageKey/);
+    expect(workspace).toMatch(/aria-label="Saved conversation"/);
+    expect(workspace).toMatch(/aria-label="Delete current conversation"/);
+    expect(workspace).toMatch(/buildHopeProviderContent\(userMessage\)/);
+    expect(workspace).toMatch(/capped at 8,000 characters/);
     expect(workspace).toMatch(/does\s+not claim Manus computer-use automation/);
     expect(workspace).toMatch(/ChatGPT feature parity/);
   });
