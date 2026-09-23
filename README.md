@@ -4,6 +4,8 @@ SKYCOIN4444 is a large TypeScript/React engineering project that combines a flag
 
 Within SKYCOIN4444, the configured Official TRUMP Solana asset is designated as the platform's **primary supported external crypto asset for the engineering beta**. This is a SKYCOIN4444 product designation only; it does not claim endorsement, partnership, issuer authorization, legal-tender status, or affiliation with Donald Trump, the Trump Organization, CIC Digital, Fight Fight Fight LLC, or any token issuer. The current integration is metadata plus unsigned transfer-intent validation only—no custody, signing, broadcast, settlement, or automated trading. See [SkyTokenRegistry](server/features/tokenRegistry/README.md).
 
+A typed [120-capability TRUMP crypto platform matrix](docs/TRUMP_CRYPTO_CAPABILITY_MATRIX.md) now defines the broader engineering roadmap, including custody, live broadcasting, settlement, automated trading, compliance, accounting, treasury, payments, and cross-chain work while keeping provider-dependent and authority-only states fail-closed until real evidence exists.
+
 ## Current engineering-beta status
 
 The default branch has a reproducible pnpm workspace and a real CI pipeline. Current required CI covers:
