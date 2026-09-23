@@ -1,17 +1,15 @@
 import { SkyTokenRegistry } from './index';
 import type { TokenDefinition } from './index';
+import {
+  OFFICIAL_TRUMP_MINT,
+  OFFICIAL_TRUMP_PUBLIC_ASSET,
+} from '../../../shared/officialTrump';
 
-/** Official TRUMP SPL mint used by the integration contract. */
-export const OFFICIAL_TRUMP_MINT =
-  '6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN';
+export { OFFICIAL_TRUMP_MINT } from '../../../shared/officialTrump';
 
 export const OFFICIAL_TRUMP_TOKEN: Readonly<TokenDefinition> = Object.freeze({
   id: 'official-trump-solana-mainnet',
-  symbol: 'TRUMP',
-  name: 'Official Trump',
-  network: 'solana',
-  decimals: 6,
-  contractAddress: OFFICIAL_TRUMP_MINT,
+  ...OFFICIAL_TRUMP_PUBLIC_ASSET,
 });
 
 /**
