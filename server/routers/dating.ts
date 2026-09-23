@@ -9,7 +9,7 @@ import {
   ne,
   or,
 } from "drizzle-orm";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import {
   datingBlocks,
@@ -96,6 +96,146 @@ type ConnectionProfile = {
   location: string | null;
   interests: string | null;
 };
+
+type PairMatch = typeof datingMatches.$inferSelect;
+
+function canonicalDatingPair(userA: string, userB: string) {
+  const [userId1, userId2] = [userA, userB].sort();
+  const digest = createHash("sha256")
+    .update(userId1)
+    .update("\0")
+    .update(userId2)
+    .digest("hex");
+  return {
+    id: `dating-pair-${digest}`,
+    userId1,
+    userId2,
+  };
+}
+
+function matchNotificationId(matchId: string, userId: string) {
+  return `dating-match-notification-${createHash("sha256")
+    .update(matchId)
+    .update("\0")
+    .update(userId)
+    .digest("hex")}`;
+}
+
+async function insertDatingNotificationOnce(input: {
+  id: string;
+  userId: string;
+  type: string;
+  relatedUserId: string | null;
+}) {
+  try {
+    await db.insert(datingNotifications).values({
+      ...input,
+      read: false,
+    });
+  } catch (error) {
+    const existing = (
+      await db
+        .select({ id: datingNotifications.id })
+        .from(datingNotifications)
+        .where(eq(datingNotifications.id, input.id))
+        .limit(1)
+    )[0];
+    if (!existing) throw error;
+  }
+}
+
+async function activateMutualMatch(
+  userA: string,
+  userB: string,
+  knownPair?: PairMatch
+) {
+  if (knownPair) {
+    if (knownPair.status === "matched") {
+      return { matchId: knownPair.id, becameMatch: false };
+    }
+    await db
+      .update(datingMatches)
+      .set({ status: "matched" })
+      .where(eq(datingMatches.id, knownPair.id));
+    return { matchId: knownPair.id, becameMatch: true };
+  }
+
+  const canonical = canonicalDatingPair(userA, userB);
+  try {
+    await db.insert(datingMatches).values({
+      ...canonical,
+      status: "matched",
+    });
+    return { matchId: canonical.id, becameMatch: true };
+  } catch (error) {
+    const existing = (
+      await db
+        .select()
+        .from(datingMatches)
+        .where(eq(datingMatches.id, canonical.id))
+        .limit(1)
+    )[0];
+    if (!existing) throw error;
+
+    const becameMatch = existing.status !== "matched";
+    if (becameMatch) {
+      await db
+        .update(datingMatches)
+        .set({ status: "matched" })
+        .where(eq(datingMatches.id, existing.id));
+    }
+    return { matchId: existing.id, becameMatch };
+  }
+}
+
+async function rejectDatingPair(
+  userA: string,
+  userB: string,
+  knownPair?: PairMatch
+) {
+  if (knownPair) {
+    if (knownPair.status === "matched") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Use unmatch or block for an active match",
+      });
+    }
+    await db
+      .update(datingMatches)
+      .set({ status: "rejected" })
+      .where(eq(datingMatches.id, knownPair.id));
+    return knownPair.id;
+  }
+
+  const canonical = canonicalDatingPair(userA, userB);
+  try {
+    await db.insert(datingMatches).values({
+      ...canonical,
+      status: "rejected",
+    });
+    return canonical.id;
+  } catch (error) {
+    const existing = (
+      await db
+        .select()
+        .from(datingMatches)
+        .where(eq(datingMatches.id, canonical.id))
+        .limit(1)
+    )[0];
+    if (!existing) throw error;
+    if (existing.status === "matched") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Use unmatch or block for an active match",
+      });
+    }
+    await db
+      .update(datingMatches)
+      .set({ status: "rejected" })
+      .where(eq(datingMatches.id, existing.id));
+    return existing.id;
+  }
+}
 
 export function parseDatingInterests(value: string | null): string[] {
   if (!value) return [];
@@ -500,11 +640,22 @@ export const datingRouter = router({
       const interestQuery = input?.interest?.trim().toLocaleLowerCase() ?? "";
       const limit = input?.limit ?? 25;
 
-      const [viewerProfile, blockRows, likedRows, pairRows, candidateRows] =
+      const viewerProfile = await db.query.datingProfiles.findFirst({
+        where: eq(datingProfiles.userId, ctx.user.id),
+      });
+      if (
+        !viewerProfile ||
+        typeof viewerProfile.age !== "number" ||
+        viewerProfile.age < 18
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Create an adult dating profile before using discovery",
+        });
+      }
+
+      const [blockRows, likedRows, pairRows, candidateRows] =
         await Promise.all([
-          db.query.datingProfiles.findFirst({
-            where: eq(datingProfiles.userId, ctx.user.id),
-          }),
           db
             .select({
               userId: datingBlocks.userId,
@@ -611,7 +762,7 @@ export const datingRouter = router({
           gender: row.gender,
           lookingFor: row.lookingFor,
           createdAt: row.createdAt,
-          ...buildDatingConnectionEvidence(viewerProfile ?? null, row),
+          ...buildDatingConnectionEvidence(viewerProfile, row),
         }))
         .sort((a, b) => b.sharedSignalCount - a.sharedSignalCount)
         .slice(0, limit);
@@ -666,19 +817,11 @@ export const datingRouter = router({
             )
           );
 
-        if (pair) {
-          await db
-            .update(datingMatches)
-            .set({ status: "rejected" })
-            .where(eq(datingMatches.id, pair.id));
-        } else {
-          await db.insert(datingMatches).values({
-            id: randomUUID(),
-            userId1: ctx.user.id,
-            userId2: input.profileUserId,
-            status: "rejected",
-          });
-        }
+        await rejectDatingPair(
+          ctx.user.id,
+          input.profileUserId,
+          pair
+        );
 
         return {
           accepted: true as const,
@@ -747,39 +890,26 @@ export const datingRouter = router({
         };
       }
 
-      let matchId = pair?.id;
-      const becameMatch = pair?.status !== "matched";
-      if (pair) {
-        await db
-          .update(datingMatches)
-          .set({ status: "matched" })
-          .where(eq(datingMatches.id, pair.id));
-      } else {
-        matchId = randomUUID();
-        await db.insert(datingMatches).values({
-          id: matchId,
-          userId1: ctx.user.id,
-          userId2: input.profileUserId,
-          status: "matched",
-        });
-      }
+      const { matchId, becameMatch } = await activateMutualMatch(
+        ctx.user.id,
+        input.profileUserId,
+        pair
+      );
 
       if (becameMatch) {
-        await db.insert(datingNotifications).values([
-          {
-            id: randomUUID(),
+        await Promise.all([
+          insertDatingNotificationOnce({
+            id: matchNotificationId(matchId, ctx.user.id),
             userId: ctx.user.id,
             type: "match",
             relatedUserId: input.profileUserId,
-            read: false,
-          },
-          {
-            id: randomUUID(),
+          }),
+          insertDatingNotificationOnce({
+            id: matchNotificationId(matchId, input.profileUserId),
             userId: input.profileUserId,
             type: "match",
             relatedUserId: ctx.user.id,
-            read: false,
-          },
+          }),
         ]);
       }
 
@@ -867,7 +997,7 @@ export const datingRouter = router({
     .input(z.object({ matchId: z.string().trim().min(1).max(255) }))
     .query(async ({ ctx, input }) => {
       await requireMatchedConversation(input.matchId, ctx.user.id);
-      return db
+      const newest = await db
         .select({
           id: datingMessages.id,
           matchId: datingMessages.matchId,
@@ -878,8 +1008,9 @@ export const datingRouter = router({
         })
         .from(datingMessages)
         .where(eq(datingMessages.matchId, input.matchId))
-        .orderBy(asc(datingMessages.createdAt))
+        .orderBy(desc(datingMessages.createdAt))
         .limit(500);
+      return newest.reverse();
     }),
 
   sendMessage: protectedProcedure
