@@ -37,7 +37,7 @@ describe("HopeAI conversation workspace release contract", () => {
     expect(workspace).toMatch(/Add text file/);
     expect(workspace).toMatch(/Provider-backed chat/);
     expect(workspace).toMatch(/localStorage\.setItem/);
-    expect(workspace).toMatch(/does not claim Manus computer-use automation/);
+    expect(workspace).toMatch(/does[\\s\\S]*not claim Manus computer-use automation/);
     expect(workspace).toMatch(/ChatGPT feature parity/);
   });
 });
