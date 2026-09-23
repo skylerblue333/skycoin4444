@@ -1,224 +1,153 @@
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
-import { PageHeader } from "@/components/PageHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ArrowRight,
+  Boxes,
+  FileCheck2,
+  FolderOpen,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { TrendingUp, DollarSign, Shield, Users, Zap, Globe, ArrowRight, ExternalLink, Download, CheckCircle, Lock, BarChart3, PieChart, Coins } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  investorDataRoomLinks,
+  offeringReadinessGates,
+} from "@/data/investorReadiness";
 
-const TOKENOMICS = [
-  { label: "Community Rewards", pct: 35, color: "bg-violet-500" },
-  { label: "Ecosystem Fund", pct: 20, color: "bg-blue-500" },
-  { label: "Team & Advisors", pct: 15, color: "bg-emerald-500" },
-  { label: "Liquidity Pool", pct: 15, color: "bg-yellow-500" },
-  { label: "Staking Pool", pct: 10, color: "bg-orange-500" },
-  { label: "Reserve", pct: 5, color: "bg-zinc-500" },
-];
-
-const ROADMAP = [
-  { phase: "Phase 1", title: "Foundation", status: "complete", items: ["Core social platform", "User auth & profiles", "Posts, comments, likes", "Community channels"] },
-  { phase: "Phase 2", title: "Economy", status: "complete", items: ["SKY444 token launch", "Staking & yield farming", "Creator subscriptions", "Marketplace"] },
-  { phase: "Phase 3", title: "GameFi", status: "active", items: ["Tournament system", "Quest board", "Achievement engine", "Season pass"] },
-  { phase: "Phase 4", title: "AI & DeFi", status: "upcoming", items: ["AI content engine", "DEX integration", "Cross-chain bridge", "DAO governance"] },
-  { phase: "Phase 5", title: "Scale", status: "upcoming", items: ["Mobile apps", "Scalable API", "Global expansion", "IPO preparation"] },
-];
+const diligenceSections = [
+  {
+    title: "Product & release evidence",
+    body: "Source, tests, CI, route health, hosted beta behavior, known limitations, and release identity should be reviewable without translating demo UI into production claims.",
+    route: "/route-health",
+    icon: Boxes,
+  },
+  {
+    title: "Token & offering readiness",
+    body: "Token design, contract identity, security review, legal structure, payments, KYC/AML, custody, vesting, disclosures, and launch controls belong in one gated review chain.",
+    route: "/i-c-o-launchpad",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Metrics methodology",
+    body: "Investor KPIs stay unpublished until each number has a named source, period, definition, exclusions, and last-updated timestamp.",
+    route: "/investor-metrics",
+    icon: FileCheck2,
+  },
+] as const;
 
 export default function InvestorRoom() {
-  const { user } = useAuth();
-
-  const { data: kpis, isLoading: kpisLoading } = trpc.investor.kpis.useQuery(undefined, {
-    enabled: !!user,
-    retry: false,
-  });
-
-  const { data: revenue, isLoading: revenueLoading } = trpc.investor.revenue.useQuery(undefined, {
-    enabled: !!user,
-    retry: false,
-  });
-
-  const { data: treasury, isLoading: treasuryLoading } = trpc.investor.treasury.useQuery(undefined, {
-    enabled: !!user,
-    retry: false,
-  });
-
-  const { data: tokenomicsData } = trpc.token.tokenomics.useQuery();
-
-  const isLoading = kpisLoading || revenueLoading || treasuryLoading;
+  const blocked = offeringReadinessGates.filter(
+    gate => gate.status === "blocked"
+  ).length;
+  const needsEvidence = offeringReadinessGates.filter(
+    gate => gate.status === "needs_evidence"
+  ).length;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        <PageHeader
-          title="Investor Room"
-          subtitle="SKYCOIN4444 — Platform metrics, tokenomics, and growth roadmap"
-          icon={TrendingUp}
-          actions={
-            <Button variant="outline" className="border-zinc-700 gap-2 text-sm">
-              <Download className="w-4 h-4" /> Pitch Deck
-            </Button>
-          }
-        />
-
-        {/* Auth Gate */}
-        {!user && (
-          <Card className="bg-violet-500/10 border-violet-500/30">
-            <CardContent className="p-6 flex items-center gap-4">
-              <Lock className="w-8 h-8 text-violet-400 shrink-0" />
-              <div>
-                <p className="font-semibold text-white">Sign in to view live metrics</p>
-                <p className="text-sm text-zinc-400 mt-1">KPIs, revenue, and treasury data require authentication.</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Live KPIs */}
-        {user && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-24 bg-zinc-900 rounded-xl animate-pulse" />
-              ))
-            ) : [
-              { label: "Total Users", value: (kpis as any)?.totalUsers?.toLocaleString() || "0", icon: Users, color: "text-blue-400" },
-              { label: "Monthly Revenue", value: `$${((revenue as any)?.total || 0).toLocaleString()}`, icon: DollarSign, color: "text-emerald-400" },
-              { label: "Treasury", value: `$${((treasury as any)?.total || 0).toLocaleString()}`, icon: Coins, color: "text-yellow-400" },
-              { label: "Active Stakers", value: (kpis as any)?.activeStakers?.toLocaleString() || "0", icon: Zap, color: "text-violet-400" },
-            ].map(stat => (
-              <Card key={stat.label} className="bg-zinc-900 border-zinc-800">
-                <CardContent className="p-4 text-center">
-                  <stat.icon className={`w-5 h-5 mx-auto mb-2 ${stat.color}`} />
-                  <div className={`text-xl font-bold ${stat.color}`}>{stat.value}</div>
-                  <div className="text-xs text-zinc-500 mt-1">{stat.label}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Tokenomics */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <PieChart className="w-5 h-5 text-violet-400" />
-              SKY444 Token Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex h-4 rounded-full overflow-hidden gap-0.5">
-              {TOKENOMICS.map(t => (
-                <div key={t.label} className={`${t.color} transition-all`} style={{ width: `${t.pct}%` }} />
-              ))}
+    <main className="min-h-screen bg-[#08070d] px-4 py-8 text-white md:px-8">
+      <div className="mx-auto max-w-6xl space-y-7">
+        <header className="rounded-3xl border border-violet-300/15 bg-gradient-to-br from-violet-500/[0.08] via-white/[0.025] to-blue-500/[0.06] p-6 md:p-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-300 text-black">
+              <FolderOpen className="h-6 w-6" />
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {TOKENOMICS.map(t => (
-                <div key={t.label} className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${t.color} shrink-0`} />
-                  <span className="text-xs text-zinc-300">{t.label}</span>
-                  <span className="text-xs font-bold text-white ml-auto">{t.pct}%</span>
-                </div>
-              ))}
-            </div>
-            <div className="pt-2 border-t border-zinc-800 grid grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-lg font-bold text-white">4,444,444,444</div>
-                <div className="text-xs text-zinc-500">Total Supply</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-emerald-400">{(tokenomicsData as any)?.circulatingSupply?.toLocaleString() || "~1.2B"}</div>
-                <div className="text-xs text-zinc-500">Circulating</div>
-              </div>
-              <div>
-                <div className="text-lg font-bold text-yellow-400">${(tokenomicsData as any)?.price?.toFixed(4) || "0.0044"}</div>
-                <div className="text-xs text-zinc-500">Current Price</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Treasury Allocation */}
-        {user && treasury && (
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-yellow-400" />
-                Treasury Allocation
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {((treasury as any).allocation || []).map((a: any) => (
-                <div key={a.name} className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400 w-32 shrink-0">{a.name}</span>
-                  <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full" style={{ width: `${a.percentage}%` }} />
-                  </div>
-                  <span className="text-xs font-bold text-white w-10 text-right">{a.percentage}%</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Roadmap */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="w-5 h-5 text-blue-400" />
-              Development Roadmap
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {ROADMAP.map(phase => (
-                <div key={phase.phase} className={`p-4 rounded-xl border ${
-                  phase.status === "complete" ? "border-emerald-500/30 bg-emerald-500/5" :
-                  phase.status === "active" ? "border-violet-500/30 bg-violet-500/5" :
-                  "border-zinc-800 bg-zinc-800/30"
-                }`}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <Badge className={`text-xs ${
-                      phase.status === "complete" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" :
-                      phase.status === "active" ? "bg-violet-500/20 text-violet-400 border-violet-500/30 animate-pulse" :
-                      "bg-zinc-700 text-zinc-400 border-zinc-600"
-                    }`}>
-                      {phase.phase}
-                    </Badge>
-                    <span className="font-semibold text-white">{phase.title}</span>
-                    {phase.status === "complete" && <CheckCircle className="w-4 h-4 text-emerald-400 ml-auto" />}
-                    {phase.status === "active" && <Zap className="w-4 h-4 text-violet-400 ml-auto animate-pulse" />}
-                  </div>
-                  <div className="grid grid-cols-2 gap-1">
-                    {phase.items.map(item => (
-                      <div key={item} className="flex items-center gap-1.5 text-xs text-zinc-400">
-                        <div className={`w-1.5 h-1.5 rounded-full ${
-                          phase.status === "complete" ? "bg-emerald-400" :
-                          phase.status === "active" ? "bg-violet-400" :
-                          "bg-zinc-600"
-                        }`} />
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* CTA */}
-        <Card className="bg-gradient-to-r from-violet-600/20 to-blue-600/20 border-violet-500/30">
-          <CardContent className="p-6 flex items-center justify-between gap-4">
             <div>
-              <p className="font-bold text-white text-lg">Interested in investing?</p>
-              <p className="text-sm text-zinc-400 mt-1">Contact the team for private sale allocation and partnership opportunities.</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-200/70">
+                Due diligence workspace
+              </p>
+              <h1 className="mt-1 text-3xl font-black md:text-4xl">Investor Room</h1>
             </div>
-            <Button className="bg-violet-600 hover:bg-violet-700 gap-2 shrink-0">
-              Contact Team <ArrowRight className="w-4 h-4" />
-            </Button>
+            <Badge className="ml-auto border border-violet-300/25 bg-violet-300/10 text-violet-100">
+              Evidence room
+            </Badge>
+          </div>
+
+          <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+            A review index for engineering evidence, investor methodology, token
+            planning, and launch controls. This room intentionally does not invent
+            revenue, users, treasury balances, token prices, token supply on-chain,
+            sale progress, valuation, or fundraising results.
+          </p>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs uppercase tracking-wider text-slate-600">Offering</div>
+              <div className="mt-1 font-bold text-amber-200">Not live</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs uppercase tracking-wider text-slate-600">Blocked gates</div>
+              <div className="mt-1 font-bold text-rose-200">{blocked}</div>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div className="text-xs uppercase tracking-wider text-slate-600">Evidence-needed gates</div>
+              <div className="mt-1 font-bold text-amber-200">{needsEvidence}</div>
+            </div>
+          </div>
+        </header>
+
+        <section className="grid gap-4 lg:grid-cols-3">
+          {diligenceSections.map(section => (
+            <Link
+              key={section.route}
+              href={section.route}
+              className="group rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-violet-300/25 hover:bg-violet-300/[0.05]"
+            >
+              <section.icon className="h-5 w-5 text-violet-200" />
+              <h2 className="mt-3 font-bold text-white">{section.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-400">{section.body}</p>
+              <div className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-violet-200">
+                Review <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              </div>
+            </Link>
+          ))}
+        </section>
+
+        <Card className="border-white/10 bg-white/[0.03]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-300" />
+              Investor data-room index
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {investorDataRoomLinks.map(item => (
+              <Link
+                key={item.route}
+                href={item.route}
+                className="rounded-xl border border-white/[0.08] bg-black/20 p-4 transition hover:border-amber-300/20"
+              >
+                <div className="font-bold text-white">{item.title}</div>
+                <div className="mt-1 text-sm leading-6 text-slate-500">{item.description}</div>
+              </Link>
+            ))}
           </CardContent>
         </Card>
+
+        <Card className="border-emerald-300/15 bg-emerald-300/[0.035]">
+          <CardContent className="p-5">
+            <div className="flex gap-3">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+              <div>
+                <h2 className="font-bold text-emerald-100">What belongs here next</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  Real historical financials, cap-table/entity documents, customer
+                  evidence, named telemetry sources, treasury reconciliation, token
+                  contract identity, security review artifacts, approved tokenomics,
+                  legal/compliance documents, and a versioned forecast with explicit
+                  assumptions.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Link
+          href="/investor-portal"
+          className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-black"
+        >
+          Back to investor portal <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
-    </div>
+    </main>
   );
 }
