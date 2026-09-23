@@ -26,6 +26,7 @@ import {
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import {
+  buildHopeProviderContent,
   buildHopeProviderHistory,
   createHopeWorkspaceMessage,
   createHopeWorkspaceThread,
@@ -41,7 +42,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-const STORAGE_KEY = "sky4444.hopeai.workspace.v1";
+const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
+
+const storageKeyForUser = (userId: string): string =>
+  STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
 type WorkspaceMode = "general" | "build" | "learn" | "plan";
 
@@ -88,9 +92,9 @@ const starterPrompts = [
   "Help me debug a TypeScript problem.",
 ];
 
-const readStoredThreads = (): HopeWorkspaceThread[] => {
+const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(storageKey);
     if (!raw) return [];
     return normalizeHopeWorkspaceThreads(JSON.parse(raw));
   } catch {
@@ -108,9 +112,10 @@ export default function HopeAIWorkspace() {
   const [mode, setMode] = useState<WorkspaceMode>("general");
   const [selectedModel, setSelectedModel] = useState("");
   const [attachments, setAttachments] = useState<HopeWorkspaceAttachment[]>([]);
-  const [storageReady, setStorageReady] = useState(false);
+  const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const storageKey = user?.id ? storageKeyForUser(user.id) : null;
 
   const models = trpc.ai.getModels.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -119,21 +124,28 @@ export default function HopeAIWorkspace() {
   const chat = trpc.ai.chat.useMutation();
 
   useEffect(() => {
-    const stored = readStoredThreads();
+    if (!storageKey) {
+      setLoadedStorageKey(null);
+      return;
+    }
+
+    const stored = readStoredThreads(storageKey);
     const next = stored.length ? stored : [createHopeWorkspaceThread()];
     setThreads(next);
     setActiveThreadId(next[0].id);
-    setStorageReady(true);
-  }, []);
+    setInput("");
+    setAttachments([]);
+    setLoadedStorageKey(storageKey);
+  }, [storageKey]);
 
   useEffect(() => {
-    if (!storageReady) return;
+    if (!storageKey || loadedStorageKey !== storageKey) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
+      localStorage.setItem(storageKey, JSON.stringify(threads));
     } catch {
       // Workspace remains usable in memory when local storage is unavailable.
     }
-  }, [storageReady, threads]);
+  }, [loadedStorageKey, storageKey, threads]);
 
   useEffect(() => {
     if (!selectedModel && models.data?.length) {
@@ -252,11 +264,7 @@ export default function HopeAIWorkspace() {
 
     try {
       const result = await chat.mutateAsync({
-        message: userMessage.attachmentContext
-          ? userMessage.content +
-            "\n\nAttached local text context:\n" +
-            userMessage.attachmentContext
-          : userMessage.content,
+        message: buildHopeProviderContent(userMessage),
         history: buildHopeProviderHistory(currentMessages),
         ...(selectedModel ? { model: selectedModel } : {}),
         systemPrompt: activeMode.systemPrompt,
@@ -330,6 +338,17 @@ export default function HopeAIWorkspace() {
           <Link href="/signin">
             <Button className="mt-6 w-full">Open invitation sign in</Button>
           </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (!storageKey || loadedStorageKey !== storageKey) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-background text-foreground">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          Loading your private HopeAI workspace…
         </div>
       </main>
     );
@@ -421,6 +440,32 @@ export default function HopeAIWorkspace() {
                   <Plus className="mr-2 h-4 w-4" />
                   New
                 </Button>
+
+                <div className="flex items-center gap-1 lg:hidden">
+                  <select
+                    aria-label="Saved conversation"
+                    value={activeThread?.id ?? ""}
+                    onChange={event => setActiveThreadId(event.target.value)}
+                    className="h-9 max-w-40 rounded-lg border border-border bg-card px-2 text-xs outline-none focus:ring-2 focus:ring-primary/40"
+                  >
+                    {threads.map(thread => (
+                      <option key={thread.id} value={thread.id}>
+                        {thread.title}
+                      </option>
+                    ))}
+                  </select>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="Delete current conversation"
+                    onClick={() =>
+                      activeThread && deleteConversation(activeThread.id)
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
 
                 <select
                   value={selectedModel}
@@ -678,8 +723,9 @@ export default function HopeAIWorkspace() {
                 </div>
               </div>
               <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                Verify important outputs. Files are read locally and sent only as
-                bounded text context with your message.
+                Verify important outputs. Files are read locally; the combined
+                prompt and attachment context is capped at 8,000 characters per
+                provider request.
               </p>
             </div>
           </div>
