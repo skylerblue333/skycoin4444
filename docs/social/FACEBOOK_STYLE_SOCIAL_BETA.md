@@ -22,7 +22,7 @@ No synthetic audience scale or engagement fixtures are introduced.
 ## Product changes
 
 - Sticky social header with Home, Friends, Groups, Video, and Events navigation.
-- Desktop left rail for profile, feed, friends/follows, communities, events, messages, and saved content.
+- Desktop left rail for profile, feed, friends/follows, communities, events, messages, and a device-local Saved feed filter.
 - Mobile shortcut rail for the same product areas.
 - Story-style recent-highlight cards derived only from existing feed records.
 - Facebook-like "What's on your mind?" compact composer that expands into the existing persisted post flow.
@@ -42,7 +42,7 @@ This is an engineering-beta UI and interaction upgrade. It does not claim:
 - Share/repost counters.
 - Real friend counts or group activity that the database does not provide.
 - Identity verification. The social home intentionally does not render the existing profile verification flag as verification evidence.
-- Persisted saves or reports in this iteration; those remain device-local.
+- Server-persisted saves or reports in this iteration; Saved filters the currently loaded feed using device-local post IDs, and reports remain device-local.
 - Live crypto transfer or tipping; tip practice remains educational only.
 
 ## Regression gate
