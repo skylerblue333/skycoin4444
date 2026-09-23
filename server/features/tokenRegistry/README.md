@@ -23,3 +23,8 @@ Treat the configured address as an integration identifier only. This module does
 `officialTrumpCapabilities.ts` expands the integration into a typed 120-capability matrix spanning asset identity, wallets, transaction/network execution, custody/security, trading/liquidity, payments/settlement, compliance/legal status, accounting/tax data, treasury/enterprise, consumer/social experiences, reliability/operations, and cross-chain integration.
 
 The matrix includes legal-tender status, custody, live transaction broadcasting, settlement, automated trading, and 115 additional capabilities, but it intentionally separates implemented contracts from engineering plans, provider-dependent integrations, and authority-only statuses. See [TRUMP Crypto Capability Matrix](../../../docs/TRUMP_CRYPTO_CAPABILITY_MATRIX.md).
+
+
+## External source and prohibited-use policy
+
+`officialTrumpEcosystemPolicy.ts` records reviewed external project sources and a fail-closed product-purpose policy. Neutral informational/product surfaces remain subject to the 120-capability matrix, while price manipulation, political persuasion, coordinated inauthentic amplification, and issuer impersonation are blocked. The policy does not enable any live transaction, custody, trading, settlement, or external-provider capability.

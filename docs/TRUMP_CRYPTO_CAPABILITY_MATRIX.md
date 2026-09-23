@@ -49,3 +49,12 @@ The current engineering beta therefore keeps live side effects disabled. The exi
 ## Activation rule
 
 A capability should move from planned/gated to live only when exact implementation, provider configuration, security review, legal/compliance requirements, monitoring, rollback, and production evidence exist for that capability. The capability matrix is designed so these states cannot be silently conflated.
+
+
+## External source provenance and product-use policy
+
+`officialTrumpEcosystemPolicy.ts` adds a reviewed external-source directory for the official project website, terms, Coin Club terms, reward information, market/ecosystem updates, and Coin Club. Every entry is marked external and carries a review date; these links do not create or imply a SKYCOIN4444 partnership or issuer authority.
+
+The same policy layer separates neutral product use from prohibited use. Asset discovery, portfolio tracking, wallet safety, market information, community discussion, creator content, commerce handoff, education, and developer integration are permitted only when the capability matrix's provider/authority gates are also satisfied. Price manipulation, political persuasion, coordinated inauthentic amplification, and issuer impersonation are explicitly blocked.
+
+This policy does not turn provider-required or authority-required capabilities into implemented services. Live external side effects remain disabled.
