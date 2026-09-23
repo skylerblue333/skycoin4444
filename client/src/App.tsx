@@ -478,8 +478,9 @@ const HealthDashboard = lazy(() => import('./pages/HealthDashboard'));
 const HealthGoals = lazy(() => import('./pages/HealthGoals'));
 const HelpCenter = lazy(() => import('./pages/HelpCenter'));
 // Home is already imported at the top
-const HopeAI = lazy(() => import('./pages/HopeAI'));
-const HopeAIAdvanced = lazy(() => import('./pages/HopeAIAdvanced'));
+const HopeAI = lazy(() => import('./pages/HopeAIWorkspace'));
+const HopeAICoach = lazy(() => import('./pages/HopeAI'));
+const HopeAIAdvanced = lazy(() => import('./pages/HopeAIWorkspace'));
 const HopeAIMeta = lazy(() => import('./pages/HopeAIMeta'));
 const HopeAIPage = lazy(() => import('./pages/HopeAIPage'));
 const HopeAIUpgrades = lazy(() => import('./pages/HopeAIUpgrades'));
@@ -1544,6 +1545,7 @@ function Router() {
         <Route path="/help-center" component={HelpCenter} />
         <Route path="/home" component={Home} />
         <Route path="/hope-a-i" component={HopeAI} />
+        <Route path="/hope-a-i-coach" component={HopeAICoach} />
         <Route path="/hope-a-i-advanced" component={HopeAIAdvanced} />
         <Route path="/hope-a-i-meta" component={HopeAIMeta} />
         <Route path="/hope-a-i-page" component={HopeAIPage} />
