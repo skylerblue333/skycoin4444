@@ -53,6 +53,7 @@ const profileInput = z.object({
 export const languageExchangeRouter = router({
   // Preserve legacy client contracts as explicit unavailable endpoints while
   // the real beta APIs below replace them incrementally.
+  get: unavailableQuery("get"),
   getBounties: unavailableQuery("getBounties"),
   completeBounty: unavailableMutation("completeBounty"),
   getProficiency: unavailableQuery("getProficiency"),
