@@ -305,9 +305,10 @@ export default function DatingMatches() {
                       <button
                         type="button"
                         key={match.id}
+                        disabled={sending}
                         onClick={() => setSelectedMatch(match)}
                         className={
-                          "w-full rounded-2xl border p-3 text-left transition " +
+                          "w-full rounded-2xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 " +
                           (selected
                             ? "border-pink-300/35 bg-pink-400/[0.09]"
                             : "border-white/8 bg-black/20 hover:border-white/15 hover:bg-white/[0.04]")
@@ -470,7 +471,7 @@ export default function DatingMatches() {
                       <span className="text-emerald-300">{sendStatus}</span>
                     ) : (
                       <span className="text-white/30">
-                        {newMessage.length}/{MAX_MESSAGE_LENGTH} · server-confirmed send
+                        {newMessage.length}/{MAX_MESSAGE_LENGTH} · server-confirmed send · conversation locked while sending
                       </span>
                     )}
                   </div>
@@ -478,6 +479,7 @@ export default function DatingMatches() {
                     <Input
                       value={newMessage}
                       maxLength={MAX_MESSAGE_LENGTH}
+                      disabled={sending}
                       onChange={event => {
                         setNewMessage(event.target.value);
                         setSendError(null);
