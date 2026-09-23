@@ -24,7 +24,8 @@ import { activityEvidenceRouter } from "./routers/activityEvidence";
 import { activationRouter } from "./routers/activation";
 import { privacyRouter } from "./routers/privacy";
 import { eventOperationsRouter } from "./routers/eventOperations";
-import { arcadeProgressRouter } from "./routers/arcadeProgress";\nimport { languageExchangeRouter } from "./routers/languageExchange";
+import { arcadeProgressRouter } from "./routers/arcadeProgress";
+import { languageExchangeRouter } from "./routers/languageExchange";
 
 const unavailable = (feature: string, operation: string): any => { throw new TRPCError({ code: "NOT_IMPLEMENTED", message: `${feature} ${operation} API is not implemented yet` }); };
 const compatibilityInput = z.union([z.void(), z.string(), z.number(), z.boolean(), z.array(z.unknown()), z.record(z.string(), z.unknown())]);
