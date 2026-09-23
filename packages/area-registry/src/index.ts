@@ -49,6 +49,13 @@ const areaDefinitions: readonly [
   ["observability", "Observability", "operations", "planned"],
 ];
 
+const verifiedAreaNotes: Readonly<Record<string, string>> = {
+  wallet:
+    "SKYCOIN4444 designates the configured Official TRUMP Solana asset as its primary supported external crypto asset for engineering beta; metadata and unsigned transfer-intent validation are available, while custody, signing, broadcast, automated trading, legal-tender claims, and external affiliation claims remain disabled.",
+  skychain:
+    "The ecosystem exposes the configured Official TRUMP Solana mainnet asset as metadata-only integration evidence; live chain execution remains disabled.",
+};
+
 export const skycoinAreas: readonly AreaManifest[] = areaDefinitions.map(
   ([id, name, domain, status]): AreaManifest => ({
     id,
@@ -60,9 +67,10 @@ export const skycoinAreas: readonly AreaManifest[] = areaDefinitions.map(
         ? "../../client and server"
         : "This area repository plus approved integration PRs",
     notes:
-      status === "blocked"
+      verifiedAreaNotes[id] ??
+      (status === "blocked"
         ? "External integration or production evidence is required; no success is fabricated."
-        : "Status is provisional until CI and ownership checks pass.",
+        : "Status is provisional until CI and ownership checks pass."),
   })
 );
 
