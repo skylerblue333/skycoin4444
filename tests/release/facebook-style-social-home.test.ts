@@ -23,8 +23,13 @@ describe("Facebook-style social home", () => {
     expect(source).toContain('label: "Events"');
     expect(source).toContain('label: "Messages"');
     expect(source).toContain('label: "Saved"');
+    expect(source).toContain('setFeedMode("saved")');
+    expect(source).not.toContain('href: "/bookmarks"');
     expect(source).toContain("What's on your mind?");
+    expect(source).toContain("Sign in to post");
     expect(source).toContain("Recent highlights");
+    expect(source).toContain("posts.slice(0, 5)");
+    expect(source).not.toContain('aria-label="Post options"');
     expect(source).toContain("Like");
     expect(source).toContain("Comment");
     expect(source).toContain("Share");
