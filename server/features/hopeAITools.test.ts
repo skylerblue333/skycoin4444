@@ -51,6 +51,23 @@ describe("HopeAI real tool registry", () => {
     expect(JSON.stringify(result.output)).toContain("governing_law");
   });
 
+  it("keeps secret-bearing helpers disabled from autonomous model use", () => {
+    expect(getHopeTool("password_strength").availability).toBe("disabled");
+    expect(getHopeTool("jwt_decode_unverified").availability).toBe("disabled");
+    const exposedNames = toLLMTools().map(tool => tool.function.name);
+    expect(exposedNames).not.toContain("password_strength");
+    expect(exposedNames).not.toContain("jwt_decode_unverified");
+  });
+
+  it("rejects obviously expensive regular expressions", async () => {
+    await expect(
+      executeHopeTool("regex_test", {
+        pattern: "(a+)+$",
+        text: "a".repeat(1000) + "!",
+      })
+    ).rejects.toThrow(/potentially expensive/i);
+  });
+
   it("fails closed when an external integration is not connected", async () => {
     expect(getHopeTool("web_search").availability).toBe("integration_required");
     await expect(executeHopeTool("web_search", {})).rejects.toThrow(
