@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, ChevronRight, ShieldCheck, Upload } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, ShieldCheck, Sparkles, Upload } from "lucide-react";
+import { Link } from "wouter";
+import {
+  DATING_SESSION_PROFILE_KEY,
+  scoreDatingProfile,
+} from "@/lib/datingExperience";
 
 type VerificationStatus = "unverified" | "email" | "phone" | "id";
 
@@ -27,7 +32,7 @@ type SavedProfile = Omit<ProfileFormData, "photos"> & {
   storage: "browser-session";
 };
 
-const STORAGE_KEY = "sky4444.dating-profile-beta";
+const STORAGE_KEY = DATING_SESSION_PROFILE_KEY;
 const interestOptions = [
   "Travel",
   "Sports",
@@ -150,16 +155,19 @@ export default function DatingProfileSetup() {
     setSavedAt(restoredSavedAt);
   }, []);
 
-  const completeness = useMemo(() => {
-    const checks = [
-      formData.displayName.trim().length >= 2,
-      formData.location.trim().length >= 2,
-      formData.bio.trim().length >= 10,
-      formData.interests.length > 0,
-      formData.photos.length > 0 || restoredPhotoCount > 0,
-    ];
-    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
-  }, [formData, restoredPhotoCount]);
+  const readiness = useMemo(
+    () =>
+      scoreDatingProfile({
+        displayName: formData.displayName,
+        bio: formData.bio,
+        location: formData.location,
+        interests: formData.interests,
+        photoCount: formData.photos.length || restoredPhotoCount,
+        lookingFor: formData.lookingFor,
+      }),
+    [formData, restoredPhotoCount]
+  );
+  const completeness = readiness.score;
 
   const update = (patch: Partial<ProfileFormData>) => {
     setFormData(current => ({ ...current, ...patch }));
@@ -211,11 +219,15 @@ export default function DatingProfileSetup() {
           <Badge variant="outline" className="mb-3">
             18+ only · engineering beta · browser-session save
           </Badge>
-          <h1 className="mb-2 text-3xl font-bold text-gray-900">
-            Create Your Profile
+          <div className="mb-3 flex items-center gap-2 text-pink-700">
+            <Sparkles className="h-5 w-5" />
+            <span className="text-sm font-semibold">Intentional dating profile</span>
+          </div>
+          <h1 className="mb-2 text-3xl font-black tracking-tight text-gray-900">
+            Build a profile worth replying to
           </h1>
           <p className="text-gray-600">
-            Step {step} of {totalSteps}
+            Step {step} of {totalSteps} · be specific enough to give a real person something to talk about.
           </p>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-gray-200">
             <div
@@ -225,20 +237,45 @@ export default function DatingProfileSetup() {
           </div>
         </div>
 
-        <Card className="mb-6 border-pink-200 bg-white p-4">
-          <div className="flex items-center justify-between gap-4">
+        <Card className="mb-6 border-pink-200 bg-white p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm text-gray-600">Profile completeness</p>
-              <p className="text-2xl font-bold text-pink-600">
+              <p className="text-sm font-semibold text-gray-700">Profile readiness</p>
+              <p className="text-3xl font-black text-pink-600">
                 {completeness}%
               </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Quality score is based only on this draft, not popularity or match likelihood.
+              </p>
             </div>
-            <p className="max-w-xs text-right text-xs text-gray-500">
+            <p className="max-w-sm text-xs leading-5 text-gray-500">
               Profile data is saved only in this browser session. No server
               persistence, matching, messaging, identity verification, or safety
               screening is claimed.
             </p>
           </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-pink-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all"
+              style={{ width: `${completeness}%` }}
+            />
+          </div>
+          {readiness.missing.length > 0 ? (
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {readiness.missing.slice(0, 4).map(item => (
+                <div
+                  key={item}
+                  className="rounded-xl border border-pink-100 bg-pink-50/60 px-3 py-2 text-xs font-medium text-pink-900"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
+              Strong draft foundation. You can keep editing or continue to discovery.
+            </div>
+          )}
         </Card>
 
         {step === 1 && (
@@ -487,10 +524,21 @@ export default function DatingProfileSetup() {
               </div>
             )}
             {savedAt && (
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-                <Check className="mr-2 inline h-4 w-4" />
-                Profile draft saved for this browser session at{" "}
-                {new Date(savedAt).toLocaleTimeString()}.
+              <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">
+                <div className="flex items-start gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div>
+                    <p className="font-semibold">Draft saved for this browser session.</p>
+                    <p className="mt-1 text-green-800/80">
+                      Saved at {new Date(savedAt).toLocaleTimeString()}. Your interests can now be used to explain transparent overlap in discovery.
+                    </p>
+                  </div>
+                </div>
+                <Link href="/dating-discovery">
+                  <Button type="button" className="mt-4 w-full bg-pink-600 hover:bg-pink-700">
+                    Continue to discovery <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             )}
           </Card>
