@@ -174,16 +174,16 @@ export default function HopeAIWorkspace() {
   };
 
   const deleteConversation = (threadId: string) => {
-    setThreads(current => {
-      const remaining = current.filter(thread => thread.id !== threadId);
-      if (remaining.length) {
-        if (activeThreadId === threadId) setActiveThreadId(remaining[0].id);
-        return remaining;
-      }
-      const replacement = createHopeWorkspaceThread();
-      setActiveThreadId(replacement.id);
-      return [replacement];
-    });
+    const remaining = threads.filter(thread => thread.id !== threadId);
+    if (remaining.length) {
+      setThreads(remaining);
+      if (activeThreadId === threadId) setActiveThreadId(remaining[0].id);
+      return;
+    }
+
+    const replacement = createHopeWorkspaceThread();
+    setThreads([replacement]);
+    setActiveThreadId(replacement.id);
   };
 
   const handleFiles = async (files: FileList | null) => {
