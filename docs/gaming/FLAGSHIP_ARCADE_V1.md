@@ -44,15 +44,30 @@ These are engineering-beta entertainment and skill simulations. Demo credits, mu
 
 The current implementation does not:
 
-- accept deposits or purchases for game credits;
+- accept deposits or withdrawals;
 - connect a wallet for wagering;
 - settle bets on a blockchain;
 - custody user assets;
 - redeem scores or credits for money or tokens;
 - claim cryptographic/provably-fair randomness;
-- provide real-money gambling.
+- provide live real-money gambling.
 
 The deterministic seed/proof strings exist for repeatable testing and transparent demo behavior only.
+
+## Charity-only finance policy
+
+If real-value gaming finance is introduced, SKYCOIN4444 restricts it to the charity path. The policy covers:
+
+- deposits;
+- withdrawals;
+- real-money wagering;
+- custody;
+- token settlement;
+- redeemable crypto rewards.
+
+A finance action is blocked unless it is associated with a verified charity beneficiary, an approved external provider, legal review, and an allowed region. Real-money wagering has additional age-gate and regulated-gaming-provider requirements.
+
+The current server contract is authorization/planning only. It does not execute a payment or wager, hold custody, or broadcast a blockchain transaction. Approved financial execution must happen through separately configured external providers.
 
 ## Release requirements
 

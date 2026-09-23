@@ -127,7 +127,7 @@ export default function Gaming() {
                 {[
                   ["05", "flagship games"],
                   ["02", "crypto skill modes"],
-                  ["00", "real-money rails"],
+                  ["CHARITY", "only finance scope"],
                 ].map(([value, label]) => (
                   <div key={label} className="rounded-2xl border border-white/10 bg-black/20 p-4">
                     <p className="text-2xl font-black">{value}</p>
@@ -261,7 +261,7 @@ export default function Gaming() {
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-5 text-white/35">
-          <strong className="text-white/60">Engineering beta:</strong> No deposits, withdrawals, wallet wagering, custody, or blockchain settlement. Credits, chips, multipliers, and payouts are browser-local demo game state with no cash or token value.
+          <strong className="text-white/60">Engineering beta:</strong> No deposits, withdrawals, wallet wagering, custody, or blockchain settlement are live today. Any future deposit, withdrawal, real-money wager, custody, token settlement, or redeemable crypto reward is restricted to the charity-only finance path and requires verified beneficiaries plus approved external providers. Credits, chips, multipliers, and payouts on the flagship floor remain browser-local demo game state with no cash or token value.
         </section>
       </div>
     </main>

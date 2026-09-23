@@ -1,11 +1,15 @@
 import { Link } from "wouter";
 import {
   ArrowRight,
+  BadgeDollarSign,
   BookOpen,
   Gamepad2,
+  HandCoins,
   HeartHandshake,
+  Landmark,
   ShieldCheck,
   Sparkles,
+  WalletCards,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +45,33 @@ const missionThemes = [
   },
 ] as const;
 
+const charityFinanceScope = [
+  {
+    title: "Deposits + withdrawals",
+    icon: Landmark,
+    detail:
+      "Reserved for verified charity beneficiaries through an approved payment provider. SKYCOIN4444 does not hold or move funds itself in the current beta.",
+  },
+  {
+    title: "Real-money wagering",
+    icon: BadgeDollarSign,
+    detail:
+      "Charity-only scope. It additionally requires age and region gates plus an approved regulated gaming provider before it can be enabled.",
+  },
+  {
+    title: "Custody + token settlement",
+    icon: WalletCards,
+    detail:
+      "Any custody or blockchain settlement must be delegated to an approved external provider with verified beneficiary records and legal review.",
+  },
+  {
+    title: "Redeemable crypto rewards",
+    icon: HandCoins,
+    detail:
+      "If introduced, redeemable crypto value must resolve to the verified charity beneficiary path rather than a personal player payout.",
+  },
+] as const;
+
 export default function GamingForCharity() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
@@ -62,16 +93,22 @@ export default function GamingForCharity() {
               >
                 No live donations
               </Badge>
+              <Badge
+                variant="outline"
+                className="border-violet-300/25 text-violet-100"
+              >
+                Charity-only finance policy
+              </Badge>
             </div>
             <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              Play with a purpose theme—without pretending money moved.
+              Real-value gaming rails belong to charity only.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-white/50">
-              This legacy route used to display invented donation totals,
-              player counts, charity rankings, and SKY444 transfers. Those
-              claims are removed. The current beta keeps only themed game
-              missions until a real charitable-giving integration is built and
-              verified.
+              The flagship games stay demo-only. If deposits, withdrawals,
+              real-money wagering, custody, token settlement, or redeemable
+              crypto rewards are introduced, this route is the only permitted
+              product scope for them—and only after verified charity,
+              provider, legal, age, and region gates are satisfied.
             </p>
           </div>
           <Link href="/gaming">
@@ -117,24 +154,57 @@ export default function GamingForCharity() {
           })}
         </section>
 
+        <section>
+          <div className="mb-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-200/60">
+              Charity-only financial scope
+            </p>
+            <h2 className="mt-2 text-3xl font-black">
+              Future real-value rails are gated, not implied.
+            </h2>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {charityFinanceScope.map(item => {
+              const Icon = item.icon;
+              return (
+                <Card
+                  key={item.title}
+                  className="border-violet-300/15 bg-violet-300/[0.035] text-white"
+                >
+                  <CardHeader>
+                    <Icon className="h-6 w-6 text-violet-200" />
+                    <CardTitle className="mt-2 text-white">
+                      {item.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-sm leading-6 text-white/45">
+                    {item.detail}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="grid gap-5 lg:grid-cols-2">
           <Card className="border-violet-300/20 bg-violet-300/[0.04] text-white">
             <CardHeader>
               <HeartHandshake className="h-6 w-6 text-violet-200" />
               <CardTitle className="mt-2 text-white">
-                What would make charity integration real?
+                What makes a charity transaction eligible?
               </CardTitle>
               <CardDescription className="text-white/45">
-                A future giving feature needs verifiable money movement—not UI
-                counters.
+                A financial action must pass every applicable gate before the
+                system can create an external-provider handoff plan.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm leading-6 text-white/45">
-              <p>• Approved payment/donation provider and beneficiary records</p>
-              <p>• Server-side donation intent and settlement lifecycle</p>
-              <p>• Idempotency, receipts, refunds/failure handling, and audit</p>
-              <p>• Legal/compliance review appropriate to the jurisdictions</p>
-              <p>• Tests proving game scores cannot fabricate a transfer</p>
+              <p>• Verified charity beneficiary identifier</p>
+              <p>• Approved payment/custody/settlement provider</p>
+              <p>• Legal review and region eligibility</p>
+              <p>• Age gate + regulated gaming provider for real-money wagering</p>
+              <p>• Idempotency, receipts, failure/refund handling, and audit evidence</p>
+              <p>• Tests proving game scores alone cannot fabricate money movement</p>
             </CardContent>
           </Card>
 
@@ -145,14 +215,14 @@ export default function GamingForCharity() {
                 Current beta boundary
               </CardTitle>
               <CardDescription className="text-white/45">
-                Game sessions can be engaging without attaching financial value
-                to every interaction.
+                The policy is implemented; live financial execution is not.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-white/45">
-              <p>Sparks, XP, scores, ranks, and combos are game-only values.</p>
-              <p>No wallet, token payout, donation, settlement, or blockchain write occurs.</p>
-              <p>No charity is described as verified or funded by this route.</p>
+              <p>Sparks, XP, scores, ranks, demo credits, and combos remain game-only values.</p>
+              <p>No wallet, token payout, donation, settlement, or blockchain write occurs today.</p>
+              <p>SKYCOIN4444 does not currently hold charity funds or execute wagers.</p>
+              <p>Approved integrations must execute externally; the platform policy layer only authorizes or blocks the handoff.</p>
               <Link
                 href="/beta-feedback"
                 className="inline-flex items-center font-semibold text-sky-200"
