@@ -4,6 +4,8 @@ SKYCOIN4444 is a large TypeScript/React engineering project that combines a flag
 
 Within SKYCOIN4444, the configured Official TRUMP Solana asset is designated as the platform's **primary supported external crypto asset for the engineering beta**. This is a SKYCOIN4444 product designation only; it does not claim endorsement, partnership, issuer authorization, legal-tender status, or affiliation with Donald Trump, the Trump Organization, CIC Digital, Fight Fight Fight LLC, or any token issuer. The current integration is metadata plus unsigned transfer-intent validation only—no custody, signing, broadcast, settlement, or automated trading. See [SkyTokenRegistry](server/features/tokenRegistry/README.md).
 
+A dedicated [TRUMP ecosystem productization program](docs/TRUMP_ECOSYSTEM_READINESS.md) now defines 100 concrete capability candidates and gates across asset discovery, portfolio, wallet, market data, community, creator, commerce/rewards, education, developer integrations, and safety. The control plane distinguishes local candidates from provider-required, research-only, and beta-blocked behavior instead of treating a long feature list as proof that live integrations exist.
+
 ## Current engineering-beta status
 
 The default branch has a reproducible pnpm workspace and a real CI pipeline. Current required CI covers:
@@ -116,6 +118,7 @@ The canonical application server entry point is `server/_core/index.ts`. The can
 - [`docs/IDEMPOTENT_MUTATIONS.md`](docs/IDEMPOTENT_MUTATIONS.md) — actor-scoped idempotency keys, durable replay, and conflict boundaries.
 - [`docs/BROWSER_SECURITY.md`](docs/BROWSER_SECURITY.md) — production CSP/HSTS, browser isolation headers, and analytics privacy boundary.
 - [`docs/PRODUCT_CATALOG.md`](docs/PRODUCT_CATALOG.md) — product/domain inventory and integration-status model.
+- [`docs/TRUMP_ECOSYSTEM_READINESS.md`](docs/TRUMP_ECOSYSTEM_READINESS.md) — 100-capability external-token ecosystem productization registry, provider gates, source provenance, and safety boundaries.
 - [`docs/LOCAL_DEVELOPMENT.md`](docs/LOCAL_DEVELOPMENT.md) — reproducible local setup and verification.
 - [`docs/BETA_DEPLOYMENT.md`](docs/BETA_DEPLOYMENT.md) — invitation-only deployment, production configuration, managed-database bootstrap, and verification gates.
 - [`docs/INTEGRATION_CONTRACTS.md`](docs/INTEGRATION_CONTRACTS.md) — cross-product contracts and fail-closed behavior.
