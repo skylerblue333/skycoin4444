@@ -2,60 +2,64 @@
 
 > Status: **Wave-3 backlog only — not implemented by this document.**
 >
-> Release boundary: Dating features must prioritize consent, age gating, blocking/reporting, privacy, abuse response, and cautious location handling; identity verification is not claimed without a verified provider.
+> Release boundary: Dating remains adult-only and must prioritize consent, blocking/reporting, abuse response, cautious location handling, and truthful provider labels. No age, identity, or safety verification is claimed without independent evidence.
 
-The first 50 items are product/domain capabilities. Items 51–100 are engineering, accessibility, privacy, operational, and release-quality additions required to make the area dependable.
+## Existing baseline not counted
 
-1. Dating-mode opt-in separate from public social profile.
-2. Dating profile builder.
-3. Profile prompts.
-4. Interest tags.
-5. Relationship-intent settings.
-6. Preferred age-range settings.
-7. Gender/preference settings with privacy controls.
-8. Language preference filters.
-9. Distance filter with coarse-location privacy.
-10. Location visibility controls.
-11. Profile photo ordering.
-12. Profile verification-status placeholder with truthful provider labeling.
-13. Profile completeness indicator.
-14. Discovery card feed.
-15. List/grid discovery mode.
-16. Like action.
-17. Pass action.
-18. Mutual-match creation.
-19. Match expiration option.
-20. Undo-last-pass option.
-21. Super-like equivalent with daily limits.
-22. Daily discovery limits.
-23. Compatibility questionnaire.
-24. Values and lifestyle questionnaire.
-25. Deal-breaker settings.
-26. Shared-interest highlights.
-27. Shared-language highlights.
-28. Conversation starter suggestions.
-29. First-message prompt.
-30. Match notes visible only to the user.
-31. Favorite matches.
-32. Archive conversation/match.
-33. Unmatch workflow.
-34. Block workflow.
-35. Report workflow.
-36. Safety center.
-37. Date safety checklist.
-38. Trusted-contact date-plan sharing contract.
-39. Check-in reminder planning.
-40. Scam-warning education.
-41. Financial-solicitation warning detection hooks.
-42. Explicit-content reporting.
-43. Harassment pattern reporting.
-44. Consent reminders.
-45. Profile visibility pause.
-46. Incognito discovery mode.
-47. Travel-mode planning.
-48. Date-idea collections.
-49. Mutual date-interest voting.
-50. Post-date private reflection/journal.
+`docs/DATING_BETA.md` already covers browser-session profile setup, candidate discovery, transparent shared-interest/location overlap, likes/super-likes/passes, API-backed matches, and API-backed match messaging. Those baseline capabilities are dependencies and are **not** included in this 100-item count.
+
+The 100 numbered entries below are **incremental additions only**. The first 50 are product/domain capabilities. Items 51–100 are engineering, accessibility, privacy, operational, and release-quality additions required to make the area dependable.
+
+1. Relationship-intent presets with per-field visibility controls.
+2. Expanded profile prompt library beyond the current basic profile draft.
+3. Audio profile-prompt attachment contract.
+4. Short video-introduction attachment contract without owning video-call transport.
+5. Interest taxonomy with normalized categories and aliases.
+6. Lifestyle preference fields with granular privacy settings.
+7. Values questionnaire with user-controlled visibility.
+8. Deal-breaker preference settings.
+9. Coarse-distance preference bands without precise location exposure.
+10. Location precision tiers and explicit location-sharing consent.
+11. Travel-mode discovery preferences without background tracking.
+12. Incognito discovery mode with explicit discoverability rules.
+13. Profile visibility pause and resume controls.
+14. Profile completeness guidance that does not fabricate verification.
+15. Photo ordering and private draft preview.
+16. Photo content-safety review adapter contract.
+17. Age-gate provider adapter contract with truthful unverified fallback.
+18. Identity-verification provider adapter contract with explicit status provenance.
+19. Compatibility questionnaire separate from the existing service score.
+20. Transparent compatibility explanation using only user-supplied fields.
+21. Shared-interest highlight cards.
+22. Shared-language highlight cards.
+23. Shared-goal highlight cards.
+24. Deterministic conversation-starter suggestions from mutual interests.
+25. First-message preference prompt.
+26. Communication-style preference settings.
+27. Reply-expectation and availability preferences.
+28. Private match notes stored only for the author.
+29. Favorite-match organization.
+30. Match folders or labels.
+31. Optional match-expiration rules.
+32. Cooldown before rematching after an unmatch.
+33. Unmatch reason capture visible only to moderation/analytics when consented.
+34. Block propagation across dating discovery and dating messaging surfaces.
+35. Dating-specific report evidence attachments.
+36. Dating safety-center dashboard.
+37. First-date safety checklist.
+38. Trusted-contact date-plan sharing integration contract.
+39. Scheduled safety check-in reminder contract.
+40. Emergency-help shortcut configuration.
+41. Scam-pattern education cards.
+42. Financial-solicitation warning hooks in dating conversations.
+43. Credential/password request warning hooks.
+44. Harassment-pattern escalation workflow.
+45. Explicit-image reporting and consent-safety workflow.
+46. Consent reminder cards before off-platform contact sharing.
+47. Mutual date-idea shortlist voting.
+48. Private post-date reflection journal.
+49. Post-date safety feedback intake.
+50. Dating abuse-response metrics dashboard with privacy-preserving aggregation.
 51. Dating & Discovery: mobile-first responsive layout.
 52. Dating & Discovery: tablet-optimized layout.
 53. Dating & Discovery: large-desktop workspace layout.

@@ -10,7 +10,7 @@ The current Wave-2 ledger is closed at 108/108 canonical products. This backlog 
 2. Markets & Portfolio
 3. Marketplace & Commerce
 4. Education / SkySchool
-5. Creator / Live / Media
+5. Creator / Media Publishing / Live Integration
 6. Dating & Discovery
 7. Language Exchange & Global
 8. Enterprise / Teams / CRM / Workflow
@@ -20,9 +20,14 @@ The current Wave-2 ledger is closed at 108/108 canonical products. This backlog 
 12. Web3 / NFT / Governance / Chain Tools
 13. SkyHope / Charity / Impact
 
-## Intentionally excluded from this backlog
+## Baseline and ownership rule
 
-Gaming, Social, HopeAI, and Chat/Messaging/Video are already under active redesign and are not duplicated here.
+The 1,300 count is a count of **incremental backlog entries**, not a count of already implemented capabilities.
+
+- Gaming, Social, and HopeAI are under active redesign and are not duplicated here.
+- Core Chat/Messaging/Video/Live transport, calling, playback, live-room mechanics, streaming/transcoding, and real-time chat are also excluded. Area 5 contains only creator-side authoring, publishing, packaging, moderation-policy, analytics, and bounded integration work that sits on top of those engines.
+- The existing Dating beta baseline—profile setup, discovery, likes/super-likes/passes, mutual matches, and match messaging—is not counted. Area 6 starts with incremental capabilities beyond that documented baseline.
+- If another backlog item is later found to already be fully satisfied by verified canonical implementation, it must be marked baseline/complete and replaced by a genuinely incremental item before the advertised backlog count is preserved.
 
 ## Rules
 
