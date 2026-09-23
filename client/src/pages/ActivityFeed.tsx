@@ -17,7 +17,6 @@ import {
   Home,
   Image,
   MessageSquare,
-  MoreHorizontal,
   Plus,
   Radio,
   RefreshCw,
@@ -57,8 +56,9 @@ const leftRailLinks = [
   { label: "Communities", href: "/community", icon: Users },
   { label: "Events", href: "/social-events", icon: Calendar },
   { label: "Messages", href: "/unified-messaging", icon: MessageSquare },
-  { label: "Saved", href: "/bookmarks", icon: Bookmark },
 ] as const;
+
+const savedShortcut = { label: "Saved", icon: Bookmark } as const;
 
 const topTabs = [
   { label: "Home", href: "/activity-feed", icon: Home },
@@ -96,12 +96,18 @@ export default function ActivityFeed() {
   const [query, setQuery] = useState("");
   const [activePostId, setActivePostId] = useState<string>();
   const [commentDraft, setCommentDraft] = useState("");
-  const [feedMode, setFeedMode] = useState<"all" | "video" | "text">("all");
+  const [feedMode, setFeedMode] =
+    useState<"all" | "video" | "text" | "saved">("all");
   const [composerOpen, setComposerOpen] = useState(false);
   const [shareStatus, setShareStatus] = useState("");
   const [savedPostIds, setSavedPostIds] = useState<string[]>(() => {
     try {
-      return JSON.parse(localStorage.getItem("sky4444.social.saved-posts") ?? "[]");
+      const parsed = JSON.parse(
+        localStorage.getItem("sky4444.social.saved-posts") ?? "[]"
+      );
+      return Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [];
     } catch {
       return [];
     }
@@ -181,7 +187,12 @@ export default function ActivityFeed() {
         post.media && /\.(mp4|webm|ogg)(\?|$)/i.test(post.media)
       );
       const matchesMode =
-        feedMode === "all" || (feedMode === "video" ? isVideo : !isVideo);
+        feedMode === "all" ||
+        (feedMode === "video"
+          ? isVideo
+          : feedMode === "text"
+            ? !isVideo
+            : savedPostIds.includes(post.id));
       const matchesQuery =
         !normalized ||
         (String(post.content ?? "") +
@@ -193,12 +204,9 @@ export default function ActivityFeed() {
           .includes(normalized);
       return matchesMode && matchesQuery;
     });
-  }, [feed.data, feedMode, query]);
+  }, [feed.data, feedMode, query, savedPostIds]);
 
-  const recentHighlights = useMemo(
-    () => (feed.data ?? []).slice(0, 5),
-    [feed.data]
-  );
+  const recentHighlights = useMemo(() => posts.slice(0, 5), [posts]);
 
   const interactionError =
     createPost.error ||
@@ -408,6 +416,27 @@ export default function ActivityFeed() {
                   </Link>
                 );
               })}
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery("");
+                  setFeedMode("saved");
+                }}
+                className={
+                  "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition " +
+                  (feedMode === "saved"
+                    ? "bg-sky-400/10 text-sky-100"
+                    : "text-white/70 hover:bg-white/[0.05] hover:text-white")
+                }
+              >
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.06]">
+                  <Bookmark className="h-4 w-4 text-sky-200" />
+                </span>
+                <span className="flex-1">{savedShortcut.label}</span>
+                <span className="text-xs text-white/35">
+                  {savedPostIds.length}
+                </span>
+              </button>
             </nav>
 
             <div className="border-t border-white/10 pt-4 text-xs leading-5 text-white/30">
@@ -432,6 +461,18 @@ export default function ActivityFeed() {
                 </Link>
               );
             })}
+            <button
+              type="button"
+              onClick={() => {
+                setQuery("");
+                setFeedMode("saved");
+              }}
+              className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/65"
+            >
+              <Bookmark className="h-4 w-4" />
+              {savedShortcut.label}
+              <span className="text-white/30">{savedPostIds.length}</span>
+            </button>
           </div>
 
           <Card className="overflow-hidden border-white/10 bg-white/[0.035] text-white">
@@ -456,19 +497,34 @@ export default function ActivityFeed() {
             </CardHeader>
             <CardContent>
               <div className="flex gap-3 overflow-x-auto pb-1">
-                <button
-                  type="button"
-                  onClick={() => setComposerOpen(true)}
-                  className="group relative flex h-44 w-28 shrink-0 flex-col justify-end overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-sky-500/20 to-violet-500/20 p-3 text-left"
-                >
-                  <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-sky-400 text-slate-950">
-                    <Plus className="h-5 w-5" />
-                  </div>
-                  <p className="text-sm font-bold">Create update</p>
-                  <p className="mt-1 text-[11px] text-white/45">
-                    Post to the real feed
-                  </p>
-                </button>
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={() => setComposerOpen(true)}
+                    className="group relative flex h-44 w-28 shrink-0 flex-col justify-end overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-sky-500/20 to-violet-500/20 p-3 text-left"
+                  >
+                    <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-sky-400 text-slate-950">
+                      <Plus className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-bold">Create update</p>
+                    <p className="mt-1 text-[11px] text-white/45">
+                      Post to the real feed
+                    </p>
+                  </button>
+                ) : (
+                  <Link
+                    href="/signin"
+                    className="group relative flex h-44 w-28 shrink-0 flex-col justify-end overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-sky-500/20 to-violet-500/20 p-3 text-left"
+                  >
+                    <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-sky-400 text-slate-950">
+                      <Plus className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-bold">Create update</p>
+                    <p className="mt-1 text-[11px] text-white/45">
+                      Sign in to post
+                    </p>
+                  </Link>
+                )}
 
                 {recentHighlights.map(post => (
                   <button
@@ -696,7 +752,7 @@ export default function ActivityFeed() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {(["all", "video", "text"] as const).map(mode => (
+                  {(["all", "video", "text", "saved"] as const).map(mode => (
                     <Button
                       key={mode}
                       type="button"
@@ -713,7 +769,9 @@ export default function ActivityFeed() {
                         ? "Top"
                         : mode === "video"
                           ? "Video"
-                          : "Posts"}
+                          : mode === "text"
+                            ? "Posts"
+                            : "Saved"}
                     </Button>
                   ))}
                   <Button
@@ -773,12 +831,18 @@ export default function ActivityFeed() {
                 <div className="py-12 text-center">
                   <MessageSquare className="mx-auto h-8 w-8 text-white/20" />
                   <p className="mt-3 font-medium text-white">
-                    {query.trim() ? "No matching posts." : "No posts yet."}
+                    {feedMode === "saved"
+                      ? "No saved posts on this device."
+                      : query.trim()
+                        ? "No matching posts."
+                        : "No posts yet."}
                   </p>
                   <p className="mt-1 text-sm text-white/35">
-                    {query.trim()
-                      ? "Clear the search or try a different phrase."
-                      : "The feed will show real community activity when it is published."}
+                    {feedMode === "saved"
+                      ? "Use Save on a post to keep a device-local shortcut here."
+                      : query.trim()
+                        ? "Clear the search or try a different phrase."
+                        : "The feed will show real community activity when it is published."}
                   </p>
                 </div>
               ) : null}
@@ -850,15 +914,6 @@ export default function ActivityFeed() {
                               : "Follow"}
                           </Button>
                         ) : null}
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          aria-label="Post options"
-                          onClick={() => toggleSaved(post.id)}
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
                       </div>
                     </div>
 
