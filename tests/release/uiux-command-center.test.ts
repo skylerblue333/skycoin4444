@@ -17,7 +17,7 @@ describe("unified command-center UI/UX", () => {
     expect(source).toContain('href: "/hope-a-i"');
     expect(source).toContain('href: "/beta-commerce"');
     expect(source).toContain('href: "/beta-web3"');
-    expect(source).toContain('href: "/dating-profile-setup"');
+    expect(source).toContain('href: "/dating-home"');
     expect(source).toContain('href: "/language-partner-discovery"');
   });
 
