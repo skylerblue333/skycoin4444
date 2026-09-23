@@ -1,12 +1,39 @@
+import { TRPCError } from "@trpc/server";
 import { and, eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { languageExchangeProfiles, users } from "../../drizzle/schema";
 import { db } from "../db";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { languageMatchScore } from "../services/languageExchangeMatching";
 
 const cefrLevel = z.enum(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const correctionPreference = z.enum(["ask-first", "gentle", "direct"]);
+
+const compatibilityInput = z.union([
+  z.void(),
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.unknown()),
+  z.record(z.string(), z.unknown()),
+]);
+
+function unavailableCompatibility(operation: string): any {
+  throw new TRPCError({
+    code: "NOT_IMPLEMENTED",
+    message: `Language Exchange ${operation} API is not implemented yet`,
+  });
+}
+
+const unavailableQuery = (operation: string) =>
+  publicProcedure
+    .input(compatibilityInput)
+    .query(() => unavailableCompatibility(operation));
+
+const unavailableMutation = (operation: string) =>
+  protectedProcedure
+    .input(compatibilityInput)
+    .mutation(() => unavailableCompatibility(operation));
 
 const profileInput = z.object({
   nativeLanguage: z.string().trim().min(2).max(64),
@@ -24,6 +51,14 @@ const profileInput = z.object({
 );
 
 export const languageExchangeRouter = router({
+  // Preserve legacy client contracts as explicit unavailable endpoints while
+  // the real beta APIs below replace them incrementally.
+  getBounties: unavailableQuery("getBounties"),
+  completeBounty: unavailableMutation("completeBounty"),
+  getProficiency: unavailableQuery("getProficiency"),
+  logSession: unavailableMutation("logSession"),
+  getStats: unavailableQuery("getStats"),
+
   profile: protectedProcedure.query(async ({ ctx }) => {
     return (
       (await db
