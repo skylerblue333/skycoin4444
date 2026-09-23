@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Heart, Loader2, RefreshCcw, ShieldCheck, Star, X } from 'lucide-react';
+import { AlertTriangle, Heart, Loader2, MessageCircle, RefreshCcw, ShieldCheck, Sparkles, Star, UserRoundPen, X } from 'lucide-react';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -8,6 +9,12 @@ import {
   submitDatingAction,
   type DatingAction,
 } from '@/lib/datingDiscovery';
+import {
+  DATING_SESSION_PROFILE_KEY,
+  buildConnectionSignals,
+  buildConversationStarters,
+  parseDatingDraftSignals,
+} from '@/lib/datingExperience';
 
 interface Profile {
   id: string;
@@ -54,6 +61,14 @@ export default function DatingDiscovery() {
   const [locationFilter, setLocationFilter] = useState('');
   const [interestFilter, setInterestFilter] = useState('');
   const [dragStart, setDragStart] = useState<number | null>(null);
+  const savedDraft = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return parseDatingDraftSignals(sessionStorage.getItem(DATING_SESSION_PROFILE_KEY));
+    } catch {
+      return null;
+    }
+  }, []);
 
   const filteredProfiles = useMemo(
     () =>
@@ -77,6 +92,17 @@ export default function DatingDiscovery() {
   );
 
   const currentProfile = filteredProfiles[0];
+  const connectionSignals = useMemo(
+    () =>
+      currentProfile
+        ? buildConnectionSignals(savedDraft, currentProfile)
+        : [],
+    [savedDraft, currentProfile],
+  );
+  const conversationStarters = useMemo(
+    () => (currentProfile ? buildConversationStarters(currentProfile) : []),
+    [currentProfile],
+  );
 
   const loadProfiles = async () => {
     setLoading(true);
@@ -219,8 +245,20 @@ export default function DatingDiscovery() {
     <div className="min-h-screen bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 p-4">
       <div className="mx-auto max-w-md">
         <div className="mb-5 text-center text-white">
-          <h1 className="text-3xl font-bold">Discover</h1>
-          <p className="text-pink-100">Find meaningful connections at your pace</p>
+          <div className="mx-auto mb-3 flex flex-wrap justify-center gap-2">
+            <Link href="/dating-profile-setup">
+              <Button variant="outline" size="sm" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+                <UserRoundPen className="mr-2 h-4 w-4" /> Edit profile
+              </Button>
+            </Link>
+            <Link href="/dating-matches">
+              <Button variant="outline" size="sm" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
+                <MessageCircle className="mr-2 h-4 w-4" /> Matches
+              </Button>
+            </Link>
+          </div>
+          <h1 className="text-3xl font-black tracking-tight">Discover with context</h1>
+          <p className="text-pink-100">Use filters, shared interests, and conversation prompts instead of blind swiping.</p>
           <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-medium backdrop-blur">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" /> 18+ discovery only
           </div>
@@ -228,7 +266,7 @@ export default function DatingDiscovery() {
 
         <div className="mb-5 rounded-2xl bg-white/15 p-4 text-white backdrop-blur">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <strong>Match filters</strong>
+            <strong>Discovery filters</strong>
             <span className="text-xs text-pink-100">{filteredProfiles.length} candidates</span>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -291,8 +329,9 @@ export default function DatingDiscovery() {
               className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-            <div className="absolute right-4 top-4 rounded-full bg-pink-500 px-4 py-2 font-bold text-white">
-              {Math.round(Math.max(0, Math.min(100, currentProfile.compatibility)))}% Match
+            <div className="absolute right-4 top-4 rounded-full bg-pink-500 px-4 py-2 text-right text-white">
+              <div className="font-bold">{Math.round(Math.max(0, Math.min(100, currentProfile.compatibility)))}%</div>
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-pink-100">service score</div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <h2 className="mb-2 text-3xl font-bold">
@@ -303,13 +342,49 @@ export default function DatingDiscovery() {
             </div>
           </div>
 
-          <div className="bg-white p-4">
-            <div className="flex flex-wrap gap-2">
-              {currentProfile.interests.length ? currentProfile.interests.map((interest) => (
-                <span key={interest} className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700">
-                  {interest}
-                </span>
-              )) : <span className="text-sm text-muted-foreground">No interests listed yet.</span>}
+          <div className="space-y-4 bg-white p-4">
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Interests</p>
+              <div className="flex flex-wrap gap-2">
+                {currentProfile.interests.length ? currentProfile.interests.map((interest) => (
+                  <span key={interest} className="rounded-full bg-pink-100 px-3 py-1 text-sm text-pink-700">
+                    {interest}
+                  </span>
+                )) : <span className="text-sm text-muted-foreground">No interests listed yet.</span>}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-violet-100 bg-violet-50 p-4">
+              <div className="flex items-center gap-2 text-violet-800">
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+                <h3 className="text-sm font-bold">Transparent connection signals</h3>
+              </div>
+              {savedDraft ? (
+                connectionSignals.length ? (
+                  <ul className="mt-2 space-y-1 text-sm text-violet-900/80">
+                    {connectionSignals.map(signal => <li key={signal}>• {signal}</li>)}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-sm leading-6 text-violet-900/70">
+                    No exact interest or location overlap was found in your browser-session draft. The service score above is not an identity, safety, or relationship-outcome guarantee.
+                  </p>
+                )
+              ) : (
+                <p className="mt-2 text-sm leading-6 text-violet-900/70">
+                  Save a profile draft to compare only the interests and general location you chose to share.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <h3 className="text-sm font-bold text-slate-900">Conversation starters</h3>
+              <div className="mt-2 grid gap-2">
+                {conversationStarters.map(prompt => (
+                  <div key={prompt} className="rounded-xl bg-white px-3 py-2 text-sm text-slate-700 shadow-sm">
+                    {prompt}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </Card>
