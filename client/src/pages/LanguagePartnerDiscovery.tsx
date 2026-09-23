@@ -61,9 +61,14 @@ const EMPTY_PROFILE: ProfileForm = {
 
 const CORRECTION_STORAGE_KEY = "sky4444.language-exchange.corrections";
 
-function readCorrections(): CorrectionNote[] {
+function correctionStorageKey(userId: string) {
+  return `${CORRECTION_STORAGE_KEY}.${userId}`;
+}
+
+function readCorrections(userId?: string): CorrectionNote[] {
+  if (!userId) return [];
   try {
-    const parsed = JSON.parse(localStorage.getItem(CORRECTION_STORAGE_KEY) ?? "[]");
+    const parsed = JSON.parse(localStorage.getItem(correctionStorageKey(userId)) ?? "[]");
     if (!Array.isArray(parsed)) return [];
     return parsed
       .filter(
@@ -89,7 +94,7 @@ export default function LanguagePartnerDiscovery() {
   const [originalText, setOriginalText] = useState("");
   const [correctedText, setCorrectedText] = useState("");
   const [correctionNote, setCorrectionNote] = useState("");
-  const [corrections, setCorrections] = useState<CorrectionNote[]>(readCorrections);
+  const [corrections, setCorrections] = useState<CorrectionNote[]>([]);
   const [recording, setRecording] = useState(false);
   const [voiceUrl, setVoiceUrl] = useState<string>();
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -133,6 +138,19 @@ export default function LanguagePartnerDiscovery() {
       await utils.dm.conversations.invalidate();
     },
   });
+
+  const markRead = trpc.dm.markRead.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.dm.conversations.invalidate(),
+        utils.dm.unreadCount.invalidate(),
+      ]);
+    },
+  });
+
+  useEffect(() => {
+    setCorrections(readCorrections(user?.id));
+  }, [user?.id]);
 
   useEffect(() => {
     if (!profileQuery.data) return;
@@ -185,6 +203,7 @@ export default function LanguagePartnerDiscovery() {
   function updateProfile(patch: Partial<ProfileForm>) {
     setProfile(current => ({ ...current, ...patch }));
     setErrors([]);
+    saveProfile.reset();
   }
 
   function persistProfile() {
@@ -199,6 +218,7 @@ export default function LanguagePartnerDiscovery() {
   function openConversation(userId: string) {
     setSelectedPartnerId(userId);
     setTab("chat");
+    markRead.mutate({ userId });
   }
 
   function submitMessage() {
@@ -210,7 +230,7 @@ export default function LanguagePartnerDiscovery() {
   }
 
   function saveCorrection() {
-    if (!originalText.trim() || !correctedText.trim()) return;
+    if (!user?.id || !originalText.trim() || !correctedText.trim()) return;
     const next = [
       {
         original: originalText.trim(),
@@ -221,7 +241,7 @@ export default function LanguagePartnerDiscovery() {
     ].slice(0, 20);
     setCorrections(next);
     try {
-      localStorage.setItem(CORRECTION_STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(correctionStorageKey(user.id), JSON.stringify(next));
     } catch {
       // Keep the current-session notebook usable when storage is unavailable.
     }
