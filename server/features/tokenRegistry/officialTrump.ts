@@ -14,6 +14,25 @@ export const OFFICIAL_TRUMP_TOKEN: Readonly<TokenDefinition> = Object.freeze({
   contractAddress: OFFICIAL_TRUMP_MINT,
 });
 
+/**
+ * SKYCOIN4444's own product designation for its primary supported external
+ * crypto asset. This designation is internal to SKYCOIN4444 and does not claim
+ * endorsement, partnership, issuer authorization, legal-tender status, or any
+ * affiliation with Donald Trump or the $TRUMP issuer.
+ */
+export const SKYCOIN4444_OFFICIAL_CRYPTO_ASSET = Object.freeze({
+  type: 'skycoin4444.crypto-asset-designation.v1',
+  designation: 'official-skycoin4444-supported-external-crypto-asset',
+  asset: OFFICIAL_TRUMP_TOKEN,
+  scope: 'skycoin4444-engineering-beta',
+  externalAffiliationClaimed: false,
+  legalTenderClaimed: false,
+  custodyEnabled: false,
+  signingEnabled: false,
+  broadcastEnabled: false,
+  automatedTradingEnabled: false,
+} as const);
+
 /** Creates a fresh registry containing only the explicitly configured TRUMP asset. */
 export function createOfficialTrumpRegistry(): SkyTokenRegistry {
   const registry = new SkyTokenRegistry();
@@ -52,6 +71,13 @@ export type UnsignedTrumpTransferIntent = Readonly<{
 
 const SOLANA_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 const AMOUNT = /^(?:0|[1-9]\d*)(?:\.\d{1,6})?$/;
+const REQUIRED_ACKNOWLEDGEMENTS = [
+  'mint',
+  'network',
+  'recipient',
+  'amount',
+  'irreversible',
+] as const;
 
 function requireSolanaAddress(value: string, field: string): string {
   if (typeof value !== 'string' || !SOLANA_ADDRESS.test(value.trim())) {
@@ -72,8 +98,14 @@ function parseTrumpAmount(value: string): { display: string; baseUnits: bigint }
 }
 
 function requireAcknowledgements(value: TrumpTransferAcknowledgements): void {
-  for (const [name, acknowledged] of Object.entries(value)) {
-    if (acknowledged !== true) throw new Error(`confirm ${name} before preparing a transfer`);
+  if (!value || typeof value !== 'object') {
+    throw new Error('all transfer acknowledgements are required');
+  }
+
+  for (const name of REQUIRED_ACKNOWLEDGEMENTS) {
+    if (value[name] !== true) {
+      throw new Error(`confirm ${name} before preparing a transfer`);
+    }
   }
 }
 
