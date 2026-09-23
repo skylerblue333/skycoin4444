@@ -51,7 +51,7 @@ const areaDefinitions: readonly [
 
 const verifiedAreaNotes: Readonly<Record<string, string>> = {
   wallet:
-    "Official TRUMP Solana metadata and unsigned transfer-intent validation are available in server/features/tokenRegistry; wallet custody, signing, broadcast, and affiliation claims remain disabled.",
+    "SKYCOIN4444 designates the configured Official TRUMP Solana asset as its primary supported external crypto asset for engineering beta; metadata and unsigned transfer-intent validation are available, while custody, signing, broadcast, automated trading, legal-tender claims, and external affiliation claims remain disabled.",
   skychain:
     "The ecosystem exposes the configured Official TRUMP Solana mainnet asset as metadata-only integration evidence; live chain execution remains disabled.",
 };
