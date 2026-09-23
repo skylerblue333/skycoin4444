@@ -53,6 +53,31 @@ export const privacyRequests = mysqlTable("privacy_requests", {
 export type PrivacyRequestRecord = typeof privacyRequests.$inferSelect;
 export type InsertPrivacyRequestRecord = typeof privacyRequests.$inferInsert;
 
+// ============ LANGUAGE EXCHANGE PROFILES TABLE ============
+export const languageExchangeProfiles = mysqlTable("language_exchange_profiles", {
+  userId: varchar("user_id", { length: 255 }).primaryKey().references(() => users.id),
+  nativeLanguage: varchar("native_language", { length: 64 }).notNull(),
+  learningLanguage: varchar("learning_language", { length: 64 }).notNull(),
+  level: varchar("level", { length: 4 }).notNull(),
+  sessionMinutes: int("session_minutes").default(45).notNull(),
+  availability: varchar("availability", { length: 255 }),
+  goals: varchar("goals", { length: 500 }).notNull(),
+  topics: varchar("topics", { length: 500 }),
+  correctionPreference: varchar("correction_preference", { length: 32 }).default("ask-first").notNull(),
+  discoverable: boolean("discoverable").default(false).notNull(),
+  createdAt: timestamp("created_at").default(sql\`CURRENT_TIMESTAMP\`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql\`CURRENT_TIMESTAMP\`).notNull(),
+}, (table) => ({
+  pairIndex: index("language_exchange_profiles_pair_idx").on(
+    table.nativeLanguage,
+    table.learningLanguage,
+    table.discoverable
+  ),
+}));
+
+export type LanguageExchangeProfileRecord = typeof languageExchangeProfiles.$inferSelect;
+export type InsertLanguageExchangeProfileRecord = typeof languageExchangeProfiles.$inferInsert;
+
 // ============ POSTS TABLE ============
 export const posts = mysqlTable("posts", {
   id: varchar("id", { length: 255 }).primaryKey(),
