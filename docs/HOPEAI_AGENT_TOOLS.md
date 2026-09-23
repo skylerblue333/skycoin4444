@@ -6,9 +6,9 @@ HopeAI now has a bounded engineering-beta agent execution layer on top of the ex
 
 - **173 specialist agent profiles**, including Lawyer, Legal Researcher, Contract Reviewer, Software Engineer, Security Analyst, Teacher, Data Analyst, Product Manager, Writer, Operations Analyst, Creator Coach, and many others.
 - **79 tool definitions** in the catalog.
-- **37 tools execute locally on the SKYCOIN4444 server** today.
+- **36 tools execute locally on the SKYCOIN4444 server** today.
 - **40 external tools are integration-required** and are not exposed to the model as executable until a real connector/provider is configured.
-- **2 secret-bearing helpers are disabled by default** and are not exposed to autonomous model tool calling.
+- **3 tools are disabled by default** (including secret-bearing helpers and JavaScript regex execution) and are not exposed to autonomous model tool calling.
 - The agent loop permits at most 3 tool rounds, 4 calls per round, and 8 total calls in one request.
 - Tool calls and their success/error results are returned to the HopeAI UI as execution evidence.
 
@@ -23,7 +23,6 @@ The current executable set includes bounded deterministic utilities for:
 - simple CSV profiling and numeric summary statistics;
 - date differences and timestamp conversion;
 - URL and query-string parsing;
-- bounded regular-expression testing with expensive-pattern rejection;
 - SHA-256, base64 encoding/decoding, UUID generation, and HTML escaping;
 - simple line differences, import extraction, and TODO/FIXME extraction;
 - contract-clause keyword checklists and legal-document heading extraction.
@@ -94,6 +93,8 @@ These are marked `integration_required`. They are not included in the LLM tool l
 - Tool arguments must be JSON objects and are revalidated by each tool implementation.
 - Tool-call count and rounds are bounded.
 - Secret-bearing password/JWT helpers are disabled from autonomous tool calling.
+- JavaScript regex execution is disabled until a time-bounded safe regex engine or isolated execution boundary is integrated.
+- Tool results are capped before being returned to the model/UI, and text replacement rejects oversized projected output before allocating it.
 - Regex patterns are length-bounded and obvious nested-quantifier patterns are rejected.
 - No tool receives credentials, private keys, recovery phrases, or provider secrets from server configuration.
 - Tool success is not inferred: the UI shows only recorded execution events.
