@@ -65,8 +65,8 @@ export const languageExchangeProfiles = mysqlTable("language_exchange_profiles",
   topics: varchar("topics", { length: 500 }),
   correctionPreference: varchar("correction_preference", { length: 32 }).default("ask-first").notNull(),
   discoverable: boolean("discoverable").default(false).notNull(),
-  createdAt: timestamp("created_at").default(sql\`CURRENT_TIMESTAMP\`).notNull(),
-  updatedAt: timestamp("updated_at").default(sql\`CURRENT_TIMESTAMP\`).notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => ({
   pairIndex: index("language_exchange_profiles_pair_idx").on(
     table.nativeLanguage,
