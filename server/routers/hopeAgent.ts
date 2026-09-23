@@ -185,7 +185,7 @@ async function runToolAgent(input: {
   };
 }
 
-export const hopeAgentRouter = router({
+export const hopeAgentProcedures = {
   catalog: publicProcedure.query(() => ({
     defaultAgentId: DEFAULT_HOPE_AGENT_ID,
     agentCount: HOPE_AGENT_PROFILE_COUNT,
@@ -235,4 +235,6 @@ export const hopeAgentRouter = router({
         throw providerError(error);
       }
     }),
-});
+};
+
+export const hopeAgentRouter = router(hopeAgentProcedures);
