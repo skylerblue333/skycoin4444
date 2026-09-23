@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildHopeProviderContent,
   buildHopeProviderHistory,
   createHopeWorkspaceMessage,
   createHopeWorkspaceThread,
@@ -42,6 +43,27 @@ describe("HopeAI workspace model", () => {
     expect(history[0].content).toBe("message 2");
     expect(history.at(-1)?.content).toContain("FILE: notes.md");
     expect(history.at(-1)?.content).toContain("bounded context");
+  });
+
+  it("caps the combined prompt and attachment context to the API limit", () => {
+    const message = createHopeWorkspaceMessage({
+      role: "user",
+      content: "review this",
+      now: 20,
+      attachments: [
+        {
+          id: "large",
+          name: "large.md",
+          size: 12_000,
+          text: "x".repeat(12_000),
+        },
+      ],
+    });
+
+    const providerContent = buildHopeProviderContent(message);
+    expect(providerContent.length).toBeLessThanOrEqual(8_000);
+    expect(providerContent).toContain("review this");
+    expect(providerContent).toContain("FILE: large.md");
   });
 
   it("pins only assistant outputs and avoids duplicate artifacts", () => {
