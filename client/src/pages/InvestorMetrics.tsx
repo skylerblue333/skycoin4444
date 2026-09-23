@@ -1,157 +1,106 @@
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Link } from "wouter";
+import { ArrowRight, BarChart3, Database, ShieldCheck } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { investorMetricRequirements } from "@/data/investorReadiness";
+
+const publicationRules = [
+  "Show the named source, exact data source, and accounting/telemetry system.",
+  "Show the measurement period and last-updated timestamp.",
+  "Define the numerator, denominator, exclusions, and test-data policy.",
+  "Keep forecasts visually separate from historical actuals.",
+  "Do not infer token price, market cap, treasury value, revenue, or users from demo data.",
+] as const;
 
 export default function InvestorMetrics() {
-  // Real metrics data
-  const dauData = [
-    { day: 'Mon', dau: 2450, mau: 12500 },
-    { day: 'Tue', dau: 2890, mau: 13200 },
-    { day: 'Wed', dau: 3200, mau: 14100 },
-    { day: 'Thu', dau: 3650, mau: 15300 },
-    { day: 'Fri', dau: 4120, mau: 16800 },
-    { day: 'Sat', dau: 4890, mau: 18200 },
-    { day: 'Sun', dau: 5340, mau: 19500 },
-  ];
-
-  const retentionData = [
-    { day: 'Day 1', retention: 100 },
-    { day: 'Day 7', retention: 68 },
-    { day: 'Day 30', retention: 42 },
-    { day: 'Day 60', retention: 28 },
-    { day: 'Day 90', retention: 18 },
-  ];
-
-  const tokenVelocity = [
-    { week: 'W1', velocity: 2.3 },
-    { week: 'W2', velocity: 2.8 },
-    { week: 'W3', velocity: 3.5 },
-    { week: 'W4', velocity: 4.2 },
-  ];
-
-  const metrics = [
-    { label: 'DAU', value: '5,340', change: '+12.4%', color: 'text-cyan-400' },
-    { label: 'MAU', value: '19,500', change: '+8.2%', color: 'text-green-400' },
-    { label: 'Token Velocity', value: '4.2x', change: '+18%', color: 'text-yellow-400' },
-    { label: '7-Day Retention', value: '68%', change: '+5%', color: 'text-purple-400' },
-    { label: 'Avg Session', value: '23m', change: '+4.5m', color: 'text-pink-400' },
-    { label: 'Conversion Rate', value: '12.3%', change: '+2.1%', color: 'text-blue-400' },
-  ];
-
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">INVESTOR METRICS</h1>
-          <p className="text-gray-400">Real-time platform analytics and growth metrics</p>
-        </div>
+    <main className="min-h-screen bg-[#08070d] px-4 py-8 text-white md:px-8">
+      <div className="mx-auto max-w-6xl space-y-7">
+        <header className="rounded-3xl border border-violet-300/15 bg-gradient-to-br from-violet-500/[0.09] via-white/[0.025] to-blue-500/[0.06] p-6 md:p-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-violet-300 text-black">
+              <BarChart3 className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-200/70">
+                Investor evidence
+              </p>
+              <h1 className="mt-1 text-3xl font-black md:text-4xl">Metrics Methodology</h1>
+            </div>
+            <Badge className="ml-auto border border-violet-300/25 bg-violet-300/10 text-violet-100">
+              No synthetic KPIs
+            </Badge>
+          </div>
+          <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-300 md:text-base">
+            This page defines what must be connected before SKYCOIN4444 publishes
+            investor-facing operating or token metrics. Until those sources are
+            verified, the correct value is “not measured,” not a placeholder number.
+          </p>
+          <div className="mt-6">
+            <Link
+              href="/investor-portal"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-black"
+            >
+              Back to investor portal <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </header>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
-          {metrics.map((metric) => (
-            <Card key={metric.label} className="bg-gray-900 border-gray-800 p-6">
-              <p className="text-gray-400 text-sm mb-2">{metric.label}</p>
-              <p className={`text-3xl font-bold ${metric.color} mb-2`}>{metric.value}</p>
-              <Badge className="bg-green-600 text-xs">{metric.change}</Badge>
+        <section className="grid gap-4 md:grid-cols-2">
+          {investorMetricRequirements.map(item => (
+            <Card key={item.id} className="border-white/10 bg-white/[0.03]">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle className="text-base">{item.metric}</CardTitle>
+                  <Badge className="border border-amber-300/25 bg-amber-300/10 text-amber-100">
+                    Evidence not connected
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600">
+                    <Database className="h-3.5 w-3.5" />
+                    Source
+                  </div>
+                  <p className="mt-1 leading-6 text-slate-300">{item.source}</p>
+                </div>
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Period
+                  </div>
+                  <p className="mt-1 leading-6 text-slate-300">{item.period}</p>
+                </div>
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                    Verification rule
+                  </div>
+                  <p className="mt-1 leading-6 text-slate-400">{item.verification}</p>
+                </div>
+              </CardContent>
             </Card>
           ))}
-        </div>
+        </section>
 
-        {/* Charts */}
-        <div className="grid grid-cols-2 gap-8 mb-12">
-          {/* DAU/MAU Chart */}
-          <Card className="bg-gray-900 border-gray-800 p-6">
-            <h3 className="text-xl font-bold mb-4">DAU / MAU Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={dauData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="day" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }} />
-                <Legend />
-                <Line type="monotone" dataKey="dau" stroke="#00ff88" strokeWidth={2} />
-                <Line type="monotone" dataKey="mau" stroke="#0088ff" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Retention Curve */}
-          <Card className="bg-gray-900 border-gray-800 p-6">
-            <h3 className="text-xl font-bold mb-4">Retention Curve</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={retentionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="day" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }} />
-                <Bar dataKey="retention" fill="#ff00ff" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Token Velocity */}
-          <Card className="bg-gray-900 border-gray-800 p-6">
-            <h3 className="text-xl font-bold mb-4">Token Velocity</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={tokenVelocity}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="week" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }} />
-                <Line type="monotone" dataKey="velocity" stroke="#ffaa00" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Valuation Summary */}
-          <Card className="bg-gray-900 border-gray-800 p-6">
-            <h3 className="text-xl font-bold mb-4">Valuation Summary</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Current Valuation</span>
-                <span className="text-2xl font-bold text-cyan-400">$125M</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Projected 12M</span>
-                <span className="text-2xl font-bold text-green-400">$500M+</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Token Market Cap</span>
-                <span className="text-2xl font-bold text-yellow-400">$45M</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Monthly Burn</span>
-                <span className="text-2xl font-bold text-red-400">$150K</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Runway</span>
-                <span className="text-2xl font-bold text-purple-400">24 months</span>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Financial Projections */}
-        <Card className="bg-gray-900 border-gray-800 p-6">
-          <h3 className="text-2xl font-bold mb-6">Financial Projections</h3>
-          <div className="grid grid-cols-4 gap-4">
-            {[
-              { label: 'Q1 2026', revenue: '$2.3M', users: '50K', status: 'On Track' },
-              { label: 'Q2 2026', revenue: '$5.8M', users: '125K', status: 'Projected' },
-              { label: 'Q3 2026', revenue: '$12.5M', users: '280K', status: 'Projected' },
-              { label: 'Q4 2026', revenue: '$28.3M', users: '650K', status: 'Projected' },
-            ].map((q) => (
-              <div key={q.label} className="border border-gray-700 rounded p-4">
-                <p className="font-bold text-lg mb-2">{q.label}</p>
-                <p className="text-cyan-400 text-sm mb-1">Revenue: {q.revenue}</p>
-                <p className="text-green-400 text-sm mb-3">Users: {q.users}</p>
-                <Badge className={q.status === 'On Track' ? 'bg-green-600' : 'bg-gray-600'}>{q.status}</Badge>
+        <Card className="border-emerald-300/15 bg-emerald-300/[0.035]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-emerald-300" />
+              Publication contract
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-2">
+            {publicationRules.map(rule => (
+              <div
+                key={rule}
+                className="rounded-xl border border-white/[0.08] bg-black/20 p-4 text-sm leading-6 text-slate-300"
+              >
+                {rule}
               </div>
             ))}
-          </div>
+          </CardContent>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }
