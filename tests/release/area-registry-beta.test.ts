@@ -41,8 +41,8 @@ describe("all-area beta registry", () => {
   });
 
   it("surfaces the bounded token boundary in the affected areas", () => {
-    expect(getBetaArea("wallet")?.notes).toMatch(/Official TRUMP Solana metadata/i);
-    expect(getBetaArea("wallet")?.notes).toMatch(/custody, signing, broadcast/i);
+    expect(getBetaArea("wallet")?.notes).toMatch(/Official TRUMP Solana asset/i);
+    expect(getBetaArea("wallet")?.notes).toMatch(/custody, signing, broadcast/i);\n    expect(getBetaArea("wallet")?.notes).toMatch(/primary supported external crypto asset/i);
     expect(getBetaArea("wallet")?.notes).toMatch(/affiliation claims remain disabled/i);
     expect(getBetaArea("skychain")?.notes).toMatch(/metadata-only integration evidence/i);
     expect(getBetaArea("skychain")?.notes).toMatch(/live chain execution remains disabled/i);
