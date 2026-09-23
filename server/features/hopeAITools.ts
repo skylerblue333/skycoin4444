@@ -363,8 +363,8 @@ const EXECUTABLE_TOOLS: readonly HopeToolDescriptor[] = Object.freeze([
     id: "regex_test",
     name: "Regex Tester",
     category: "developer",
-    description: "Test a bounded JavaScript regular expression against supplied text.",
-    availability: "executable",
+    description: "Regex execution is disabled until a time-bounded safe regex engine is integrated.",
+    availability: "disabled",
     sideEffect: "none",
     requiresConfirmation: false,
     parameters: objectSchema(
@@ -666,6 +666,23 @@ function round(value: number): number {
   return Number(value.toPrecision(12));
 }
 
+const MAX_TOOL_RESULT_CHARS = 8_000;
+
+function boundToolOutput(output: unknown): unknown {
+  const serialized = JSON.stringify(output);
+  if (typeof serialized !== "string") {
+    return { value: String(output) };
+  }
+  if (serialized.length <= MAX_TOOL_RESULT_CHARS) return output;
+
+  return {
+    truncated: true,
+    preview: serialized.slice(0, MAX_TOOL_RESULT_CHARS - 256),
+    originalCharacters: serialized.length,
+    limitCharacters: MAX_TOOL_RESULT_CHARS,
+  };
+}
+
 function execute(toolId: string, args: Args): unknown {
   switch (toolId) {
     case "math_operation": {
@@ -927,27 +944,10 @@ function execute(toolId: string, args: Args): unknown {
       return {
         entries: [...new URLSearchParams(requireString(args, "query", 8_000).replace(/^\?/, "")).entries()],
       };
-    case "regex_test": {
-      const pattern = requireString(args, "pattern", 200);
-      if (
-        /\([^)]*[+*][^)]*\)[+*{]/.test(pattern) ||
-        /\[[^\]]+\][+*{][^)]*[+*{]/.test(pattern) ||
-        /\.\*.*\.\*/.test(pattern)
-      ) {
-        throw new Error("regex pattern rejected as potentially expensive");
-      }
-      const flags = typeof args.flags === "string" ? args.flags.slice(0, 8) : "";
-      if (!/^[dgimsuvy]*$/.test(flags)) throw new Error("unsupported regex flags");
-      const regex = new RegExp(pattern, flags);
-      const text = requireString(args, "text");
-      const match = regex.exec(text);
-      return {
-        matched: Boolean(match),
-        match: match?.[0] ?? null,
-        index: match?.index ?? null,
-        groups: match ? match.slice(1, 21) : [],
-      };
-    }
+    case "regex_test":
+      throw new Error(
+        "regex execution is disabled until a time-bounded safe regex engine is configured"
+      );
     case "sha256":
       return {
         hex: createHash("sha256").update(requireString(args, "text"), "utf8").digest("hex"),
@@ -1053,6 +1053,24 @@ function execute(toolId: string, args: Args): unknown {
       const find = requireString(args, "find", 2_000);
       const replacement = requireString(args, "replace", 2_000);
       if (!find) throw new Error("find cannot be empty");
+
+      let occurrences = 0;
+      let offset = 0;
+      while (offset <= text.length - find.length) {
+        const index = text.indexOf(find, offset);
+        if (index === -1) break;
+        occurrences += 1;
+        offset = index + find.length;
+      }
+
+      const projectedLength =
+        text.length + occurrences * (replacement.length - find.length);
+      if (projectedLength > MAX_TOOL_RESULT_CHARS) {
+        throw new Error(
+          `replacement output would exceed ${MAX_TOOL_RESULT_CHARS} characters`
+        );
+      }
+
       return { text: text.split(find).join(replacement) };
     }
     case "text_excerpt": {
@@ -1127,9 +1145,10 @@ export async function executeHopeTool(
     throw new Error("tool arguments must be an object");
   }
 
+  const output = execute(toolId, args);
   return Object.freeze({
     toolId,
-    output: execute(toolId, args),
+    output: boundToolOutput(output),
   });
 }
 
