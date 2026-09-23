@@ -1135,7 +1135,10 @@ export async function executeHopeTool(
   args: Args
 ): Promise<HopeToolExecution> {
   const descriptor = getHopeTool(toolId);
-  if (descriptor.availability !== "executable") {
+  if (descriptor.availability === "disabled") {
+    throw new Error(`${descriptor.name} is disabled in this runtime`);
+  }
+  if (descriptor.availability === "integration_required") {
     throw new Error(
       `${descriptor.name} requires a configured external integration and is not executable in this runtime`
     );
