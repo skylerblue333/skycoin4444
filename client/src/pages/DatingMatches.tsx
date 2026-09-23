@@ -95,6 +95,29 @@ export default function DatingMatches() {
     }
   );
 
+  const markConversationRead = trpc.dating.markConversationRead.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.dating.notifications.invalidate(),
+        utils.dating.summary.invalidate(),
+      ]);
+    },
+  });
+
+  useEffect(() => {
+    if (!selectedMatchId || !conversation.data?.length) return;
+    const hasUnreadIncoming = conversation.data.some(
+      message => message.senderId !== user?.id && message.read !== true
+    );
+    if (!hasUnreadIncoming) return;
+    markConversationRead.mutate({ matchId: selectedMatchId });
+  }, [
+    selectedMatchId,
+    conversation.data,
+    user?.id,
+    markConversationRead.mutate,
+  ]);
+
   const starters = useMemo(
     () =>
       selectedMatch
