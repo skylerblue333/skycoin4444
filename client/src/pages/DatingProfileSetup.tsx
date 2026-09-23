@@ -10,6 +10,8 @@ import {
   DATING_SESSION_PROFILE_KEY,
   scoreDatingProfile,
 } from "@/lib/datingExperience";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 
 type VerificationStatus = "unverified" | "email" | "phone" | "id";
 
@@ -78,6 +80,12 @@ export function validateDatingProfile(profile: ProfileFormData) {
     errors.push("Bio must be at least 10 characters.");
   if (profile.interests.length < 1)
     errors.push("Choose at least one interest.");
+  if (profile.interests.length > 8)
+    errors.push("Choose no more than 8 interests.");
+  if (profile.interests.some(interest => interest.trim().length > 24))
+    errors.push("Each interest must be 24 characters or fewer.");
+  if (profile.bio.length > 255)
+    errors.push("Bio must be 255 characters or fewer.");
   return errors;
 }
 
@@ -127,11 +135,23 @@ export function parseSavedDatingProfile(
 }
 
 export default function DatingProfileSetup() {
+  const { isAuthenticated } = useAuth();
+  const utils = trpc.useUtils();
+  const saveServerProfile = trpc.dating.upsertProfile.useMutation({
+    onSuccess: async () => {
+      await utils.dating.profile.invalidate();
+      await utils.dating.summary.invalidate();
+      await utils.dating.discover.invalidate();
+    },
+  });
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<ProfileFormData>(initialProfile);
   const [interestInput, setInterestInput] = useState("");
   const [submitErrors, setSubmitErrors] = useState<string[]>([]);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [serverSaveStatus, setServerSaveStatus] = useState<
+    "idle" | "saved" | "local-only" | "error"
+  >("idle");
   const [restoredPhotoCount, setRestoredPhotoCount] = useState(0);
   const totalSteps = 5;
 
@@ -174,6 +194,7 @@ export default function DatingProfileSetup() {
     if (patch.photos) setRestoredPhotoCount(0);
     setSubmitErrors([]);
     setSavedAt(null);
+    setServerSaveStatus("idle");
   };
 
   const handleAddInterest = (value = interestInput) => {
@@ -185,7 +206,11 @@ export default function DatingProfileSetup() {
       )
     )
       return;
-    update({ interests: [...formData.interests, normalized].slice(0, 12) });
+    if (normalized.length > 24) {
+      setSubmitErrors(["Interests must be 24 characters or fewer."]);
+      return;
+    }
+    update({ interests: [...formData.interests, normalized].slice(0, 8) });
     setInterestInput("");
   };
 
@@ -196,7 +221,7 @@ export default function DatingProfileSetup() {
     update({ photos: [...formData.photos, ...newPhotos].slice(0, 6) });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const errors = validateDatingProfile(formData);
     if (errors.length) {
       setSubmitErrors(errors);
@@ -210,6 +235,25 @@ export default function DatingProfileSetup() {
       // Keep the completed profile in memory when browser storage is unavailable.
     }
     setSavedAt(saved.savedAt);
+
+    if (!isAuthenticated) {
+      setServerSaveStatus("local-only");
+      return;
+    }
+
+    try {
+      await saveServerProfile.mutateAsync({
+        bio: formData.bio.trim(),
+        interests: formData.interests,
+        location: formData.location.trim(),
+        age: formData.age,
+        gender: null,
+        lookingFor: formData.lookingFor,
+      });
+      setServerSaveStatus("saved");
+    } catch {
+      setServerSaveStatus("error");
+    }
   };
 
   return (
@@ -382,13 +426,13 @@ export default function DatingProfileSetup() {
               <Textarea
                 value={formData.bio}
                 onChange={event =>
-                  update({ bio: event.target.value.slice(0, 500) })
+                  update({ bio: event.target.value.slice(0, 255) })
                 }
                 rows={5}
                 placeholder="Tell people what matters to you..."
               />
               <p className="mt-1 text-xs text-gray-500">
-                {formData.bio.length}/500
+                {formData.bio.length}/255
               </p>
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -528,12 +572,32 @@ export default function DatingProfileSetup() {
                 <div className="flex items-start gap-2">
                   <Check className="mt-0.5 h-4 w-4 shrink-0" />
                   <div>
-                    <p className="font-semibold">Draft saved for this browser session.</p>
+                    <p className="font-semibold">
+                      {serverSaveStatus === "saved"
+                        ? "Profile saved to the authenticated dating beta."
+                        : "Draft saved for this browser session."}
+                    </p>
                     <p className="mt-1 text-green-800/80">
-                      Saved at {new Date(savedAt).toLocaleTimeString()}. Your interests can now be used to explain transparent overlap in discovery.
+                      Saved at {new Date(savedAt).toLocaleTimeString()}. Bio,
+                      age, location, relationship intent, and interests can be
+                      stored server-side when authenticated. Photos, display
+                      name, height, body type, and verification preference remain
+                      browser-session data in this flow.
                     </p>
                   </div>
                 </div>
+                {serverSaveStatus === "local-only" ? (
+                  <p className="mt-3 rounded-lg bg-amber-100 px-3 py-2 text-xs text-amber-900">
+                    Sign in before discovery to persist the dating profile to the
+                    server.
+                  </p>
+                ) : null}
+                {serverSaveStatus === "error" ? (
+                  <p className="mt-3 rounded-lg bg-red-100 px-3 py-2 text-xs text-red-900">
+                    The browser-session draft is safe, but the server profile
+                    could not be saved. Try again before relying on discovery.
+                  </p>
+                ) : null}
                 <Link href="/dating-discovery">
                   <Button type="button" className="mt-4 w-full bg-pink-600 hover:bg-pink-700">
                     Continue to discovery <ArrowRight className="ml-2 h-4 w-4" />
@@ -565,9 +629,14 @@ export default function DatingProfileSetup() {
               Next <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button type="button" onClick={handleSubmit} className="flex-1">
+            <Button
+              type="button"
+              onClick={() => void handleSubmit()}
+              disabled={saveServerProfile.isPending}
+              className="flex-1"
+            >
               <Check className="mr-2 h-4 w-4" />
-              Save Profile Draft
+              {saveServerProfile.isPending ? "Saving…" : "Save Profile"}
             </Button>
           )}
         </div>
