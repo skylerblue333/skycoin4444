@@ -23,6 +23,7 @@ type ProfileFormData = {
   interests: string[];
   photos: File[];
   verificationStatus: VerificationStatus;
+  gender: "man" | "woman" | "nonbinary" | "other" | "prefer-not-to-say";
   lookingFor: "relationship" | "casual" | "friendship" | "networking";
   height: string;
   bodyType: string;
@@ -64,6 +65,7 @@ const initialProfile: ProfileFormData = {
   interests: [],
   photos: [],
   verificationStatus: "unverified",
+  gender: "prefer-not-to-say",
   lookingFor: "relationship",
   height: "",
   bodyType: "",
@@ -121,6 +123,10 @@ export function parseSavedDatingProfile(
       !["relationship", "casual", "friendship", "networking"].includes(
         parsed.lookingFor ?? ""
       ) ||
+      (parsed.gender !== undefined &&
+        !["man", "woman", "nonbinary", "other", "prefer-not-to-say"].includes(
+          parsed.gender
+        )) ||
       typeof parsed.height !== "string" ||
       typeof parsed.bodyType !== "string" ||
       typeof parsed.photoCount !== "number" ||
@@ -128,7 +134,17 @@ export function parseSavedDatingProfile(
       parsed.storage !== "browser-session"
     )
       return null;
-    return parsed as SavedProfile;
+    return {
+      ...parsed,
+      gender:
+        parsed.gender === "man" ||
+        parsed.gender === "woman" ||
+        parsed.gender === "nonbinary" ||
+        parsed.gender === "other" ||
+        parsed.gender === "prefer-not-to-say"
+          ? parsed.gender
+          : "prefer-not-to-say",
+    } as SavedProfile;
   } catch {
     return null;
   }
@@ -247,7 +263,7 @@ export default function DatingProfileSetup() {
         interests: formData.interests,
         location: formData.location.trim(),
         age: formData.age,
-        gender: null,
+        gender: formData.gender,
         lookingFor: formData.lookingFor,
       });
       setServerSaveStatus("saved");
@@ -352,23 +368,42 @@ export default function DatingProfileSetup() {
                 />
               </Field>
             </div>
-            <Field label="Looking For">
-              <select
-                className="w-full rounded-md border border-gray-300 px-3 py-2"
-                value={formData.lookingFor}
-                onChange={event =>
-                  update({
-                    lookingFor: event.target
-                      .value as ProfileFormData["lookingFor"],
-                  })
-                }
-              >
-                <option value="relationship">Relationship</option>
-                <option value="casual">Casual Dating</option>
-                <option value="friendship">Friendship</option>
-                <option value="networking">Networking</option>
-              </select>
-            </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Gender">
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  value={formData.gender}
+                  onChange={event =>
+                    update({
+                      gender: event.target.value as ProfileFormData["gender"],
+                    })
+                  }
+                >
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                  <option value="man">Man</option>
+                  <option value="woman">Woman</option>
+                  <option value="nonbinary">Nonbinary</option>
+                  <option value="other">Other</option>
+                </select>
+              </Field>
+              <Field label="Relationship Intent">
+                <select
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                  value={formData.lookingFor}
+                  onChange={event =>
+                    update({
+                      lookingFor: event.target
+                        .value as ProfileFormData["lookingFor"],
+                    })
+                  }
+                >
+                  <option value="relationship">Relationship</option>
+                  <option value="casual">Casual Dating</option>
+                  <option value="friendship">Friendship</option>
+                  <option value="networking">Networking</option>
+                </select>
+              </Field>
+            </div>
           </Card>
         )}
 
