@@ -29,8 +29,9 @@ const historySchema = z
 const argsSchema = z.record(z.string(), z.unknown());
 
 const responseText = (
-  content: string | Array<{ type: string; text?: string }>
+  content: string | Array<{ type: string; text?: string }> | null
 ): string => {
+  if (content === null) return "";
   if (typeof content === "string") return content;
   return content.map(part => part.text ?? "").join("\n").trim();
 };
@@ -110,7 +111,7 @@ async function runToolAgent(input: {
 
     messages.push({
       role: "assistant",
-      content: assistant.content,
+      content: assistant.content ?? "",
       tool_calls: calls,
     });
 
