@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  assertTrumpCapabilityUseAllowed,
   assertTrumpEcosystemPurposeAllowed,
+  evaluateTrumpCapabilityUse,
   evaluateTrumpEcosystemPurpose,
   getOfficialTrumpEcosystemSource,
   OFFICIAL_TRUMP_ECOSYSTEM_POLICY,
@@ -63,6 +65,36 @@ describe('Official TRUMP ecosystem source and purpose policy', () => {
     });
     expect(OFFICIAL_TRUMP_ECOSYSTEM_POLICY.politicalPersuasionEnabled).toBe(false);
     expect(OFFICIAL_TRUMP_ECOSYSTEM_POLICY.issuerImpersonationEnabled).toBe(false);
+  });
+
+  it('combines capability maturity with purpose policy before exposure', () => {
+    expect(
+      assertTrumpCapabilityUseAllowed('asset-designation', 'asset_discovery'),
+    ).toMatchObject({
+      allowedInEngineeringBeta: true,
+    });
+
+    expect(
+      evaluateTrumpCapabilityUse('market-data', 'market_information'),
+    ).toMatchObject({
+      allowedInEngineeringBeta: false,
+    });
+
+    expect(
+      evaluateTrumpCapabilityUse('asset-designation', 'price_manipulation'),
+    ).toMatchObject({
+      allowedInEngineeringBeta: false,
+    });
+
+    expect(
+      evaluateTrumpCapabilityUse('automated-trading', 'market_information'),
+    ).toMatchObject({
+      allowedInEngineeringBeta: false,
+    });
+
+    expect(() =>
+      assertTrumpCapabilityUseAllowed('market-data', 'market_information'),
+    ).toThrow(/blocked/);
   });
 
   it('keeps live external side effects disabled at the policy layer', () => {
