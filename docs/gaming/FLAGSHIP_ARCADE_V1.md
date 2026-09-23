@@ -44,8 +44,8 @@ These are engineering-beta entertainment and skill simulations. Demo credits, mu
 
 The current implementation does not:
 
-- accept live deposits or withdrawals;
-- connect a wallet for live wagering;
+- accept deposits or withdrawals;
+- connect a wallet for wagering;
 - settle bets on a blockchain;
 - custody user assets;
 - redeem scores or credits for money or tokens;
