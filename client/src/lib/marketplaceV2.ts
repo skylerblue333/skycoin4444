@@ -197,7 +197,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "description": "Fitness-recovery fixture with supplier trust, MOQ, and bulk pricing interactions.",
     "unitAmountMinor": 3299,
     "minOrder": 1,
-    "rating": 4.4,
+    "rating": 3.9,
     "reviewCount": 29,
     "trendScore": 88,
     "freeShipping": false,
@@ -273,7 +273,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "description": "Salon-accessory fixture with sample ratings, quantity breaks, and shipping flags.",
     "unitAmountMinor": 1099,
     "minOrder": 2,
-    "rating": 4.3,
+    "rating": 3.8,
     "reviewCount": 25,
     "trendScore": 81,
     "freeShipping": true,
@@ -310,7 +310,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "category": "Fashion",
     "description": "Unbranded apparel fixture designed for variant, wholesale, and creator-merch workflows.",
     "unitAmountMinor": 2299,
-    "minOrder": 5,
+    "minOrder": 10,
     "rating": 4.6,
     "reviewCount": 39,
     "trendScore": 90,
@@ -324,7 +324,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     },
     "bulkTiers": [
       {
-        "minQty": 5,
+        "minQty": 10,
         "unitAmountMinor": 2299
       },
       {
@@ -349,7 +349,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "description": "Generic footwear fixture for comparison, review filtering, and supplier discovery.",
     "unitAmountMinor": 2799,
     "minOrder": 2,
-    "rating": 4.4,
+    "rating": 3.9,
     "reviewCount": 31,
     "trendScore": 86,
     "freeShipping": false,
@@ -424,7 +424,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "category": "Tools",
     "description": "Repair-tool fixture with MOQ, supplier history, sample ratings, and quantity pricing.",
     "unitAmountMinor": 1399,
-    "minOrder": 2,
+    "minOrder": 6,
     "rating": 4.7,
     "reviewCount": 54,
     "trendScore": 93,
@@ -438,7 +438,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     },
     "bulkTiers": [
       {
-        "minQty": 2,
+        "minQty": 6,
         "unitAmountMinor": 1399
       },
       {
@@ -500,7 +500,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     "category": "Sports",
     "description": "Fitness fixture for supplier discovery, free-shipping filtering, and cart planning.",
     "unitAmountMinor": 1799,
-    "minOrder": 3,
+    "minOrder": 8,
     "rating": 4.5,
     "reviewCount": 36,
     "trendScore": 84,
@@ -514,7 +514,7 @@ export const marketplaceDemoProducts: readonly MarketplaceProduct[] = [
     },
     "bulkTiers": [
       {
-        "minQty": 3,
+        "minQty": 8,
         "unitAmountMinor": 1799
       },
       {
