@@ -38,6 +38,23 @@ describe("marketplace V2 beta model", () => {
     expect(results.every(item => item.supplier.tier === "demo-verified")).toBe(true);
   });
 
+  it("uses fixture ranges that make rating and MOQ filters observable", () => {
+    const fourStars = filterMarketplaceProducts(marketplaceDemoProducts, {
+      fourStarsOnly: true,
+    });
+    const lowMoq = filterMarketplaceProducts(marketplaceDemoProducts, {
+      maxMinOrder: 5,
+    });
+
+    expect(fourStars.length).toBeGreaterThan(0);
+    expect(fourStars.length).toBeLessThan(marketplaceDemoProducts.length);
+    expect(fourStars.every(item => item.rating >= 4)).toBe(true);
+
+    expect(lowMoq.length).toBeGreaterThan(0);
+    expect(lowMoq.length).toBeLessThan(marketplaceDemoProducts.length);
+    expect(lowMoq.every(item => item.minOrder <= 5)).toBe(true);
+  });
+
   it("applies quantity price breaks without claiming a live supplier quote", () => {
     const earbuds = marketplaceDemoProducts.find(
       item => item.sku === "DEMO-WIRELESS-EARBUDS"
