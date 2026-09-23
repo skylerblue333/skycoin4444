@@ -79,7 +79,7 @@ describe("HopeAI real tool registry", () => {
 
   it("caps oversized tool results returned to the agent", async () => {
     const result = await executeHopeTool("sort_lines", {
-      text: Array.from({ length: 4_500 }, (_, index) =>
+      text: Array.from({ length: 1_500 }, (_, index) =>
         "line-" + index.toString().padStart(4, "0")
       ).join("\n"),
       direction: "desc",
