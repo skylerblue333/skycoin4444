@@ -4,7 +4,9 @@ import {
   createOfficialTrumpTransferIntent,
   OFFICIAL_TRUMP_MINT,
   OFFICIAL_TRUMP_TOKEN,
+  SKYCOIN4444_OFFICIAL_CRYPTO_ASSET,
 } from './officialTrump';
+import type { TrumpTransferAcknowledgements } from './officialTrump';
 
 const sourceOwner = '11111111111111111111111111111111';
 const destinationOwner = 'So11111111111111111111111111111111111111112';
@@ -24,6 +26,21 @@ describe('Official TRUMP Solana transfer boundary', () => {
       network: 'solana',
       decimals: 6,
       contractAddress: OFFICIAL_TRUMP_MINT,
+    });
+  });
+
+  it('records the SKYCOIN4444-only official crypto-asset designation without external affiliation claims', () => {
+    expect(SKYCOIN4444_OFFICIAL_CRYPTO_ASSET).toMatchObject({
+      type: 'skycoin4444.crypto-asset-designation.v1',
+      designation: 'official-skycoin4444-supported-external-crypto-asset',
+      asset: OFFICIAL_TRUMP_TOKEN,
+      scope: 'skycoin4444-engineering-beta',
+      externalAffiliationClaimed: false,
+      legalTenderClaimed: false,
+      custodyEnabled: false,
+      signingEnabled: false,
+      broadcastEnabled: false,
+      automatedTradingEnabled: false,
     });
   });
 
@@ -53,7 +70,7 @@ describe('Official TRUMP Solana transfer boundary', () => {
     expect(intent.custodyCreated).toBe(false);
   });
 
-  it('rejects unacknowledged or imprecise transaction inputs', () => {
+  it('rejects false, missing, or partial acknowledgements', () => {
     expect(() =>
       createOfficialTrumpTransferIntent({
         sourceOwner,
@@ -63,6 +80,29 @@ describe('Official TRUMP Solana transfer boundary', () => {
       }),
     ).toThrow('confirm irreversible');
 
+    expect(() =>
+      createOfficialTrumpTransferIntent({
+        sourceOwner,
+        destinationOwner,
+        amount: '1',
+        acknowledgements: {} as TrumpTransferAcknowledgements,
+      }),
+    ).toThrow('confirm mint');
+
+    expect(() =>
+      createOfficialTrumpTransferIntent({
+        sourceOwner,
+        destinationOwner,
+        amount: '1',
+        acknowledgements: {
+          mint: true,
+          network: true,
+        } as TrumpTransferAcknowledgements,
+      }),
+    ).toThrow('confirm recipient');
+  });
+
+  it('rejects imprecise transaction amounts', () => {
     expect(() =>
       createOfficialTrumpTransferIntent({
         sourceOwner,
