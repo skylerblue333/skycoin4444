@@ -46,6 +46,19 @@ export default function DatingHome() {
     enabled: isAuthenticated,
     retry: false,
   });
+  const notifications = trpc.dating.notifications.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
+  const utils = trpc.useUtils();
+  const markAllRead = trpc.dating.markAllNotificationsRead.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.dating.notifications.invalidate(),
+        utils.dating.summary.invalidate(),
+      ]);
+    },
+  });
 
   const confirmAdult = () => {
     setAdultConfirmed(true);
@@ -229,9 +242,21 @@ export default function DatingHome() {
 
         <div className="space-y-5">
           <SurfaceCard className="p-5">
-            <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-pink-600" />
-              <h2 className="font-black text-slate-900">Your dating status</h2>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Bell className="h-5 w-5 text-pink-600" />
+                <h2 className="font-black text-slate-900">Your dating status</h2>
+              </div>
+              {unreadCount > 0 ? (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={markAllRead.isPending}
+                  onClick={() => markAllRead.mutate()}
+                >
+                  Mark all read
+                </Button>
+              ) : null}
             </div>
             <div className="mt-4 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-xl bg-slate-50 p-3">
@@ -253,9 +278,26 @@ export default function DatingHome() {
                 <span className="text-xs text-slate-500">unread</span>
               </div>
             </div>
-            {summary.isError ? (
+            {notifications.data?.length ? (
+              <div className="mt-4 space-y-2">
+                {notifications.data.slice(0, 4).map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs"
+                  >
+                    <span className="font-semibold capitalize text-slate-700">
+                      {item.type}
+                    </span>
+                    <span className={item.read ? "text-slate-400" : "text-pink-600"}>
+                      {item.read ? "read" : "new"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {summary.isError || notifications.isError ? (
               <p className="mt-3 text-xs leading-5 text-red-600">
-                Dating status could not be loaded. Your account may not be
+                Dating status could not be fully loaded. Your account may not be
                 authenticated or the database may be unavailable.
               </p>
             ) : null}
