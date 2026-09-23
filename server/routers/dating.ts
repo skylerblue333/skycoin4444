@@ -54,10 +54,13 @@ const profileInput = z.object({
   lookingFor: relationshipIntent,
 });
 
+const minAgeSchema = z.number().int().min(18).max(120);
+const maxAgeSchema = z.number().int().min(18).max(120);
+
 export const datingPreferencesInputSchema = z
   .object({
-    minAge: z.number().int().min(18).max(120),
-    maxAge: z.number().int().min(18).max(120),
+    minAge: minAgeSchema,
+    maxAge: maxAgeSchema,
     genderPreference: genderPreference.nullable().optional(),
   })
   .refine(value => value.maxAge >= value.minAge, {
@@ -65,17 +68,14 @@ export const datingPreferencesInputSchema = z
     path: ["maxAge"],
   });
 
-export const datingDiscoveryInputSchema = datingPreferencesInputSchema
-  .extend({
-    location: z.string().trim().max(120).optional(),
-    interest: z.string().trim().max(24).optional(),
-    limit: z.number().int().min(1).max(50).default(25),
-  })
-  .partial({
-    minAge: true,
-    maxAge: true,
-    genderPreference: true,
-  });
+export const datingDiscoveryInputSchema = z.object({
+  minAge: minAgeSchema.optional(),
+  maxAge: maxAgeSchema.optional(),
+  genderPreference: genderPreference.nullable().optional(),
+  location: z.string().trim().max(120).optional(),
+  interest: z.string().trim().max(24).optional(),
+  limit: z.number().int().min(1).max(50).default(25),
+});
 
 export const datingActionInputSchema = z.object({
   profileUserId: z.string().trim().min(1).max(255),
