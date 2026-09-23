@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import {
   and,
-  asc,
   desc,
   eq,
   gte,
@@ -99,7 +98,7 @@ type ConnectionProfile = {
 
 type PairMatch = typeof datingMatches.$inferSelect;
 
-function canonicalDatingPair(userA: string, userB: string) {
+export function canonicalDatingPair(userA: string, userB: string) {
   const [userId1, userId2] = [userA, userB].sort();
   const digest = createHash("sha256")
     .update(userId1)
