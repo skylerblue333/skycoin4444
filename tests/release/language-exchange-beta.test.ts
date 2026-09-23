@@ -15,6 +15,24 @@ describe("language exchange beta integration", () => {
     expect(page).toContain("trpc.languageExchange.partners");
     expect(page).toContain("trpc.dm.messages");
     expect(page).toContain("trpc.dm.send");
+    expect(page).toContain("trpc.dm.markRead");
+    expect(page).toContain("saveProfile.reset()");
+    expect(page).toContain("correctionStorageKey(user.id)");
     expect(page).toContain("MediaRecorder");
+  });
+
+  it("includes persisted language profile data in self-service account exports", () => {
+    const privacy = readFileSync("server/routers/privacy.ts", "utf8");
+    expect(privacy).toContain('"language_exchange"');
+    expect(privacy).toContain("languageExchangeProfiles");
+    expect(privacy).toContain("output.languageExchange");
+  });
+
+  it("filters compatible profiles in SQL before applying the requested result limit", () => {
+    const router = readFileSync("server/routers/languageExchange.ts", "utf8");
+    expect(router).toContain("or(");
+    expect(router).toContain("own.learningLanguage");
+    expect(router).toContain("own.nativeLanguage");
+    expect(router).not.toContain(".limit(100)");
   });
 });
