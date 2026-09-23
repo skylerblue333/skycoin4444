@@ -6,6 +6,7 @@ import {
   eq,
   gte,
   lte,
+  ne,
   or,
 } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
@@ -1031,6 +1032,46 @@ export const datingRouter = router({
         .update(datingNotifications)
         .set({ read: true })
         .where(eq(datingNotifications.id, input.id));
+      return { read: true as const };
+    }),
+
+  markAllNotificationsRead: protectedProcedure.mutation(async ({ ctx }) => {
+    await db
+      .update(datingNotifications)
+      .set({ read: true })
+      .where(eq(datingNotifications.userId, ctx.user.id));
+    return { read: true as const };
+  }),
+
+  markConversationRead: protectedProcedure
+    .input(z.object({ matchId: z.string().trim().min(1).max(255) }))
+    .mutation(async ({ ctx, input }) => {
+      const { otherUserId } = await requireMatchedConversation(
+        input.matchId,
+        ctx.user.id
+      );
+
+      await db
+        .update(datingMessages)
+        .set({ read: true })
+        .where(
+          and(
+            eq(datingMessages.matchId, input.matchId),
+            ne(datingMessages.senderId, ctx.user.id)
+          )
+        );
+
+      await db
+        .update(datingNotifications)
+        .set({ read: true })
+        .where(
+          and(
+            eq(datingNotifications.userId, ctx.user.id),
+            eq(datingNotifications.relatedUserId, otherUserId),
+            eq(datingNotifications.type, "message")
+          )
+        );
+
       return { read: true as const };
     }),
 
