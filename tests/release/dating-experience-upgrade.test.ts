@@ -57,7 +57,7 @@ describe("dating product suite", () => {
   it("keeps a dedicated safety center and explicit product boundaries", () => {
     expect(home).toContain('href="/dating-safety"');
     expect(safety).toContain("Safer choices without fake guarantees");
-    expect(safety).toContain("not an emergency-response or monitoring service");
+    expect(safety).toMatch(/not an emergency-response or monitoring\s+service/);
     expect(router).toContain("No identity verification");
   });
 });
