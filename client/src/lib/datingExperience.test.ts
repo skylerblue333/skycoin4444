@@ -95,6 +95,28 @@ describe("dating experience helpers", () => {
     expect(signals).toContain("You listed the same general location.");
   });
 
+  it("does not treat arbitrary location substrings as the same place", () => {
+    const signals = buildConnectionSignals(
+      {
+        displayName: "Sky",
+        bio: "Builder",
+        age: 26,
+        location: "Kansas",
+        interests: [],
+        lookingFor: "relationship",
+        photoCount: 2,
+      },
+      {
+        displayName: "Alex",
+        bio: "Hello",
+        location: "Arkansas",
+        interests: [],
+      },
+    );
+
+    expect(signals).not.toContain("You listed the same general location.");
+  });
+
   it("creates respectful deterministic conversation starters", () => {
     expect(
       buildConversationStarters({
