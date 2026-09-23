@@ -102,7 +102,7 @@ describe('Official TRUMP Solana transfer boundary', () => {
     ).toThrow('confirm recipient');
   });
 
-  it('rejects imprecise transaction amounts', () => {
+  it('rejects imprecise or unrepresentable transaction amounts', () => {
     expect(() =>
       createOfficialTrumpTransferIntent({
         sourceOwner,
@@ -111,6 +111,15 @@ describe('Official TRUMP Solana transfer boundary', () => {
         acknowledgements,
       }),
     ).toThrow('no more than 6 decimals');
+
+    expect(() =>
+      createOfficialTrumpTransferIntent({
+        sourceOwner,
+        destinationOwner,
+        amount: '18446744073709.551616',
+        acknowledgements,
+      }),
+    ).toThrow('u64 limit');
   });
 
   it('rejects self-transfers and secret-like invalid addresses', () => {
