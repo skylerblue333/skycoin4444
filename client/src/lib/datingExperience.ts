@@ -138,13 +138,20 @@ export function buildConnectionSignals(
     );
   }
 
-  const myLocation = normalize(draft.location);
-  const theirLocation = normalize(candidate.location);
-  if (
-    myLocation &&
-    theirLocation &&
-    (theirLocation.includes(myLocation) || myLocation.includes(theirLocation))
-  ) {
+  const myLocationParts = draft.location
+    .split(",")
+    .map(normalize)
+    .filter(Boolean);
+  const theirLocationParts = candidate.location
+    .split(",")
+    .map(normalize)
+    .filter(Boolean);
+  const sharesLocationComponent =
+    myLocationParts.length > 0 &&
+    theirLocationParts.length > 0 &&
+    myLocationParts.some(part => theirLocationParts.includes(part));
+
+  if (sharesLocationComponent) {
     reasons.push("You listed the same general location.");
   }
 
