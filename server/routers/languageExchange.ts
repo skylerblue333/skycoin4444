@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, or } from "drizzle-orm";
 import { z } from "zod";
 import { languageExchangeProfiles, users } from "../../drizzle/schema";
 import { db } from "../db";
@@ -141,10 +141,13 @@ export const languageExchangeRouter = router({
           and(
             eq(languageExchangeProfiles.discoverable, true),
             ne(languageExchangeProfiles.userId, ctx.user.id),
-            ne(users.profileVisibility, "private")
+            ne(users.profileVisibility, "private"),
+            or(
+              eq(languageExchangeProfiles.nativeLanguage, own.learningLanguage),
+              eq(languageExchangeProfiles.learningLanguage, own.nativeLanguage)
+            )
           )
-        )
-        .limit(100);
+        );
 
       return candidates
         .map(candidate => {
