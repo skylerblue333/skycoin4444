@@ -369,7 +369,7 @@ const EXECUTABLE_TOOLS: readonly HopeToolDescriptor[] = Object.freeze([
     requiresConfirmation: false,
     parameters: objectSchema(
       {
-        pattern: stringProp("Regular expression pattern.", 500),
+        pattern: stringProp("Regular expression pattern.", 200),
         flags: { type: "string", maxLength: 8, default: "" },
         text: stringProp("Text to test.", 20_000),
       },
@@ -467,7 +467,7 @@ const EXECUTABLE_TOOLS: readonly HopeToolDescriptor[] = Object.freeze([
     name: "Password Strength Heuristic",
     category: "security",
     description: "Evaluate local password composition without storing or transmitting it beyond this request.",
-    availability: "executable",
+    availability: "disabled",
     sideEffect: "sensitive",
     requiresConfirmation: false,
     parameters: objectSchema({ password: stringProp("Password to evaluate.", 512) }, ["password"]),
@@ -477,7 +477,7 @@ const EXECUTABLE_TOOLS: readonly HopeToolDescriptor[] = Object.freeze([
     name: "JWT Decoder (Unverified)",
     category: "security",
     description: "Decode JWT header and payload without verifying the signature.",
-    availability: "executable",
+    availability: "disabled",
     sideEffect: "sensitive",
     requiresConfirmation: false,
     parameters: objectSchema({ token: stringProp("JWT token.", 20_000) }, ["token"]),
@@ -928,7 +928,14 @@ function execute(toolId: string, args: Args): unknown {
         entries: [...new URLSearchParams(requireString(args, "query", 8_000).replace(/^\?/, "")).entries()],
       };
     case "regex_test": {
-      const pattern = requireString(args, "pattern", 500);
+      const pattern = requireString(args, "pattern", 200);
+      if (
+        /\([^)]*[+*][^)]*\)[+*{]/.test(pattern) ||
+        /\[[^\]]+\][+*{][^)]*[+*{]/.test(pattern) ||
+        /\.\*.*\.\*/.test(pattern)
+      ) {
+        throw new Error("regex pattern rejected as potentially expensive");
+      }
       const flags = typeof args.flags === "string" ? args.flags.slice(0, 8) : "";
       if (!/^[dgimsuvy]*$/.test(flags)) throw new Error("unsupported regex flags");
       const regex = new RegExp(pattern, flags);
