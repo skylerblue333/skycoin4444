@@ -37,6 +37,7 @@ export type HopeWorkspaceThread = {
 const MAX_THREAD_COUNT = 30;
 const MAX_MESSAGE_COUNT = 100;
 const MAX_ATTACHMENT_CHARS = 8_000;
+export const MAX_HOPE_PROVIDER_MESSAGE_CHARS = 8_000;
 
 const id = (prefix: string, now: number) =>
   prefix + "-" + now.toString(36) + "-" + Math.random().toString(36).slice(2, 8);
@@ -97,10 +98,20 @@ export const formatHopeAttachmentContext = (
     })
     .join("\n\n");
 
-const providerContent = (message: HopeWorkspaceMessage): string =>
-  message.attachmentContext
-    ? message.content + "\n\nAttached local text context:\n" + message.attachmentContext
-    : message.content;
+export const buildHopeProviderContent = (
+  message: HopeWorkspaceMessage,
+  limit = MAX_HOPE_PROVIDER_MESSAGE_CHARS
+): string => {
+  const safeLimit = Math.max(1, Math.min(limit, MAX_HOPE_PROVIDER_MESSAGE_CHARS));
+  const prompt = message.content.slice(0, safeLimit);
+  if (!message.attachmentContext || prompt.length >= safeLimit) return prompt;
+
+  const prefix = "\n\nAttached local text context:\n";
+  const remaining = safeLimit - prompt.length - prefix.length;
+  if (remaining <= 0) return prompt;
+
+  return prompt + prefix + message.attachmentContext.slice(0, remaining);
+};
 
 export const buildHopeProviderHistory = (
   messages: HopeWorkspaceMessage[],
@@ -111,7 +122,7 @@ export const buildHopeProviderHistory = (
     .slice(-Math.max(1, Math.min(limit, 12)))
     .map(message => ({
       role: message.role,
-      content: providerContent(message).slice(0, 8_000),
+      content: buildHopeProviderContent(message),
     }));
 
 export const pinHopeWorkspaceArtifact = (
