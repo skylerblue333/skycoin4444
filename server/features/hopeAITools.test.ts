@@ -51,21 +51,43 @@ describe("HopeAI real tool registry", () => {
     expect(JSON.stringify(result.output)).toContain("governing_law");
   });
 
-  it("keeps secret-bearing helpers disabled from autonomous model use", () => {
+  it("keeps secret-bearing and unsafe regex helpers disabled from autonomous model use", async () => {
     expect(getHopeTool("password_strength").availability).toBe("disabled");
     expect(getHopeTool("jwt_decode_unverified").availability).toBe("disabled");
+    expect(getHopeTool("regex_test").availability).toBe("disabled");
     const exposedNames = toLLMTools().map(tool => tool.function.name);
     expect(exposedNames).not.toContain("password_strength");
     expect(exposedNames).not.toContain("jwt_decode_unverified");
-  });
-
-  it("rejects obviously expensive regular expressions", async () => {
+    expect(exposedNames).not.toContain("regex_test");
     await expect(
       executeHopeTool("regex_test", {
-        pattern: "(a+)+$",
+        pattern: "(a|aa)+$",
         text: "a".repeat(1000) + "!",
       })
-    ).rejects.toThrow(/potentially expensive/i);
+    ).rejects.toThrow(/disabled|not executable|configured external integration/i);
+  });
+
+  it("rejects text replacement amplification before constructing the result", async () => {
+    await expect(
+      executeHopeTool("text_replace", {
+        text: "a".repeat(20_000),
+        find: "a",
+        replace: "x".repeat(2_000),
+      })
+    ).rejects.toThrow(/exceed 8000 characters/i);
+  });
+
+  it("caps oversized tool results returned to the agent", async () => {
+    const result = await executeHopeTool("sort_lines", {
+      text: Array.from({ length: 4_500 }, (_, index) =>
+        "line-" + index.toString().padStart(4, "0")
+      ).join("\n"),
+      direction: "desc",
+    });
+    expect(result.output).toMatchObject({
+      truncated: true,
+      limitCharacters: 8_000,
+    });
   });
 
   it("fails closed when an external integration is not connected", async () => {
