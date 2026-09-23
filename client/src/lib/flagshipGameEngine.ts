@@ -5,6 +5,14 @@ export type PlayingCard = Readonly<{ suit: Suit; rank: Rank }>;
 const SUITS: readonly Suit[] = ["♠", "♥", "♦", "♣"];
 const RANKS: readonly Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 const RED_ROULETTE = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+export const EUROPEAN_ROULETTE_ORDER = [
+  0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
+  5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26,
+] as const;
+
+export const PLINKO_MULTIPLIERS_10 = [8, 4.1, 2, 1.15, 0.62, 0.45, 0.62, 1.15, 2, 4.1, 8] as const;
+
 const CRYPTO_CHALLENGES = [
   {
     id: "recovery",
@@ -90,9 +98,27 @@ export function rouletteColor(number: number): "green" | "red" | "black" {
   return RED_ROULETTE.has(number) ? "red" : "black";
 }
 
-export function spinRoulette(seed: number): Readonly<{ number: number; color: "green" | "red" | "black"; proof: string }> {
-  const number = Math.floor(seededUnit(seed, 17) * 37);
-  return { number, color: rouletteColor(number), proof: demoProof(seed, "roulette") };
+export function rouletteRotationFor(number: number, turns = 6): number {
+  const index = EUROPEAN_ROULETTE_ORDER.indexOf(number as (typeof EUROPEAN_ROULETTE_ORDER)[number]);
+  const slot = index < 0 ? 0 : index;
+  const slotAngle = 360 / EUROPEAN_ROULETTE_ORDER.length;
+  return turns * 360 + (360 - slot * slotAngle - slotAngle / 2);
+}
+
+export function spinRoulette(seed: number): Readonly<{
+  number: number;
+  color: "green" | "red" | "black";
+  proof: string;
+  rotation: number;
+}> {
+  const index = Math.floor(seededUnit(seed, 17) * EUROPEAN_ROULETTE_ORDER.length);
+  const number = EUROPEAN_ROULETTE_ORDER[index] ?? 0;
+  return {
+    number,
+    color: rouletteColor(number),
+    proof: demoProof(seed, "roulette"),
+    rotation: rouletteRotationFor(number, 5 + Math.floor(seededUnit(seed, 18) * 3)),
+  };
 }
 
 export type RouletteBet =
@@ -112,19 +138,41 @@ export function simulatePlinko(seed: number, rows = 10): Readonly<{
   bucket: number;
   multiplier: number;
   proof: string;
+  points: readonly Readonly<{ x: number; y: number }>[];
 }> {
   if (!Number.isInteger(rows) || rows < 4 || rows > 16) throw new Error("rows must be an integer between 4 and 16");
   const path: Array<"L" | "R"> = [];
+  const points: Array<{ x: number; y: number }> = [{ x: 50, y: 3 }];
   let bucket = 0;
+  let lateral = 0;
+
   for (let row = 0; row < rows; row += 1) {
     const right = seededUnit(seed, row + 31) >= 0.5;
     path.push(right ? "R" : "L");
     if (right) bucket += 1;
+    lateral += right ? 1 : -1;
+    points.push({
+      x: 50 + (lateral / Math.max(1, rows)) * 43,
+      y: 8 + ((row + 1) / rows) * 82,
+    });
   }
-  const center = rows / 2;
-  const distance = Math.abs(bucket - center) / Math.max(1, center);
-  const multiplier = Number((0.45 + Math.pow(distance, 2.15) * 7.55).toFixed(2));
-  return { path, bucket, multiplier, proof: demoProof(seed, "plinko") };
+
+  let multiplier: number;
+  if (rows === 10) {
+    multiplier = PLINKO_MULTIPLIERS_10[bucket] ?? 0.45;
+  } else {
+    const center = rows / 2;
+    const distance = Math.abs(bucket - center) / Math.max(1, center);
+    multiplier = Number((0.45 + Math.pow(distance, 2.15) * 7.55).toFixed(2));
+  }
+
+  return {
+    path,
+    bucket,
+    multiplier,
+    proof: demoProof(seed, "plinko"),
+    points,
+  };
 }
 
 export function nextCardRank(seed: number): number {
@@ -145,6 +193,11 @@ export function crashPoint(seed: number): number {
   const unit = Math.min(0.999999, Math.max(0.000001, seededUnit(seed, 91)));
   const raw = 1 + (-Math.log(1 - unit) * 1.35);
   return Number(Math.min(25, Math.max(1.01, raw)).toFixed(2));
+}
+
+export function crashCurveMultiplier(elapsedMs: number): number {
+  const seconds = Math.max(0, elapsedMs) / 1000;
+  return Number(Math.max(1, Math.exp(seconds * 0.285)).toFixed(2));
 }
 
 export function cryptoChallenge(seed: number) {
