@@ -153,6 +153,10 @@ export function parseSavedDatingProfile(
 export default function DatingProfileSetup() {
   const { isAuthenticated } = useAuth();
   const utils = trpc.useUtils();
+  const serverProfile = trpc.dating.profile.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
   const saveServerProfile = trpc.dating.upsertProfile.useMutation({
     onSuccess: async () => {
       await utils.dating.profile.invalidate();
@@ -169,6 +173,7 @@ export default function DatingProfileSetup() {
     "idle" | "saved" | "local-only" | "error"
   >("idle");
   const [restoredPhotoCount, setRestoredPhotoCount] = useState(0);
+  const [serverHydrated, setServerHydrated] = useState(false);
   const totalSteps = 5;
 
   useEffect(() => {
@@ -190,6 +195,40 @@ export default function DatingProfileSetup() {
     setRestoredPhotoCount(photoCount);
     setSavedAt(restoredSavedAt);
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || !serverProfile.data || serverHydrated) return;
+
+    const serverGender =
+      serverProfile.data.gender === "man" ||
+      serverProfile.data.gender === "woman" ||
+      serverProfile.data.gender === "nonbinary" ||
+      serverProfile.data.gender === "other" ||
+      serverProfile.data.gender === "prefer-not-to-say"
+        ? serverProfile.data.gender
+        : "prefer-not-to-say";
+    const serverIntent =
+      serverProfile.data.lookingFor === "relationship" ||
+      serverProfile.data.lookingFor === "casual" ||
+      serverProfile.data.lookingFor === "friendship" ||
+      serverProfile.data.lookingFor === "networking"
+        ? serverProfile.data.lookingFor
+        : "relationship";
+
+    setFormData(current => ({
+      ...current,
+      bio: serverProfile.data.bio ?? "",
+      age:
+        typeof serverProfile.data.age === "number"
+          ? serverProfile.data.age
+          : current.age,
+      location: serverProfile.data.location ?? "",
+      interests: serverProfile.data.interests,
+      gender: serverGender,
+      lookingFor: serverIntent,
+    }));
+    setServerHydrated(true);
+  }, [isAuthenticated, serverProfile.data, serverHydrated]);
 
   const readiness = useMemo(
     () =>
@@ -277,7 +316,7 @@ export default function DatingProfileSetup() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-8">
           <Badge variant="outline" className="mb-3">
-            18+ only · engineering beta · browser-session save
+            18+ only · engineering beta · local draft + authenticated server fields
           </Badge>
           <div className="mb-3 flex items-center gap-2 text-pink-700">
             <Sparkles className="h-5 w-5" />
@@ -309,9 +348,11 @@ export default function DatingProfileSetup() {
               </p>
             </div>
             <p className="max-w-sm text-xs leading-5 text-gray-500">
-              Profile data is saved only in this browser session. No server
-              persistence, matching, messaging, identity verification, or safety
-              screening is claimed.
+              When signed in, bio, age, general location, interests, gender, and
+              relationship intent are persisted to the dating database. Display
+              name draft, selected local photos, height, body type, and
+              verification preference stay in this browser session. No identity
+              verification, background check, or safety screening is claimed.
             </p>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-pink-100">
