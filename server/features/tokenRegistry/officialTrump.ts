@@ -94,6 +94,7 @@ function parseTrumpAmount(value: string): { display: string; baseUnits: bigint }
   const [whole, fraction = ''] = normalized.split('.');
   const baseUnits = BigInt(whole) * 1_000_000n + BigInt(fraction.padEnd(6, '0'));
   if (baseUnits <= 0n) throw new Error('amount must be positive with no more than 6 decimals');
+  if (baseUnits > MAX_SPL_U64) throw new Error('amount exceeds the Solana SPL u64 limit');
   return { display: `${whole}.${fraction.padEnd(6, '0')}`, baseUnits };
 }
 
