@@ -45,7 +45,7 @@ export default function GameCrash() {
         setMultiplier(locked);
         setTrail(values => [...values, locked].slice(-120));
         setCredits(value => Number((value + roundStake * locked).toFixed(2)));
-        setHistory(values => [{ point: crashAt, outcome: "cash" }, ...values].slice(0, 10));
+        setHistory(values => [{ point: crashAt, outcome: "cash" as const }, ...values].slice(0, 10));
         setMessage("Auto cash-out locked at " + locked.toFixed(2) + "x.");
         setState("cashed");
         return;
@@ -54,7 +54,7 @@ export default function GameCrash() {
       if (next >= crashAt) {
         setMultiplier(crashAt);
         setTrail(values => [...values, crashAt].slice(-120));
-        setHistory(values => [{ point: crashAt, outcome: "crash" }, ...values].slice(0, 10));
+        setHistory(values => [{ point: crashAt, outcome: "crash" as const }, ...values].slice(0, 10));
         setMessage("Crashed at " + crashAt.toFixed(2) + "x. The local demo stake was consumed.");
         setState("crashed");
         return;
@@ -91,7 +91,7 @@ export default function GameCrash() {
     if (state !== "running") return;
     const locked = multiplier;
     setCredits(value => Number((value + roundStake * locked).toFixed(2)));
-    setHistory(values => [{ point: crashAt, outcome: "cash" }, ...values].slice(0, 10));
+    setHistory(values => [{ point: crashAt, outcome: "cash" as const }, ...values].slice(0, 10));
     setMessage("Cashed out at " + locked.toFixed(2) + "x for " + (roundStake * locked).toFixed(2) + " demo credits.");
     setState("cashed");
   }
