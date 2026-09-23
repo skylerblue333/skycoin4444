@@ -71,6 +71,7 @@ export type UnsignedTrumpTransferIntent = Readonly<{
 
 const SOLANA_ADDRESS = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 const AMOUNT = /^(?:0|[1-9]\d*)(?:\.\d{1,6})?$/;
+const MAX_SPL_U64 = 18_446_744_073_709_551_615n;
 const REQUIRED_ACKNOWLEDGEMENTS = [
   'mint',
   'network',
