@@ -121,7 +121,7 @@ export default function Arcade() {
   }
 
   function playHighLow(guess: "higher" | "lower") {
-    if (!canPlay()) return;
+    if (highLowReveal !== null || !canPlay()) return;
     const nextSeed = seed + 1;
     const next = nextCardRank(nextSeed);
     const outcome = resolveHighLow(highLowCard, next, guess);
@@ -313,8 +313,8 @@ export default function Arcade() {
                       <span className="text-8xl font-black">{cardLabel(highLowReveal ?? highLowCard)}</span>
                     </motion.div>
                     <div className="mt-6 flex justify-center gap-3">
-                      <Button size="lg" onClick={() => playHighLow("lower")}><ArrowDown className="mr-2 h-5 w-5" />Lower</Button>
-                      <Button size="lg" variant="outline" className="border-white/15 bg-white/[0.04] text-white" onClick={() => playHighLow("higher")}><ArrowUp className="mr-2 h-5 w-5" />Higher</Button>
+                      <Button size="lg" disabled={highLowReveal !== null} onClick={() => playHighLow("lower")}><ArrowDown className="mr-2 h-5 w-5" />Lower</Button>
+                      <Button size="lg" variant="outline" className="border-white/15 bg-white/[0.04] text-white" disabled={highLowReveal !== null} onClick={() => playHighLow("higher")}><ArrowUp className="mr-2 h-5 w-5" />Higher</Button>
                     </div>
                     <p className="mt-5 text-2xl font-black">Streak {highLowStreak}</p>
                   </div>
