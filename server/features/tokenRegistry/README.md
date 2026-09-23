@@ -17,3 +17,9 @@ The integration never receives private keys, signs, broadcasts, automates a tran
 Configured Solana mint: `6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN`.
 
 Treat the configured address as an integration identifier only. This module does not provide investment advice, a price forecast, political advocacy, or a recommendation to buy, sell, hold, or transfer any asset.
+
+## 120-capability platform matrix
+
+`officialTrumpCapabilities.ts` expands the integration into a typed 120-capability matrix spanning asset identity, wallets, transaction/network execution, custody/security, trading/liquidity, payments/settlement, compliance/legal status, accounting/tax data, treasury/enterprise, consumer/social experiences, reliability/operations, and cross-chain integration.
+
+The matrix includes legal-tender status, custody, live transaction broadcasting, settlement, automated trading, and 115 additional capabilities, but it intentionally separates implemented contracts from engineering plans, provider-dependent integrations, and authority-only statuses. See [TRUMP Crypto Capability Matrix](../../../docs/TRUMP_CRYPTO_CAPABILITY_MATRIX.md).
