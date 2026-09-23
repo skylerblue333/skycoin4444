@@ -208,6 +208,34 @@ export default function DatingDiscovery() {
     );
   }
 
+  if (profile.isError || preferences.isError) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#090404] p-4 text-white">
+        <Card className="w-full max-w-lg border-red-400/20 bg-red-400/[0.06] p-7 text-center text-white">
+          <AlertTriangle className="mx-auto h-10 w-10 text-red-300" />
+          <h1 className="mt-3 text-xl font-black">
+            Dating setup could not load
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-white/55">
+            {profile.error?.message ??
+              preferences.error?.message ??
+              "The dating service is unavailable."}
+          </p>
+          <Button
+            className="mt-4"
+            onClick={() => {
+              void profile.refetch();
+              void preferences.refetch();
+            }}
+          >
+            <RefreshCcw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </Card>
+      </main>
+    );
+  }
+
   if (profile.isLoading || preferences.isLoading || !preferencesInitialized) {
     return (
       <main className="grid min-h-screen place-items-center bg-[#090404] text-white">
