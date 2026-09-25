@@ -440,7 +440,7 @@ export default function V3CommandPalette({
 
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.07] px-5 py-3 text-[10px] text-white/25">
               <span>↑↓ select · Enter open · ★ save · Esc close</span>
-              <span>Preferences stay on this device · route registry remains the source of truth</span>
+              <span>Registry-backed discovery · Preferences stay on this device · route registry remains the source of truth</span>
             </div>
           </div>
         </div>
