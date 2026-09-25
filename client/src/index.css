@@ -281,3 +281,56 @@
   background: rgba(241, 184, 76, 0.28);
   background-clip: padding-box;
 }
+
+
+/*
+ * Platform-wide interaction accessibility.
+ *
+ * These rules are intentionally shared so legacy and newly-built screens inherit
+ * usable keyboard focus and OS-level reduced-motion behavior without each route
+ * having to reimplement the same baseline.
+ */
+@layer base {
+  :where(
+    a[href],
+    button:not(:disabled),
+    input:not(:disabled),
+    select:not(:disabled),
+    textarea:not(:disabled),
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+    outline: 2px solid rgba(248, 198, 92, 0.9);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :where(
+    a[href],
+    button:not(:disabled),
+    input:not(:disabled),
+    select:not(:disabled),
+    textarea:not(:disabled),
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+    outline: 2px solid Highlight !important;
+    outline-offset: 3px;
+  }
+}
