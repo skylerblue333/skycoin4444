@@ -547,6 +547,31 @@ export const onChainTransactions = mysqlTable("on_chain_transactions", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const cryptoProviderEvents = mysqlTable("crypto_provider_events", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id),
+  provider: varchar("provider", { length: 64 }).notNull(),
+  eventType: varchar("event_type", { length: 64 }).notNull(),
+  asset: varchar("asset", { length: 32 }),
+  amountAtomic: varchar("amount_atomic", { length: 255 }),
+  externalRef: varchar("external_ref", { length: 255 }),
+  txHash: varchar("tx_hash", { length: 255 }),
+  status: varchar("status", { length: 64 }).default("observed").notNull(),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+}, (table) => ({
+  providerExternalUnique: uniqueIndex("crypto_provider_events_provider_external_unique").on(
+    table.provider,
+    table.externalRef
+  ),
+  userCreatedIndex: index("crypto_provider_events_user_created_idx").on(
+    table.userId,
+    table.createdAt
+  ),
+  txHashIndex: index("crypto_provider_events_tx_hash_idx").on(table.txHash),
+}));
+
 // ============ TOKEN & ECONOMY TABLES ============
 export const tokenMarketState = mysqlTable("token_market_state", {
   id: varchar("id", { length: 255 }).primaryKey(),
