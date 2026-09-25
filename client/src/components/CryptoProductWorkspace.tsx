@@ -33,6 +33,47 @@ type SwapQuote = {
   liveLiquidityClaimed: false;
 };
 
+type LiveDexQuote = {
+  provider: "0x-swap-api-v2";
+  quoteId: string;
+  chainId: number;
+  sellToken: string;
+  buyToken: string;
+  sellAmount: string;
+  buyAmount: string;
+  minBuyAmount: string | null;
+  taker: string;
+  allowanceTarget: string | null;
+  issues: unknown;
+  fees: unknown;
+  route: unknown;
+  transaction: { to: string; data: string; value: string; gas: string | null };
+  executableByWallet: true;
+  serverBroadcast: false;
+  persisted: boolean;
+};
+
+type MainnetPolicy = {
+  allowed: boolean;
+  reasons: string[];
+  policyId: string;
+  chainId: number;
+  to: string;
+  valueWei: string;
+  purpose: "transfer" | "dex-swap";
+  operatorApprovalStillRequired: true;
+};
+
+type ReconciliationResult = {
+  network: "evm";
+  chainId: number;
+  txHash: string;
+  status: string;
+  confirmations: number;
+  confirmed: boolean;
+  persisted: boolean;
+};
+
 type LiquidityPlan = {
   planId: string;
   tokenA: string;
@@ -122,14 +163,17 @@ function utf8Hex(value: string): string {
   return "0x" + Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function ethToWeiHex(value: string): string {
+function ethToWei(value: string): bigint {
   const normalized = value.trim();
   if (!/^\d+(?:\.\d{1,18})?$/.test(normalized)) {
     throw new Error("ETH amount must be a non-negative decimal with at most 18 decimals.");
   }
   const [whole, fraction = ""] = normalized.split(".");
-  const wei = BigInt(whole) * 10n ** 18n + BigInt(fraction.padEnd(18, "0"));
-  return "0x" + wei.toString(16);
+  return BigInt(whole) * 10n ** 18n + BigInt(fraction.padEnd(18, "0"));
+}
+
+function ethToWeiHex(value: string): string {
+  return "0x" + ethToWei(value).toString(16);
 }
 
 function shortHex(value: string) {
@@ -161,8 +205,15 @@ export default function CryptoProductWorkspace() {
   const [sendEth, setSendEth] = useState("0");
   const [txHash, setTxHash] = useState("");
   const [walletBusy, setWalletBusy] = useState(false);
+  const [reconciliation, setReconciliation] = useState<ReconciliationResult | null>(null);
 
   const [swapQuote, setSwapQuote] = useState<SwapQuote | null>(null);
+  const [liveDexQuote, setLiveDexQuote] = useState<LiveDexQuote | null>(null);
+  const [liveDexPolicy, setLiveDexPolicy] = useState<MainnetPolicy | null>(null);
+  const [liveSellToken, setLiveSellToken] = useState("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+  const [liveBuyToken, setLiveBuyToken] = useState("0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48");
+  const [liveSellAmount, setLiveSellAmount] = useState("1000000000000000");
+  const [liveSlippageBps, setLiveSlippageBps] = useState("100");
   const [swapError, setSwapError] = useState<string | null>(null);
   const [tokenIn, setTokenIn] = useState("ETH");
   const [tokenOut, setTokenOut] = useState("USDC");
@@ -242,19 +293,29 @@ export default function CryptoProductWorkspace() {
     }
   };
 
-  const broadcastTestnet = async () => {
+  const broadcastWalletTransaction = async () => {
     const provider = browserProvider();
     if (!provider || !account) return;
     setWalletBusy(true);
     setWalletError(null);
     setTxHash("");
+    setReconciliation(null);
     try {
       const currentChain = String(await provider.request({ method: "eth_chainId" }));
-      if (!TESTNETS[currentChain]) {
-        throw new Error("Broadcast is limited to Ethereum Sepolia or Base Sepolia in this beta.");
-      }
       if (!/^0x[a-fA-F0-9]{40}$/.test(sendTo.trim())) {
         throw new Error("Destination must be a valid 20-byte EVM address.");
+      }
+      const valueWei = ethToWei(sendEth);
+      if (!TESTNETS[currentChain]) {
+        const policy = await postJson<MainnetPolicy>("/api/crypto-provider/wallet/mainnet-policy", {
+          chainId: Number(BigInt(currentChain)),
+          to: sendTo.trim(),
+          valueWei: valueWei.toString(),
+          purpose: "transfer",
+        });
+        if (!policy.allowed) {
+          throw new Error("Mainnet policy denied: " + policy.reasons.join("; "));
+        }
       }
       const hash = String(
         await provider.request({
@@ -271,9 +332,64 @@ export default function CryptoProductWorkspace() {
       setTxHash(hash);
       setChainId(currentChain);
     } catch (error) {
-      setWalletError(error instanceof Error ? error.message : "Testnet broadcast failed.");
+      setWalletError(error instanceof Error ? error.message : "Wallet broadcast failed.");
     } finally {
       setWalletBusy(false);
+    }
+  };
+
+  const reconcileWalletTransaction = async () => {
+    if (!txHash || !chainId) return;
+    setWalletBusy(true);
+    setWalletError(null);
+    try {
+      setReconciliation(
+        await postJson<ReconciliationResult>("/api/crypto-provider/tx/reconcile", {
+          network: "evm",
+          chainId: Number(BigInt(chainId)),
+          txHash,
+          minConfirmations: 2,
+        }),
+      );
+    } catch (error) {
+      setWalletError(error instanceof Error ? error.message : "Transaction reconciliation failed.");
+    } finally {
+      setWalletBusy(false);
+    }
+  };
+
+  const runLiveDexQuote = async () => {
+    if (!account || !chainId) {
+      setSwapError("Connect an EVM wallet before requesting a live provider quote.");
+      return;
+    }
+    setSwapError(null);
+    setLiveDexQuote(null);
+    setLiveDexPolicy(null);
+    try {
+      const quote = await postJson<LiveDexQuote>("/api/crypto-provider/dex/0x/quote", {
+        chainId: Number(BigInt(chainId)),
+        sellToken: liveSellToken,
+        buyToken: liveBuyToken,
+        sellAmount: liveSellAmount,
+        taker: account,
+        slippageBps: Number(liveSlippageBps),
+      });
+      setLiveDexQuote(quote);
+      try {
+        setLiveDexPolicy(
+          await postJson<MainnetPolicy>("/api/crypto-provider/wallet/mainnet-policy", {
+            chainId: quote.chainId,
+            to: quote.transaction.to,
+            valueWei: quote.transaction.value,
+            purpose: "dex-swap",
+          }),
+        );
+      } catch {
+        setLiveDexPolicy(null);
+      }
+    } catch (error) {
+      setSwapError(error instanceof Error ? error.message : "Live DEX quote failed.");
     }
   };
 
@@ -460,13 +576,14 @@ export default function CryptoProductWorkspace() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Radio className="h-5 w-5 text-violet-300" />
-                  Testnet transaction broadcast
+                  Wallet transaction broadcast
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-zinc-400">
-                  Enabled only when the connected wallet is on Ethereum Sepolia or Base Sepolia.
-                  The wallet displays the final transaction and gas request before anything is sent.
+                  Sepolia and Base Sepolia are enabled directly for beta testing. Other EVM chains must pass
+                  the server's explicit mainnet chain, destination, and native-value policy before the wallet
+                  is asked to send anything. The wallet still shows the final transaction for user approval.
                 </p>
                 <div className="grid gap-3 md:grid-cols-2">
                   <label className="text-xs text-zinc-400">
@@ -474,17 +591,26 @@ export default function CryptoProductWorkspace() {
                     <input className={inputClass} value={sendTo} onChange={event => setSendTo(event.target.value)} />
                   </label>
                   <label className="text-xs text-zinc-400">
-                    Test ETH amount
+                    Native asset amount
                     <input className={inputClass} value={sendEth} onChange={event => setSendEth(event.target.value)} />
                   </label>
                 </div>
-                <Button onClick={() => void broadcastTestnet()} disabled={!account || walletBusy}>
-                  Broadcast with wallet approval
+                <Button onClick={() => void broadcastWalletTransaction()} disabled={!account || walletBusy}>
+                  Evaluate policy & broadcast with wallet approval
                 </Button>
                 {txHash && (
                   <ResultBox>
                     <div className="text-xs text-zinc-500">Submitted transaction hash</div>
                     <div className="mt-1 break-all font-mono text-violet-200">{txHash}</div>
+                    <Button className="mt-3" variant="outline" size="sm" onClick={() => void reconcileWalletTransaction()} disabled={walletBusy}>
+                      Check confirmations
+                    </Button>
+                    {reconciliation && (
+                      <div className="mt-3 text-xs">
+                        Status: {reconciliation.status} · confirmations: {reconciliation.confirmations} ·
+                        persisted: {reconciliation.persisted ? "yes" : "no"}
+                      </div>
+                    )}
                   </ResultBox>
                 )}
               </CardContent>
@@ -517,6 +643,37 @@ export default function CryptoProductWorkspace() {
                   <div className="mt-2 text-xs text-amber-200">Planning only · no live liquidity claimed</div>
                 </ResultBox>
               )}
+              <div className="border-t border-white/10 pt-5">
+                <h3 className="text-lg font-bold">Live 0x Swap API v2 route</h3>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Uses the configured server-side 0x API key to request a real provider quote for the connected
+                  EVM wallet. SKYCOIN4444 never sends the API key to the browser and does not auto-broadcast the quote.
+                </p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <label className="text-xs text-zinc-400">Sell token address<input className={inputClass} value={liveSellToken} onChange={event => setLiveSellToken(event.target.value)} /></label>
+                  <label className="text-xs text-zinc-400">Buy token address<input className={inputClass} value={liveBuyToken} onChange={event => setLiveBuyToken(event.target.value)} /></label>
+                  <label className="text-xs text-zinc-400">Sell amount (atomic units)<input className={inputClass} value={liveSellAmount} onChange={event => setLiveSellAmount(event.target.value)} /></label>
+                  <label className="text-xs text-zinc-400">Slippage bps<input className={inputClass} value={liveSlippageBps} onChange={event => setLiveSlippageBps(event.target.value)} /></label>
+                </div>
+                <Button className="mt-4" onClick={() => void runLiveDexQuote()} disabled={!account}>
+                  Request live 0x route
+                </Button>
+                {liveDexQuote && (
+                  <ResultBox>
+                    <div><span className="text-zinc-500">Provider:</span> {liveDexQuote.provider}</div>
+                    <div><span className="text-zinc-500">Buy amount:</span> {liveDexQuote.buyAmount}</div>
+                    <div><span className="text-zinc-500">Transaction target:</span> {shortHex(liveDexQuote.transaction.to)}</div>
+                    <div><span className="text-zinc-500">Quote persisted:</span> {liveDexQuote.persisted ? "yes" : "no"}</div>
+                    <div className="mt-2 text-xs text-amber-200">
+                      {liveDexPolicy
+                        ? liveDexPolicy.allowed
+                          ? "Server mainnet policy allows this target/value, but wallet approval and token allowance are still required."
+                          : "Server mainnet policy denies execution: " + liveDexPolicy.reasons.join("; ")
+                        : "Execution policy unavailable or not configured. Quote remains read-only."}
+                    </div>
+                  </ResultBox>
+                )}
+              </div>
               {swapError && <div className="text-sm text-red-300">{swapError}</div>}
             </CardContent>
           </Card>
