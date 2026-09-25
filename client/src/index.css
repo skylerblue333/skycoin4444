@@ -334,3 +334,49 @@
     outline-offset: 3px;
   }
 }
+
+
+/* Browser-local accessibility preferences applied by GlobalExperienceRuntime. */
+html.sky-a11y-scale-100 {
+  font-size: 100%;
+}
+html.sky-a11y-scale-110 {
+  font-size: 110%;
+}
+html.sky-a11y-scale-125 {
+  font-size: 125%;
+}
+html.sky-a11y-scale-150 {
+  font-size: 150%;
+}
+
+html.sky-a11y-high-contrast {
+  --foreground: oklch(0.98 0.005 80);
+  --muted-foreground: oklch(0.82 0.015 80);
+  --border: oklch(0.72 0.03 78);
+  --input: oklch(0.72 0.03 78);
+  --ring: oklch(0.88 0.15 82);
+}
+
+html.sky-a11y-underline-links a[href] {
+  text-decoration-line: underline;
+  text-decoration-thickness: max(1px, 0.08em);
+  text-underline-offset: 0.18em;
+}
+
+html.sky-a11y-reduced-motion,
+html.sky-a11y-reduced-motion * ,
+html.sky-a11y-reduced-motion *::before,
+html.sky-a11y-reduced-motion *::after {
+  scroll-behavior: auto !important;
+}
+
+html.sky-a11y-reduced-motion *,
+html.sky-a11y-reduced-motion *::before,
+html.sky-a11y-reduced-motion *::after {
+  animation-delay: 0ms !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-delay: 0ms !important;
+  transition-duration: 0.01ms !important;
+}
