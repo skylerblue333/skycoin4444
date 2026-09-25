@@ -55,7 +55,11 @@ function notifyAccessibilityPreferenceChange() {
 export function saveAccessibilityPreferences(next: AccessibilityPreview) {
   const normalized = normalizeAccessibilityPreview(next);
   if (typeof window !== "undefined") {
-    window.localStorage.setItem(ACCESSIBILITY_STORAGE_KEY, JSON.stringify(normalized));
+    try {
+      window.localStorage.setItem(ACCESSIBILITY_STORAGE_KEY, JSON.stringify(normalized));
+    } catch {
+      // Preference changes should still apply for this session when storage is blocked.
+    }
     notifyAccessibilityPreferenceChange();
   }
   return normalized;
@@ -63,7 +67,11 @@ export function saveAccessibilityPreferences(next: AccessibilityPreview) {
 
 export function resetAccessibilityPreferences() {
   if (typeof window !== "undefined") {
-    window.localStorage.removeItem(ACCESSIBILITY_STORAGE_KEY);
+    try {
+      window.localStorage.removeItem(ACCESSIBILITY_STORAGE_KEY);
+    } catch {
+      // Reset should remain non-fatal when browser storage is unavailable.
+    }
     notifyAccessibilityPreferenceChange();
   }
   return defaultAccessibilityPreview;
