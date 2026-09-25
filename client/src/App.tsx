@@ -16,6 +16,7 @@ import OperationalReadiness from "./pages/OperationalReadiness";
 import RouteHealth from "./pages/RouteHealth";
 import DiscoveryCenter from "./pages/DiscoveryCenter";
 import BetaNavigation from "./components/BetaNavigation";
+import GlobalExperienceRuntime from "./components/GlobalExperienceRuntime";
 
 // Lazy load all 1057 pages
 const ABTesting = lazy(() => import('./pages/ABTesting'));
@@ -2174,8 +2175,11 @@ function App() {
       <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
           <Toaster />
+          <GlobalExperienceRuntime />
           <GlobalNavigation />
-          <Router />
+          <main id="sky4444-route-content" tabIndex={-1}>
+            <Router />
+          </main>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
