@@ -326,6 +326,8 @@ importers:
 
   packages/sky-entitlements: {}
 
+  packages/sky-enterprise-foundation: {}
+
   packages/sky-evaluation: {}
 
   packages/sky-experimentation: {}
