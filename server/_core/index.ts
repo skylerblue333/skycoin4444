@@ -11,6 +11,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { registerLiveRoomRoutes } from "./liveRoomRoutes";
 import { registerCryptoLabRoutes } from "./cryptoLab";
 import { registerCryptoProductRoutes } from "./cryptoProducts";
+import { registerCryptoProviderRoutes } from "./cryptoProviderAdapters";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { closeDatabasePool } from "../db";
@@ -119,6 +120,7 @@ async function startServer() {
   registerLiveRoomRoutes(app);
   registerCryptoLabRoutes(app);
   registerCryptoProductRoutes(app);
+  registerCryptoProviderRoutes(app);
 
   app.use(
     "/api/trpc",
