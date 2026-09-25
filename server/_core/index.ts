@@ -9,6 +9,7 @@ import { registerPlatformKernelRoutes } from "./platformKernel";
 import { registerEventFabricRoutes } from "./eventRegistry";
 import { registerStorageProxy } from "./storageProxy";
 import { registerLiveRoomRoutes } from "./liveRoomRoutes";
+import { registerCryptoLabRoutes } from "./cryptoLab";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { closeDatabasePool } from "../db";
@@ -115,6 +116,7 @@ async function startServer() {
   registerEventFabricRoutes(app);
   registerOutboxDispatcherRoutes(app, outboxDispatcher);
   registerLiveRoomRoutes(app);
+  registerCryptoLabRoutes(app);
 
   app.use(
     "/api/trpc",
