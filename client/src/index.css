@@ -365,7 +365,7 @@ html.sky-a11y-underline-links a[href] {
 }
 
 html.sky-a11y-reduced-motion,
-html.sky-a11y-reduced-motion * ,
+html.sky-a11y-reduced-motion *,
 html.sky-a11y-reduced-motion *::before,
 html.sky-a11y-reduced-motion *::after {
   scroll-behavior: auto !important;
