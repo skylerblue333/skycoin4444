@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   defaultAccessibilityPreview,
-  normalizeAccessibilityPreview,
   type AccessibilityPreview,
 } from "@/lib/betaUtilities";
+import {
+  loadAccessibilityPreferences,
+  resetAccessibilityPreferences,
+  saveAccessibilityPreferences,
+} from "@/lib/accessibilityPreferences";
 import { Accessibility, RotateCcw } from "lucide-react";
-
-const STORAGE_KEY = "sky4444.beta-accessibility-preview";
 
 export default function AccessibilitySettings() {
   const [settings, setSettings] = useState<AccessibilityPreview>(
@@ -18,24 +20,18 @@ export default function AccessibilitySettings() {
 
   useEffect(() => {
     try {
-      setSettings(
-        normalizeAccessibilityPreview(
-          JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")
-        )
-      );
+      setSettings(loadAccessibilityPreferences());
     } catch {
       setSettings(defaultAccessibilityPreview);
     }
   }, []);
 
   const update = (next: AccessibilityPreview) => {
-    setSettings(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    setSettings(saveAccessibilityPreferences(next));
   };
 
   const reset = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setSettings(defaultAccessibilityPreview);
+    setSettings(resetAccessibilityPreferences());
   };
 
   const previewStyle = {
@@ -48,16 +44,17 @@ export default function AccessibilitySettings() {
       <div className="container mx-auto max-w-6xl px-4 py-10">
         <header className="mb-8">
           <Badge variant="outline" className="mb-3">
-            Launchable beta · local preview
+            Engineering beta · browser-local app preference
           </Badge>
           <h1 className="flex items-center gap-3 text-4xl font-black">
             <Accessibility className="h-8 w-8 text-primary" />
             Accessibility Settings Lab
           </h1>
           <p className="mt-3 max-w-3xl text-muted-foreground">
-            Preview text scaling, stronger contrast, reduced motion, and
-            underlined links locally. These controls do not certify WCAG
-            conformance across the full historical screen inventory.
+            Apply text scaling, stronger design-token contrast, reduced motion,
+            and underlined links across the routed beta on this browser. These
+            controls do not certify WCAG conformance across the full historical
+            screen inventory.
           </p>
         </header>
 
@@ -66,7 +63,7 @@ export default function AccessibilitySettings() {
             <CardHeader>
               <CardTitle>Preferences</CardTitle>
               <CardDescription>
-                Stored only in this browser for this beta lab.
+                Stored only in this browser and applied across the routed beta.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -93,9 +90,9 @@ export default function AccessibilitySettings() {
               </div>
 
               {[
-                ["highContrast", "Higher contrast preview"],
-                ["reducedMotion", "Reduced motion preview"],
-                ["underlineLinks", "Underline links in preview"],
+                ["highContrast", "Higher contrast"],
+                ["reducedMotion", "Reduced motion"],
+                ["underlineLinks", "Underline links"],
               ].map(([key, label]) => {
                 const typedKey = key as keyof Pick<
                   AccessibilityPreview,
@@ -121,7 +118,7 @@ export default function AccessibilitySettings() {
 
               <Button type="button" variant="ghost" onClick={reset}>
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Reset preview
+                Reset preferences
               </Button>
             </CardContent>
           </Card>
@@ -138,8 +135,8 @@ export default function AccessibilitySettings() {
               <CardDescription
                 className={settings.highContrast ? "text-white/80" : undefined}
               >
-                Confirm that the selected preferences improve readability for
-                you before wider design-system work adopts them.
+                This sample reflects the same browser-local preferences now
+                applied by the shared app runtime.
               </CardDescription>
             </CardHeader>
             <CardContent style={previewStyle} className="space-y-5">
@@ -166,7 +163,7 @@ export default function AccessibilitySettings() {
                     : "transform 180ms ease",
                 }}
               >
-                <strong>Local-only boundary</strong>
+                <strong>Browser-local, app-wide preference</strong>
                 <p
                   className={
                     "mt-2 text-sm " +
@@ -175,8 +172,9 @@ export default function AccessibilitySettings() {
                       : "text-muted-foreground")
                   }
                 >
-                  These preferences affect this preview and remain in browser
-                  storage. They are not an accessibility certification.
+                  These preferences are applied across the routed beta in this
+                  browser. They remain convenience settings, not an accessibility
+                  certification or a cross-device account preference.
                 </p>
               </div>
             </CardContent>
