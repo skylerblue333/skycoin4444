@@ -35,7 +35,8 @@ describe("global browser-local accessibility preferences", () => {
   });
 
   it("does not claim certification or cross-device persistence", () => {
-    expect(page).toContain("not an accessibility certification");
-    expect(page).toContain("not a cross-device account preference");
+    expect(page).toMatch(/not an accessibility\s+certification/);
+    expect(page).toMatch(/cross-device account preference/);
+    expect(page).toContain("Stored only in this browser");
   });
 });
