@@ -300,7 +300,7 @@ async function probeBitcoin(env: NodeJS.ProcessEnv): Promise<NetworkProbe> {
     };
   }
   try {
-    const auth =
+    const auth: Record<string, string> =
       env.BITCOIN_RPC_USER && env.BITCOIN_RPC_PASSWORD
         ? {
             authorization:
