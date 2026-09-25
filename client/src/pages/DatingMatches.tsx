@@ -1,246 +1,247 @@
-import React, { useEffect, useState } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
+  Ban,
+  Flag,
   Heart,
+  Loader2,
   MessageCircle,
   RefreshCcw,
   ShieldCheck,
   Sparkles,
   UserRoundPen,
+  XCircle,
 } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { DatingNotificationToast } from "@/components/DatingNotificationToast";
+import { trpc } from "@/lib/trpc";
+import { buildConversationStarters } from "@/lib/datingExperience";
 
-interface Match {
-  id: number;
-  user1Id: number;
-  user2Id: number;
-  matchType: "like" | "superlike" | "mutual_like" | "mutual_superlike";
-  isMutual: boolean;
-  lastMessageAt: string | null;
-  createdAt: string;
-  matchedUser?: {
-    id: number;
-    displayName: string;
-    profileImageUrl: string;
-    age: number;
-  };
-}
+type ReportReason =
+  | "fake_profile"
+  | "harassment"
+  | "scam_money"
+  | "underage_concern"
+  | "unsafe_behavior"
+  | "other";
 
-interface Message {
-  id: number;
-  matchId: number;
-  senderId: number;
-  recipientId: number;
-  content: string;
-  mediaUrl: string | null;
-  mediaType: "image" | "video" | "audio" | null;
-  readAt: string | null;
-  createdAt: string;
-}
+const reportReasonLabels: Record<ReportReason, string> = {
+  fake_profile: "Fake or impersonated profile",
+  harassment: "Harassment or threats",
+  scam_money: "Money / crypto / gift-card scam",
+  underage_concern: "Possible underage use",
+  unsafe_behavior: "Unsafe behavior",
+  other: "Other concern",
+};
 
-const MAX_MESSAGE_LENGTH = 1000;
-
-function safeRelativeTime(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "recently";
-  return formatDistanceToNow(date, { addSuffix: true });
-}
-
-function isAdultMatchedUser(match: Match) {
-  return !match.matchedUser || Number(match.matchedUser.age) >= 18;
+function relativeLabel(value: Date | string | null | undefined) {
+  if (!value) return "no messages yet";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "recent activity";
+  const minutes = Math.max(
+    0,
+    Math.floor((Date.now() - date.getTime()) / 60_000)
+  );
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 export default function DatingMatches() {
-  const { user } = useAuth();
-  const parsedUserId = Number(user?.id);
-  const currentUserId = Number.isFinite(parsedUserId) ? parsedUserId : null;
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const utils = trpc.useUtils();
+  const matchesQuery = trpc.dating.matches.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
+
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [messageLoading, setMessageLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [conversationError, setConversationError] = useState<string | null>(null);
-  const [sendError, setSendError] = useState<string | null>(null);
-  const [sendStatus, setSendStatus] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [safetyOpen, setSafetyOpen] = useState(false);
+  const [reportReason, setReportReason] =
+    useState<ReportReason>("unsafe_behavior");
+  const [reportDetails, setReportDetails] = useState("");
+  const [blockAfterReport, setBlockAfterReport] = useState(true);
 
-  const loadMatches = async () => {
-    setLoading(true);
-    setLoadError(null);
-
-    try {
-      const response = await fetch("/api/dating/matches");
-      if (!response.ok) {
-        throw new Error(`Unable to load matches (${response.status}).`);
-      }
-
-      const data = (await response.json()) as { matches?: unknown };
-      if (!Array.isArray(data.matches)) {
-        throw new Error("The match service returned an invalid response.");
-      }
-
-      const safeMatches = (data.matches as Match[]).filter(isAdultMatchedUser);
-      setMatches(safeMatches);
-      setSelectedMatch(current =>
-        current && safeMatches.some(match => match.id === current.id)
-          ? current
-          : safeMatches[0] ?? null,
-      );
-    } catch (error) {
-      console.error("Failed to load matches:", error);
-      setMatches([]);
-      setSelectedMatch(null);
-      setLoadError(
-        error instanceof Error ? error.message : "Unable to load matches.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadMessages = async (matchId: number) => {
-    setMessageLoading(true);
-    setConversationError(null);
-
-    try {
-      const response = await fetch(`/api/dating/conversations/${matchId}`);
-      if (!response.ok) {
-        throw new Error(`Unable to load this conversation (${response.status}).`);
-      }
-
-      const data = (await response.json()) as { messages?: unknown };
-      if (!Array.isArray(data.messages)) {
-        throw new Error("The conversation service returned an invalid response.");
-      }
-
-      setMessages(data.messages as Message[]);
-    } catch (error) {
-      console.error("Failed to load messages:", error);
-      setMessages([]);
-      setConversationError(
-        error instanceof Error ? error.message : "Unable to load this conversation.",
-      );
-    } finally {
-      setMessageLoading(false);
-    }
-  };
+  const matches = matchesQuery.data ?? [];
 
   useEffect(() => {
-    void loadMatches();
-  }, []);
-
-  useEffect(() => {
-    if (selectedMatch) {
-      void loadMessages(selectedMatch.id);
-    } else {
-      setMessages([]);
-    }
-  }, [selectedMatch]);
-
-  const handleSendMessage = async () => {
-    const content = newMessage.trim();
-    if (
-      !content ||
-      !selectedMatch ||
-      currentUserId === null ||
-      sending ||
-      content.length > MAX_MESSAGE_LENGTH
-    ) {
+    if (!matches.length) {
+      setSelectedMatchId(null);
       return;
     }
+    if (
+      !selectedMatchId ||
+      !matches.some(match => match.id === selectedMatchId)
+    ) {
+      setSelectedMatchId(matches[0].id);
+    }
+  }, [matches, selectedMatchId]);
 
-    setSending(true);
-    setSendError(null);
-    setSendStatus(null);
+  const selectedMatch =
+    matches.find(match => match.id === selectedMatchId) ?? null;
 
-    try {
-      const response = await fetch("/api/dating/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          matchId: selectedMatch.id,
-          content,
-        }),
-      });
+  const conversation = trpc.dating.conversation.useQuery(
+    { matchId: selectedMatchId ?? "" },
+    {
+      enabled: Boolean(isAuthenticated && selectedMatchId),
+      retry: false,
+    }
+  );
 
-      if (!response.ok) {
-        let detail = "";
-        try {
-          const body = (await response.json()) as { message?: unknown; error?: unknown };
-          const candidate =
-            typeof body.message === "string" ? body.message : body.error;
-          detail = typeof candidate === "string" ? candidate.trim() : "";
-        } catch {
-          // The status code still gives the user a truthful failure state.
-        }
-        throw new Error(detail || `Message was not accepted (${response.status}).`);
-      }
+  const markConversationRead = trpc.dating.markConversationRead.useMutation({
+    onSuccess: async () => {
+      await Promise.all([
+        utils.dating.notifications.invalidate(),
+        utils.dating.summary.invalidate(),
+      ]);
+    },
+  });
 
-      setNewMessage("");
-      setSendStatus("Message sent.");
-      await loadMessages(selectedMatch.id);
-      await loadMatches();
-    } catch (error) {
-      console.error("Failed to send message:", error);
-      setSendError(
-        error instanceof Error ? error.message : "Message could not be sent.",
-      );
-    } finally {
-      setSending(false);
+  useEffect(() => {
+    if (!selectedMatchId || !conversation.data?.length) return;
+    const hasUnreadIncoming = conversation.data.some(
+      message => message.senderId !== user?.id && message.read !== true
+    );
+    if (!hasUnreadIncoming) return;
+    markConversationRead.mutate({ matchId: selectedMatchId });
+  }, [
+    selectedMatchId,
+    conversation.data,
+    user?.id,
+    markConversationRead.mutate,
+  ]);
+
+  const starters = useMemo(
+    () =>
+      selectedMatch
+        ? buildConversationStarters({
+            displayName: selectedMatch.matchedUser.displayName,
+            location: selectedMatch.matchedUser.location,
+            bio: "",
+            interests: selectedMatch.matchedUser.interests,
+          })
+        : [],
+    [selectedMatch]
+  );
+
+  const refreshInbox = async () => {
+    await Promise.all([
+      utils.dating.matches.invalidate(),
+      utils.dating.summary.invalidate(),
+      utils.dating.notifications.invalidate(),
+    ]);
+    if (selectedMatchId) {
+      await utils.dating.conversation.invalidate({ matchId: selectedMatchId });
     }
   };
 
-  if (loading) {
+  const sendMessage = trpc.dating.sendMessage.useMutation({
+    onSuccess: async () => {
+      setNewMessage("");
+      setStatusMessage("Message accepted by the server.");
+      await refreshInbox();
+    },
+  });
+
+  const unmatch = trpc.dating.unmatch.useMutation({
+    onSuccess: async result => {
+      setSafetyOpen(false);
+      setStatusMessage(result.message);
+      setSelectedMatchId(null);
+      await refreshInbox();
+    },
+  });
+
+  const block = trpc.dating.block.useMutation({
+    onSuccess: async () => {
+      setSafetyOpen(false);
+      setStatusMessage("Profile blocked and active dating connection closed.");
+      setSelectedMatchId(null);
+      await refreshInbox();
+    },
+  });
+
+  const report = trpc.dating.report.useMutation({
+    onSuccess: async result => {
+      setSafetyOpen(false);
+      setReportDetails("");
+      setStatusMessage(result.message);
+      if (result.blocked) setSelectedMatchId(null);
+      await refreshInbox();
+    },
+  });
+
+  const send = () => {
+    const content = newMessage.trim();
+    if (!selectedMatchId || !content || sendMessage.isPending) return;
+    setStatusMessage(null);
+    sendMessage.mutate({ matchId: selectedMatchId, content });
+  };
+
+  if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#090404] text-white">
-        <div className="flex items-center gap-3" role="status" aria-live="polite">
-          <Spinner />
-          Loading matches…
-        </div>
-      </div>
+      <main className="grid min-h-screen place-items-center bg-[#090404] text-white">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#090404] p-4 text-white">
+        <Card className="w-full max-w-lg border-white/10 bg-white/[0.04] p-7 text-center text-white">
+          <ShieldCheck className="mx-auto h-12 w-12 text-pink-300" />
+          <h1 className="mt-4 text-2xl font-black">Sign in to open matches</h1>
+          <p className="mt-2 text-sm leading-6 text-white/55">
+            Matches and messages are tied to the authenticated beta account.
+          </p>
+          <Link href="/signin">
+            <Button className="mt-5">Sign in</Button>
+          </Link>
+        </Card>
+      </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-[#090404] px-4 py-8 text-white">
-      <DatingNotificationToast />
-
       <div className="mx-auto max-w-7xl">
-        <header className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-amber-200/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 sm:flex-row sm:items-center sm:justify-between">
+        <header className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-amber-100/70">
+            <div className="flex items-center gap-2 text-pink-200">
               <Sparkles className="h-4 w-4" />
               <span className="text-xs font-black uppercase tracking-[0.18em]">
-                Adult-only dating beta
+                Mutual matches only
               </span>
             </div>
             <h1 className="mt-2 text-3xl font-black tracking-tight">
               Matches & conversations
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/55">
-              Keep the journey connected: discover, match, message, and keep
-              safety controls visible. Messages appear only after the server
-              accepts them.
+              Conversation access is authorized by an active mutual match.
+              Sending is server-confirmed; block, report, and unmatch controls
+              close the active dating connection.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/dating-profile-setup">
-              <Button variant="outline" className="border-white/10 bg-white/[0.04] text-white hover:bg-white/[0.08]">
+              <Button
+                variant="outline"
+                className="border-white/10 bg-white/[0.03] text-white"
+              >
                 <UserRoundPen className="mr-2 h-4 w-4" />
-                Edit profile
+                Profile
               </Button>
             </Link>
             <Link href="/dating-discovery">
-              <Button className="bg-pink-600 text-white hover:bg-pink-500">
+              <Button className="bg-pink-600 hover:bg-pink-500">
                 <Heart className="mr-2 h-4 w-4" />
                 Discover
               </Button>
@@ -248,17 +249,16 @@ export default function DatingMatches() {
           </div>
         </header>
 
-        {loadError ? (
-          <Card className="mb-6 border-red-400/20 bg-red-400/[0.06] p-5 text-white">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-300" />
-                <div>
-                  <h2 className="font-bold">Matches are unavailable</h2>
-                  <p className="mt-1 text-sm text-red-100/70">{loadError}</p>
-                </div>
+        {matchesQuery.isError ? (
+          <Card className="mb-5 border-red-400/20 bg-red-400/[0.06] p-5 text-white">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-black">Matches could not load</h2>
+                <p className="mt-1 text-sm text-white/50">
+                  {matchesQuery.error.message}
+                </p>
               </div>
-              <Button variant="outline" onClick={() => void loadMatches()} className="border-red-200/20 bg-white/[0.04] text-white">
+              <Button onClick={() => void matchesQuery.refetch()}>
                 <RefreshCcw className="mr-2 h-4 w-4" />
                 Retry
               </Button>
@@ -268,11 +268,11 @@ export default function DatingMatches() {
 
         <div className="grid gap-5 lg:grid-cols-[340px_minmax(0,1fr)]">
           <div className="space-y-5">
-            <Card className="border-white/10 bg-white/[0.035] p-4 text-white">
-              <div className="mb-4 flex items-center justify-between gap-3">
+            <Card className="border-white/10 bg-white/[0.04] p-4 text-white">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/35">
-                    Your connections
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-white/30">
+                    Connections
                   </p>
                   <h2 className="mt-1 text-xl font-black">
                     {matches.length} match{matches.length === 1 ? "" : "es"}
@@ -281,16 +281,21 @@ export default function DatingMatches() {
                 <MessageCircle className="h-5 w-5 text-pink-300" />
               </div>
 
-              {matches.length === 0 ? (
+              {matchesQuery.isLoading ? (
+                <div className="flex items-center justify-center py-10 text-white/45">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading…
+                </div>
+              ) : matches.length === 0 ? (
                 <div className="rounded-2xl border border-white/8 bg-black/20 p-6 text-center">
-                  <Heart className="mx-auto h-10 w-10 text-pink-300/60" />
-                  <p className="mt-3 font-semibold">No matches yet</p>
-                  <p className="mt-1 text-sm leading-6 text-white/45">
-                    Discovery is the next step. A like alone is not represented
-                    here as a mutual match.
+                  <Heart className="mx-auto h-10 w-10 text-pink-300/50" />
+                  <p className="mt-3 font-bold">No mutual matches yet</p>
+                  <p className="mt-2 text-sm leading-6 text-white/45">
+                    A one-sided like is not shown as a match. Continue discovery
+                    and a conversation appears only after reciprocal interest.
                   </p>
                   <Link href="/dating-discovery">
-                    <Button className="mt-4 w-full bg-pink-600 hover:bg-pink-500">
+                    <Button className="mt-4 bg-pink-600 hover:bg-pink-500">
                       Open discovery
                     </Button>
                   </Link>
@@ -298,44 +303,47 @@ export default function DatingMatches() {
               ) : (
                 <div className="space-y-2">
                   {matches.map(match => {
-                    const selected = selectedMatch?.id === match.id;
-                    const name = match.matchedUser?.displayName || "Match";
-                    const age = match.matchedUser?.age;
+                    const selected = selectedMatchId === match.id;
                     return (
                       <button
-                        type="button"
                         key={match.id}
-                        disabled={sending}
-                        onClick={() => setSelectedMatch(match)}
+                        type="button"
+                        disabled={sendMessage.isPending}
+                        onClick={() => {
+                          setSelectedMatchId(match.id);
+                          setSafetyOpen(false);
+                          setStatusMessage(null);
+                        }}
                         className={
                           "w-full rounded-2xl border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 " +
                           (selected
-                            ? "border-pink-300/35 bg-pink-400/[0.09]"
+                            ? "border-pink-300/30 bg-pink-400/[0.09]"
                             : "border-white/8 bg-black/20 hover:border-white/15 hover:bg-white/[0.04]")
                         }
                       >
                         <div className="flex items-center gap-3">
-                          {match.matchedUser?.profileImageUrl ? (
+                          {match.matchedUser.profileImageUrl ? (
                             <img
                               src={match.matchedUser.profileImageUrl}
-                              alt={name}
+                              alt={match.matchedUser.displayName}
                               className="h-12 w-12 rounded-2xl object-cover"
                             />
                           ) : (
-                            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-400/15 text-lg font-black text-pink-200">
-                              {name.charAt(0).toUpperCase()}
-                            </div>
+                            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-400/15 text-lg font-black text-pink-200">
+                              {match.matchedUser.displayName
+                                .charAt(0)
+                                .toUpperCase()}
+                            </span>
                           )}
                           <div className="min-w-0 flex-1">
-                            <p className="truncate font-bold">
-                              {name}
-                              {typeof age === "number" ? `, ${age}` : ""}
+                            <p className="truncate font-black">
+                              {match.matchedUser.displayName},{" "}
+                              {match.matchedUser.age}
                             </p>
-                            <p className="mt-1 truncate text-xs text-white/40">
-                              {match.isMutual ? "Mutual match" : "Match"}
+                            <p className="mt-1 truncate text-xs text-white/35">
                               {match.lastMessageAt
-                                ? ` · active ${safeRelativeTime(match.lastMessageAt)}`
-                                : " · no messages yet"}
+                                ? `active ${relativeLabel(match.lastMessageAt)}`
+                                : "no messages yet"}
                             </p>
                           </div>
                         </div>
@@ -346,96 +354,205 @@ export default function DatingMatches() {
               )}
             </Card>
 
-            <Card className="border-emerald-300/15 bg-emerald-300/[0.045] p-5 text-white">
+            <Card className="border-emerald-300/15 bg-emerald-300/[0.05] p-5 text-white">
               <div className="flex items-center gap-2 text-emerald-200">
                 <ShieldCheck className="h-5 w-5" />
-                <h2 className="font-bold">Keep first meetings safer</h2>
+                <h2 className="font-black">Messaging safety</h2>
               </div>
               <div className="mt-3 space-y-2 text-sm leading-6 text-white/55">
-                <p>Meet in a public place and control your own transportation.</p>
-                <p>Do not send money, crypto, passwords, private keys, or recovery phrases.</p>
-                <p>Leave a conversation if someone pressures, threatens, or impersonates another person.</p>
+                <p>Never send passwords, private keys, or recovery phrases.</p>
+                <p>Be cautious with money, crypto, gift-card, or secrecy requests.</p>
+                <p>Move at your own pace and respect a no, silence, or boundary.</p>
               </div>
+              <Link href="/dating-safety">
+                <Button
+                  variant="outline"
+                  className="mt-4 w-full border-white/10 bg-white/[0.03] text-white"
+                >
+                  Open safety center
+                </Button>
+              </Link>
             </Card>
           </div>
 
-          <Card className="flex min-h-[620px] flex-col overflow-hidden border-white/10 bg-white/[0.035] text-white">
+          <Card className="flex min-h-[650px] flex-col overflow-hidden border-white/10 bg-white/[0.04] text-white">
             {selectedMatch ? (
               <>
-                <div className="flex items-center justify-between gap-4 border-b border-white/8 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 p-5">
                   <div className="flex items-center gap-3">
-                    {selectedMatch.matchedUser?.profileImageUrl ? (
+                    {selectedMatch.matchedUser.profileImageUrl ? (
                       <img
                         src={selectedMatch.matchedUser.profileImageUrl}
                         alt={selectedMatch.matchedUser.displayName}
-                        className="h-11 w-11 rounded-2xl object-cover"
+                        className="h-12 w-12 rounded-2xl object-cover"
                       />
                     ) : (
-                      <div className="grid h-11 w-11 place-items-center rounded-2xl bg-pink-400/15 font-black text-pink-200">
-                        {(selectedMatch.matchedUser?.displayName || "M")
+                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-400/15 font-black text-pink-200">
+                        {selectedMatch.matchedUser.displayName
                           .charAt(0)
                           .toUpperCase()}
-                      </div>
+                      </span>
                     )}
                     <div>
                       <h2 className="font-black">
-                        {selectedMatch.matchedUser?.displayName || "Match"}
-                        {typeof selectedMatch.matchedUser?.age === "number"
-                          ? `, ${selectedMatch.matchedUser.age}`
-                          : ""}
+                        {selectedMatch.matchedUser.displayName},{" "}
+                        {selectedMatch.matchedUser.age}
                       </h2>
-                      <p className="text-xs text-white/40">
-                        {selectedMatch.isMutual
-                          ? "Mutual match · message at your pace"
-                          : "Match · message at your pace"}
+                      <p className="text-xs text-white/35">
+                        Mutual match · no online-status claim
                       </p>
                     </div>
                   </div>
-                  <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/45">
-                    No online-status claim
-                  </span>
+                  <Button
+                    variant="outline"
+                    className="border-white/10 bg-white/[0.03] text-white"
+                    onClick={() => setSafetyOpen(value => !value)}
+                  >
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    Safety
+                  </Button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-5">
-                  {messageLoading ? (
-                    <div className="grid h-full place-items-center">
-                      <div className="flex items-center gap-2 text-sm text-white/55">
-                        <Spinner /> Loading conversation…
-                      </div>
+                {safetyOpen ? (
+                  <div className="border-b border-amber-200/10 bg-amber-200/[0.04] p-5">
+                    <p className="text-xs leading-5 text-amber-100/60">
+                      Unmatch closes conversation access. Block also removes the
+                      active dating connection. Reports are stored as pending
+                      review and are not emergency response.
+                    </p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+                      <select
+                        value={reportReason}
+                        onChange={event =>
+                          setReportReason(event.target.value as ReportReason)
+                        }
+                        className="rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-white"
+                      >
+                        {(Object.keys(reportReasonLabels) as ReportReason[]).map(
+                          reason => (
+                            <option key={reason} value={reason}>
+                              {reportReasonLabels[reason]}
+                            </option>
+                          )
+                        )}
+                      </select>
+                      <Input
+                        value={reportDetails}
+                        maxLength={160}
+                        onChange={event => setReportDetails(event.target.value)}
+                        placeholder="Optional report details"
+                      />
+                      <label className="flex items-center gap-2 text-xs text-white/60">
+                        <input
+                          type="checkbox"
+                          checked={blockAfterReport}
+                          onChange={event =>
+                            setBlockAfterReport(event.target.checked)
+                          }
+                        />
+                        Block after report
+                      </label>
                     </div>
-                  ) : conversationError ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        className="border-white/10 bg-white/[0.03] text-white"
+                        disabled={unmatch.isPending}
+                        onClick={() =>
+                          unmatch.mutate({ matchId: selectedMatch.id })
+                        }
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Unmatch
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-white/10 bg-white/[0.03] text-white"
+                        disabled={block.isPending}
+                        onClick={() =>
+                          block.mutate({
+                            userId: selectedMatch.matchedUser.id,
+                            reason: "blocked from active match",
+                          })
+                        }
+                      >
+                        <Ban className="mr-2 h-4 w-4" />
+                        Block
+                      </Button>
+                      <Button
+                        className="bg-amber-600 hover:bg-amber-500"
+                        disabled={report.isPending}
+                        onClick={() =>
+                          report.mutate({
+                            userId: selectedMatch.matchedUser.id,
+                            reason: reportReason,
+                            details: reportDetails || undefined,
+                            blockAfterReport,
+                          })
+                        }
+                      >
+                        <Flag className="mr-2 h-4 w-4" />
+                        Report
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div className="flex-1 overflow-y-auto p-5">
+                  {conversation.isLoading ? (
+                    <div className="grid h-full place-items-center text-white/45">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    </div>
+                  ) : conversation.isError ? (
                     <div className="grid h-full place-items-center">
-                      <div className="max-w-md rounded-2xl border border-red-400/20 bg-red-400/[0.06] p-5 text-center">
-                        <AlertTriangle className="mx-auto h-8 w-8 text-red-300" />
-                        <p className="mt-3 font-bold">Conversation unavailable</p>
+                      <div className="max-w-md text-center">
+                        <AlertTriangle className="mx-auto h-10 w-10 text-red-300" />
+                        <h3 className="mt-3 font-black">
+                          Conversation unavailable
+                        </h3>
                         <p className="mt-2 text-sm text-white/50">
-                          {conversationError}
+                          {conversation.error.message}
                         </p>
                         <Button
-                          variant="outline"
-                          className="mt-4 border-white/10 bg-white/[0.04] text-white"
-                          onClick={() => void loadMessages(selectedMatch.id)}
+                          className="mt-4"
+                          onClick={() => void conversation.refetch()}
                         >
                           <RefreshCcw className="mr-2 h-4 w-4" />
                           Retry
                         </Button>
                       </div>
                     </div>
-                  ) : messages.length === 0 ? (
+                  ) : !conversation.data?.length ? (
                     <div className="grid h-full place-items-center">
-                      <div className="max-w-md text-center">
-                        <MessageCircle className="mx-auto h-12 w-12 text-pink-300/55" />
-                        <h3 className="mt-4 text-xl font-black">Start with something specific</h3>
+                      <div className="max-w-xl text-center">
+                        <MessageCircle className="mx-auto h-12 w-12 text-pink-300/50" />
+                        <h3 className="mt-4 text-xl font-black">
+                          Start with something specific
+                        </h3>
                         <p className="mt-2 text-sm leading-6 text-white/45">
-                          Ask about an interest from their profile rather than
-                          opening with a generic line. Respect a no or no reply.
+                          Use something they actually chose to share instead of
+                          a generic opener.
                         </p>
+                        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                          {starters.map(starter => (
+                            <button
+                              key={starter}
+                              type="button"
+                              onClick={() =>
+                                setNewMessage(starter.slice(0, 255))
+                              }
+                              className="rounded-xl border border-white/8 bg-black/20 p-3 text-left text-sm text-white/60 transition hover:border-pink-300/20"
+                            >
+                              {starter}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {messages.map(message => {
-                        const mine = message.senderId === currentUserId;
+                      {conversation.data.map(message => {
+                        const mine = message.senderId === user?.id;
                         return (
                           <div
                             key={message.id}
@@ -453,7 +570,7 @@ export default function DatingMatches() {
                                 {message.content}
                               </p>
                               <p className="mt-1 text-[10px] opacity-60">
-                                {safeRelativeTime(message.createdAt)}
+                                {relativeLabel(message.createdAt)}
                               </p>
                             </div>
                           </div>
@@ -465,46 +582,53 @@ export default function DatingMatches() {
 
                 <div className="border-t border-white/8 p-4">
                   <div className="mb-2 min-h-5 text-xs" aria-live="polite">
-                    {sendError ? (
-                      <span className="text-red-300">{sendError}</span>
-                    ) : sendStatus ? (
-                      <span className="text-emerald-300">{sendStatus}</span>
+                    {sendMessage.isError ? (
+                      <span className="text-red-300">
+                        {sendMessage.error.message}
+                      </span>
+                    ) : unmatch.isError ? (
+                      <span className="text-red-300">{unmatch.error.message}</span>
+                    ) : block.isError ? (
+                      <span className="text-red-300">{block.error.message}</span>
+                    ) : report.isError ? (
+                      <span className="text-red-300">{report.error.message}</span>
+                    ) : statusMessage ? (
+                      <span className="text-emerald-300">{statusMessage}</span>
                     ) : (
                       <span className="text-white/30">
-                        {newMessage.length}/{MAX_MESSAGE_LENGTH} · server-confirmed send · conversation locked while sending
+                        {newMessage.length}/255 · conversation selection is
+                        locked while a send is in flight
                       </span>
                     )}
                   </div>
                   <div className="flex gap-2">
                     <Input
                       value={newMessage}
-                      maxLength={MAX_MESSAGE_LENGTH}
-                      disabled={sending}
+                      maxLength={255}
+                      disabled={sendMessage.isPending}
                       onChange={event => {
                         setNewMessage(event.target.value);
-                        setSendError(null);
-                        setSendStatus(null);
+                        setStatusMessage(null);
                       }}
                       onKeyDown={event => {
                         if (event.key === "Enter" && !event.shiftKey) {
                           event.preventDefault();
-                          void handleSendMessage();
+                          send();
                         }
                       }}
                       placeholder="Write a respectful message…"
                       className="flex-1"
                     />
                     <Button
-                      onClick={() => void handleSendMessage()}
-                      disabled={
-                        !newMessage.trim() ||
-                        currentUserId === null ||
-                        sending ||
-                        newMessage.trim().length > MAX_MESSAGE_LENGTH
-                      }
+                      onClick={send}
+                      disabled={!newMessage.trim() || sendMessage.isPending}
                       className="bg-pink-600 hover:bg-pink-500"
                     >
-                      {sending ? <Spinner className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
+                      {sendMessage.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <MessageCircle className="h-4 w-4" />
+                      )}
                       <span className="sr-only">Send message</span>
                     </Button>
                   </div>
@@ -514,9 +638,11 @@ export default function DatingMatches() {
               <div className="grid flex-1 place-items-center p-8 text-center">
                 <div>
                   <MessageCircle className="mx-auto h-14 w-14 text-white/20" />
-                  <h2 className="mt-4 text-xl font-black">Choose a match</h2>
+                  <h2 className="mt-4 text-xl font-black">
+                    Choose a mutual match
+                  </h2>
                   <p className="mt-2 text-sm text-white/45">
-                    Select a server-returned match to open its conversation.
+                    Select a match to open the server-backed conversation.
                   </p>
                 </div>
               </div>

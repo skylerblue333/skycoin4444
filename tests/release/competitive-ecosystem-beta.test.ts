@@ -137,10 +137,15 @@ describe("competitive ecosystem beta", () => {
 
   it("keeps dating and social-tip expansion safety gated", () => {
     const datingHome = fs.readFileSync("client/src/pages/DatingHome.tsx", "utf8");
+    const datingDiscovery = fs.readFileSync(
+      "client/src/pages/DatingDiscovery.tsx",
+      "utf8"
+    );
     const social = fs.readFileSync("client/src/pages/ActivityFeed.tsx", "utf8");
     expect(datingHome).toMatch(/I confirm I am 18 or older/);
-    expect(datingHome).toMatch(/Block sample/);
-    expect(datingHome).toMatch(/Report sample/);
+    expect(datingDiscovery).toMatch(/trpc\.dating\.block/);
+    expect(datingDiscovery).toMatch(/trpc\.dating\.report/);
+    expect(datingDiscovery).toMatch(/Block after report/);
     expect(social).toMatch(/Crypto tip safety rehearsal/);
     expect(social).toMatch(/No value moved/);
     expect(social).toMatch(/tip practice[\s\S]*never creates a transaction or balance/i);
