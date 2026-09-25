@@ -2177,9 +2177,9 @@ function App() {
           <Toaster />
           <GlobalExperienceRuntime />
           <GlobalNavigation />
-          <main id="sky4444-route-content" tabIndex={-1}>
+          <div id="sky4444-route-content" tabIndex={-1}>
             <Router />
-          </main>
+          </div>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
