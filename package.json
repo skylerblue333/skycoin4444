@@ -34,6 +34,7 @@
     "beta:db:bootstrap": "node scripts/bootstrap-beta-db.mjs",
     "beta:smoke:hosted": "node scripts/hosted-beta-smoke.mjs",
     "beta:db:migrate:arcade-progress": "node scripts/migrate-arcade-progress.mjs",
+    "beta:db:migrate:language-exchange": "node scripts/migrate-language-exchange.mjs",
     "beta:smoke:hosted:journey": "node scripts/hosted-beta-journey-smoke.mjs"
   },
   "dependencies": {
