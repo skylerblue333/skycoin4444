@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Bot, CheckCircle2, Copy, MessageCircle, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { prepareMessagingHopeAILaunch } from "@/lib/hopeAILaunchContext";
 
 const MAX_DRAFT_LENGTH = 4_000;
 
 export default function UnifiedMessaging() {
   const { isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
   const [draft, setDraft] = useState("");
 
   const trimmedDraft = draft.trim();
