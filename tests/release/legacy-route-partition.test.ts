@@ -4,6 +4,22 @@ import { describe, expect, it } from "vitest";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const APP_PATH = path.join(ROOT, "client/src/App.tsx");
+const ROUTE_CATALOG_PATH = path.join(ROOT, "client/src/data/routeCatalog.json");
+const ROOT_SHELL_PATHS = new Set([
+  "/",
+  "/404",
+  "/beta-catalog",
+  "/beta-commerce",
+  "/beta-feedback",
+  "/beta-journey",
+  "/beta-web3",
+  "/beta-workspace",
+  "/discovery-center",
+  "/home",
+  "/not-found",
+  "/operational-readiness",
+  "/route-health",
+]);
 const BUCKETS = [
   ["AF", /^[a-f]/],
   ["GL", /^[g-l]/],
@@ -33,8 +49,16 @@ describe("legacy route partition", () => {
       allPaths.push(...paths);
     }
 
-    expect(allPaths).toHaveLength(1058);
-    expect(new Set(allPaths).size).toBe(1058);
+    const catalog = JSON.parse(readFileSync(ROUTE_CATALOG_PATH, "utf8")) as {
+      routes: Array<{ path: string }>;
+    };
+    const legacyCatalogPaths = catalog.routes
+      .map(route => route.path)
+      .filter(routePath => !ROOT_SHELL_PATHS.has(routePath));
+
+    expect(new Set(allPaths).size).toBe(allPaths.length);
+    expect(new Set(legacyCatalogPaths).size).toBe(legacyCatalogPaths.length);
+    expect([...allPaths].sort()).toEqual([...legacyCatalogPaths].sort());
   });
 
   it("keeps the root application shell small and delegates the catalog", () => {
