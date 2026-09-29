@@ -11,6 +11,7 @@ describe("HopeAI single-brand contract", () => {
     expect(charity).toContain("HopeAI includes an Impact workspace");
     expect(charity).not.toContain(">SkyHope<");
     expect(charity).not.toContain("SkyHope now focuses");
+    expect(charity).not.toContain("\\n");
 
     expect(donation).toContain("HopeAI Impact donation-intent review");
     expect(donation).toContain("Back to HopeAI Impact");
