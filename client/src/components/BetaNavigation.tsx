@@ -519,10 +519,18 @@ export default function BetaNavigation() {
         </div>
       ) : null}
 
-      <div className="fixed inset-x-3 bottom-3 z-[70] grid grid-cols-5 gap-1 rounded-[1.35rem] border border-amber-200/14 bg-[#100706]/95 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-2xl md:hidden">
+      <div className="fixed inset-x-3 bottom-3 z-[70] grid grid-cols-6 gap-1 rounded-[1.35rem] border border-amber-200/14 bg-[#100706]/95 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-2xl md:hidden">
         <Link aria-label="Mobile home" href="/" className={"grid min-h-12 place-items-center rounded-xl transition " + (location === "/" ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
           <Home className="h-4 w-4" />
           <span className="text-[9px] font-bold">Home</span>
+        </Link>
+        <Link aria-label="Open HopeAI" href="/hope-a-i" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/hope-a-i") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <Bot className="h-4 w-4" />
+          <span className="text-[9px] font-bold">HopeAI</span>
+        </Link>
+        <Link aria-label="Open SkyHope charity" href="/charity" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/charity") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <HeartHandshake className="h-4 w-4" />
+          <span className="text-[9px] font-bold">SkyHope</span>
         </Link>
         <Link href="/activity-feed" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/activity-feed") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
           <Users className="h-4 w-4" />
@@ -531,10 +539,6 @@ export default function BetaNavigation() {
         <Link href="/gaming" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/gaming") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
           <Gamepad2 className="h-4 w-4" />
           <span className="text-[9px] font-bold">Games</span>
-        </Link>
-        <Link href="/unified-messaging" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/unified-messaging") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <MessageCircleMore className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Chat</span>
         </Link>
         <button type="button" onClick={() => { setMobileOpen(open => !open); setAreaOpen(false); }} className="grid min-h-12 place-items-center rounded-xl text-white/45 transition hover:bg-amber-200/[0.05] hover:text-amber-100">
           <Grid2X2 className="h-4 w-4" />
