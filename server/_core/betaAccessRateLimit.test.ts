@@ -92,7 +92,7 @@ describe("beta access login rate-limit policy", () => {
     expect(limiter.consume("198.51.100.5", "tester@example.com").allowed).toBe(true);
   });
 
-  it("isolates counters by client and normalized email digest", () => {
+  it("shares the attempt budget across emails for one client", () => {
     const limiter = new BetaAccessRateLimiter({
       windowMs: 10_000,
       maxAttempts: 3,
@@ -101,12 +101,12 @@ describe("beta access login rate-limit policy", () => {
       scope: "process_local",
     });
 
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      expect(limiter.consume("192.0.2.1", "one@example.com").allowed).toBe(true);
-    }
-    expect(limiter.consume("192.0.2.1", "one@example.com").allowed).toBe(false);
-    expect(limiter.consume("192.0.2.2", "one@example.com").allowed).toBe(true);
+    expect(limiter.consume("192.0.2.1", "one@example.com").allowed).toBe(true);
     expect(limiter.consume("192.0.2.1", "two@example.com").allowed).toBe(true);
+    expect(limiter.consume("192.0.2.1", "three@example.com").allowed).toBe(true);
+
+    expect(limiter.consume("192.0.2.1", "four@example.com").allowed).toBe(false);
+    expect(limiter.consume("192.0.2.2", "one@example.com").allowed).toBe(true);
   });
 
   it("keeps the in-memory key registry bounded", () => {
@@ -119,7 +119,7 @@ describe("beta access login rate-limit policy", () => {
     });
 
     for (let index = 0; index < 200; index += 1) {
-      limiter.consume("192.0.2.1", `user${index}@example.com`);
+      limiter.consume(`192.0.2.${index}`, `user${index}@example.com`);
     }
 
     expect(limiter.trackedKeyCount).toBeLessThanOrEqual(128);
