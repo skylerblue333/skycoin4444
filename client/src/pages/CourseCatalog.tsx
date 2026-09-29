@@ -45,9 +45,9 @@ const connectedLearningPaths = [
   {
     title: "Connect learning to impact",
     description:
-      "Explore SkyHope's charity and impact path. Opening this route does not process a donation or imply external payment execution.",
+      "Explore HopeAI Impact's charity and service-planning path. Opening this route does not process a donation or imply external payment execution.",
     href: "/charity",
-    action: "Open SkyHope",
+    action: "Open Impact",
     icon: HeartHandshake,
   },
   {
@@ -262,7 +262,7 @@ export default function CourseCatalog() {
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-6 text-white/45">
-              These links connect SkySchool to HopeAI, SkyHope, gaming, and social without claiming shared persistence, provider execution, financial settlement, or credential issuance.
+              These links connect SkySchool to HopeAI, Impact, gaming, and social without claiming shared persistence, provider execution, financial settlement, or credential issuance.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
