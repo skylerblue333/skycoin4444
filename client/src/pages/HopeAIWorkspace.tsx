@@ -371,10 +371,16 @@ export default function HopeAIWorkspace() {
         updatedAt: Date.now(),
         messages: [...thread.messages, assistantMessage].slice(-100),
       }));
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "AI provider request failed.";
-      toast.error(message);
+    } catch {
+      updateThread(threadId, thread => ({
+        ...thread,
+        title: currentMessages.length === 0 ? activeThread.title : thread.title,
+        updatedAt: Date.now(),
+        messages: thread.messages.filter(message => message.id !== userMessage.id),
+      }));
+      setInput(current => (current.trim() ? current : text));
+      setAttachments(current => [...sentAttachments, ...current].slice(0, 3));
+      toast.error("HopeAI request failed. Your draft was restored. Try again.");
     }
   };
 
