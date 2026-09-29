@@ -151,6 +151,8 @@ export default function HopeAIWorkspace() {
   const endRef = useRef<HTMLDivElement>(null);
   const launchContextAppliedRef = useRef(false);
   const storageKey = user?.id ? storageKeyForUser(user.id) : null;
+  const launchPrompt = useMemo(readLaunchPrompt, []);
+  const launchMode = useMemo(readLaunchMode, []);
 
   const models = trpc.ai.getModels.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -171,10 +173,15 @@ export default function HopeAIWorkspace() {
     const next = stored.length ? stored : [createHopeWorkspaceThread()];
     setThreads(next);
     setActiveThreadId(next[0].id);
-    setInput("");
+    setInput(launchPrompt);
+    setMode(launchMode);
+    setSelectedAgentId(
+      modeOptions.find(option => option.id === launchMode)?.agentId ??
+        "general-assistant"
+    );
     setAttachments([]);
     setLoadedStorageKey(storageKey);
-  }, [storageKey]);
+  }, [launchMode, launchPrompt, storageKey]);
 
   useEffect(() => {
     if (!storageKey || loadedStorageKey !== storageKey) return;
