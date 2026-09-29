@@ -224,3 +224,100 @@ export function hashHuntRound(seed: number): Readonly<{
   });
   return { target, candidates, answerIndex, proof: demoProof(seed, "hash-hunt") };
 }
+
+
+export type DemoRoundReceiptGame =
+  | "crash"
+  | "roulette"
+  | "plinko"
+  | "hash-hunt"
+  | "wallet-defense";
+
+export type DemoRoundReceipt = Readonly<{
+  version: 1;
+  game: DemoRoundReceiptGame;
+  seed: number;
+  proof: string;
+  summary: string;
+  replayable: true;
+  realValue: false;
+}>;
+
+function assertReplaySeed(seed: number): void {
+  if (!Number.isSafeInteger(seed) || seed < -0x80000000 || seed > 0x7fffffff) {
+    throw new Error("demo replay seed must be a signed 32-bit safe integer");
+  }
+}
+
+function roundReceiptSummary(game: DemoRoundReceiptGame, seed: number): string {
+  if (game === "crash") {
+    return `crashAt=${crashPoint(seed).toFixed(2)}x`;
+  }
+  if (game === "roulette") {
+    const result = spinRoulette(seed);
+    return `number=${result.number};color=${result.color}`;
+  }
+  if (game === "plinko") {
+    const result = simulatePlinko(seed, 10);
+    return `bucket=${result.bucket};multiplier=${result.multiplier.toFixed(2)}x;path=${result.path.join("")}`;
+  }
+  if (game === "hash-hunt") {
+    const result = hashHuntRound(seed);
+    return `target=${result.target};answer=${result.answerIndex};candidates=${result.candidates.join(",")}`;
+  }
+
+  const challenge = cryptoChallenge(seed);
+  return `challenge=${challenge.id};answer=${challenge.correctIndex}`;
+}
+
+export function createDemoRoundReceipt(
+  game: DemoRoundReceiptGame,
+  seed: number,
+): DemoRoundReceipt {
+  assertReplaySeed(seed);
+  return Object.freeze({
+    version: 1 as const,
+    game,
+    seed,
+    proof: demoProof(seed, `receipt-${game}`),
+    summary: roundReceiptSummary(game, seed),
+    replayable: true as const,
+    realValue: false as const,
+  });
+}
+
+export function verifyDemoRoundReceipt(receipt: unknown): boolean {
+  if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) return false;
+  const candidate = receipt as Partial<DemoRoundReceipt>;
+  if (
+    candidate.version !== 1 ||
+    candidate.replayable !== true ||
+    candidate.realValue !== false ||
+    typeof candidate.seed !== "number" ||
+    typeof candidate.game !== "string" ||
+    typeof candidate.proof !== "string" ||
+    typeof candidate.summary !== "string"
+  ) {
+    return false;
+  }
+
+  if (
+    candidate.game !== "crash" &&
+    candidate.game !== "roulette" &&
+    candidate.game !== "plinko" &&
+    candidate.game !== "hash-hunt" &&
+    candidate.game !== "wallet-defense"
+  ) {
+    return false;
+  }
+
+  try {
+    const canonical = createDemoRoundReceipt(candidate.game, candidate.seed);
+    return (
+      canonical.proof === candidate.proof &&
+      canonical.summary === candidate.summary
+    );
+  } catch {
+    return false;
+  }
+}
