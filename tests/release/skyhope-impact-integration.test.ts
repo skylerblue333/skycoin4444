@@ -62,9 +62,11 @@ describe("SkyHope impact integration", () => {
     expect(impactPlay).toMatch(/trpc\.charity\.missions\.useQuery/);
     expect(impactPlay).toMatch(/No live donations/);
     expect(impactPlay).toMatch(/Open SkyHope Impact/);
-    expect(school).toMatch(/SkyHope Impact Lab/);
-    expect(school).toMatch(/href="\/charity"/);
+    expect(school).toContain("SkyHopeImpactRail");
     expect(school).toMatch(/Ask HopeAI Coach/);
+    expect(impactPlay).toMatch(/mission\.learningRoute/);
+    expect(impactPlay).toMatch(/mission\.coachRoute/);
+    expect(impactPlay).toMatch(/mission\.practiceRoute/);
   });
 
   it("promotes the major product paths in navigation and dashboard entry points", () => {
