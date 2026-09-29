@@ -48,8 +48,8 @@ The internal event-outbox dispatcher is currently an optional dependency.
 Its readiness state is reported as:
 
 - `disabled` when not enabled;
-- `ok` when enabled and running without a newer failure than the last successful cycle;
-- `degraded` when enabled but not running or when its latest failure is newer than its latest successful cycle.
+- `ok` only when enabled, running, a valid successful-cycle timestamp exists, and any recorded failure is strictly older than that success;
+- `degraded` when enabled but not running, before any successful cycle is proven, when dispatcher timestamps are missing/malformed, or when the latest failure is equal to or newer than the latest successful cycle.
 
 A degraded optional dispatcher does not force the required readiness result to 503. The response carries `degraded: true` so operators can distinguish "serving required beta dependencies" from "all optional subsystems healthy."
 
