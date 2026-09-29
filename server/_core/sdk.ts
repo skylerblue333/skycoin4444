@@ -13,6 +13,7 @@ import * as db from "../db";
 import { ENV } from "./env";
 import { evaluateBetaAdmission } from "./betaAdmission";
 import { oauthProviderRuntimeEnabled } from "./betaAccessAuth";
+import { deriveLoginMethod } from "./loginMethod";
 import { sanitizeOperationalError } from "./operationalError";
 import { resolveSessionTtlMs } from "./sessionPolicy";
 import {
@@ -39,6 +40,8 @@ export type SessionPayload = {
 const EXCHANGE_TOKEN_PATH = `/webdev.v1.WebDevAuthPublicService/ExchangeToken`;
 const GET_USER_INFO_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfo`;
 const GET_USER_INFO_WITH_JWT_PATH = `/webdev.v1.WebDevAuthPublicService/GetUserInfoWithJwt`;
+
+type ProviderUserInfo<T> = T & { platforms?: unknown };
 
 class OAuthService {
   constructor(private client: ReturnType<typeof axios.create>) {
@@ -79,9 +82,11 @@ class OAuthService {
   }
 
   async getUserInfoByToken(
-    token: ExchangeTokenResponse
-  ): Promise<GetUserInfoResponse> {
-    const { data } = await this.client.post<GetUserInfoResponse>(
+    token: Pick<ExchangeTokenResponse, "accessToken">
+  ): Promise<ProviderUserInfo<GetUserInfoResponse>> {
+    const { data } = await this.client.post<
+      ProviderUserInfo<GetUserInfoResponse>
+    >(
       GET_USER_INFO_PATH,
       {
         accessToken: token.accessToken,
@@ -107,28 +112,6 @@ class SDKServer {
     this.oauthService = new OAuthService(this.client);
   }
 
-  private deriveLoginMethod(
-    platforms: unknown,
-    fallback: string | null | undefined
-  ): string | null {
-    if (fallback && fallback.length > 0) return fallback;
-    if (!Array.isArray(platforms) || platforms.length === 0) return null;
-    const set = new Set<string>(
-      platforms.filter((p): p is string => typeof p === "string")
-    );
-    if (set.has("REGISTERED_PLATFORM_EMAIL")) return "email";
-    if (set.has("REGISTERED_PLATFORM_GOOGLE")) return "google";
-    if (set.has("REGISTERED_PLATFORM_APPLE")) return "apple";
-    if (
-      set.has("REGISTERED_PLATFORM_MICROSOFT") ||
-      set.has("REGISTERED_PLATFORM_AZURE")
-    )
-      return "microsoft";
-    if (set.has("REGISTERED_PLATFORM_GITHUB")) return "github";
-    const first = Array.from(set)[0];
-    return first ? first.toLowerCase() : null;
-  }
-
   async exchangeCodeForToken(
     code: string,
     state: string
@@ -139,16 +122,16 @@ class SDKServer {
   async getUserInfo(accessToken: string): Promise<GetUserInfoResponse> {
     const data = await this.oauthService.getUserInfoByToken({
       accessToken,
-    } as ExchangeTokenResponse);
-    const loginMethod = this.deriveLoginMethod(
-      (data as any)?.platforms,
-      (data as any)?.platform ?? data.platform ?? null
+    });
+    const loginMethod = deriveLoginMethod(
+      data.platforms,
+      data.platform ?? null
     );
     return {
-      ...(data as any),
+      ...data,
       platform: loginMethod,
       loginMethod,
-    } as GetUserInfoResponse;
+    };
   }
 
   private parseCookies(cookieHeader: string | undefined) {
@@ -266,20 +249,19 @@ class SDKServer {
       projectId: ENV.appId,
     };
 
-    const { data } = await this.client.post<GetUserInfoWithJwtResponse>(
-      GET_USER_INFO_WITH_JWT_PATH,
-      payload
-    );
+    const { data } = await this.client.post<
+      ProviderUserInfo<GetUserInfoWithJwtResponse>
+    >(GET_USER_INFO_WITH_JWT_PATH, payload);
 
-    const loginMethod = this.deriveLoginMethod(
-      (data as any)?.platforms,
-      (data as any)?.platform ?? data.platform ?? null
+    const loginMethod = deriveLoginMethod(
+      data.platforms,
+      data.platform ?? null
     );
     return {
-      ...(data as any),
+      ...data,
       platform: loginMethod,
       loginMethod,
-    } as GetUserInfoWithJwtResponse;
+    };
   }
 
   async authenticateRequest(req: Request): Promise<AuthenticatedUser> {
