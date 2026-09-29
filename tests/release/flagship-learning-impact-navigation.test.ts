@@ -6,11 +6,11 @@ const journey = fs.readFileSync("client/src/pages/BetaJourney.tsx", "utf8");
 const normalizedJourney = journey.replace(/\s+/g, " ");
 const school = fs.readFileSync("client/src/pages/CourseCatalog.tsx", "utf8");
 
-describe("flagship learning, HopeAI, SkyHope, social, and gaming paths", () => {
-  it("promotes SkySchool and SkyHope into the persistent primary navigation", () => {
+describe("flagship learning, HopeAI Impact, social, and gaming paths", () => {
+  it("promotes SkySchool and Impact into the persistent primary navigation", () => {
     expect(nav).toContain('{ label: "School", route: "/course-catalog", icon: GraduationCap }');
-    expect(nav).toContain('{ label: "SkyHope", route: "/charity", icon: HeartHandshake }');
-    expect(nav).toContain("School, HopeAI, SkyHope");
+    expect(nav).toContain('{ label: "Impact", route: "/charity", icon: HeartHandshake }');
+    expect(nav).toContain("School, HopeAI, Impact");
   });
 
   it("connects SkySchool to the four requested flagship areas", () => {
