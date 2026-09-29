@@ -15,6 +15,7 @@ import {
   StatusBadge,
 } from "@/features/gaming/components/ArcadeSurface";
 import {
+  createDemoRoundReceipt,
   cryptoChallenge,
   EUROPEAN_ROULETTE_ORDER,
   hashHuntRound,
@@ -25,6 +26,7 @@ import {
   roulettePayoutMultiplier,
   simulatePlinko,
   spinRoulette,
+  verifyDemoRoundReceipt,
   type RouletteBet,
 } from "@/lib/flagshipGameEngine";
 
@@ -56,6 +58,7 @@ export default function Arcade() {
   const [seed, setSeed] = useState(4444);
   const [status, setStatus] = useState("Choose a game. Every score and credit on this floor is local demo state.");
 
+  const [plinkoSeed, setPlinkoSeed] = useState(seed);
   const [plinkoResult, setPlinkoResult] = useState(() => simulatePlinko(seed));
   const [plinkoHistory, setPlinkoHistory] = useState<Array<{ bucket: number; multiplier: number }>>([]);
 
@@ -64,6 +67,7 @@ export default function Arcade() {
   const [highLowStreak, setHighLowStreak] = useState(0);
   const [highLowHistory, setHighLowHistory] = useState<string[]>([]);
 
+  const [rouletteSeed, setRouletteSeed] = useState(seed);
   const [rouletteBet, setRouletteBet] = useState<RouletteBet>({ kind: "red" });
   const [rouletteNumber, setRouletteNumber] = useState(7);
   const [rouletteResult, setRouletteResult] = useState(() => spinRoulette(seed));
@@ -75,6 +79,14 @@ export default function Arcade() {
   const [hashChoice, setHashChoice] = useState<number | null>(null);
   const [hashScore, setHashScore] = useState(0);
 
+  const plinkoReceipt = useMemo(
+    () => createDemoRoundReceipt("plinko", plinkoSeed),
+    [plinkoSeed],
+  );
+  const rouletteReceipt = useMemo(
+    () => createDemoRoundReceipt("roulette", rouletteSeed),
+    [rouletteSeed],
+  );
   const challenge = useMemo(() => cryptoChallenge(cryptoSeed), [cryptoSeed]);
   const hashRound = useMemo(() => hashHuntRound(cryptoSeed + 1000), [cryptoSeed]);
 
@@ -110,6 +122,7 @@ export default function Arcade() {
     const result = simulatePlinko(nextSeed, 10);
     const payout = stake * result.multiplier;
     setSeed(nextSeed);
+    setPlinkoSeed(nextSeed);
     setPlinkoResult(result);
     setCredits(value => Number((value - stake + payout).toFixed(2)));
     setPlinkoHistory(value => [{ bucket: result.bucket, multiplier: result.multiplier }, ...value].slice(0, 7));
@@ -153,6 +166,7 @@ export default function Arcade() {
     const multiplier = roulettePayoutMultiplier(result.number, bet);
     const payout = stake * multiplier;
     setSeed(nextSeed);
+    setRouletteSeed(nextSeed);
     setRouletteBet(bet);
     setRouletteResult(result);
     setCredits(value => Number((value - stake + payout).toFixed(2)));
@@ -275,6 +289,16 @@ export default function Arcade() {
                     <p className="mt-2 text-5xl font-black">{plinkoResult.multiplier.toFixed(2)}x</p>
                     <p className="mt-2 text-sm text-white/35">Bucket {plinkoResult.bucket + 1} of 11</p>
                     <Button size="lg" className="mt-5 w-full" onClick={dropPlinko}>Drop chip · {stake}</Button>
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Replay receipt</p>
+                        <span className="text-[10px] font-bold text-emerald-300">
+                          {verifyDemoRoundReceipt(plinkoReceipt) ? "VERIFIED" : "MISMATCH"}
+                        </span>
+                      </div>
+                      <p className="mt-2 break-all font-mono text-[10px] text-white/35">{plinkoReceipt.proof}</p>
+                      <p className="mt-1 break-all font-mono text-[10px] text-white/25">{plinkoReceipt.summary}</p>
+                    </div>
                   </div>
 
                   <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
@@ -396,6 +420,16 @@ export default function Arcade() {
                       <Button variant={rouletteBet.kind === "number" ? "default" : "outline"} className={rouletteBet.kind === "number" ? "" : "border-white/10 bg-white/[0.025] text-white"} onClick={() => chooseRouletteBet("number")}>Straight</Button>
                     </div>
                     <Button size="lg" className="mt-4 w-full" onClick={spinWheel}>Spin wheel · {stake}</Button>
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Replay receipt</p>
+                        <span className="text-[10px] font-bold text-emerald-300">
+                          {verifyDemoRoundReceipt(rouletteReceipt) ? "VERIFIED" : "MISMATCH"}
+                        </span>
+                      </div>
+                      <p className="mt-2 break-all font-mono text-[10px] text-white/35">{rouletteReceipt.proof}</p>
+                      <p className="mt-1 break-all font-mono text-[10px] text-white/25">{rouletteReceipt.summary}</p>
+                    </div>
                   </div>
 
                   <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
