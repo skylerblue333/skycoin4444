@@ -262,7 +262,7 @@ export default function CourseCatalog() {
               </h2>
             </div>
             <p className="max-w-2xl text-sm leading-6 text-white/45">
-              These links connect SkySchool to HopeAI, SkyHope, gaming, and social without claiming shared persistence, provider execution, financial settlement, or credential issuance.
+              These links connect SkySchool to HopeAI, Impact, gaming, and social without claiming shared persistence, provider execution, financial settlement, or credential issuance.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
