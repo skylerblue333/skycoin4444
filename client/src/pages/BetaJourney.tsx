@@ -24,6 +24,15 @@ const missionIcons = {
   impact: Heart,
 } as const;
 
+const activationEvidenceRoutes = [
+  { label: "Sign in", href: "/signin" },
+  { label: "Profile", href: "/profile" },
+  { label: "Course catalog", href: "/course-catalog" },
+  { label: "Social activity", href: "/activity-feed" },
+  { label: "Beta feedback", href: "/beta-feedback" },
+  { label: "Activity evidence", href: "/activity-evidence" },
+] as const;
+
 export default function BetaJourney() {
   const { user, loading, isAuthenticated } = useAuth();
   const journey = trpc.charity.journey.useQuery(undefined, {
@@ -53,7 +62,7 @@ export default function BetaJourney() {
             This path is derived from account-owned records instead of a client-side tour counter. Social posts,
             SkySchool lesson completions, synced arcade plays, and SkyHope impact actions all feed one next-step
             contract. HopeAI stays available as the planning assistant without pretending its local chat history is
-            server-persisted completion evidence.
+            server-persisted completion evidence. Persisted evidence over page count.
           </p>
         </header>
 
@@ -157,9 +166,14 @@ export default function BetaJourney() {
                   <p className="text-sm leading-6 text-white/42">
                     Inspect the broader onboarding and activity evidence used by the invitation-only beta.
                   </p>
-                  <div className="mt-4 grid gap-2">
-                    <Link href="/onboarding"><Button className="w-full" variant="outline">Onboarding status</Button></Link>
-                    <Link href="/activity-evidence"><Button className="w-full" variant="ghost">Activity evidence</Button></Link>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {activationEvidenceRoutes.map(route => (
+                      <Link key={route.href} href={route.href}>
+                        <Button className="w-full" variant={route.href === "/activity-evidence" ? "outline" : "ghost"}>
+                          {route.label}
+                        </Button>
+                      </Link>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -193,9 +207,9 @@ export default function BetaJourney() {
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/45">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
-          Journey completion does not create money, token rewards, credentials, charity verification, payment
-          settlement, custody, or blockchain activity. It is an account-owned product-usage summary for the
-          engineering beta.
+          Journey completion does not issue credentials, token rewards, charity verification, payment settlement,
+          custody, or blockchain transactions. It does not prove external-provider or HopeAI execution. It is an
+          account-owned product-usage summary for the engineering beta.
         </section>
       </div>
     </main>
