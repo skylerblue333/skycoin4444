@@ -104,15 +104,3 @@ These are marked `integration_required`. They are not included in the LLM tool l
 This is an engineering beta, not ChatGPT or Manus feature parity. The current runtime does not itself provide computer use, web browsing, durable cloud memory, external account access, background execution, payments, blockchain signing/broadcast, legal representation, regulatory certification, or guaranteed professional advice.
 
 Those capabilities require separately configured integrations, authorization, provider-specific safety controls, and their own verification evidence.
-
-## HopeAI + SkyHope / charity boundary
-
-HopeAI can support the charity/impact area with bounded planning and content assistance without pretending to move money or verify organizations. Relevant specialist workflows may:
-
-- turn a charity goal into a campaign brief, milestone plan, volunteer checklist, or donor-communication draft;
-- summarize user-provided impact notes and extract action items;
-- help prepare non-legal grant, outreach, event, education, and community-support drafts;
-- use deterministic text/data tools to inspect user-provided campaign material;
-- route users toward the canonical SkyHope/charity surfaces for impact activity rather than inventing a financial transaction inside chat.
-
-HopeAI must not claim that a charity is verified, that a donation settled, that funds are held, that tax deductibility is established, or that a payment/blockchain transfer occurred. Any future donation execution remains behind the repository's separate provider, legal-review, region, custody, and settlement controls.
