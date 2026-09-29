@@ -78,6 +78,18 @@ describe("cookie mutation origin policy", () => {
         env
       )
     ).toEqual({ allowed: false, reason: "cross_site_fetch" });
+
+    expect(
+      evaluateCookieMutationOrigin(
+        {
+          method: "POST",
+          requiresOriginValidation: true,
+          originHeader: "https://evil.example",
+          secFetchSite: "same-site",
+        },
+        env
+      )
+    ).toEqual({ allowed: false, reason: "origin_mismatch" });
   });
 
   it("ignores the legacy unprefixed cookie in production", () => {
