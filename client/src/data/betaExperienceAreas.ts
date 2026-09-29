@@ -262,19 +262,21 @@ export const betaExperienceAreas: readonly BetaExperienceArea[] = [
   {
     id: "impact",
     name: "SkyHope & Impact",
-    eyebrow: "Charity · evidence · impact",
+    eyebrow: "HopeAI · charity · learning · community",
     category: "impact",
     status: "controlled_beta",
     description:
-      "Bring charity and impact tools together while keeping donation execution and external proof claims behind their real verification boundaries.",
-    route: "/charity",
-    action: "Open Impact",
+      "Plan a cause-driven mission across HopeAI, learning, community, games, and charity while keeping external outcomes and financial actions behind explicit evidence and provider gates.",
+    route: "/impact-hub",
+    action: "Build an impact mission",
     highlights: [
-      { label: "Leaderboard", route: "/charity-leaderboard", note: "Community impact ranking surface" },
-      { label: "Impact map", route: "/impact-map", note: "Impact visualization" },
+      { label: "SkyHope", route: "/charity", note: "Charity and beneficiary planning surface" },
+      { label: "HopeAI", route: "/hope-a-i", note: "Mission planning and assistant workspace" },
+      { label: "Impact Play", route: "/gaming-for-charity", note: "Demo-only learning and awareness challenges" },
+      { label: "SkySchool", route: "/sky-school", note: "Learning and quiz path" },
       { label: "Impact metrics", route: "/impact-metrics", note: "Impact measurement surface" },
     ],
-    searchTerms: ["hope", "charity", "impact", "community", "giving"],
+    searchTerms: ["hope", "charity", "impact", "community", "giving", "mission", "volunteer", "beneficiary"],
   },
   {
     id: "trust-safety",
@@ -352,7 +354,7 @@ const betaAreaRouteHints: Readonly<Record<string, readonly string[]>> = {
   creator: ["creator", "content", "publish", "media", "video editor", "video upload", "audio", "blog", "reel"],
   enterprise: ["enterprise", "crm", "business", "organization", "project", "task", "approval", "support", "contract", "invoice", "billing", "subscription", "workflow automation"],
   investor: ["investor", "vesting", "fundraising", "treasury", "equity"],
-  impact: ["charity", "donation", "impact", "skyhope"],
+  impact: ["charity", "donation", "impact", "skyhope", "mission", "volunteer", "beneficiary", "gaming for charity"],
   "trust-safety": ["trust", "safety", "security", "privacy", "audit", "moderation", "compliance", "accessibility", "two factor", "2fa", "permission", "consent", "identity", "auth", "secret"],
   analytics: ["analytics", "metric", "report", "tracking", "insight", "monitoring", "status", "health"],
 };
