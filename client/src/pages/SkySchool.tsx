@@ -17,6 +17,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { gapCourses } from "@/data/gapCourses";
 import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
+import SkillCheckStudio from "@/components/SkillCheckStudio";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -352,6 +353,23 @@ export default function SkySchool() {
               </CardContent>
             </Card>
           </div>
+        </section>
+
+        <section>
+          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-sky-200/60">
+                Interactive checks
+              </p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight">
+                Practice the ideas, not just the pages.
+              </h2>
+            </div>
+            <Link href="/quizzes" className="text-sm font-bold text-sky-200/75 hover:text-sky-100">
+              Browse the wider quiz library →
+            </Link>
+          </div>
+          <SkillCheckStudio />
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
