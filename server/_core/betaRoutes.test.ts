@@ -77,6 +77,7 @@ describe("beta status routes", () => {
 
     app.routes["/api/beta/health"]({}, response);
 
+    expect(body.headers["Cache-Control"]).toBe("no-store");
     expect(body.payload).toMatchObject({
       status: "ok",
       releaseChannel: "invitation-only-engineering-beta",
