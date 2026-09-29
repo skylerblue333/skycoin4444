@@ -179,7 +179,10 @@ export default function Charity() {
               <span className="text-rose-300">Do not fake the evidence.</span>
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-white/60 md:text-lg">
-              HopeAI includes an Impact workspace for useful planning, volunteer capacity, impact\n              evidence, and cross-ecosystem coordination. It does not pretend a\n              charity is verified, that money moved, or that a blockchain\n              transaction settled.
+              HopeAI includes an Impact workspace for useful planning, volunteer
+              capacity, impact evidence, and cross-ecosystem coordination. It
+              does not pretend a charity is verified, that money moved, or that
+              a blockchain transaction settled.
             </p>
           </div>
 
