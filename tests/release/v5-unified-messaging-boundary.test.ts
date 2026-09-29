@@ -13,7 +13,8 @@ const navigation = fs.readFileSync(
 describe("flagship unified messaging truth boundary", () => {
   it("keeps Chat on the canonical unified messaging route", () => {
     expect(navigation).toMatch(/label: "Chat", route: "\/unified-messaging"/);
-    expect(navigation).toMatch(/href="\/unified-messaging"/);
+    expect(navigation).toMatch(/primaryLinks\.map/);
+    expect(navigation).toMatch(/href=\{route\}/);
   });
 
   it("removes simulated people, replies, and unsupported realtime claims", () => {
