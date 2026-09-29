@@ -55,7 +55,7 @@ const flagshipAreas = [
   {
     title: "SkySchool",
     subtitle: "Lessons and assessment flows",
-    href: "/sky-school",
+    href: "/course-catalog",
     icon: GraduationCap,
     status: "Working beta",
   },
@@ -74,7 +74,7 @@ const flagshipAreas = [
     status: "Controlled lab",
   },
   {
-    title: "SkyHope",
+    title: "HopeAI Impact",
     subtitle: "Pledges, volunteering, impact",
     href: "/charity",
     icon: Heart,
@@ -139,7 +139,7 @@ const missions = [
   { id: "social", label: "Post or reply once", href: "/activity-feed", icon: Users },
   { id: "learn", label: "Complete one lesson", href: "/course-catalog", icon: GraduationCap },
   { id: "play", label: "Play one flagship game", href: "/gaming", icon: Gamepad2 },
-  { id: "impact", label: "Record one SkyHope action", href: "/charity", icon: Heart },
+  { id: "impact", label: "Record one Impact action", href: "/charity", icon: Heart },
 ] as const;
 
 function localDateKey(date: Date) {
@@ -400,7 +400,7 @@ export default function Home() {
             </div>
             <h2 className="mt-3 text-3xl font-black tracking-tight">A four-step loop, not a wall of features.</h2>
             <p className="mt-4 max-w-xl text-sm leading-7 text-white/43">
-              Use this as a simple device-local routine. For persisted account evidence across Social, SkySchool, Gaming, and SkyHope, open the connected journey.
+              Use this as a simple device-local routine. For persisted account evidence across Social, SkySchool, Gaming, and HopeAI Impact, open the connected journey.
             </p>
 
             <div className="mt-6 flex items-end gap-4">

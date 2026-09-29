@@ -60,7 +60,7 @@ export default function BetaJourney() {
           </div>
           <p className="mt-5 max-w-4xl text-sm leading-7 text-white/50">
             This path is derived from account-owned records instead of a client-side tour counter. Social posts,
-            SkySchool lesson completions, synced arcade plays, and SkyHope impact actions all feed one next-step
+            SkySchool lesson completions, synced arcade plays, and HopeAI Impact actions all feed one next-step
             contract. HopeAI stays available as the planning assistant without pretending its local chat history is
             server-persisted completion evidence. Persisted evidence over page count.
           </p>
@@ -78,7 +78,7 @@ export default function BetaJourney() {
               { label: "School", href: "/course-catalog" },
               { label: "Gaming", href: "/gaming" },
               { label: "HopeAI", href: "/hope-a-i" },
-              { label: "SkyHope", href: "/charity" },
+              { label: "Impact", href: "/charity" },
               { label: "Social", href: "/activity-feed" },
             ].map(path => (
               <Link key={path.href} href={path.href}>
@@ -122,7 +122,7 @@ export default function BetaJourney() {
                     </Button>
                   </Link>
                   <p className="text-xs leading-5 text-white/30">
-                    SkyHope persistence: {journey.data.impactPersistenceReady ? "ready" : "migration 0015 required"}
+                    Impact persistence: {journey.data.impactPersistenceReady ? "ready" : "migration 0015 required"}
                   </p>
                 </CardContent>
               </Card>
@@ -203,14 +203,14 @@ export default function BetaJourney() {
               <Card className="border-rose-300/15 bg-rose-300/[0.035]">
                 <CardHeader>
                   <Heart className="h-5 w-5 text-rose-200" />
-                  <CardTitle className="mt-2">SkyHope impact</CardTitle>
+                  <CardTitle className="mt-2">HopeAI Impact</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-6 text-white/42">
                     Record pledge intent or volunteer effort, then bring what you actually did back to Social.
                   </p>
                   <div className="mt-4 grid gap-2">
-                    <Link href="/charity"><Button className="w-full">Open SkyHope</Button></Link>
+                    <Link href="/charity"><Button className="w-full">Open Impact</Button></Link>
                     <Link href="/activity-feed"><Button className="w-full" variant="ghost">Open Social</Button></Link>
                   </div>
                 </CardContent>
