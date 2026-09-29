@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { SKYHOPE_CAMPAIGNS, isImpactTableUnavailable } from "./charity";
+import {
+  SKYHOPE_CAMPAIGNS,
+  isImpactIdempotencyConflict,
+  isImpactTableUnavailable,
+} from "./charity";
 
 describe("SkyHope campaign catalog", () => {
   it("uses a bounded reviewed campaign catalog with no settlement claims", () => {
@@ -58,6 +62,56 @@ describe("SkyHope persistence error classification", () => {
       isImpactTableUnavailable({
         code: "ER_LOCK_DEADLOCK",
         message: "deadlock while updating charity_pledges",
+      }),
+    ).toBe(false);
+  });
+});
+
+
+describe("SkyHope pledge idempotency conflict classification", () => {
+  it("recognizes only duplicate-key failures tied to the pledge idempotency boundary", () => {
+    expect(
+      isImpactIdempotencyConflict({
+        code: "ER_DUP_ENTRY",
+        errno: 1062,
+        message:
+          "Duplicate entry 'user-key' for key 'charity_pledges_user_idempotency_unique'",
+      }),
+    ).toBe(true);
+    expect(
+      isImpactIdempotencyConflict({
+        code: "23505",
+        message:
+          'duplicate key value violates unique constraint "charity_pledges_user_idempotency_unique"',
+      }),
+    ).toBe(true);
+    expect(
+      isImpactIdempotencyConflict({
+        code: "SQLITE_CONSTRAINT_UNIQUE",
+        message:
+          "UNIQUE constraint failed: charity_pledges.user_id, charity_pledges.idempotency_key",
+      }),
+    ).toBe(true);
+  });
+
+  it("does not hide unrelated duplicate or database failures", () => {
+    expect(
+      isImpactIdempotencyConflict({
+        code: "ER_DUP_ENTRY",
+        errno: 1062,
+        message: "Duplicate entry 'pledge-id' for key 'PRIMARY'",
+      }),
+    ).toBe(false);
+    expect(
+      isImpactIdempotencyConflict({
+        code: "ER_LOCK_DEADLOCK",
+        message: "deadlock while inserting charity_pledges",
+      }),
+    ).toBe(false);
+    expect(
+      isImpactIdempotencyConflict({
+        code: "ECONNRESET",
+        message: "connection lost while inserting charity_pledges",
       }),
     ).toBe(false);
   });
