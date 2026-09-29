@@ -64,14 +64,23 @@ const actionTypeSchema = z.enum([
   "community-support",
 ]);
 
-function isImpactTableUnavailable(error: unknown): boolean {
+export function isImpactTableUnavailable(error: unknown): boolean {
   const candidate = error as { code?: unknown; errno?: unknown; message?: unknown };
-  const message = String(candidate?.message ?? "");
-  return (
-    candidate?.code === "ER_NO_SUCH_TABLE" ||
-    candidate?.errno === 1146 ||
+  if (candidate?.code === "ER_NO_SUCH_TABLE" || candidate?.errno === 1146) {
+    return true;
+  }
+
+  const message = String(candidate?.message ?? "").toLowerCase();
+  const referencesImpactTable =
     message.includes("charity_pledges") ||
-    message.includes("charity_volunteer_actions")
+    message.includes("charity_volunteer_actions");
+  if (!referencesImpactTable) return false;
+
+  return (
+    message.includes("doesn't exist") ||
+    message.includes("does not exist") ||
+    message.includes("no such table") ||
+    message.includes("unknown table")
   );
 }
 
