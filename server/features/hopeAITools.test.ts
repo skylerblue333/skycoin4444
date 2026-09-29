@@ -112,5 +112,48 @@ describe("HopeAI real tool registry", () => {
     await expect(
       executeHopeTool("number_stats", { values: [1, Number.NaN] })
     ).rejects.toThrow(/finite numbers/i);
+
+    await expect(
+      executeHopeTool("unit_convert_length", {
+        value: Number.MAX_VALUE,
+        from: "km",
+        to: "mm",
+      })
+    ).rejects.toThrow(/not finite/i);
+  });
+
+  it("rejects physically invalid temperatures regardless of target unit", async () => {
+    await expect(
+      executeHopeTool("temperature_convert", {
+        value: -1,
+        from: "K",
+        to: "C",
+      })
+    ).rejects.toThrow(/below absolute zero/i);
+
+    await expect(
+      executeHopeTool("temperature_convert", {
+        value: -300,
+        from: "C",
+        to: "F",
+      })
+    ).rejects.toThrow(/below absolute zero/i);
+  });
+
+  it("decodes only canonical or safely unpadded base64", async () => {
+    await expect(
+      executeHopeTool("base64_decode", { value: "SGVsbG8" })
+    ).resolves.toEqual({
+      toolId: "base64_decode",
+      output: { text: "Hello" },
+    });
+
+    await expect(
+      executeHopeTool("base64_decode", { value: "!!!!" })
+    ).rejects.toThrow(/valid base64/i);
+
+    await expect(
+      executeHopeTool("base64_decode", { value: "SGVsbG8=garbage" })
+    ).rejects.toThrow(/valid base64/i);
   });
 });
