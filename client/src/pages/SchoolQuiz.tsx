@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { quizBank } from "@/data/quizBank";
 import {
+  buildQuizReviewPlan,
   filterQuizQuestions,
   quizCategories,
   scoreQuiz,
@@ -83,6 +84,11 @@ export default function SchoolQuiz() {
     [questions, answers],
   );
 
+  const reviewPlan = useMemo(
+    () => buildQuizReviewPlan(questions, answers),
+    [questions, answers],
+  );
+
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
   const question = questions[current];
@@ -145,6 +151,51 @@ export default function SchoolQuiz() {
                   <Button className="w-full gap-2 sm:w-auto">
                     Continue learning
                     <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-300/20 bg-blue-300/[0.035] text-white">
+            <CardHeader>
+              <CardTitle className="text-xl text-white">Targeted review plan</CardTitle>
+              <p className="text-sm leading-6 text-white/50">
+                Built only from this quiz attempt. It is a study aid, not an academic assessment or accredited credential.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/30">Completion</p>
+                  <p className="mt-1 text-2xl font-black">{reviewPlan.completionPercentage}%</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/30">Missed</p>
+                  <p className="mt-1 text-2xl font-black">{reviewPlan.missedQuestionIds.length}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/30">Unanswered</p>
+                  <p className="mt-1 text-2xl font-black">{reviewPlan.unansweredQuestionIds.length}</p>
+                </div>
+              </div>
+              <p className="text-sm leading-6 text-white/60">{reviewPlan.recommendation}</p>
+              {reviewPlan.weakestCategories.length ? (
+                <div className="flex flex-wrap gap-2">
+                  {reviewPlan.weakestCategories.map(item => (
+                    <Badge key={item} variant="outline" className="border-blue-200/20 bg-blue-200/[0.04] text-blue-100">
+                      Review: {item}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button variant="outline" className="border-white/15" onClick={resetAttempt}>
+                  Practice this set again
+                </Button>
+                <Link href="/hope-a-i">
+                  <Button className="w-full sm:w-auto">
+                    Ask HopeAI to explain a missed concept
                   </Button>
                 </Link>
               </div>

@@ -2,7 +2,10 @@ import { Link } from "wouter";
 import {
   Activity,
   BookOpen,
+  Bot,
   Flag,
+  Gamepad2,
+  HeartHandshake,
   MessageSquare,
   ShieldCheck,
   UserRound,
@@ -62,6 +65,33 @@ const steps = [
     href: "/beta-feedback",
     label: "Open feedback",
     icon: Flag,
+  },
+] as const;
+
+const connectedPaths = [
+  {
+    title: "Study with HopeAI",
+    description:
+      "Carry a hard question into the HopeAI workspace. Provider-backed answers remain subject to configured AI availability and the workspace's evidence boundaries.",
+    href: "/hope-a-i",
+    label: "Open HopeAI",
+    icon: Bot,
+  },
+  {
+    title: "Connect learning to SkyHope",
+    description:
+      "Move from education into the charity and impact surface. Browsing the path does not itself process a donation, payment, or external transfer.",
+    href: "/charity",
+    label: "Open SkyHope",
+    icon: HeartHandshake,
+  },
+  {
+    title: "Practice through play",
+    description:
+      "Use the flagship game floor as a demo-credit practice path. This journey does not turn game activity into real-value wagering or rewards.",
+    href: "/gaming",
+    label: "Open gaming",
+    icon: Gamepad2,
   },
 ] as const;
 
@@ -164,11 +194,52 @@ export default function BetaJourney() {
           })}
         </section>
 
+        <section className="space-y-4" aria-labelledby="connected-ecosystem-paths">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200/70">
+              Connected ecosystem paths
+            </p>
+            <h2 id="connected-ecosystem-paths" className="mt-2 text-2xl font-black tracking-tight">
+              Learn once, then move somewhere useful.
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/50">
+              The durable activation loop stays evidence-led, while these next paths connect education to HopeAI, SkyHope, and the flagship game floor without pretending those systems share persistence or financial execution.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {connectedPaths.map(path => {
+              const Icon = path.icon;
+              return (
+                <Card
+                  key={path.href}
+                  className="h-full border-amber-200/10 bg-amber-200/[0.025] text-white"
+                >
+                  <CardHeader>
+                    <Icon className="h-5 w-5 text-amber-200" />
+                    <CardTitle className="mt-3 text-base">{path.title}</CardTitle>
+                    <CardDescription className="leading-6 text-white/45">
+                      {path.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href={path.href}>
+                      <Button variant="outline" className="w-full">
+                        {path.label}
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/50">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
           This journey does not issue credentials, token rewards, staking
           rewards, airdrops, payments, wallet custody, signatures, blockchain
-          transactions, provider-backed AI output, livestream delivery, or
+          transactions, guaranteed AI-provider availability, live donation
+          processing, real-value gaming, livestream delivery, or
           production-availability guarantees.
         </section>
       </div>

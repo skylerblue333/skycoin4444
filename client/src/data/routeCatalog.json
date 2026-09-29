@@ -2141,14 +2141,29 @@
       "label": "Game Fi Quest Board"
     },
     {
+      "path": "/game-high-low",
+      "component": "GameHighLow",
+      "label": "Game High Low"
+    },
+    {
       "path": "/game-lobby",
       "component": "GameLobby",
       "label": "Game Lobby"
     },
     {
+      "path": "/game-plinko",
+      "component": "GamePlinko",
+      "label": "Game Plinko"
+    },
+    {
       "path": "/game-room",
       "component": "GameRoom",
       "label": "Game Room"
+    },
+    {
+      "path": "/game-roulette",
+      "component": "GameRoulette",
+      "label": "Game Roulette"
     },
     {
       "path": "/game-settings",
@@ -2354,6 +2369,11 @@
       "path": "/hope-a-i-advanced",
       "component": "HopeAIAdvanced",
       "label": "Hope AI Advanced"
+    },
+    {
+      "path": "/hope-a-i-coach",
+      "component": "HopeAICoach",
+      "label": "Hope AI Coach"
     },
     {
       "path": "/hope-a-i-meta",
