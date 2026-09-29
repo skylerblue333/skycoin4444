@@ -55,13 +55,40 @@ const DEFAULT_EVIDENCE: ImpactEvidenceState = {
   privacyReviewed: false,
 };
 
+const MAX_SAVED_DRAFT_CHARS = 4_096;
+
+function draftFromPlan(plan: SkyHopeCampaignPlan): SkyHopeCampaignDraft {
+  return {
+    title: plan.title,
+    mission: plan.mission,
+    beneficiaryScope: plan.beneficiaryScope,
+    targetOutcome: plan.targetOutcome,
+    targetCount: plan.targetCount,
+    durationDays: plan.durationDays,
+  };
+}
+
 function loadDraft(): SkyHopeCampaignDraft {
   if (typeof window === "undefined") return DEFAULT_DRAFT;
   try {
     const raw = window.localStorage.getItem(SKYHOPE_DRAFT_KEY);
     if (!raw) return DEFAULT_DRAFT;
-    return normalizeSkyHopeCampaignDraft(JSON.parse(raw)) ?? DEFAULT_DRAFT;
+    if (raw.length > MAX_SAVED_DRAFT_CHARS) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    const normalized = normalizeSkyHopeCampaignDraft(JSON.parse(raw));
+    if (!normalized) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    return normalized;
   } catch {
+    try {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+    } catch {
+      // Storage can be unavailable; the in-memory default is still safe.
+    }
     return DEFAULT_DRAFT;
   }
 }
@@ -139,11 +166,23 @@ export default function Charity() {
   }
 
   function saveDraft() {
+    setPlanError("");
     try {
-      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, JSON.stringify(draft));
-      setSavedMessage("Draft saved on this device.");
-    } catch {
-      setSavedMessage("Browser storage is unavailable; keep a copy manually.");
+      const validatedPlan = createSkyHopeCampaignPlan(draft);
+      const normalizedDraft = draftFromPlan(validatedPlan);
+      const serialized = JSON.stringify(normalizedDraft);
+      if (serialized.length > MAX_SAVED_DRAFT_CHARS) {
+        throw new Error("Validated draft is too large for browser storage.");
+      }
+      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, serialized);
+      setDraft(normalizedDraft);
+      setPlan(validatedPlan);
+      setSavedMessage("Validated draft saved on this device.");
+    } catch (error) {
+      setSavedMessage("Draft was not saved.");
+      setPlanError(
+        error instanceof Error ? error.message : "Campaign draft is invalid."
+      );
     }
   }
 
@@ -284,6 +323,7 @@ export default function Charity() {
                     Title
                     <Input
                       value={draft.title}
+                      maxLength={120}
                       onChange={event =>
                         setDraft(current => ({
                           ...current,
@@ -298,6 +338,7 @@ export default function Charity() {
                     Mission
                     <textarea
                       value={draft.mission}
+                      maxLength={600}
                       onChange={event =>
                         setDraft(current => ({
                           ...current,
@@ -313,6 +354,7 @@ export default function Charity() {
                       Beneficiary scope
                       <Input
                         value={draft.beneficiaryScope}
+                        maxLength={240}
                         onChange={event =>
                           setDraft(current => ({
                             ...current,
@@ -326,6 +368,7 @@ export default function Charity() {
                       Measured outcome
                       <Input
                         value={draft.targetOutcome}
+                        maxLength={240}
                         onChange={event =>
                           setDraft(current => ({
                             ...current,
@@ -382,7 +425,7 @@ export default function Charity() {
                     </Button>
                     <Button variant="outline" onClick={saveDraft}>
                       <Save className="mr-2 h-4 w-4" />
-                      Save on this device
+                      Validate + save on this device
                     </Button>
                   </div>
                   {savedMessage ? (
