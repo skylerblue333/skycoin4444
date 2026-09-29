@@ -35,7 +35,7 @@ const DEFAULT_DRAFT: SkyHopeCampaignDraft = {
 
 const MAX_SAVED_DRAFT_CHARS = 4_096;
 const HOPEAI_PRIVATE_HANDOFF_PROMPT =
-  "Help me review a SkyHope organizer brief. I will paste the private planning details into HopeAI myself. Keep beneficiary privacy, consent, evidence quality, and realistic measurement central. Do not claim the campaign is published, verified, tax-deductible, funded, or connected to a payment provider.";
+  "Help me review a HopeAI Impact organizer brief. I will paste the private planning details into HopeAI myself. Keep beneficiary privacy, consent, evidence quality, and realistic measurement central. Do not claim the campaign is published, verified, tax-deductible, funded, or connected to a payment provider.";
 
 function draftFromPlan(plan: SkyHopeCampaignPlan): SkyHopeCampaignDraft {
   return {
@@ -81,7 +81,7 @@ export default function FundraiserTools() {
   const organizerBrief = useMemo(() => {
     if (!plan) return "";
     return [
-      "# SkyHope organizer brief",
+      "# HopeAI Impact organizer brief",
       "",
       "Campaign: " + plan.title,
       "Mission: " + plan.mission,
@@ -129,7 +129,7 @@ export default function FundraiserTools() {
       window.localStorage.setItem(SKYHOPE_DRAFT_KEY, serialized);
       setDraft(normalizedDraft);
       setPlan(validatedPlan);
-      toast.success("Validated SkyHope draft saved on this device.");
+      toast.success("Validated HopeAI Impact draft saved on this device.");
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Campaign draft is invalid."
@@ -144,7 +144,7 @@ export default function FundraiserTools() {
       setDraft(DEFAULT_DRAFT);
       setPlan(null);
       setError("");
-      toast.success("Saved SkyHope draft cleared from this browser.");
+      toast.success("Saved HopeAI Impact draft cleared from this browser.");
     } catch {
       toast.error("Browser storage is unavailable.");
     }
@@ -170,7 +170,7 @@ export default function FundraiserTools() {
         <div className="flex flex-wrap items-center gap-2">
           <Badge className="border-rose-400/30 bg-rose-400/10 text-rose-100">
             <HeartHandshake className="mr-1 h-3.5 w-3.5" />
-            SkyHope fundraiser tools
+            HopeAI · Impact tools
           </Badge>
           <Badge variant="outline" className="border-white/15 text-white/60">
             Organizer planning · no fundraising execution
@@ -195,7 +195,7 @@ export default function FundraiserTools() {
               Browser-saved drafts are local application storage, not encrypted
               beneficiary records. Do not enter names, precise addresses,
               contact details, medical information, account identifiers, or
-              other sensitive personal data. SkyHope also keeps organizer-brief
+              other sensitive personal data. HopeAI Impact also keeps organizer-brief
               details out of the HopeAI URL; copy and paste them explicitly if
               you decide they should be shared with HopeAI.
             </p>
@@ -363,7 +363,7 @@ export default function FundraiserTools() {
             href="/charity"
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm font-bold hover:border-rose-300/25"
           >
-            Back to SkyHope <ArrowRight className="ml-1 inline h-4 w-4" />
+            Back to HopeAI Impact <ArrowRight className="ml-1 inline h-4 w-4" />
           </Link>
           <Link
             href="/donation-processing"
