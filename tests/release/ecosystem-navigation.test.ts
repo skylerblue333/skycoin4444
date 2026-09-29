@@ -25,11 +25,25 @@ describe("ecosystem navigation and visual foundation", () => {
       "/dating-home",
       "/beta-web3",
       "/hope-a-i",
+      "/charity",
       "/creator-dashboard",
       "/beta-feedback",
     ]) {
       expect(nav).toContain(route);
     }
+  });
+
+  it("promotes the flagship social, learning, AI, gaming, and impact paths", () => {
+    for (const marker of [
+      '{ label: "Social", route: "/activity-feed"',
+      '{ label: "Gaming", route: "/gaming"',
+      '{ label: "Learn", route: "/sky-school"',
+      '{ label: "HopeAI", route: "/hope-a-i"',
+      '{ label: "SkyHope", route: "/charity"',
+    ]) {
+      expect(nav).toContain(marker);
+    }
+    expect(nav).toContain("Listening… say Home, Explore, Social, Chat, Gaming, Learn, HopeAI, SkyHope");
   });
 
   it("makes the home page a front door to every headline beta journey", () => {
