@@ -27,6 +27,7 @@ import {
   spinRoulette,
   type RouletteBet,
 } from "@/lib/flagshipGameEngine";
+import { loadArcadeSession, saveArcadeSession } from "@/lib/betaSessionState";
 
 type ArcadeTab = "plinko" | "high-low" | "roulette" | "crypto";
 const VALID_TABS = new Set<ArcadeTab>(["plinko", "high-low", "roulette", "crypto"]);
@@ -51,17 +52,24 @@ function credit(value: number) {
 
 export default function Arcade() {
   const [activeTab, setActiveTab] = useState<ArcadeTab>(tabFromHash);
-  const [credits, setCredits] = useState(1000);
-  const [stake, setStake] = useState(25);
-  const [seed, setSeed] = useState(4444);
-  const [status, setStatus] = useState("Choose a game. Every score and credit on this floor is local demo state.");
+  const [initialSession] = useState(() =>
+    loadArcadeSession(typeof window === "undefined" ? null : window.localStorage)
+  );
+  const [credits, setCredits] = useState(initialSession.credits);
+  const [stake, setStake] = useState(initialSession.stake);
+  const [seed, setSeed] = useState(initialSession.seed);
+  const [status, setStatus] = useState(
+    initialSession.restored
+      ? "Browser-local demo session restored. No money or token balance is involved."
+      : "Choose a game. Every score and credit on this floor is local demo state."
+  );
 
   const [plinkoResult, setPlinkoResult] = useState(() => simulatePlinko(seed));
   const [plinkoHistory, setPlinkoHistory] = useState<Array<{ bucket: number; multiplier: number }>>([]);
 
   const [highLowCard, setHighLowCard] = useState(7);
   const [highLowReveal, setHighLowReveal] = useState<number | null>(null);
-  const [highLowStreak, setHighLowStreak] = useState(0);
+  const [highLowStreak, setHighLowStreak] = useState(initialSession.highLowStreak);
   const [highLowHistory, setHighLowHistory] = useState<string[]>([]);
 
   const [rouletteBet, setRouletteBet] = useState<RouletteBet>({ kind: "red" });
@@ -83,6 +91,13 @@ export default function Arcade() {
     window.addEventListener("hashchange", syncHash);
     return () => window.removeEventListener("hashchange", syncHash);
   }, []);
+
+  useEffect(() => {
+    saveArcadeSession(
+      typeof window === "undefined" ? null : window.localStorage,
+      { credits, stake, seed, highLowStreak }
+    );
+  }, [credits, highLowStreak, seed, stake]);
 
   function changeTab(value: string) {
     const tab = VALID_TABS.has(value as ArcadeTab) ? (value as ArcadeTab) : "plinko";
@@ -191,6 +206,7 @@ export default function Arcade() {
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="bg-cyan-500/15 text-cyan-100">ARCADE FLOOR V2</Badge>
               <StatusBadge>No cash or token value</StatusBadge>
+              <StatusBadge>Browser-local session</StatusBadge>
             </div>
             <h1 className="mt-4 text-4xl font-black tracking-[-0.04em] sm:text-5xl">
               Plinko · High-Low · Roulette · Crypto Ops
