@@ -13,7 +13,12 @@ import {
   StakeSelector,
   StatusBadge,
 } from "@/features/gaming/components/ArcadeSurface";
-import { crashCurveMultiplier, crashPoint, demoProof } from "@/lib/flagshipGameEngine";
+import {
+  crashCurveMultiplier,
+  crashPoint,
+  createDemoRoundReceipt,
+  verifyDemoRoundReceipt,
+} from "@/lib/flagshipGameEngine";
 
 type RoundState = "idle" | "running" | "cashed" | "crashed";
 
@@ -31,7 +36,14 @@ export default function GameCrash() {
   const [trail, setTrail] = useState<number[]>([1]);
   const startedAtRef = useRef(0);
 
-  const proof = useMemo(() => demoProof(seed, "crash"), [seed]);
+  const replayReceipt = useMemo(
+    () => createDemoRoundReceipt("crash", seed),
+    [seed],
+  );
+  const replayVerified = useMemo(
+    () => verifyDemoRoundReceipt(replayReceipt),
+    [replayReceipt],
+  );
 
   useEffect(() => {
     if (state !== "running") return;
@@ -224,8 +236,15 @@ export default function GameCrash() {
                   <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal text-white/25">Set 0 to disable.</span>
                 </label>
                 <div className="rounded-2xl border border-white/10 bg-black/25 p-3">
-                  <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Demo proof</p>
-                  <p className="mt-1 break-all font-mono text-xs text-white/42">{proof}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-white/25">Demo replay receipt</p>
+                    <span className={replayVerified ? "text-[10px] font-bold text-emerald-300" : "text-[10px] font-bold text-rose-300"}>
+                      {replayVerified ? "REPLAY VERIFIED" : "MISMATCH"}
+                    </span>
+                  </div>
+                  <p className="mt-2 break-all font-mono text-xs text-white/42">{replayReceipt.proof}</p>
+                  <p className="mt-2 font-mono text-[11px] text-white/28">{replayReceipt.summary}</p>
+                  <p className="mt-2 text-[11px] leading-4 text-white/25">Deterministic beta replay evidence only — not cryptographic fairness, money, or token settlement.</p>
                 </div>
               </CardContent>
             </Card>
