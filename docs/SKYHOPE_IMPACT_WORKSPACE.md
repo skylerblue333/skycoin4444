@@ -21,3 +21,10 @@ Any future real-value donation path requires a separately verified beneficiary, 
 ## HopeAI boundary
 
 HopeAI may assist with campaign briefs, volunteer plans, outreach drafts, evidence checklists, and summaries of user-provided material. It must not claim a charity is verified or that money moved unless a separately connected and verified provider supplies that evidence.
+
+
+## Pledge-intent retry reliability
+
+The account-owned pledge-intent API uses an idempotency key and a database uniqueness boundary. Concurrent retries that race past the initial read now recover the already-recorded pledge intent after an idempotency-key conflict instead of presenting a false server failure. Unrelated duplicate-key, connectivity, permission, and database failures still fail closed.
+
+This remains non-custodial engineering-beta planning state. Retry convergence does not execute a donation, call a payment provider, move funds, verify a beneficiary, create tax evidence, or settle a blockchain transaction.
