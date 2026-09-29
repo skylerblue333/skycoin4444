@@ -743,11 +743,13 @@ export default function ActivityFeed() {
                   >
                     {feed.isLoading
                       ? "Loading posts…"
-                      : posts.length +
-                        " visible posts" +
-                        (query.trim()
-                          ? " matching “" + query.trim() + "”"
-                          : "")}
+                      : feed.isError
+                        ? "Feed unavailable"
+                        : posts.length +
+                          " visible posts" +
+                          (query.trim()
+                            ? " matching “" + query.trim() + "”"
+                            : "")}
                   </CardDescription>
                 </div>
 
@@ -819,12 +821,34 @@ export default function ActivityFeed() {
 
             <CardContent className="space-y-4">
               {feed.isError ? (
-                <p
-                  className="rounded-xl border border-rose-300/20 bg-rose-300/[0.05] p-4 text-sm text-rose-100"
+                <div
+                  className="flex flex-col gap-3 rounded-xl border border-rose-300/20 bg-rose-300/[0.05] p-4 text-sm text-rose-100 sm:flex-row sm:items-center sm:justify-between"
                   role="alert"
                 >
-                  The feed could not be loaded. Try refreshing the page.
-                </p>
+                  <div>
+                    <p className="font-semibold">The feed could not be loaded.</p>
+                    <p className="mt-1 text-xs text-rose-100/70">
+                      Your posts are not shown as empty when the persisted feed is unavailable.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => feed.refetch()}
+                    disabled={feed.isFetching}
+                    aria-label="Retry activity feed"
+                    className="shrink-0 border-rose-200/25 bg-transparent text-rose-50 hover:bg-rose-100/10"
+                  >
+                    <RefreshCw
+                      className={
+                        "mr-2 h-4 w-4 " +
+                        (feed.isFetching ? "animate-spin" : "")
+                      }
+                    />
+                    {feed.isFetching ? "Retrying…" : "Retry feed"}
+                  </Button>
+                </div>
               ) : null}
 
               {!feed.isLoading && !feed.isError && !posts.length ? (
