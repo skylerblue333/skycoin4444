@@ -187,6 +187,7 @@ async function verifyCredentialedAccess(origin, auth) {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
+      origin,
     },
     body: JSON.stringify({
       email: credentials.email,
@@ -243,6 +244,7 @@ async function verifyCredentialedAccess(origin, auth) {
     headers: {
       accept: "application/json",
       "content-type": "application/json",
+      origin,
     },
     body: JSON.stringify({
       email: credentials.email,
@@ -264,6 +266,7 @@ async function verifyCredentialedAccess(origin, auth) {
     headers: {
       accept: "application/json",
       cookie: cookiePair,
+      origin,
     },
   });
   if (!logout.ok) {
