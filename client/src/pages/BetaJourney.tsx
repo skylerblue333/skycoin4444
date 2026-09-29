@@ -69,6 +69,25 @@ export default function BetaJourney() {
           </p>
         </header>
 
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-black uppercase tracking-[0.18em] text-white/35">
+              Connected ecosystem paths
+            </span>
+            {[
+              { label: "School", href: "/course-catalog" },
+              { label: "Gaming", href: "/gaming" },
+              { label: "HopeAI", href: "/hope-a-i" },
+              { label: "SkyHope", href: "/charity" },
+              { label: "Social", href: "/activity-feed" },
+            ].map(path => (
+              <Link key={path.href} href={path.href}>
+                <Button size="sm" variant="ghost">{path.label}</Button>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {!isAuthenticated || !user ? (
           <Card className="border-amber-300/20 bg-amber-300/[0.04]">
             <CardContent className="space-y-4 p-6">
