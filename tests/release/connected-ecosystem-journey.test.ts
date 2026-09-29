@@ -46,16 +46,26 @@ describe("HopeAI social gaming education SkyHope integration", () => {
     expect(charityImpactPanel).toContain("No payment execution");
   });
 
-  it("routes legacy impact screens to one truthful SkyHope center", () => {
+  it("keeps legacy impact screens truthful while preserving useful planning tools", () => {
     for (const path of [
       "client/src/pages/CharityLeaderboard.tsx",
       "client/src/pages/ImpactMap.tsx",
       "client/src/pages/ImpactMetrics.tsx",
-      "client/src/pages/DonationProcessing.tsx",
-      "client/src/pages/FundraiserTools.tsx",
     ]) {
       expect(readFileSync(path, "utf8")).toContain('from "./Charity"');
     }
+
+    const donationPlanning = readFileSync("client/src/pages/DonationProcessing.tsx", "utf8");
+    expect(donationPlanning).toContain("Donation intent preview");
+    expect(donationPlanning).toContain("Local planning only");
+    expect(donationPlanning).toContain("/hope-a-i?source=skyhope");
+    expect(donationPlanning).toContain("does not contact a payment provider");
+
+    const fundraiserPlanning = readFileSync("client/src/pages/FundraiserTools.tsx", "utf8");
+    expect(fundraiserPlanning).toContain("Organizer planning · no fundraising execution");
+    expect(fundraiserPlanning).toContain("local planning artifact only");
+    expect(fundraiserPlanning).toContain("/hope-a-i?source=skyhope");
+
     const impactPlay = readFileSync("client/src/pages/GamingForCharity.tsx", "utf8");
     expect(impactPlay).toContain("Impact Play Lab");
     expect(impactPlay).toContain("No live donations");
