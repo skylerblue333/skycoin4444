@@ -10,22 +10,24 @@ describe("V5 global beta navigation", () => {
     expect(navigation).not.toContain("V4 engineering beta");
   });
 
-  it("keeps voice navigation aligned with the ten-platform V5 labels", () => {
+  it("keeps voice navigation aligned with the major V5 labels and SkyHope impact path", () => {
     expect(navigation).toContain(
-      "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+      "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, SkyHope, Market, Web3, Dating, Global, or Creator."
     );
     expect(navigation).toContain('{ label: "Creator", route: "/creator-dashboard"');
     expect(navigation).toContain(
       '{ label: "Global", route: "/translation-enabled-community"'
     );
     expect(navigation).toContain('{ label: "Dating", route: "/dating-home"');
+    expect(navigation).toContain('{ label: "School", route: "/sky-school"');
+    expect(navigation).toContain('{ label: "SkyHope", route: "/charity"');
   });
 
   it("preserves global search, feedback, account, and Four Fours controls", () => {
     expect(navigation).toContain("V3CommandPalette");
     expect(navigation).toContain("Search all SKYCOIN4444 routes");
     expect(navigation).toContain("/beta-feedback?route=");
-    expect(navigation).toContain("isAuthenticated ? \"/dashboard\" : \"/signin\"");
+    expect(navigation).toContain('isAuthenticated ? "/dashboard" : "/signin"');
     expect(navigation).toContain("You found the Four Fours.");
     expect(navigation).toContain(
       "No fake progress. Build it. Test it. Integrate it. Prove it."
