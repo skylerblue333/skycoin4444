@@ -201,6 +201,53 @@ export async function persistProviderEvent(input: ProviderEventInput): Promise<b
   }
 }
 
+export async function executeWithProviderAudit<T>(
+  requestedEvent: ProviderEventInput,
+  operation: () => Promise<T>,
+  completedEvent: (result: T) => ProviderEventInput,
+): Promise<Readonly<{ result: T; persisted: true }>> {
+  if (requestedEvent.status !== "requested" || !requestedEvent.externalRef) {
+    throw new Error("audited provider operations require a requested event with an externalRef");
+  }
+
+  const requestedPersisted = await persistProviderEvent(requestedEvent);
+  if (!requestedPersisted) {
+    throw new Error("Provider event ledger unavailable; external operation was not attempted");
+  }
+
+  let result: T;
+  try {
+    result = await operation();
+  } catch (error) {
+    await persistProviderEvent({
+      ...requestedEvent,
+      status: "failed",
+      metadata: {
+        ...(requestedEvent.metadata ?? {}),
+        auditPhase: "provider_failed",
+      },
+    });
+    throw error;
+  }
+
+  const completed = completedEvent(result);
+  if (
+    completed.provider !== requestedEvent.provider ||
+    completed.externalRef !== requestedEvent.externalRef
+  ) {
+    throw new Error("audited provider operation changed provider or externalRef");
+  }
+
+  const completionPersisted = await persistProviderEvent(completed);
+  if (!completionPersisted) {
+    throw new Error(
+      "Provider event ledger completion update failed; operation requires reconciliation",
+    );
+  }
+
+  return Object.freeze({ result, persisted: true as const });
+}
+
 export function cryptoProviderConfigSnapshot(env: NodeJS.ProcessEnv = process.env) {
   let stratumConfigured = false;
   try {
@@ -594,7 +641,9 @@ function parseZeroExQuote(payload: unknown, input: ZeroExQuoteInput) {
   const value =
     typeof transaction.value === "string" && DECIMAL_RE.test(transaction.value)
       ? transaction.value
-      : "0";
+      : (() => {
+          throw new Error("0x.transaction.value is invalid");
+        })();
   const gas =
     typeof transaction.gas === "string" && DECIMAL_RE.test(transaction.gas)
       ? transaction.gas
@@ -1226,19 +1275,52 @@ export function registerCryptoProviderRoutes(app: Express) {
     const user = await requireAdmin(req, res);
     if (!user) return;
     try {
-      const result = await submitStratumShare(req.body ?? {});
-      const persisted = await persistProviderEvent({
-        userId: user.id,
-        provider: "stratum-v1",
-        eventType: "share_submission",
-        externalRef: result.shareRef,
-        status: result.accepted ? "accepted" : "rejected",
-        metadata: {
-          accepted: result.accepted,
-          latencyMs: result.latencyMs,
+      const shareInput = req.body ?? {};
+      const jobId = requireSafeRef(shareInput.jobId, "jobId");
+      const extraNonce2 = requireSafeRef(shareInput.extraNonce2, "extraNonce2");
+      const ntime = requireSafeRef(shareInput.ntime, "ntime");
+      const nonce = requireSafeRef(shareInput.nonce, "nonce");
+      if (!HEX_RE.test(extraNonce2) || extraNonce2.length > 64) {
+        throw new Error("extraNonce2 must be hexadecimal");
+      }
+      if (!/^[a-fA-F0-9]{8}$/.test(ntime)) {
+        throw new Error("ntime must be 8 hex characters");
+      }
+      if (!/^[a-fA-F0-9]{8}$/.test(nonce)) {
+        throw new Error("nonce must be 8 hex characters");
+      }
+      const shareRef = stableHash("share", { jobId, extraNonce2, ntime, nonce });
+
+      const audited = await executeWithProviderAudit(
+        {
+          userId: user.id,
+          provider: "stratum-v1",
+          eventType: "share_submission",
+          externalRef: shareRef,
+          status: "requested",
+          metadata: { auditPhase: "requested" },
         },
-      });
-      res.json({ ...result, persisted });
+        () =>
+          submitStratumShare({
+            jobId,
+            extraNonce2,
+            ntime,
+            nonce,
+          }),
+        result => ({
+          userId: user.id,
+          provider: "stratum-v1",
+          eventType: "share_submission",
+          externalRef: shareRef,
+          status: result.accepted ? "accepted" : "rejected",
+          metadata: {
+            accepted: result.accepted,
+            latencyMs: result.latencyMs,
+            auditPhase: "completed",
+          },
+        }),
+      );
+      res.json({ ...audited.result, persisted: audited.persisted });
     } catch (error) {
       unavailable(res, error);
     }
@@ -1288,23 +1370,51 @@ export function registerCryptoProviderRoutes(app: Express) {
     const user = await requireAdmin(req, res);
     if (!user) return;
     try {
-      const result = await signDigestWithOpenBao(req.body ?? {});
-      const persisted = await persistProviderEvent({
-        userId: user.id,
-        provider: "openbao-transit",
-        eventType: "digest_signature",
-        externalRef: stableHash("openbao-sign", {
-          digestHex: result.digestHex,
-          signature: result.signature,
-        }),
-        status: "signed",
-        metadata: {
-          keyRef: result.keyRef,
-          digestHex: result.digestHex,
-          privateKeyExposed: false,
+      const config = openBaoConfig(process.env);
+      if (!config) throw new Error("OpenBao Transit is not configured");
+      if (!config.enabled) throw new Error("OpenBao signing is disabled by operator policy");
+      const digestHex =
+        typeof req.body?.digestHex === "string" && /^[a-fA-F0-9]{64}$/.test(req.body.digestHex)
+          ? req.body.digestHex.toLowerCase()
+          : (() => {
+              throw new Error("digestHex must be a 32-byte hexadecimal digest");
+            })();
+      const auditRef = "openbao-sign:" + randomUUID();
+
+      const audited = await executeWithProviderAudit(
+        {
+          userId: user.id,
+          provider: "openbao-transit",
+          eventType: "digest_signature",
+          externalRef: auditRef,
+          status: "requested",
+          metadata: {
+            keyRef: config.key,
+            digestHex,
+            privateKeyExposed: false,
+            auditPhase: "requested",
+          },
         },
+        () => signDigestWithOpenBao({ digestHex }),
+        result => ({
+          userId: user.id,
+          provider: "openbao-transit",
+          eventType: "digest_signature",
+          externalRef: auditRef,
+          status: "signed",
+          metadata: {
+            keyRef: result.keyRef,
+            digestHex: result.digestHex,
+            privateKeyExposed: false,
+            auditPhase: "completed",
+          },
+        }),
+      );
+      res.json({
+        ...audited.result,
+        persisted: audited.persisted,
+        auditRef,
       });
-      res.json({ ...result, persisted });
     } catch (error) {
       unavailable(res, error);
     }
@@ -1314,21 +1424,58 @@ export function registerCryptoProviderRoutes(app: Express) {
     const user = await requireAdmin(req, res);
     if (!user) return;
     try {
-      const result = await signDigestWithMpcGateway(req.body ?? {});
-      const persisted = await persistProviderEvent({
-        userId: user.id,
-        provider: "mpc-signer-gateway",
-        eventType: "digest_signature",
-        externalRef: result.requestId,
-        status: "signed",
-        metadata: {
-          keyRef: result.keyRef,
-          digestHex: result.digestHex,
-          algorithm: result.algorithm,
-          privateKeyExposed: false,
+      const config = mpcConfig(process.env);
+      if (!config) throw new Error("MPC signer gateway is not configured");
+      if (!config.enabled) throw new Error("MPC signing is disabled by operator policy");
+      const digestHex =
+        typeof req.body?.digestHex === "string" && /^[a-fA-F0-9]{64}$/.test(req.body.digestHex)
+          ? req.body.digestHex.toLowerCase()
+          : (() => {
+              throw new Error("digestHex must be a 32-byte hexadecimal digest");
+            })();
+      const algorithm =
+        req.body?.algorithm === undefined
+          ? "secp256k1-sha256"
+          : requireSafeRef(req.body.algorithm, "algorithm");
+      const auditRef = "mpc-sign:" + randomUUID();
+
+      const audited = await executeWithProviderAudit(
+        {
+          userId: user.id,
+          provider: "mpc-signer-gateway",
+          eventType: "digest_signature",
+          externalRef: auditRef,
+          status: "requested",
+          metadata: {
+            keyRef: config.keyId,
+            digestHex,
+            algorithm,
+            privateKeyExposed: false,
+            auditPhase: "requested",
+          },
         },
+        () => signDigestWithMpcGateway({ digestHex, algorithm }),
+        result => ({
+          userId: user.id,
+          provider: "mpc-signer-gateway",
+          eventType: "digest_signature",
+          externalRef: auditRef,
+          status: "signed",
+          metadata: {
+            providerRequestId: result.requestId,
+            keyRef: result.keyRef,
+            digestHex: result.digestHex,
+            algorithm: result.algorithm,
+            privateKeyExposed: false,
+            auditPhase: "completed",
+          },
+        }),
+      );
+      res.json({
+        ...audited.result,
+        persisted: audited.persisted,
+        auditRef,
       });
-      res.json({ ...result, persisted });
     } catch (error) {
       unavailable(res, error);
     }
