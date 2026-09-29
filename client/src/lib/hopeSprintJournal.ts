@@ -27,7 +27,7 @@ export type HopeSprintReceipt = Readonly<{
   provenance: "tester-confirmed-local-receipt";
 }>;
 
-const FOCUS_VALUES = new Set<HopeFocus>(["build", "learn", "play", "ship"]);
+const FOCUS_VALUES = new Set<HopeFocus>(["build", "learn", "play", "impact", "ship"]);
 
 function normalizeText(value: string, maxLength: number) {
   return value.trim().replace(/\s+/g, " ").slice(0, maxLength);
@@ -167,6 +167,13 @@ export function recommendHopeNextAction(
       href: "/beta-feedback",
       reason:
         "The core evidence types are already represented, so use the next sprint to close a concrete product-quality finding.",
+    },
+    impact: {
+      focus: "ship",
+      title: "Turn impact planning into truthful evidence",
+      href: "/charity",
+      reason:
+        "The impact mission is planning-only, so close the loop by reviewing what was actually learned, practiced, or shared before making any impact claim.",
     },
     ship: {
       focus: "build",

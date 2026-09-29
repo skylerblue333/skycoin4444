@@ -8,6 +8,7 @@ import {
   Clipboard,
   Gamepad2,
   GraduationCap,
+  HandHeart,
   Lightbulb,
   Mic,
   MicOff,
@@ -63,6 +64,12 @@ const focusOptions: Array<{
     icon: Gamepad2,
   },
   {
+    id: "impact",
+    label: "Impact",
+    detail: "Connect learning, charity planning, play, and truthful sharing.",
+    icon: HandHeart,
+  },
+  {
     id: "ship",
     label: "Ship",
     detail: "Walk the tester path and close feedback.",
@@ -74,6 +81,7 @@ const quickGoals = [
   "Make the gaming hub more fun with a rush game",
   "Learn blockchain basics and test myself",
   "Improve the social beta without fake metrics",
+  "Build a charity impact mission for my community",
   "Ship one visible beta improvement today",
   "Clear today's Arcade Passport challenge",
 ] as const;
@@ -178,13 +186,14 @@ export default function HopeAI() {
 
   function generatePlan() {
     const nextPlan = createHopePlan({
-        goal,
-        focus,
-        activity: summary,
-      });
+      goal,
+      focus,
+      activity: summary,
+    });
     setPlan(nextPlan);
     setCompletedSteps([]);
     setCopied(false);
+
   }
 
   function toggleStep(stepId: string) {
@@ -281,9 +290,10 @@ export default function HopeAI() {
             </h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-white/50">
               Turn a goal into a short action sprint using typed rules plus your
-              account-owned beta evidence. This is useful today without
-              pretending model connectivity, emotional inference, hidden memory,
-              or autonomous agents exist.
+              account-owned beta evidence. Impact focus now carries the same
+              mission into SkyHope, SkySchool, charity-safe Gaming, and Social
+              without pretending model connectivity, beneficiary verification,
+              donation execution, hidden memory, or autonomous agents exist.
             </p>
           </div>
 
@@ -295,6 +305,15 @@ export default function HopeAI() {
               >
                 <GraduationCap className="mr-2 h-4 w-4" />
                 SkySchool
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                variant="outline"
+                className="border-white/15 bg-white/[0.03] text-white"
+              >
+                <HandHeart className="mr-2 h-4 w-4" />
+                SkyHope
               </Button>
             </Link>
             <Link href="/game-fi-quest-board">

@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Gamepad2,
   GraduationCap,
+  HandHeart,
   Lightbulb,
   PlayCircle,
   ShieldCheck,
@@ -61,6 +62,14 @@ const practiceCards = [
     href: "/game-fi-quest-board",
     icon: Target,
     accent: "border-amber-300/20 bg-amber-300/[0.04]",
+  },
+  {
+    title: "Impact learning mission",
+    detail:
+      "Carry one lesson into a bounded SkyHope action with evidence instead of invented impact metrics.",
+    href: "/charity",
+    icon: HandHeart,
+    accent: "border-emerald-300/20 bg-emerald-300/[0.04]",
   },
 ] as const;
 
@@ -139,7 +148,7 @@ export default function SkySchool() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
             <Link href="/course-catalog">
               <Button size="lg" className="w-full">
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -154,6 +163,16 @@ export default function SkySchool() {
               >
                 <Brain className="mr-2 h-4 w-4" />
                 Ask HopeAI Coach
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-emerald-300/20 bg-emerald-300/[0.04] text-emerald-50"
+              >
+                <HandHeart className="mr-2 h-4 w-4" />
+                Build impact mission
               </Button>
             </Link>
           </div>
