@@ -102,12 +102,16 @@ The canonical V5 beta is additionally observed through two provider/external lay
 - Railway exposes deployment logs, HTTP request signals, and CPU/memory/network resource metrics for the hosted service; the managed MySQL service exposes CPU/memory/disk/network resource metrics.
 - `.github/workflows/hosted-beta-health-monitor.yml` performs an independent public smoke every 15 minutes from GitHub Actions. It checks the home/sign-in surfaces plus beta health, beta readiness, runtime readiness, authentication configuration, database/configuration state, the explicit no-live-financial-or-chain-execution safety boundary, and the deployed release SHA.
 
-Scheduled and manually dispatched monitor runs reconcile one repository-native incident signal:
+Scheduled and manually dispatched monitor runs reconcile one repository-native operational alert:
 
-- the first non-success result opens one issue titled `[ops] Hosted beta health monitor incident`;
-- later failed runs reuse that open incident instead of creating duplicates;
-- the first later successful run comments with the recovery SHA/run and closes the incident;
+- the first non-success result opens one issue titled `[ops] Hosted beta health monitor incident` and assigns it to the repository owner;
+- the incident records a machine-readable consecutive-failure count plus the first and latest failing source SHAs;
+- failures 1–2 are classified **SEV-3**, failures 3–5 **SEV-2**, and 6+ consecutive failures **SEV-1**;
+- later failed runs update the same incident instead of creating duplicates, and a comment is added only when the severity crosses an escalation threshold;
+- GitHub control-flow results `cancelled` and `skipped` leave incident state untouched; unexpected result strings fail closed instead of being treated as outages;
+- the first later successful run comments with the recovery SHA/run and prior failure streak, then closes the incident;
 - pull-request checks never receive `issues: write` and never mutate incident state;
+- GitHub API calls from the incident reconciler are time-bounded and GitHub API/server origins reject embedded credentials;
 - the incident body contains source/run metadata only, not invitation credentials, session tokens, provider secrets, or request bodies.
 
 The workflow keeps default `contents: read` permission. Only the scheduled/manual incident job receives scoped `issues: write` permission.
@@ -143,9 +147,9 @@ This work does not establish:
 - tamper-proof logging;
 - distributed trace propagation;
 - OpenTelemetry export;
-- pager/phone/SMS/on-call escalation or a formal SLO alert policy;
+- pager/phone/SMS/on-call delivery or an SLA/SLO-based external paging policy;
 - complete secret detection;
 - external proxy/header trust configuration;
 - production security certification.
 
-The scheduled GitHub Actions monitor plus deduplicated GitHub incident issue is a basic repository-native external availability/configuration signal. It is not an uptime SLA, an independent incident-management provider, or production observability certification.
+The scheduled GitHub Actions monitor plus assigned, deduplicated, severity-escalating GitHub incident is a repository-native external availability/configuration alert. It is not an uptime SLA, phone/SMS/pager delivery, an independent incident-management provider, or production observability certification.
