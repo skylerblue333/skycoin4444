@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { quizBank } from "../client/src/data/quizBank";
 import {
+  buildQuizReviewPlan,
   filterQuizQuestions,
   quizCategories,
   scoreQuiz,
@@ -57,6 +58,37 @@ describe("quizEngine", () => {
     expect(result.earnedPoints).toBe(0);
     expect(result.percentage).toBe(0);
     expect(result.passed).toBe(false);
+  });
+
+  it("builds a deterministic targeted review plan from missed and unanswered questions", () => {
+    const questions = quizBank.slice(0, 6);
+    const answers = {
+      [questions[0].id]: questions[0].correctIndex,
+      [questions[1].id]: (questions[1].correctIndex + 1) % questions[1].choices.length,
+      [questions[2].id]: questions[2].correctIndex,
+    };
+    const plan = buildQuizReviewPlan(questions, answers);
+
+    expect(plan.completionPercentage).toBe(50);
+    expect(plan.missedQuestionIds).toEqual([questions[1].id]);
+    expect(plan.unansweredQuestionIds).toEqual(questions.slice(3).map(question => question.id));
+    expect(plan.categories.length).toBeGreaterThan(0);
+    expect(plan.weakestCategories.length).toBeGreaterThan(0);
+    expect(plan.recommendation).toMatch(/Finish 3 unanswered questions/i);
+  });
+
+  it("recognizes strong complete coverage without inventing a credential", () => {
+    const questions = quizBank.slice(0, 4);
+    const answers = Object.fromEntries(
+      questions.map(question => [question.id, question.correctIndex]),
+    );
+    const plan = buildQuizReviewPlan(questions, answers);
+
+    expect(plan.completionPercentage).toBe(100);
+    expect(plan.missedQuestionIds).toHaveLength(0);
+    expect(plan.unansweredQuestionIds).toHaveLength(0);
+    expect(plan.weakestCategories).toHaveLength(0);
+    expect(plan.recommendation).toMatch(/Continue to the next lesson|harder question set/i);
   });
 
   it("reports invalid authored questions", () => {

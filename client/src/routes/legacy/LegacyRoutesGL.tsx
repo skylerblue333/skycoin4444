@@ -11,7 +11,10 @@ const GameChat = lazy(() => import('@/pages/GameChat'));
 const GameCrash = lazy(() => import('@/pages/GameCrash'));
 const GameCryptoQuiz = lazy(() => import('@/pages/GameCryptoQuiz'));
 const GameFiQuestBoard = lazy(() => import('@/pages/GameFiQuestBoard'));
+const GameHighLow = lazy(() => import('@/pages/GameHighLow'));
 const GameLobby = lazy(() => import('@/pages/GameLobby'));
+const GamePlinko = lazy(() => import('@/pages/GamePlinko'));
+const GameRoulette = lazy(() => import('@/pages/GameRoulette'));
 const GameRoom = lazy(() => import('@/pages/GameRoom'));
 const GameSettings = lazy(() => import('@/pages/GameSettings'));
 const GameSlots = lazy(() => import('@/pages/GameSlots'));
@@ -136,7 +139,10 @@ export default function LegacyRoutesGL() {
       <Route path="/game-crash" component={GameCrash} />
       <Route path="/game-crypto-quiz" component={GameCryptoQuiz} />
       <Route path="/game-fi-quest-board" component={GameFiQuestBoard} />
+      <Route path="/game-high-low" component={GameHighLow} />
       <Route path="/game-lobby" component={GameLobby} />
+      <Route path="/game-plinko" component={GamePlinko} />
+      <Route path="/game-roulette" component={GameRoulette} />
       <Route path="/game-room" component={GameRoom} />
       <Route path="/game-settings" component={GameSettings} />
       <Route path="/game-slots" component={GameSlots} />
