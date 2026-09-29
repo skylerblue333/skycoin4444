@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { courseById, gapCourses, gradeCourseQuestion } from '../../client/src/data/gapCourses';
 
 describe('SkySchool gap course content', () => {
-  it('authors eighteen complete course tracks', () => {
-    expect(gapCourses).toHaveLength(18);
-    expect(new Set(gapCourses.map((course) => course.id)).size).toBe(18);
+  it('authors nineteen complete course tracks', () => {
+    expect(gapCourses).toHaveLength(19);
+    expect(new Set(gapCourses.map((course) => course.id)).size).toBe(19);
   });
 
   it('gives every course meaningful lesson and assessment coverage', () => {
@@ -19,6 +19,12 @@ describe('SkySchool gap course content', () => {
         expect(lesson.question.correctIndex).toBeLessThan(lesson.question.choices.length);
       }
     }
+  });
+
+  it('includes the SkyHope responsible-giving track', () => {
+    const course = courseById('skyhope-impact-101');
+    expect(course?.title).toBe('Responsible Giving & Impact Evidence');
+    expect(course?.lessons).toHaveLength(6);
   });
 
   it('grades assessments deterministically', () => {
