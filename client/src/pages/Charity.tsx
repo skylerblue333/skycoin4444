@@ -1,471 +1,462 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Link } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
+import { startLogin } from "@/const";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { getLoginUrl } from "@/const";
-import { toast } from "sonner";
 import {
-  Heart, HandHeart, Globe, Users, TrendingUp, Sparkles, Vote,
-  Trophy, BarChart3, Target, Coins, Shield, Loader2, ThumbsUp,
-  ThumbsDown, Award, Flame, Clock, CheckCircle2, ArrowUpRight
+  ArrowRight,
+  Bot,
+  Gamepad2,
+  GraduationCap,
+  HandHeart,
+  Heart,
+  Loader2,
+  MessageCircleMore,
+  ShieldCheck,
+  Sparkles,
+  Users,
 } from "lucide-react";
 
-// DAO Proposals for charity fund allocation
-const DAO_PROPOSALS = [
-  {
-    id: "prop-1",
-    title: "Allocate 50,000 SKY444 to Clean Water Initiative",
-    description: "Fund the deployment of water purification systems in 3 rural communities in East Africa. Partnership with WaterAid verified.",
-    category: "Environment",
-    requestedAmount: 50000,
-    votesFor: 847,
-    votesAgainst: 123,
-    status: "active" as const,
-    endsIn: "3 days",
-    proposer: "SkylerDev",
-  },
-  {
-    id: "prop-2",
-    title: "Fund 100 STEM Scholarships for Underserved Youth",
-    description: "Provide full scholarships for coding bootcamps and university CS programs. Partnered with Code.org and local universities.",
-    category: "Education",
-    requestedAmount: 120000,
-    votesFor: 1203,
-    votesAgainst: 89,
-    status: "active" as const,
-    endsIn: "5 days",
-    proposer: "CryptoKing",
-  },
-  {
-    id: "prop-3",
-    title: "Emergency Relief: Disaster Recovery Fund",
-    description: "Rapid-response fund for natural disaster relief. Funds distributed within 24 hours of verified events via smart contract.",
-    category: "Humanitarian",
-    requestedAmount: 200000,
-    votesFor: 2341,
-    votesAgainst: 156,
-    status: "passed" as const,
-    endsIn: "Ended",
-    proposer: "NFTQueen",
-  },
-];
+type Campaign = {
+  id: "education-access" | "shelter-support" | "emergency-readiness";
+  title: string;
+  description: string;
+  category: string;
+  goalMinor: number;
+  currency: string;
+  status: string;
+  beneficiaryLabel: string;
+  pledgedMinor: number;
+  pledgeCount: number;
+  goalProgressPercent: number;
+};
 
-// Top donors leaderboard
-const LEADERBOARD = [
-  { rank: 1, name: "SkylerDev", donated: 125000, campaigns: 12, badge: "Diamond Donor" },
-  { rank: 2, name: "CryptoKing", donated: 89000, campaigns: 8, badge: "Platinum Donor" },
-  { rank: 3, name: "AITrader", donated: 67000, campaigns: 15, badge: "Gold Donor" },
-  { rank: 4, name: "NFTQueen", donated: 45000, campaigns: 6, badge: "Gold Donor" },
-  { rank: 5, name: "DeFiPro", donated: 34000, campaigns: 9, badge: "Silver Donor" },
-  { rank: 6, name: "GameDev", donated: 28000, campaigns: 4, badge: "Silver Donor" },
-  { rank: 7, name: "BlockchainBob", donated: 22000, campaigns: 7, badge: "Bronze Donor" },
-  { rank: 8, name: "CyberAlice", donated: 18000, campaigns: 5, badge: "Bronze Donor" },
-];
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-white outline-none focus:border-amber-300/70";
 
-
-
-function DonateDialog({ campaign, onSuccess }: { campaign: any; onSuccess: () => void }) {
-  const [amount, setAmount] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const donate = trpc.charity.donate.useMutation({
-    onSuccess: () => {
-      toast.success(`Thank you! ${amount} SKY444 donated to "${campaign.title}"`);
-      setAmount("");
-      setOpen(false);
-      onSuccess();
-    },
-    onError: () => toast.error("Failed to process donation. Please try again."),
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-xs font-semibold">
-          <Heart className="w-3 h-3 mr-1" /> Donate
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border/50">
-        <DialogHeader>
-          <DialogTitle className="text-lg">Donate to Campaign</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-3">
-          <div className="p-3 rounded-lg bg-background/50 border border-border/30">
-            <h4 className="font-semibold text-sm">{campaign.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1">{campaign.description}</p>
-          </div>
-          <div>
-            <label className="text-sm text-muted-foreground mb-1.5 block">Donation Amount (SKY444)</label>
-            <Input
-              type="number"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-background/50 border-border/30 font-mono"
-            />
-            <div className="flex gap-2 mt-2">
-              {[10, 50, 100, 500].map(v => (
-                <button
-                  key={v}
-                  onClick={() => setAmount(String(v))}
-                  className="px-3 py-1 rounded-md border border-border/30 bg-background/50 text-xs font-mono hover:border-primary/50 transition-all"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-3 rounded-lg bg-purple-600/5 border border-purple-500/20">
-            <div className="flex items-center gap-2 text-xs text-purple-400">
-              <Shield className="w-3.5 h-3.5" />
-              <span>100% of donations go directly to the cause. On-chain verified.</span>
-            </div>
-          </div>
-          <Button
-            className="w-full bg-primary hover:bg-primary/90 font-semibold"
-            disabled={!amount || parseFloat(amount) <= 0 || donate.isPending}
-            onClick={() => donate.mutate({ campaignId: campaign.id, amount: parseFloat(amount) })}
-          >
-            {donate.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Heart className="w-4 h-4 mr-2" />}
-            Confirm Donation
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
+function formatUsdMinor(value: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value / 100);
 }
 
-function ProposalCard({ proposal }: { proposal: typeof DAO_PROPOSALS[0] }) {
-  const { isAuthenticated } = useAuth();
-  const totalVotes = proposal.votesFor + proposal.votesAgainst;
-  const forPercent = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
-
-  return (
-    <div className={`p-5 rounded-xl border ${proposal.status === "passed" ? "border-purple-500/30 bg-purple-600/5" : "border-border/50 bg-card/80"} backdrop-blur`}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">{proposal.category}</Badge>
-          <Badge className={`text-[10px] ${proposal.status === "passed" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-            {proposal.status === "passed" ? <><CheckCircle2 className="w-2.5 h-2.5 mr-0.5" /> Passed</> : <><Clock className="w-2.5 h-2.5 mr-0.5" /> {proposal.endsIn}</>}
-          </Badge>
-        </div>
-        <span className="text-xs text-muted-foreground">by {proposal.proposer}</span>
-      </div>
-
-      <h3 className="font-semibold mb-2">{proposal.title}</h3>
-      <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{proposal.description}</p>
-
-      <div className="flex items-center justify-between text-xs mb-2">
-        <span className="text-purple-400 font-mono">{proposal.votesFor} For</span>
-        <span className="text-red-400 font-mono">{proposal.votesAgainst} Against</span>
-      </div>
-      <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30 mb-3">
-        <div className="h-full bg-purple-600 rounded-full" style={{ width: `${forPercent}%` }} />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono text-muted-foreground">
-          <Coins className="w-3 h-3 inline mr-1" />{(proposal.requestedAmount ?? 0).toLocaleString()} SKY444
-        </span>
-        {proposal.status === "active" && (
-          isAuthenticated ? (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="text-xs h-7 text-purple-400 border-purple-500/30 hover:bg-purple-600/10">
-                <ThumbsUp className="w-3 h-3 mr-1" /> For
-              </Button>
-              <Button size="sm" variant="outline" className="text-xs h-7 text-red-400 border-red-500/30 hover:bg-red-500/10">
-                <ThumbsDown className="w-3 h-3 mr-1" /> Against
-              </Button>
-            </div>
-          ) : (
-            <a href={getLoginUrl()}>
-              <Button size="sm" variant="outline" className="text-xs h-7">Sign In to Vote</Button>
-            </a>
-          )
-        )}
-      </div>
-    </div>
-  );
+function dollarsToMinor(value: string): number | null {
+  const normalized = value.trim();
+  if (!/^\d+(?:\.\d{1,2})?$/.test(normalized)) return null;
+  const [whole, fraction = ""] = normalized.split(".");
+  const minor = Number(whole) * 100 + Number(fraction.padEnd(2, "0"));
+  return Number.isSafeInteger(minor) && minor > 0 ? minor : null;
 }
+
+function makeIdempotencyKey(prefix: string) {
+  const suffix =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+  return prefix + ":" + suffix;
+}
+
+const ecosystemLinks = [
+  { label: "HopeAI", href: "/hope-a-i", icon: Bot, detail: "Plan an impact project or outreach draft" },
+  { label: "Social", href: "/activity-feed", icon: MessageCircleMore, detail: "Share a real update with the community" },
+  { label: "SkySchool", href: "/sky-school", icon: GraduationCap, detail: "Continue a persisted learning path" },
+  { label: "Gaming", href: "/gaming", icon: Gamepad2, detail: "Play a synced no-value arcade run" },
+] as const;
 
 export default function Charity() {
-  const { isAuthenticated } = useAuth();
-  const { data: campaigns, isLoading, refetch } = trpc.charity.campaigns.useQuery({});
-  const { data: charityStats } = trpc.charity.stats.useQuery();
-  const { data: donorLeaderboard } = trpc.charity.leaderboard.useQuery();
-  const impactMetrics = [
-    { label: "Active Campaigns", value: String(charityStats?.activeCampaigns ?? "—"), icon: Target, color: "text-primary" },
-    { label: "Total Campaigns", value: String(charityStats?.totalCampaigns ?? "—"), icon: HandHeart, color: "text-purple-400" },
-    { label: "SKY444 Raised", value: charityStats ? String(Math.round(charityStats.totalRaised)) : "—", icon: Coins, color: "text-[oklch(0.7_0.2_60)]" },
-    { label: "Donors", value: String(charityStats?.totalDonors ?? "—"), icon: Users, color: "text-green-400" },
-  ];
+  const { user, loading, isAuthenticated } = useAuth();
+  const campaigns = trpc.charity.campaigns.useQuery(undefined, { retry: false });
+  const summary = trpc.charity.summary.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
+  const pledge = trpc.charity.pledge.useMutation({
+    onSuccess: async () => {
+      setPledgeAmount("");
+      await Promise.all([campaigns.refetch(), summary.refetch()]);
+    },
+  });
+  const volunteer = trpc.charity.volunteer.useMutation({
+    onSuccess: async () => {
+      setVolunteerMinutes("30");
+      setVolunteerNote("");
+      await summary.refetch();
+    },
+  });
+
+  const [selectedCampaignId, setSelectedCampaignId] =
+    useState<Campaign["id"]>("education-access");
+  const [pledgeAmount, setPledgeAmount] = useState("");
+  const [volunteerCampaignId, setVolunteerCampaignId] =
+    useState<Campaign["id"]>("shelter-support");
+  const [volunteerType, setVolunteerType] = useState<
+    "service" | "education" | "outreach" | "fundraising-prep" | "community-support"
+  >("community-support");
+  const [volunteerMinutes, setVolunteerMinutes] = useState("30");
+  const [volunteerNote, setVolunteerNote] = useState("");
+
+  const campaignRows = (campaigns.data?.campaigns ?? []) as Campaign[];
+  const selectedCampaign =
+    campaignRows.find(campaign => campaign.id === selectedCampaignId) ??
+    campaignRows[0];
+  const pledgeMinor = dollarsToMinor(pledgeAmount);
+  const volunteerMinutesNumber = Number(volunteerMinutes);
+  const journey = summary.data?.journey;
+
+  const impactSummary = useMemo(() => {
+    if (!summary.data) return "No account impact evidence loaded.";
+    return [
+      summary.data.pledgeCount + " pledge" + (summary.data.pledgeCount === 1 ? "" : "s"),
+      summary.data.volunteerMinutes + " volunteer minutes",
+      journey ? journey.completedCount + "/" + journey.totalCount + " ecosystem missions" : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }, [journey, summary.data]);
+
+  if (loading) {
+    return <main className="min-h-screen bg-[#09090f] p-8 text-white">Loading SkyHope…</main>;
+  }
 
   return (
-    <div className="min-h-screen">
-      {/* ═══ CINEMATIC CHARITY HERO ═══ */}
-      <section className="hero-cinematic border-b border-slate-800/60" style={{ minHeight: 320 }}>
-        <div className="glow-orb glow-orb-pink w-96 h-96 -top-20 right-0 animate-hero-float" />
-        <div className="glow-orb w-64 h-64 bottom-0 left-10 animate-hero-float" style={{ background: 'oklch(0.55 0.24 15 / 0.18)', animationDelay: '2s' }} />
-        <div className="container mx-auto px-4 relative z-10 py-16">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-500/30 bg-red-500/10 mb-6">
-              <Heart className="h-3.5 w-3.5 text-red-400 animate-pulse" />
-              <span className="text-xs font-bold text-red-400 tracking-wide">TRANSPARENT GIVING — ON-CHAIN</span>
+    <main className="min-h-screen bg-[#09090f] p-4 text-white md:p-8">
+      <div className="mx-auto max-w-7xl space-y-7">
+        <header className="relative overflow-hidden rounded-[2rem] border border-rose-300/15 bg-gradient-to-br from-rose-500/[0.10] via-[#111118] to-amber-300/[0.06] p-6 md:p-8">
+          <div className="absolute right-[-5rem] top-[-5rem] h-56 w-56 rounded-full bg-rose-400/10 blur-3xl" />
+          <div className="relative">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-rose-300/20 bg-rose-400/10">
+                <Heart className="h-6 w-6 text-rose-200" />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-200/70">SkyHope impact center</p>
+                <h1 className="mt-1 text-3xl font-black md:text-4xl">Turn intent into recorded action.</h1>
+              </div>
+              <Badge variant="outline" className="border-emerald-300/25 text-emerald-100">
+                Account-owned beta
+              </Badge>
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-4 leading-tight text-rainbow">
-              <span className="text-white">Charity</span>{' '}
-              <span className="text-gradient">Hub</span>
-            </h1>
-            <p className="text-lg leading-relaxed max-w-xl desc-metallic">
-              Support causes, vote on fund allocation via DAO governance, and track real-world impact — all on-chain and fully transparent.
+            <p className="mt-5 max-w-4xl text-sm leading-7 text-white/55">
+              SkyHope now records pledge intent and volunteer effort instead of displaying fake donor totals,
+              fabricated DAO votes, or pretending a payment settled. Use HopeAI to plan the work, SkySchool to learn,
+              Gaming to stay engaged, and Social to share real progress.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-            {impactMetrics.map((metric, i) => (
-              <div key={metric.label} className="card-epic p-5 text-center animate-slide-up" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-white/5">
-                  <metric.icon className={`w-5 h-5 ${metric.color}`} />
-                </div>
-                <div className={`text-3xl font-black stat-number ${metric.color} mb-1`}>{metric.value}</div>
-                <div className="text-xs text-slate-500">{metric.label}</div>
+        </header>
+
+        {!isAuthenticated ? (
+          <Card className="border-amber-300/20 bg-amber-300/[0.04]">
+            <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-black">Sign in to persist your impact activity</h2>
+                <p className="mt-1 text-sm text-white/45">
+                  Campaign information is public. Pledges, volunteer records, and ecosystem progress are account scoped.
+                </p>
               </div>
-            ))}
+              <Button onClick={() => startLogin()}>Sign in</Button>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        <section className="grid gap-4 md:grid-cols-4">
+          <MetricCard
+            label="Your pledge intents"
+            value={summary.data ? String(summary.data.pledgeCount) : "—"}
+            detail={summary.data ? formatUsdMinor(summary.data.pledgedMinor) + " pledged, not settled" : "Account evidence"}
+          />
+          <MetricCard
+            label="Volunteer effort"
+            value={summary.data ? String(summary.data.volunteerMinutes) + " min" : "—"}
+            detail={summary.data ? String(summary.data.volunteerActionCount) + " recorded actions" : "Account evidence"}
+          />
+          <MetricCard
+            label="Ecosystem journey"
+            value={journey ? String(journey.completionPercent) + "%" : "—"}
+            detail={journey ? journey.completedCount + "/" + journey.totalCount + " evidence-backed missions" : "Social · Learn · Play · Impact"}
+          />
+          <MetricCard
+            label="Persistence"
+            value={campaigns.data?.persistenceReady ? "Ready" : "Migration needed"}
+            detail="No payment-provider settlement is claimed"
+          />
+        </section>
+
+        <section>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-100/55">Campaign catalog</p>
+              <h2 className="mt-1 text-2xl font-black">Choose where you want to help.</h2>
+            </div>
+            <span className="text-xs text-white/35">Totals below are pledge intent, not money received.</span>
           </div>
-        </div>
-      </section>
+          <div className="grid gap-4 lg:grid-cols-3">
+            {campaignRows.map(campaign => (
+              <button
+                key={campaign.id}
+                type="button"
+                onClick={() => setSelectedCampaignId(campaign.id)}
+                className={
+                  "rounded-3xl border p-5 text-left transition " +
+                  (selectedCampaignId === campaign.id
+                    ? "border-rose-300/30 bg-rose-400/[0.07]"
+                    : "border-white/10 bg-[#111118] hover:border-white/20")
+                }
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <Badge variant="outline">{campaign.category}</Badge>
+                  <span className="text-xs text-white/35">{campaign.pledgeCount} pledges</span>
+                </div>
+                <h3 className="mt-4 text-xl font-black">{campaign.title}</h3>
+                <p className="mt-2 min-h-16 text-sm leading-6 text-white/45">{campaign.description}</p>
+                <div className="mt-5">
+                  <div className="mb-2 flex items-center justify-between text-xs">
+                    <span className="text-white/40">Pledged intent</span>
+                    <span className="font-bold text-rose-100">{formatUsdMinor(campaign.pledgedMinor)}</span>
+                  </div>
+                  <Progress value={campaign.goalProgressPercent} />
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-white/30">
+                    <span>{campaign.goalProgressPercent.toFixed(2)}%</span>
+                    <span>planning goal {formatUsdMinor(campaign.goalMinor)}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+            {campaigns.isLoading ? <div className="text-sm text-white/40">Loading campaigns…</div> : null}
+          </div>
+        </section>
 
-      {/* Main Content */}
-      <section className="pb-24">
-        <div className="container mx-auto px-4">
-          <Tabs defaultValue="campaigns" className="w-full">
-            <TabsList className="w-full max-w-lg bg-card/80 border border-border/50">
-              <TabsTrigger value="campaigns" className="flex-1">
-                <HandHeart className="w-4 h-4 mr-1.5" /> Campaigns
-              </TabsTrigger>
-              <TabsTrigger value="dao" className="flex-1">
-                <Vote className="w-4 h-4 mr-1.5" /> DAO Voting
-              </TabsTrigger>
-              <TabsTrigger value="leaderboard" className="flex-1">
-                <Trophy className="w-4 h-4 mr-1.5" /> Leaderboard
-              </TabsTrigger>
-              <TabsTrigger value="impact" className="flex-1">
-                <BarChart3 className="w-4 h-4 mr-1.5" /> Impact
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Campaigns Tab */}
-            <TabsContent value="campaigns" className="mt-6">
-              {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="p-5 rounded-xl border border-border/50 animate-pulse">
-                      <div className="h-4 bg-muted/20 rounded w-1/3 mb-3" />
-                      <div className="h-5 bg-muted/20 rounded w-2/3 mb-2" />
-                      <div className="h-3 bg-muted/20 rounded w-full mb-4" />
-                      <div className="h-2 bg-muted/20 rounded w-full" />
-                    </div>
+        <section className="grid gap-6 lg:grid-cols-2">
+          <Card className="border-white/10 bg-[#111118]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <HandHeart className="h-5 w-5 text-rose-200" />
+                Record a pledge
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm leading-6 text-white/45">
+                A pledge is a persisted expression of intent. It does not charge a card, move crypto, reserve funds,
+                prove tax deductibility, or verify a beneficiary.
+              </p>
+              <label className="text-xs text-white/45">
+                Campaign
+                <select
+                  className={inputClass}
+                  value={selectedCampaignId}
+                  onChange={event => setSelectedCampaignId(event.target.value as Campaign["id"])}
+                >
+                  {campaignRows.map(campaign => (
+                    <option key={campaign.id} value={campaign.id}>{campaign.title}</option>
                   ))}
-                </div>
-              ) : campaigns && campaigns.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {campaigns.map((c: any) => {
-                    const progress = c.goalAmount > 0 ? (Number(c.raisedAmount) / Number(c.goalAmount)) * 100 : 0;
-                    return (
-                      <div key={c.id} className="p-5 rounded-xl border border-border/50 bg-card/80 hover:border-primary/30 transition-all">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-[10px]">{c.category}</Badge>
-                          <Badge className={`text-[10px] ${c.status === "active" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-muted/20 text-muted-foreground"}`}>
-                            {c.status}
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold mb-2">{c.title}</h3>
-                        <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{c.description}</p>
-                        <div className="mb-2">
-                          {/* Progress bar with milestone markers */}
-                          <div className="relative h-3 bg-background/50 rounded-full overflow-visible border border-border/30 mb-1">
-                            <div className="h-full bg-gradient-to-r from-primary to-[oklch(0.72_0.28_160)] rounded-full transition-all" style={{ width: `${Math.min(100, progress)}%` }} />
-                            {/* Milestone markers at 25%, 50%, 75% */}
-                            {[25, 50, 75].map(pct => (
-                              <div key={pct} className="absolute top-0 bottom-0 w-0.5 flex flex-col items-center" style={{ left: `${pct}%` }}>
-                                <div className={`w-2 h-2 rounded-full border-2 mt-0.5 transition-all ${progress >= pct ? "bg-[oklch(0.80_0.18_70)] border-[oklch(0.80_0.18_70)]" : "bg-background border-border/50"}`} />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex justify-between text-[9px] text-muted-foreground/50 px-1">
-                            <span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between text-xs mb-4">
-                          <span className="font-mono text-primary">{Number(c.raisedAmount).toLocaleString()} SKY444 raised</span>
-                          <span className="text-muted-foreground">{Math.round(progress)}% of goal</span>
-                        </div>
-                        {isAuthenticated ? (
-                          <DonateDialog campaign={c} onSuccess={refetch} />
-                        ) : (
-                          <a href={getLoginUrl()} className="block">
-                            <Button size="sm" variant="outline" className="w-full text-xs">Sign In to Donate</Button>
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <HandHeart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No Active Campaigns</h3>
-                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                    Charity campaigns will be launched soon. Every donation is tracked on-chain for full transparency.
-                  </p>
-                </div>
-              )}
-            </TabsContent>
+                </select>
+              </label>
+              <label className="text-xs text-white/45">
+                Pledge amount (USD)
+                <input
+                  className={inputClass}
+                  inputMode="decimal"
+                  placeholder="25.00"
+                  value={pledgeAmount}
+                  onChange={event => setPledgeAmount(event.target.value)}
+                />
+              </label>
+              <Button
+                disabled={!isAuthenticated || !selectedCampaign || pledgeMinor === null || pledge.isPending}
+                onClick={() => {
+                  if (!selectedCampaign || pledgeMinor === null) return;
+                  pledge.mutate({
+                    campaignId: selectedCampaign.id,
+                    amountMinor: pledgeMinor,
+                    idempotencyKey: makeIdempotencyKey("skyhope-pledge"),
+                  });
+                }}
+              >
+                {pledge.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Heart className="mr-2 h-4 w-4" />}
+                Record pledge intent
+              </Button>
+              {pledge.error ? <p className="text-sm text-red-300">{pledge.error.message}</p> : null}
+            </CardContent>
+          </Card>
 
-            {/* DAO Voting Tab */}
-            <TabsContent value="dao" className="mt-6">
-              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 mb-6 flex items-start gap-3">
-                <Vote className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Charity DAO Governance</h4>
-                  <p className="text-xs text-muted-foreground">SKY444 holders vote on how charity funds are allocated. 1 token = 1 vote. Proposals require 66% approval to pass.</p>
-                </div>
+          <Card className="border-white/10 bg-[#111118]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-sky-200" />
+                Record volunteer effort
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm leading-6 text-white/45">
+                Keep an account-owned log of time you actually spent helping. SkyHope records what you enter; it does
+                not independently verify attendance or assign financial value to volunteer time.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="text-xs text-white/45">
+                  Campaign
+                  <select
+                    className={inputClass}
+                    value={volunteerCampaignId}
+                    onChange={event => setVolunteerCampaignId(event.target.value as Campaign["id"])}
+                  >
+                    {campaignRows.map(campaign => (
+                      <option key={campaign.id} value={campaign.id}>{campaign.title}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-xs text-white/45">
+                  Action
+                  <select
+                    className={inputClass}
+                    value={volunteerType}
+                    onChange={event => setVolunteerType(event.target.value as typeof volunteerType)}
+                  >
+                    <option value="community-support">Community support</option>
+                    <option value="service">Service</option>
+                    <option value="education">Education</option>
+                    <option value="outreach">Outreach</option>
+                    <option value="fundraising-prep">Fundraising preparation</option>
+                  </select>
+                </label>
+                <label className="text-xs text-white/45">
+                  Minutes
+                  <input
+                    className={inputClass}
+                    inputMode="numeric"
+                    value={volunteerMinutes}
+                    onChange={event => setVolunteerMinutes(event.target.value)}
+                  />
+                </label>
+                <label className="text-xs text-white/45">
+                  Note
+                  <input
+                    className={inputClass}
+                    maxLength={255}
+                    placeholder="What did you work on?"
+                    value={volunteerNote}
+                    onChange={event => setVolunteerNote(event.target.value)}
+                  />
+                </label>
               </div>
-              <div className="space-y-4">
-                {DAO_PROPOSALS.map(proposal => (
-                  <ProposalCard key={proposal.id} proposal={proposal} />
+              <Button
+                disabled={
+                  !isAuthenticated ||
+                  volunteer.isPending ||
+                  !Number.isSafeInteger(volunteerMinutesNumber) ||
+                  volunteerMinutesNumber < 5 ||
+                  volunteerMinutesNumber > 1440
+                }
+                onClick={() =>
+                  volunteer.mutate({
+                    campaignId: volunteerCampaignId,
+                    actionType: volunteerType,
+                    minutes: volunteerMinutesNumber,
+                    note: volunteerNote || undefined,
+                  })
+                }
+              >
+                {volunteer.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <HandHeart className="mr-2 h-4 w-4" />}
+                Save volunteer record
+              </Button>
+              {volunteer.error ? <p className="text-sm text-red-300">{volunteer.error.message}</p> : null}
+            </CardContent>
+          </Card>
+        </section>
+
+        {journey ? (
+          <Card className="border-amber-300/15 bg-gradient-to-br from-amber-300/[0.05] to-[#111118]">
+            <CardHeader>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-100/55">Connected ecosystem</p>
+                  <CardTitle className="mt-1">Your evidence-backed beta journey</CardTitle>
+                </div>
+                <Badge variant="outline">{impactSummary}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 md:grid-cols-4">
+                {journey.missions.map(mission => (
+                  <Link
+                    key={mission.id}
+                    href={mission.route}
+                    className="rounded-2xl border border-white/10 bg-black/15 p-4 transition hover:border-amber-200/25"
+                  >
+                    <div className="flex items-center justify-between">
+                      <strong>{mission.label}</strong>
+                      <Badge variant="outline" className={mission.complete ? "border-emerald-300/30 text-emerald-100" : ""}>
+                        {mission.complete ? "Done" : "Next"}
+                      </Badge>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-white/35">{mission.evidence}</p>
+                  </Link>
                 ))}
               </div>
-            </TabsContent>
-
-            {/* Leaderboard Tab */}
-            <TabsContent value="leaderboard" className="mt-6">
-              <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 mb-6 flex items-start gap-3">
-                <Trophy className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Donor Leaderboard</h4>
-                  <p className="text-xs text-muted-foreground">Top contributors earn badges, exclusive NFTs, and governance weight multipliers. Donate to climb the ranks!</p>
-                </div>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <Link href={journey.nextMission.route}>
+                  <Button>
+                    Continue: {journey.nextMission.label}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/hope-a-i">
+                  <Button variant="outline">
+                    <Bot className="mr-2 h-4 w-4" />
+                    Ask HopeAI to plan the next step
+                  </Button>
+                </Link>
+                <Link href="/activity-feed">
+                  <Button variant="ghost">
+                    <MessageCircleMore className="mr-2 h-4 w-4" />
+                    Share progress on Social
+                  </Button>
+                </Link>
               </div>
-              <div className="rounded-xl border border-border/50 bg-card/80 overflow-hidden">
-                <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 border-b border-border/30 text-xs text-muted-foreground font-medium">
-                  <span>Rank</span>
-                  <span>Donor</span>
-                  <span className="text-right">Donated</span>
-                  <span className="text-right">Campaigns</span>
-                  <span className="text-right">Badge</span>
-                </div>
-                {((donorLeaderboard as any[]) || LEADERBOARD).map(donor => (
-                  <div key={donor.rank} className={`grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 items-center border-b border-border/10 last:border-0 ${donor.rank <= 3 ? "bg-yellow-500/5" : ""}`}>
-                    <span className={`font-mono font-bold text-sm ${donor.rank === 1 ? "text-yellow-400" : donor.rank === 2 ? "text-gray-300" : donor.rank === 3 ? "text-orange-400" : "text-muted-foreground"}`}>
-                      #{donor.rank}
-                    </span>
-                    <span className="font-medium text-sm">{donor.name}</span>
-                    <span className="font-mono text-sm text-right text-primary">{(donor.donated ?? 0).toLocaleString()}</span>
-                    <span className="font-mono text-sm text-right text-muted-foreground">{donor.campaigns}</span>
-                    <Badge className={`text-[9px] ${
-                      (donor.badge || "").includes("Diamond") ? "bg-primary/10 text-primary border-primary/30" :
-                      (donor.badge || "").includes("Platinum") ? "bg-gray-200/10 text-gray-300 border-gray-300/30" :
-                      (donor.badge || "").includes("Gold") ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30" :
-                      (donor.badge || "").includes("Silver") ? "bg-gray-400/10 text-gray-400 border-gray-400/30" :
-                      "bg-orange-500/10 text-orange-400 border-orange-500/30"
-                    }`}>
-                      <Award className="w-2.5 h-2.5 mr-0.5" /> {donor.badge}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
+        ) : null}
 
-            {/* Impact Analytics Tab */}
-            <TabsContent value="impact" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Impact by Category */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-primary" /> Impact by Category
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { category: "Education", amount: 320000, percent: 38, color: "bg-primary" },
-                      { category: "Environment", amount: 210000, percent: 25, color: "bg-purple-600" },
-                      { category: "Humanitarian", amount: 180000, percent: 21, color: "bg-red-500" },
-                      { category: "Healthcare", amount: 87000, percent: 10, color: "bg-[oklch(0.7_0.2_280)]" },
-                      { category: "Technology", amount: 50000, percent: 6, color: "bg-[oklch(0.7_0.2_60)]" },
-                    ].map(item => (
-                      <div key={item.category}>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted-foreground">{item.category}</span>
-                          <span className="font-mono">${(item.amount / 1000).toFixed(0)}K ({item.percent}%)</span>
-                        </div>
-                        <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30">
-                          <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percent}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ecosystemLinks.map(({ label, href, icon: Icon, detail }) => (
+            <Link
+              key={label}
+              href={href}
+              className="rounded-2xl border border-white/10 bg-[#111118] p-4 transition hover:-translate-y-0.5 hover:border-amber-200/20"
+            >
+              <Icon className="h-5 w-5 text-amber-100" />
+              <h3 className="mt-3 font-black">{label}</h3>
+              <p className="mt-1 text-xs leading-5 text-white/35">{detail}</p>
+            </Link>
+          ))}
+        </section>
 
-                {/* Recent Milestones */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-yellow-400" /> Recent Milestones
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { event: "Clean Water Initiative reached 5,000 beneficiaries", date: "Jun 10, 2026", icon: Globe },
-                      { event: "100th scholarship awarded via STEM program", date: "Jun 8, 2026", icon: Award },
-                      { event: "Emergency fund deployed to flood relief", date: "Jun 5, 2026", icon: Heart },
-                      { event: "$500K total donations milestone reached", date: "Jun 1, 2026", icon: TrendingUp },
-                      { event: "New partnership with UNICEF Innovation", date: "May 28, 2026", icon: HandHeart },
-                    ].map((milestone, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
-                        <milestone.icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-sm">{milestone.event}</p>
-                          <span className="text-[10px] text-muted-foreground">{milestone.date}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        <Card className="border-emerald-300/15 bg-emerald-300/[0.035]">
+          <CardContent className="flex gap-3 p-5 text-sm leading-6 text-white/55">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-200" />
+            <p>
+              SkyHope is an impact-recording engineering beta. It does not currently process donations, hold funds,
+              broadcast blockchain transfers, verify charities or beneficiaries, determine tax deductibility, or
+              guarantee outcomes. Future payment execution remains behind separate provider/legal/region controls.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
+}
 
-                {/* Transparency Report */}
-                <div className="p-5 rounded-xl border border-purple-500/20 bg-purple-600/5 md:col-span-2">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-purple-400" /> Transparency Report
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-purple-400">100%</div>
-                      <div className="text-xs text-muted-foreground mt-1">On-Chain Verified</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-primary">0%</div>
-                      <div className="text-xs text-muted-foreground mt-1">Admin Fees</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_280)]">24h</div>
-                      <div className="text-xs text-muted-foreground mt-1">Avg Disbursement</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_60)]">47</div>
-                      <div className="text-xs text-muted-foreground mt-1">Verified Partners</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-4 text-center">
-                    All charity fund flows are publicly auditable on-chain. Smart contracts ensure funds reach verified recipients without intermediaries.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-    </div>
+function MetricCard({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <Card className="border-white/10 bg-[#111118]">
+      <CardContent className="p-5">
+        <div className="text-xs font-bold uppercase tracking-[0.12em] text-white/35">{label}</div>
+        <div className="mt-2 text-2xl font-black">{value}</div>
+        <div className="mt-1 text-xs leading-5 text-white/30">{detail}</div>
+      </CardContent>
+    </Card>
   );
 }
