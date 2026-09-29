@@ -1,4 +1,4 @@
-import { createHash, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, scrypt, timingSafeEqual } from "node:crypto";
 
 export type BetaAuthMode = "oauth" | "access_key";
 
@@ -67,10 +67,25 @@ function digest(value: string) {
   return createHash("sha256").update(value, "utf8").digest();
 }
 
-export function verifyBetaAccessKey(
+function deriveScryptKey(
+  value: string,
+  salt: Buffer
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scrypt(value, salt, SCRYPT_KEY_BYTES, (error, derivedKey) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(derivedKey);
+    });
+  });
+}
+
+export async function verifyBetaAccessKey(
   candidate: string,
   env: NodeJS.ProcessEnv = process.env
-): boolean {
+): Promise<boolean> {
   if (betaAuthMode(env) !== "access_key") return false;
   if (betaAccessKeyIssue(env)) return false;
 
@@ -78,10 +93,9 @@ export function verifyBetaAccessKey(
     env.BETA_ACCESS_PASSWORD_SCRYPT
   );
   if (scryptCredential) {
-    const candidateDigest = scryptSync(
+    const candidateDigest = await deriveScryptKey(
       candidate,
-      scryptCredential.salt,
-      SCRYPT_KEY_BYTES
+      scryptCredential.salt
     );
     return timingSafeEqual(candidateDigest, scryptCredential.digest);
   }
