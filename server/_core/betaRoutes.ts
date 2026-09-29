@@ -168,6 +168,7 @@ export function registerBetaRoutes(
   readiness?: ReadinessAssessor
 ) {
   app.get("/api/beta/health", (_req, res) => {
+    res.set("Cache-Control", "no-store");
     res.json({
       status: "ok",
       catalogAreas: skycoinBetaAreas.length,
