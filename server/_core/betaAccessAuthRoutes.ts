@@ -100,7 +100,7 @@ export function registerBetaAccessAuthRoutes(app: Express) {
 
     const openId = betaAccessOpenId(email);
     const admission = evaluateBetaAdmission({ openId, email });
-    const keyValid = verifyBetaAccessKey(accessKey);
+    const keyValid = await verifyBetaAccessKey(accessKey);
 
     // Deliberately use one generic failure for both checks to avoid exposing
     // whether a submitted address is on the invitation allowlist.
