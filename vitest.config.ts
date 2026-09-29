@@ -19,6 +19,7 @@ export default defineConfig({
       "server/**/*.spec.ts",
       "tests/release/**/*.test.ts",
       "tests/release/**/*.spec.ts",
+      "scripts/lib/**/*.test.mjs",
       "packages/sky-audit/src/**/*.test.ts",
       "packages/platform-kernel/src/**/*.test.ts",
       "packages/event-fabric/src/**/*.test.ts",
