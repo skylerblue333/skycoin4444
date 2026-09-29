@@ -160,6 +160,66 @@ describe("post-Wave-2 integration smoke", () => {
     ).toThrow("agent plan integrity check failed");
   });
 
+  it("blocks a HopeAI handoff when the agent is not a thread participant without side effects", () => {
+    const plan = buildAgentPlan("agent:hope", [
+      {
+        id: "step:draft",
+        kind: "prompt",
+        input: "Draft a safe summary",
+      },
+    ]);
+    const ready = nextReadySteps(plan, new Set());
+    const notifications: MessagingNotificationContract[] = [];
+    const messaging = new MessagingService({
+      now: () => 1_000,
+      threadIdFactory: () => "thread:ai-membership-smoke",
+      messageIdFactory: () => "msg:should-not-exist",
+      onNotification: (event) => notifications.push(event),
+    });
+    const thread = messaging.createThread(["agent:other", "user:42"]);
+
+    expect(() =>
+      messaging.send({
+        threadId: thread.id,
+        senderId: plan.agentId,
+        body: ready[0]!.input,
+        clientRequestId: plan.planId,
+      }),
+    ).toThrow("sender_not_participant");
+    expect(messaging.list(thread.id, "user:42")).toEqual([]);
+    expect(notifications).toEqual([]);
+  });
+
+  it("fails closed when a valid HopeAI step exceeds the Messaging body contract", () => {
+    const plan = buildAgentPlan("agent:hope", [
+      {
+        id: "step:long-draft",
+        kind: "prompt",
+        input: "x".repeat(4_001),
+      },
+    ]);
+    const ready = nextReadySteps(plan, new Set());
+    const notifications: MessagingNotificationContract[] = [];
+    const messaging = new MessagingService({
+      now: () => 1_000,
+      threadIdFactory: () => "thread:ai-length-smoke",
+      messageIdFactory: () => "msg:should-not-exist",
+      onNotification: (event) => notifications.push(event),
+    });
+    const thread = messaging.createThread(["agent:hope", "user:42"]);
+
+    expect(() =>
+      messaging.send({
+        threadId: thread.id,
+        senderId: plan.agentId,
+        body: ready[0]!.input,
+        clientRequestId: plan.planId,
+      }),
+    ).toThrow("invalid_message_body");
+    expect(messaging.list(thread.id, "user:42")).toEqual([]);
+    expect(notifications).toEqual([]);
+  });
+
   it("composes Marketplace, Checkout and Wallet as a provider-free commerce intent", () => {
     const listing = transitionListing(
       createListing({

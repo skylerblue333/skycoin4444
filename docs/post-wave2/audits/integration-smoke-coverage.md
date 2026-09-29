@@ -20,7 +20,11 @@ Scope: maintain low-cost cross-product smoke tests proving that representative W
 - the first dependency-ready planner step is handed to SkyMessaging;
 - the HopeAI plan id is used as the message idempotency key;
 - replay does not duplicate the message or notification;
-- a tampered plan id fails closed before it can drive downstream work.
+- a tampered plan id fails closed before it can drive downstream work;
+- a HopeAI sender that is not a thread participant is rejected before message creation or notification;
+- a planner step above Messaging's 4,000-character body limit is rejected without partial delivery or notification.
+
+The planner intentionally accepts step inputs up to 16,000 characters while Messaging caps message bodies at 4,000 characters. The smoke suite now proves this mismatch fails closed, but a production adapter, summarization policy, or explicit size contract is still required before the boundary can be considered fully transport-compatible.
 
 This proves local TypeScript/domain composition only. It does **not** prove live model inference, autonomous tool execution, external chat transport, realtime delivery, push notifications, persistence, identity verification, or ShadowChat deployment.
 
