@@ -94,3 +94,100 @@ export function filterQuizQuestions(
 export function quizCategories(questions: readonly QuizQuestion[]): string[] {
   return Array.from(new Set(questions.map(question => question.category))).sort((a, b) => a.localeCompare(b));
 }
+
+export type QuizCategoryReview = {
+  category: string;
+  questionCount: number;
+  answeredCount: number;
+  correctCount: number;
+  earnedPoints: number;
+  totalPoints: number;
+  percentage: number;
+};
+
+export type QuizReviewPlan = {
+  completionPercentage: number;
+  categories: QuizCategoryReview[];
+  weakestCategories: string[];
+  missedQuestionIds: string[];
+  unansweredQuestionIds: string[];
+  recommendation: string;
+};
+
+export function buildQuizReviewPlan(
+  questions: readonly QuizQuestion[],
+  answers: QuizAnswers,
+): QuizReviewPlan {
+  const buckets = new Map<string, Omit<QuizCategoryReview, "percentage">>();
+  const missedQuestionIds: string[] = [];
+  const unansweredQuestionIds: string[] = [];
+
+  for (const question of questions) {
+    const current = buckets.get(question.category) ?? {
+      category: question.category,
+      questionCount: 0,
+      answeredCount: 0,
+      correctCount: 0,
+      earnedPoints: 0,
+      totalPoints: 0,
+    };
+    current.questionCount += 1;
+    current.totalPoints += question.points;
+
+    const answer = answers[question.id];
+    if (answer === undefined) {
+      unansweredQuestionIds.push(question.id);
+    } else {
+      current.answeredCount += 1;
+      if (answer === question.correctIndex) {
+        current.correctCount += 1;
+        current.earnedPoints += question.points;
+      } else {
+        missedQuestionIds.push(question.id);
+      }
+    }
+    buckets.set(question.category, current);
+  }
+
+  const categories = [...buckets.values()]
+    .map(category => ({
+      ...category,
+      percentage:
+        category.totalPoints === 0
+          ? 0
+          : Math.round((category.earnedPoints / category.totalPoints) * 100),
+    }))
+    .sort(
+      (a, b) =>
+        a.percentage - b.percentage ||
+        a.correctCount - b.correctCount ||
+        a.category.localeCompare(b.category),
+    );
+
+  const weakestCategories = categories
+    .filter(category => category.percentage < 85 || category.answeredCount < category.questionCount)
+    .slice(0, 3)
+    .map(category => category.category);
+
+  const answeredCount = questions.length - unansweredQuestionIds.length;
+  const completionPercentage =
+    questions.length === 0 ? 0 : Math.round((answeredCount / questions.length) * 100);
+
+  const recommendation =
+    questions.length === 0
+      ? "Choose a quiz set to build a review plan."
+      : unansweredQuestionIds.length > 0
+        ? `Finish ${unansweredQuestionIds.length} unanswered question${unansweredQuestionIds.length === 1 ? "" : "s"}, then review ${weakestCategories.join(", ") || "the completed topics"}.`
+        : weakestCategories.length > 0
+          ? `Review ${weakestCategories.join(", ")} before the next attempt.`
+          : "Strong coverage across this quiz set. Continue to the next lesson or harder question set.";
+
+  return {
+    completionPercentage,
+    categories,
+    weakestCategories,
+    missedQuestionIds,
+    unansweredQuestionIds,
+    recommendation,
+  };
+}
