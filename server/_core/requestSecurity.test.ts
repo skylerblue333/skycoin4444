@@ -39,6 +39,47 @@ describe("cookie mutation origin policy", () => {
     });
   });
 
+  it("requires same-origin validation for credential-issuing mutations before a session exists", () => {
+    const env = {
+      NODE_ENV: "production",
+      BETA_PUBLIC_ORIGIN: "https://beta.example",
+    } as NodeJS.ProcessEnv;
+
+    expect(
+      evaluateCookieMutationOrigin(
+        {
+          method: "POST",
+          requiresOriginValidation: true,
+          originHeader: "https://beta.example",
+          secFetchSite: "same-origin",
+        },
+        env
+      )
+    ).toEqual({ allowed: true, reason: "same_origin" });
+
+    expect(
+      evaluateCookieMutationOrigin(
+        {
+          method: "POST",
+          requiresOriginValidation: true,
+        },
+        env
+      )
+    ).toEqual({ allowed: false, reason: "missing_origin" });
+
+    expect(
+      evaluateCookieMutationOrigin(
+        {
+          method: "POST",
+          requiresOriginValidation: true,
+          originHeader: "https://beta.example",
+          secFetchSite: "cross-site",
+        },
+        env
+      )
+    ).toEqual({ allowed: false, reason: "cross_site_fetch" });
+  });
+
   it("ignores the legacy unprefixed cookie in production", () => {
     expect(
       evaluateCookieMutationOrigin(
