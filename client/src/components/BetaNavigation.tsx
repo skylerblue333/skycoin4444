@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Bot,
+  BookOpen,
   ChevronRight,
   Compass,
   Gamepad2,
+  GraduationCap,
+  HeartHandshake,
   Grid2X2,
   Home,
   LogIn,
@@ -36,14 +39,15 @@ const primaryLinks = [
   { label: "Social", route: "/activity-feed", icon: Users },
   { label: "Chat", route: "/unified-messaging", icon: MessageCircleMore },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
+  { label: "School", route: "/sky-school", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
+  { label: "SkyHope", route: "/charity", icon: HeartHandshake },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
 const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
-  { label: "School", route: "/sky-school" },
   { label: "Web3", route: "/beta-web3" },
   { label: "Dating", route: "/dating-home" },
   { label: "Global", route: "/translation-enabled-community" },
@@ -189,7 +193,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, SkyHope, Market, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
@@ -220,7 +224,7 @@ export default function BetaNavigation() {
         setVoiceMessage(`Opening ${label}.`);
         setLocation(destination);
       } else {
-        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Wallet, Market, School, Live, Dating, or Explore.`);
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, School, HopeAI, SkyHope, Wallet, Market, Live, Dating, or Explore.`);
       }
     };
     recognition.onerror = () => {

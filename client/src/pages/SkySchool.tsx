@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Gamepad2,
   GraduationCap,
+  HeartHandshake,
   Lightbulb,
   PlayCircle,
   ShieldCheck,
@@ -19,6 +20,7 @@ import { gapCourses } from "@/data/gapCourses";
 import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import SkyHopeImpactRail from "@/components/SkyHopeImpactRail";
 import {
   Card,
   CardContent,
@@ -60,6 +62,14 @@ const practiceCards = [
     href: "/game-fi-quest-board",
     icon: Target,
     accent: "border-amber-300/20 bg-amber-300/[0.04]",
+  },
+  {
+    title: "SkyHope Impact Lab",
+    detail:
+      "Turn learning and game practice into an evidence-led impact mission without pretending practice creates a donation.",
+    href: "/charity",
+    icon: HeartHandshake,
+    accent: "border-rose-300/20 bg-rose-300/[0.04]",
   },
 ] as const;
 
@@ -138,7 +148,7 @@ export default function SkySchool() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
             <Link href="/course-catalog">
               <Button size="lg" className="w-full">
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -153,6 +163,16 @@ export default function SkySchool() {
               >
                 <Brain className="mr-2 h-4 w-4" />
                 Ask HopeAI Coach
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-rose-300/20 bg-rose-300/[0.03] text-white"
+              >
+                <HeartHandshake className="mr-2 h-4 w-4" />
+                Open SkyHope Impact
               </Button>
             </Link>
           </div>
@@ -322,7 +342,7 @@ export default function SkySchool() {
             <Card className="border-white/10 bg-white/[0.03] text-white">
               <CardHeader>
                 <CardTitle className="text-white">
-                  Learn → recall → play
+                  Learn → coach → play → impact
                 </CardTitle>
                 <CardDescription className="text-white/45">
                   Short game sessions make the beta more engaging without
@@ -392,6 +412,8 @@ export default function SkySchool() {
             );
           })}
         </section>
+
+        <SkyHopeImpactRail context="education" />
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
