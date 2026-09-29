@@ -59,6 +59,8 @@ Credentials belong in environment variables or the hosting secret manager. Do no
 
 The tool writes a short-lived MySQL client option file with mode `0600` and removes it after the client process exits. Credentials are not passed on the command line.
 
+Recovery command failures first remove the configured source/restore database URLs and parsed credentials, then pass the remaining text through the shared operational-error sanitizer before logging. This keeps driver errors from echoing database credentials, including passwords that contain an `@` character.
+
 ## Create a logical backup
 
 Set the approved source database URL in the operator environment and run:

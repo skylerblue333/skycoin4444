@@ -9,6 +9,7 @@ import {
   parseMysqlRecoveryTarget,
   parsePositiveNumber,
   resolveReleaseSha,
+  sanitizeRecoveryError,
 } from "../../server/operations/databaseRecovery";
 
 describe("database recovery safety contracts", () => {
@@ -130,6 +131,27 @@ describe("database recovery safety contracts", () => {
     expect(() => assertRequiredRecoveryTables(["users"])).toThrow(
       "beta_feedback",
     );
+  });
+
+  it("redacts configured database URLs and credentials from recovery failures", () => {
+    const databaseUrl =
+      "mysql://beta_user:p@ssword@db.internal/skycoin_beta?token=leaked-token";
+    const safe = sanitizeRecoveryError(
+      new Error(
+        databaseUrl +
+          " failed password=provider-secret Bearer abc.def.ghi user=beta_user",
+      ),
+      {
+        DATABASE_URL: databaseUrl,
+      } as NodeJS.ProcessEnv,
+    );
+
+    expect(safe).toContain("[redacted-database-url]");
+    expect(safe).not.toContain("p@ssword");
+    expect(safe).not.toContain("@ssword@");
+    expect(safe).not.toContain("leaked-token");
+    expect(safe).not.toContain("provider-secret");
+    expect(safe).not.toContain("abc.def.ghi");
   });
 
   it("validates recovery objectives and release identities", () => {
