@@ -1085,7 +1085,14 @@ export async function signDigestWithMpcGateway(
     input.algorithm === undefined
       ? "secp256k1-sha256"
       : requireSafeRef(input.algorithm, "algorithm");
-  const requestId = randomUUID();
+  // Derive the idempotency key from the signing intent so a transport retry of
+  // the same request cannot create a second logical signing operation at the
+  // gateway. A random UUID defeats provider-side idempotency across retries.
+  const requestId = stableHash("mpc-sign-request", {
+    keyId: config.keyId,
+    digestHex,
+    algorithm,
+  });
   const { controller, timer } = abortAfter(timeoutMs(env));
   try {
     const response = await fetch(config.url, {
