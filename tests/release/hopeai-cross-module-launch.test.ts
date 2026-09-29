@@ -19,22 +19,22 @@ const fundraiser = fs.readFileSync(
 );
 
 describe("HopeAI cross-module launch context", () => {
-  it("consumes bounded launch prompts and SkyHope mode on workspace load", () => {
-    expect(workspace).toMatch(/const launchPrompt = useMemo\(readLaunchPrompt, \[\]\)/);
-    expect(workspace).toMatch(/const launchMode = useMemo\(readLaunchMode, \[\]\)/);
+  it("keeps the merged bounded HopeAI launch-consumer contract", () => {
+    expect(workspace).toMatch(/const launchPrompt = readLaunchPrompt\(\)/);
     expect(workspace).toMatch(/setInput\(launchPrompt\)/);
-    expect(workspace).toMatch(/setMode\(launchMode\)/);
-    expect(workspace).toMatch(/option\.id === launchMode/);
-    expect(workspace).toMatch(/slice\(0, 4_000\)/);
     expect(workspace).toMatch(/get\("source"\) === "skyhope"/);
+    expect(workspace).toMatch(/url\.searchParams\.delete\("prompt"\)/);
+    expect(workspace).toMatch(/url\.searchParams\.delete\("source"\)/);
+    expect(workspace).toMatch(/window\.history\.replaceState/);
+    expect(workspace).toMatch(/slice\(0, 4_000\)/);
   });
 
-  it("keeps the existing SkyHope planner handoffs connected to HopeAI", () => {
+  it("preserves the existing SkyHope planner handoffs", () => {
     expect(donation).toMatch(/\/hope-a-i\?source=skyhope&prompt=/);
     expect(fundraiser).toMatch(/\/hope-a-i\?source=skyhope&prompt=/);
   });
 
-  it("carries a current Chat draft into HopeAI without claiming remote send", () => {
+  it("carries a current Chat draft into the same HopeAI launch contract", () => {
     expect(messaging).toMatch(/source=messaging&prompt=/);
     expect(messaging).toMatch(/encodeURIComponent\(trimmedDraft\)/);
     expect(messaging).toMatch(/href=\{hopeAIHref\}/);
