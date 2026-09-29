@@ -63,6 +63,7 @@ describe("HopeAI social gaming education SkyHope integration", () => {
   });
 
   it("promotes HopeAI SkySchool SkyHope and the connected journey in navigation", () => {
+    expect(navigation).toContain('{ label: "School", route: "/course-catalog"');
     expect(navigation).toContain('{ label: "School", route: "/sky-school"');
     expect(navigation).toContain('{ label: "HopeAI", route: "/hope-a-i"');
     expect(navigation).toContain('{ label: "SkyHope", route: "/charity"');
