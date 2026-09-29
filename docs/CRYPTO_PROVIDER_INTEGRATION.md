@@ -128,7 +128,7 @@ The gateway contract is:
 
 ```json
 {
-  "requestId": "uuid",
+  "requestId": "mpc-sign-request:<sha256-of-key-digest-algorithm>",
   "keyId": "provider-key-reference",
   "digestHex": "64-hex-character digest",
   "algorithm": "secp256k1-sha256"
@@ -137,7 +137,7 @@ The gateway contract is:
 
 The provider must return a `signature`, with optional `requestId`.
 
-The adapter sends an idempotency key and bearer credential from the server. It never accepts a private key from the browser.
+The adapter derives `requestId` deterministically from the key reference, digest, and algorithm, and sends that same value as the `idempotency-key` header. Retries of an identical signing intent therefore reuse one provider idempotency key instead of creating a new logical signing request. The bearer credential remains server-side, and the adapter never accepts a private key from the browser.
 
 ## Durable provider event ledger
 
