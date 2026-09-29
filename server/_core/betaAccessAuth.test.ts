@@ -60,17 +60,19 @@ describe("beta access-key authentication policy", () => {
     ).toBeNull();
   });
 
-  it("verifies access keys without exposing the configured value", () => {
+  it("verifies access keys without exposing the configured value", async () => {
     const env = {
       VITE_BETA_AUTH_MODE: "access_key",
       BETA_ACCESS_KEY: strongKey,
     } as NodeJS.ProcessEnv;
 
-    expect(verifyBetaAccessKey(strongKey, env)).toBe(true);
-    expect(verifyBetaAccessKey("B".repeat(48), env)).toBe(false);
+    await expect(verifyBetaAccessKey(strongKey, env)).resolves.toBe(true);
+    await expect(
+      verifyBetaAccessKey("B".repeat(48), env)
+    ).resolves.toBe(false);
   });
 
-  it("verifies a beta password against a server-side scrypt credential", () => {
+  it("verifies a beta password against a server-side scrypt credential asynchronously", async () => {
     const salt = Buffer.from("00112233445566778899aabbccddeeff", "hex");
     const password = "short-beta-password";
     const passwordCredential =
@@ -83,8 +85,10 @@ describe("beta access-key authentication policy", () => {
     } as NodeJS.ProcessEnv;
 
     expect(betaAccessKeyIssue(env)).toBeNull();
-    expect(verifyBetaAccessKey(password, env)).toBe(true);
-    expect(verifyBetaAccessKey("wrong-password", env)).toBe(false);
+    await expect(verifyBetaAccessKey(password, env)).resolves.toBe(true);
+    await expect(
+      verifyBetaAccessKey("wrong-password", env)
+    ).resolves.toBe(false);
   });
 
   it("normalizes invited emails and derives a stable opaque session identity", () => {
