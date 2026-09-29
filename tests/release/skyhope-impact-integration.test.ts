@@ -80,10 +80,10 @@ describe("SkyHope impact integration", () => {
     }
 
     expect(navigation).toMatch(
-      /label: "School", route: "\/sky-school", icon: BookOpen/
+      /label: "School", route: "\/sky-school", icon: GraduationCap/
     );
     expect(navigation).toMatch(
-      /label: "Impact", route: "\/charity", icon: HeartHandshake/
+      /label: "SkyHope", route: "\/charity", icon: HeartHandshake/
     );
   });
 });
