@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { WifiOff } from "lucide-react";
 import { useLocation } from "wouter";
 import routeCatalog from "@/data/routeCatalog.json";
+import {
+  ACCESSIBILITY_PREFERENCES_EVENT,
+  ACCESSIBILITY_STORAGE_KEY,
+  applyAccessibilityPreferences,
+  loadAccessibilityPreferences,
+} from "@/lib/accessibilityPreferences";
 
 type RouteRecord = {
   path: string;
@@ -45,6 +51,23 @@ export default function GlobalExperienceRuntime() {
         ? "SKYCOIN4444 · Engineering Beta"
         : `${route.label} · SKYCOIN4444`;
   }, [route.label, route.path]);
+
+  useEffect(() => {
+    const syncPreferences = () => {
+      applyAccessibilityPreferences(loadAccessibilityPreferences());
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (!event.key || event.key === ACCESSIBILITY_STORAGE_KEY) syncPreferences();
+    };
+
+    syncPreferences();
+    window.addEventListener(ACCESSIBILITY_PREFERENCES_EVENT, syncPreferences);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener(ACCESSIBILITY_PREFERENCES_EVENT, syncPreferences);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
 
   useEffect(() => {
     const syncConnection = () => setOnline(navigator.onLine);
