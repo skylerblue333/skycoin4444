@@ -55,6 +55,8 @@ export default function GamePlinko() {
 
   function reset() {
     setCredits(1000);
+    setSeed(4444);
+    setLastSeed(4444);
     setBucket(null);
     setMultiplier(null);
     setPath([]);
