@@ -5,6 +5,7 @@ const routers = readFileSync("server/routers.ts", "utf8");
 const charityRouter = readFileSync("server/routers/charity.ts", "utf8");
 const journey = readFileSync("server/features/ecosystem-journey/index.ts", "utf8");
 const charityPage = readFileSync("client/src/pages/Charity.tsx", "utf8");
+const charityImpactPanel = readFileSync("client/src/components/SkyHopeAccountImpactPanel.tsx", "utf8");
 const betaJourney = readFileSync("client/src/pages/BetaJourney.tsx", "utf8");
 const navigation = readFileSync("client/src/components/BetaNavigation.tsx", "utf8");
 const home = readFileSync("client/src/pages/Home.tsx", "utf8");
@@ -31,15 +32,18 @@ describe("HopeAI social gaming education SkyHope integration", () => {
     expect(journey).toContain("persistedCompletionTracked: false");
   });
 
-  it("removes fabricated charity economics from the canonical page", () => {
-    expect(charityPage).toContain("Record pledge intent");
-    expect(charityPage).toContain("Save volunteer record");
-    expect(charityPage).toContain("settled");
-    expect(charityPage).toContain("does not currently process donations");
+  it("combines the truthful planning workspace with persisted account impact evidence", () => {
+    expect(charityPage).toContain("SkyHopeAccountImpactPanel");
+    expect(charityPage).toContain("No live donations or custody");
     expect(charityPage).not.toContain("Diamond Donor");
     expect(charityPage).not.toContain("votesFor");
     expect(charityPage).not.toContain("100% of donations go directly");
     expect(charityPage).not.toContain("On-chain verified");
+    expect(charityImpactPanel).toContain("trpc.charity.campaigns.useQuery");
+    expect(charityImpactPanel).toContain("trpc.charity.summary.useQuery");
+    expect(charityImpactPanel).toContain("trpc.charity.pledge.useMutation");
+    expect(charityImpactPanel).toContain("trpc.charity.volunteer.useMutation");
+    expect(charityImpactPanel).toContain("No payment execution");
   });
 
   it("routes legacy impact screens to one truthful SkyHope center", () => {
