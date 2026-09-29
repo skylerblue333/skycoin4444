@@ -13,44 +13,51 @@ const matches = fs.readFileSync(
   "client/src/pages/DatingMatches.tsx",
   "utf8",
 );
-const helpers = fs.readFileSync(
-  "client/src/lib/datingExperience.ts",
+const home = fs.readFileSync("client/src/pages/DatingHome.tsx", "utf8");
+const safety = fs.readFileSync(
+  "client/src/pages/DatingSafetyCenter.tsx",
   "utf8",
 );
+const router = fs.readFileSync("server/routers/dating.ts", "utf8");
 
-describe("dating experience upgrade", () => {
-  it("connects profile setup to discovery instead of ending at a local save", () => {
+describe("dating product suite", () => {
+  it("connects profile setup to authenticated persistence and discovery", () => {
+    expect(profileSetup).toContain("trpc.dating.upsertProfile");
     expect(profileSetup).toContain('href="/dating-discovery"');
-    expect(profileSetup).toContain("Build a profile worth replying to");
-    expect(profileSetup).toContain("scoreDatingProfile");
-    expect(profileSetup).toContain("browser session");
+    expect(profileSetup).toContain("sessionStorage.setItem");
+    expect(profileSetup).toContain("gender: formData.gender");
   });
 
-  it("uses transparent user-provided signals instead of inventing compatibility reasons", () => {
-    expect(discovery).toContain("Transparent connection signals");
-    expect(discovery).toContain("buildConnectionSignals");
-    expect(discovery).toContain("service score");
-    expect(helpers).toContain("sharedDatingInterests");
-    expect(helpers).not.toMatch(/identity verified|background check passed/i);
+  it("uses server-backed discovery and factual overlap instead of fake match scores", () => {
+    expect(discovery).toContain("trpc.dating.discover");
+    expect(discovery).toContain("sharedSignalCount");
+    expect(discovery).toContain("Shared interests");
+    expect(discovery).not.toContain("service score");
+    expect(discovery).not.toContain("% Match");
+    expect(router).toContain("buildDatingConnectionEvidence");
   });
 
-  it("provides deterministic conversation starters", () => {
-    expect(discovery).toContain("Conversation starters");
-    expect(discovery).toContain("buildConversationStarters");
-    expect(helpers).toContain("What got you into");
+  it("uses mutual-match authorized server messaging", () => {
+    expect(matches).toContain("trpc.dating.matches");
+    expect(matches).toContain("trpc.dating.conversation");
+    expect(matches).toContain("trpc.dating.sendMessage");
+    expect(matches).toContain("Mutual matches only");
+    expect(router).toContain("requireMatchedConversation");
   });
 
-  it("does not display an optimistic dating message before the server accepts it", () => {
-    expect(matches).toContain('fetch("/api/dating/messages"');
-    expect(matches).toContain("if (!response.ok)");
-    expect(matches).toContain('setSendStatus("Message sent.")');
-    expect(matches).not.toContain("tempMessage");
-    expect(matches).not.toContain("setMessages([...messages, tempMessage])");
+  it("exposes block report and unmatch controls", () => {
+    expect(discovery).toContain("trpc.dating.block");
+    expect(discovery).toContain("trpc.dating.report");
+    expect(matches).toContain("trpc.dating.unmatch");
+    expect(matches).toContain("Block after report");
+    expect(router).toContain("datingReports");
+    expect(router).toContain("datingBlocks");
   });
 
-  it("keeps adult-only and safety boundaries visible", () => {
-    expect(discovery).toContain("18+ discovery only");
-    expect(matches).toContain("Adult-only dating beta");
-    expect(matches).toContain("Do not send money, crypto, passwords, private keys, or recovery phrases.");
+  it("keeps a dedicated safety center and explicit product boundaries", () => {
+    expect(home).toContain('href="/dating-safety"');
+    expect(safety).toContain("Safer choices without fake guarantees");
+    expect(safety).toMatch(/not an emergency-response or monitoring\s+service/);
+    expect(router).toContain("No identity verification");
   });
 });

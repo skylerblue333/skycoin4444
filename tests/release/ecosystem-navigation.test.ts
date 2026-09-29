@@ -40,7 +40,7 @@ describe("ecosystem navigation and visual foundation", () => {
       "/gaming",
       "/beta-commerce",
       "/language-partner-discovery",
-      "/dating-profile-setup",
+      "/dating-home",
       "/beta-web3",
       "/hope-a-i",
     ]) {

@@ -89,8 +89,8 @@ const flagshipAreas = [
   },
   {
     title: "Dating",
-    subtitle: "Adult-only profile workflow",
-    href: "/dating-profile-setup",
+    subtitle: "Adult-only profile, discovery, matches & safety",
+    href: "/dating-home",
     icon: Heart,
     status: "Safety-first beta",
   },

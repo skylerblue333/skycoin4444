@@ -301,6 +301,7 @@ const DatingMessages = lazy(() => import('./pages/DatingMessages'));
 const DatingPremium = lazy(() => import('./pages/DatingPremium'));
 const DatingProfile = lazy(() => import('./pages/DatingProfile'));
 const DatingProfileSetup = lazy(() => import('./pages/DatingProfileSetup'));
+const DatingSafetyCenter = lazy(() => import('./pages/DatingSafetyCenter'));
 const DatingSubscription = lazy(() => import('./pages/DatingSubscription'));
 const DayTradeRoom = lazy(() => import('./pages/DayTradeRoom'));
 const DeFi = lazy(() => import('./pages/DeFi'));
@@ -1367,6 +1368,7 @@ function Router() {
         <Route path="/dating-premium" component={DatingPremium} />
         <Route path="/dating-profile" component={DatingProfile} />
         <Route path="/dating-profile-setup" component={DatingProfileSetup} />
+        <Route path="/dating-safety" component={DatingSafetyCenter} />
         <Route path="/dating-subscription" component={DatingSubscription} />
         <Route path="/day-trade-room" component={DayTradeRoom} />
         <Route path="/de-fi" component={DeFi} />

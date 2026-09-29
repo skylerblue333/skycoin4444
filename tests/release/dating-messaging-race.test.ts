@@ -5,14 +5,15 @@ const matches = readFileSync("client/src/pages/DatingMatches.tsx", "utf8");
 
 describe("dating messaging send lock", () => {
   it("locks conversation selection and draft editing during an in-flight send", () => {
-    const sendLocks = matches.match(/disabled=\{sending\}/g) ?? [];
-    expect(sendLocks.length).toBeGreaterThanOrEqual(2);
-    expect(matches).toContain("conversation locked while sending");
+    expect(matches).toContain("disabled={sendMessage.isPending}");
+    expect(matches).toContain("conversation selection is");
+    expect(matches).toContain("locked while a send is in flight");
   });
 
-  it("keeps the server response as the source of truth before success", () => {
-    expect(matches).toContain('fetch("/api/dating/messages"');
-    expect(matches).toContain("if (!response.ok)");
-    expect(matches).toContain('setSendStatus("Message sent.")');
+  it("uses the authenticated mutation as the send source of truth", () => {
+    expect(matches).toContain("trpc.dating.sendMessage");
+    expect(matches).toContain("Message accepted by the server.");
+    expect(matches).not.toContain('fetch("/api/dating/messages"');
+    expect(matches).not.toContain("tempMessage");
   });
 });
