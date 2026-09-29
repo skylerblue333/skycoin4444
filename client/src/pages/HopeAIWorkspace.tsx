@@ -12,6 +12,7 @@ import {
   FileText,
   FolderOpen,
   GraduationCap,
+  HeartHandshake,
   Loader2,
   Scale,
   MessageSquarePlus,
@@ -48,7 +49,7 @@ const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 const storageKeyForUser = (userId: string): string =>
   STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
-type WorkspaceMode = "general" | "build" | "learn" | "plan" | "legal";
+type WorkspaceMode = "general" | "build" | "learn" | "plan" | "impact" | "legal";
 
 const modeOptions: Array<{
   id: WorkspaceMode;
@@ -81,6 +82,12 @@ const modeOptions: Array<{
     agentId: "project-manager",
   },
   {
+    id: "impact",
+    label: "Impact",
+    icon: HeartHandshake,
+    agentId: "project-manager",
+  },
+  {
     id: "legal",
     label: "Lawyer",
     icon: Scale,
@@ -93,7 +100,30 @@ const starterPrompts = [
   "Explain a difficult concept and quiz me on it.",
   "Turn this idea into a concrete implementation plan.",
   "Help me debug a TypeScript problem.",
+  "Turn my SkyHope cause idea into a consent-aware impact plan with evidence checkpoints.",
 ];
+
+const readLaunchPrompt = (): string => {
+  if (typeof window === "undefined") return "";
+  try {
+    return (new URLSearchParams(window.location.search).get("prompt") ?? "")
+      .trim()
+      .slice(0, 4_000);
+  } catch {
+    return "";
+  }
+};
+
+const readLaunchMode = (): WorkspaceMode => {
+  if (typeof window === "undefined") return "general";
+  try {
+    return new URLSearchParams(window.location.search).get("source") === "skyhope"
+      ? "impact"
+      : "general";
+  } catch {
+    return "general";
+  }
+};
 
 const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
   try {
