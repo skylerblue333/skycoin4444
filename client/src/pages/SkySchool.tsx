@@ -19,6 +19,7 @@ import { gapCourses } from "@/data/gapCourses";
 import { useArcadePassportSync } from "@/hooks/useArcadePassportSync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import SkyHopeImpactRail from "@/components/SkyHopeImpactRail";
 import {
   Card,
   CardContent,
@@ -392,6 +393,8 @@ export default function SkySchool() {
             );
           })}
         </section>
+
+        <SkyHopeImpactRail context="education" />
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 text-xs leading-6 text-white/35">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-200" />
