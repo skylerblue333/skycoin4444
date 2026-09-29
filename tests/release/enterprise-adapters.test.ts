@@ -3,6 +3,8 @@ import {
   ENTERPRISE_ADAPTERS,
   assessIntegrationCoverage,
   createAdapterCommand,
+  createAdapterRuntimeEvidence,
+  evaluateAdapterExecutionGate,
   inspectAdapterReadiness,
 } from "../../packages/sky-enterprise-adapters/src/index";
 
@@ -34,6 +36,48 @@ describe("enterprise adapter release contract", () => {
     });
   });
 
+  it("requires fresh authenticated runtime evidence before live external execution", () => {
+    const config = {
+      STRIPE_SECRET_KEY: "release-test",
+      STRIPE_WEBHOOK_SECRET: "release-test",
+    };
+    const nowMs = Date.parse("2026-09-28T20:00:00.000Z");
+
+    expect(
+      evaluateAdapterExecutionGate({
+        adapterId: "stripe",
+        config,
+        nowMs,
+      }),
+    ).toMatchObject({
+      allowed: false,
+      reason: "missing-health-evidence",
+    });
+
+    const evidence = createAdapterRuntimeEvidence({
+      adapterId: "stripe",
+      state: "healthy",
+      authenticated: true,
+      checkedAt: "2026-09-28T19:59:45.000Z",
+      latencyMs: 25,
+      networkCallPerformed: true,
+      reason: null,
+    });
+
+    expect(
+      evaluateAdapterExecutionGate({
+        adapterId: "stripe",
+        config,
+        evidence,
+        nowMs,
+      }),
+    ).toMatchObject({
+      allowed: true,
+      reason: "ready",
+      runtimeState: "healthy",
+    });
+  });
+
   it("exposes integration gaps instead of manufacturing success", () => {
     const coverage = assessIntegrationCoverage([
       { capability: "sso.saml", criticality: "required" },
@@ -43,6 +87,8 @@ describe("enterprise adapter release contract", () => {
     ]);
 
     expect(coverage.every((item) => item.status === "catalog-only")).toBe(true);
-    expect(coverage.every((item) => item.configuredAdapters.length === 0)).toBe(true);
+    expect(
+      coverage.every((item) => item.configuredAdapters.length === 0),
+    ).toBe(true);
   });
 });

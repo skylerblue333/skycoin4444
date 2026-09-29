@@ -66,7 +66,11 @@ export type EnterpriseAuthKind =
   | "oidc"
   | "saml-metadata";
 
-export type EnterpriseRiskClass = "standard" | "sensitive" | "identity" | "financial";
+export type EnterpriseRiskClass =
+  | "standard"
+  | "sensitive"
+  | "identity"
+  | "financial";
 
 export type EnterpriseAdapterDefinition = Readonly<{
   id: string;
@@ -91,6 +95,39 @@ export type AdapterReadiness = Readonly<{
   secretsPresent: readonly string[];
   externalConnectivityVerified: false;
   networkCallPerformed: false;
+}>;
+
+export type AdapterRuntimeState =
+  | "configured"
+  | "healthy"
+  | "degraded"
+  | "failed";
+
+export type AdapterRuntimeEvidence = Readonly<{
+  adapterId: string;
+  state: AdapterRuntimeState;
+  authenticated: boolean;
+  checkedAt: string | null;
+  latencyMs: number | null;
+  networkCallPerformed: boolean;
+  reason: string | null;
+}>;
+
+export type AdapterExecutionGateReason =
+  | "unconfigured"
+  | "missing-health-evidence"
+  | "runtime-unhealthy"
+  | "stale-health-evidence"
+  | "future-health-evidence"
+  | "ready";
+
+export type AdapterExecutionGate = Readonly<{
+  adapterId: string;
+  allowed: boolean;
+  reason: AdapterExecutionGateReason;
+  runtimeState: AdapterRuntimeState | "unconfigured" | "missing";
+  checkedAt: string | null;
+  freshnessMs: number | null;
 }>;
 
 export type AdapterCommand = Readonly<{
