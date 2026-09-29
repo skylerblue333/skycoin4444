@@ -111,12 +111,24 @@ export default function GamingForCharity() {
               provider, legal, age, and region gates are satisfied.
             </p>
           </div>
-          <Link href="/gaming">
-            <Button size="lg" className="w-full">
-              <Gamepad2 className="mr-2 h-5 w-5" />
-              Open Games Center
-            </Button>
-          </Link>
+          <div className="grid gap-2">
+            <Link href="/impact-hub">
+              <Button size="lg" className="w-full">
+                <HeartHandshake className="mr-2 h-5 w-5" />
+                Build an impact mission
+              </Button>
+            </Link>
+            <Link href="/gaming">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-white/15 bg-white/[0.03] text-white"
+              >
+                <Gamepad2 className="mr-2 h-5 w-5" />
+                Open Games Center
+              </Button>
+            </Link>
+          </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">
