@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { getDb } from "../db";
 import {
   cryptoProviderConfigSnapshot,
+  executeWithProviderAudit,
   evaluateMainnetWalletPolicy,
   fetchZeroExQuote,
   probeStratumPool,
@@ -10,8 +12,15 @@ import {
   signDigestWithOpenBao,
 } from "./cryptoProviderAdapters";
 
+vi.mock("../db", () => ({
+  getDb: vi.fn(),
+}));
+
+const getDbMock = vi.mocked(getDb);
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.clearAllMocks();
 });
 
 describe("crypto real provider adapters", () => {
@@ -92,6 +101,33 @@ describe("crypto real provider adapters", () => {
     expect(result.balanced).toBe(true);
   });
 
+  it("fails closed before a provider side effect when the event ledger is unavailable", async () => {
+    getDbMock.mockRejectedValueOnce(new Error("database unavailable"));
+    const operation = vi.fn(async () => ({ signed: true }));
+
+    await expect(
+      executeWithProviderAudit(
+        {
+          userId: "admin-1",
+          provider: "test-provider",
+          eventType: "sensitive_operation",
+          externalRef: "audit:test:1",
+          status: "requested",
+        },
+        operation,
+        result => ({
+          userId: "admin-1",
+          provider: "test-provider",
+          eventType: "sensitive_operation",
+          externalRef: "audit:test:1",
+          status: result.signed ? "completed" : "failed",
+        }),
+      ),
+    ).rejects.toThrow(/not attempted/);
+
+    expect(operation).not.toHaveBeenCalled();
+  });
+
   it("calls the current 0x v2 allowance-holder quote contract without broadcasting", async () => {
     const fetchMock = vi.fn(async (input: URL | RequestInfo, init?: RequestInit) => {
       const url = String(input);
@@ -139,6 +175,40 @@ describe("crypto real provider adapters", () => {
     expect(quote.transaction.to).toBe("0x4444444444444444444444444444444444444444");
     expect(quote.executableByWallet).toBe(true);
     expect(quote.serverBroadcast).toBe(false);
+  });
+
+  it("rejects a 0x quote that omits the transaction value instead of assuming zero", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        new Response(
+          JSON.stringify({
+            liquidityAvailable: true,
+            buyAmount: "950",
+            transaction: {
+              to: "0x4444444444444444444444444444444444444444",
+              data: "0x1234",
+              gas: "21000",
+            },
+          }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        ),
+      ),
+    );
+
+    await expect(
+      fetchZeroExQuote(
+        {
+          chainId: 1,
+          sellToken: "0x1111111111111111111111111111111111111111",
+          buyToken: "0x2222222222222222222222222222222222222222",
+          sellAmount: "1000",
+          taker: "0x5555555555555555555555555555555555555555",
+          slippageBps: 100,
+        },
+        { ZEROX_API_KEY: "test-key" },
+      ),
+    ).rejects.toThrow(/transaction\.value is invalid/);
   });
 
   it("reconciles EVM confirmations from the configured chain RPC", async () => {
