@@ -2,25 +2,25 @@
 
 The invitation-only engineering beta supports bounded, user-visible handoffs into the canonical HopeAI workspace.
 
-## SkyHope
+## Existing SkyHope contract
 
-`DonationProcessing` and `FundraiserTools` may link to:
+SkyHope planning surfaces already link into HopeAI with a bounded query contract:
 
 ```
 /hope-a-i?source=skyhope&prompt=<url-encoded prompt>
 ```
 
-HopeAI consumes the prompt when the authenticated workspace loads, selects the **Impact** mode, and chooses that mode's mapped specialist. Prompt input is capped at 4,000 characters before it reaches the workspace.
+The canonical HopeAI workspace consumes the prompt after the authenticated workspace loads, selects **Impact** mode for the `skyhope` source, removes the consumed query context from browser history, and leaves provider execution user-initiated.
 
-## Messaging
+## Messaging extension
 
-The flagship Messaging beta remains a local drafting workspace with no remote-send claim. When a draft exists, its HopeAI handoff uses:
+The flagship Messaging beta remains a local drafting workspace with no remote-send claim. When a draft exists, its HopeAI handoff now uses the same bounded prompt contract:
 
 ```
 /hope-a-i?source=messaging&prompt=<url-encoded draft>
 ```
 
-HopeAI opens in the general mode with the draft prefilled so the user can explicitly choose whether to send it to the configured provider.
+The workspace treats `messaging` as general mode, prefills the draft, and waits for the user to explicitly submit it. Empty drafts continue to link to the plain HopeAI workspace.
 
 ## Boundaries
 
