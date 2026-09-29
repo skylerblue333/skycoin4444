@@ -1,14 +1,18 @@
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
   BadgeDollarSign,
   BookOpen,
+  Bot,
   Gamepad2,
   HandCoins,
   HeartHandshake,
   Landmark,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
+  Target,
   WalletCards,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +24,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  evaluateImpactAllocation,
+  IMPACT_PLAY_RECOMMENDED,
+  type ImpactAllocation,
+} from "@/lib/impactPlayLab";
 
 const missionThemes = [
   {
@@ -72,7 +81,56 @@ const charityFinanceScope = [
   },
 ] as const;
 
+const allocationLabels: Array<{
+  key: keyof ImpactAllocation;
+  label: string;
+  detail: string;
+}> = [
+  {
+    key: "needs",
+    label: "Needs discovery",
+    detail: "Understand the problem, people, consent, and baseline before designing the intervention.",
+  },
+  {
+    key: "evidence",
+    label: "Evidence",
+    detail: "Decide what would demonstrate progress without exaggerating outcomes.",
+  },
+  {
+    key: "delivery",
+    label: "Delivery",
+    detail: "Plan staffing, access, logistics, handoffs, and failure recovery.",
+  },
+  {
+    key: "safeguards",
+    label: "Safeguards",
+    detail: "Protect privacy, accessibility, eligibility, safety, and reporting boundaries.",
+  },
+];
+
+const presets: Array<{ label: string; value: ImpactAllocation }> = [
+  { label: "Balanced", value: IMPACT_PLAY_RECOMMENDED },
+  {
+    label: "Evidence-heavy",
+    value: { needs: 25, evidence: 35, delivery: 20, safeguards: 20 },
+  },
+  {
+    label: "Delivery-heavy",
+    value: { needs: 25, evidence: 20, delivery: 35, safeguards: 20 },
+  },
+];
+
 export default function GamingForCharity() {
+  const [allocation, setAllocation] = useState<ImpactAllocation>(
+    IMPACT_PLAY_RECOMMENDED,
+  );
+
+  const total = Object.values(allocation).reduce((sum, value) => sum + value, 0);
+  const result = useMemo(() => {
+    if (total !== 100) return null;
+    return evaluateImpactAllocation(allocation);
+  }, [allocation, total]);
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none fixed inset-0">
@@ -81,7 +139,7 @@ export default function GamingForCharity() {
       </div>
 
       <div className="relative mx-auto max-w-6xl space-y-8 px-4 py-10">
-        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1fr_320px] lg:items-end">
+        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1fr_360px] lg:items-end">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="bg-emerald-500/15 text-emerald-100">
@@ -101,23 +159,189 @@ export default function GamingForCharity() {
               </Badge>
             </div>
             <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              Real-value gaming rails belong to charity only.
+              Play with impact planning without pretending the game moves money.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-white/50">
-              The flagship games stay demo-only. If deposits, withdrawals,
-              real-money wagering, custody, token settlement, or redeemable
-              crypto rewards are introduced, this route is the only permitted
-              product scope for them—and only after verified charity,
-              provider, legal, age, and region gates are satisfied.
+              This lab adds a deterministic planning game beside the existing
+              themed missions. The score is practice feedback only: it has no cash
+              or token value, does not trigger a donation, and does not predict
+              real-world charitable impact.
             </p>
           </div>
-          <Link href="/gaming">
-            <Button size="lg" className="w-full">
-              <Gamepad2 className="mr-2 h-5 w-5" />
-              Open Games Center
-            </Button>
-          </Link>
+          <div className="grid gap-2">
+            <Link href="/charity">
+              <Button size="lg" className="w-full">
+                <HeartHandshake className="mr-2 h-5 w-5" />
+                Open SkyHope planner
+              </Button>
+            </Link>
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/sky-school">
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 bg-white/[0.03] text-white"
+                >
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Learn
+                </Button>
+              </Link>
+              <Link href="/hope-a-i">
+                <Button
+                  variant="outline"
+                  className="w-full border-white/15 bg-white/[0.03] text-white"
+                >
+                  <Bot className="mr-2 h-4 w-4" />
+                  HopeAI
+                </Button>
+              </Link>
+            </div>
+          </div>
         </header>
+
+        <section className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card className="border-emerald-300/15 bg-emerald-300/[0.035] text-white">
+            <CardHeader>
+              <Target className="h-6 w-6 text-emerald-200" />
+              <CardTitle className="mt-2 text-2xl text-white">
+                Impact allocation drill
+              </CardTitle>
+              <CardDescription className="leading-6 text-white/45">
+                Allocate exactly 100 practice points. The game rewards balance
+                across needs, evidence, delivery, and safeguards.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="flex flex-wrap gap-2">
+                {presets.map(preset => (
+                  <Button
+                    key={preset.label}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-white/15 bg-white/[0.03] text-white"
+                    onClick={() => setAllocation(preset.value)}
+                  >
+                    {preset.label}
+                  </Button>
+                ))}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setAllocation(IMPACT_PLAY_RECOMMENDED)}
+                >
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                  Reset
+                </Button>
+              </div>
+
+              <div className="space-y-5">
+                {allocationLabels.map(item => (
+                  <div key={item.key}>
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">{item.label}</p>
+                        <p className="mt-1 max-w-2xl text-xs leading-5 text-white/35">
+                          {item.detail}
+                        </p>
+                      </div>
+                      <span className="min-w-12 text-right text-xl font-black text-emerald-100">
+                        {allocation[item.key]}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={60}
+                      step={5}
+                      value={allocation[item.key]}
+                      aria-label={item.label + " allocation"}
+                      onChange={event =>
+                        setAllocation(current => ({
+                          ...current,
+                          [item.key]: Number(event.target.value),
+                        }))
+                      }
+                      className="w-full accent-emerald-400"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className={
+                  total === 100
+                    ? "rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.035] p-4"
+                    : "rounded-2xl border border-amber-300/20 bg-amber-300/[0.035] p-4"
+                }
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">Allocated points</span>
+                  <span className="text-2xl font-black">{total}/100</span>
+                </div>
+                {total !== 100 ? (
+                  <p className="mt-2 text-xs leading-5 text-amber-100/70">
+                    Rebalance the sliders until the total is exactly 100 to get
+                    practice feedback.
+                  </p>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-white/[0.035] text-white">
+            <CardHeader>
+              <Gamepad2 className="h-6 w-6 text-violet-200" />
+              <CardTitle className="mt-2 text-white">
+                Game-only planning score
+              </CardTitle>
+              <CardDescription className="text-white/45">
+                Deterministic feedback on allocation balance—not a claim about
+                program effectiveness.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!result ? (
+                <div className="grid min-h-72 place-items-center rounded-2xl border border-dashed border-white/10 text-center text-sm text-white/35">
+                  Allocate exactly 100 points to score the practice round.
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="rounded-2xl border border-violet-300/15 bg-violet-300/[0.035] p-5 text-center">
+                    <p className="text-6xl font-black text-violet-100">
+                      {result.practiceScore}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.18em] text-white/30">
+                      practice score / 100
+                    </p>
+                  </div>
+                  <p className="text-sm leading-6 text-white/50">{result.message}</p>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-white/30">
+                      Strengths this round
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {result.strengths.map(strength => (
+                        <Badge
+                          key={strength}
+                          variant="outline"
+                          className="border-emerald-300/20 text-emerald-100"
+                        >
+                          {strength}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-black/15 p-4 text-xs leading-5 text-white/35">
+                    No wallet, token payout, donation, settlement, or blockchain
+                    write occurs from this drill. A high score does not verify a
+                    charity or predict real-world impact.
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
 
         <section className="grid gap-4 md:grid-cols-3">
           {missionThemes.map(theme => {
@@ -131,9 +355,7 @@ export default function GamingForCharity() {
                   <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-200">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <CardTitle className="mt-3 text-white">
-                    {theme.name}
-                  </CardTitle>
+                  <CardTitle className="mt-3 text-white">{theme.name}</CardTitle>
                   <CardDescription className="leading-6 text-white/45">
                     {theme.detail}
                   </CardDescription>
@@ -173,9 +395,7 @@ export default function GamingForCharity() {
                 >
                   <CardHeader>
                     <Icon className="h-6 w-6 text-violet-200" />
-                    <CardTitle className="mt-2 text-white">
-                      {item.title}
-                    </CardTitle>
+                    <CardTitle className="mt-2 text-white">{item.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-sm leading-6 text-white/45">
                     {item.detail}
