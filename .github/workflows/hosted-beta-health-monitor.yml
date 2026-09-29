@@ -8,8 +8,11 @@ on:
     paths:
       - ".github/workflows/hosted-beta-health-monitor.yml"
       - "scripts/hosted-beta-smoke.mjs"
+      - "scripts/hosted-beta-incident.mjs"
       - "tests/release/hosted-beta-smoke.test.ts"
+      - "tests/release/hosted-beta-incident.test.ts"
       - "docs/V5_BETA_LAUNCH.md"
+      - "docs/OBSERVABILITY.md"
 
 permissions:
   contents: read
@@ -39,3 +42,29 @@ jobs:
 
       - name: Verify hosted beta public contracts
         run: node scripts/hosted-beta-smoke.mjs
+
+  incident:
+    name: Reconcile hosted beta incident
+    if: ${{ always() && github.event_name != 'pull_request' }}
+    needs: hosted-health
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      HOSTED_BETA_MONITOR_RESULT: ${{ needs.hosted-health.result }}
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Reconcile monitor incident
+        run: node scripts/hosted-beta-incident.mjs
