@@ -35,7 +35,10 @@ async function readJson(req: http.IncomingMessage) {
   return raw ? JSON.parse(raw) : null;
 }
 
-async function createMockGitHub(openIncidentNumber?: number) {
+async function createMockGitHub(
+  openIncidentNumber?: number,
+  incidentPage = 1
+) {
   const requests: RequestRecord[] = [];
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
@@ -54,12 +57,31 @@ async function createMockGitHub(openIncidentNumber?: number) {
       authorization,
     });
 
-    if (method === "GET" && url.pathname === "/search/issues") {
-      json(res, 200, {
-        items: openIncidentNumber
-          ? [{ number: openIncidentNumber, title: INCIDENT_TITLE }]
-          : [],
-      });
+    if (
+      method === "GET" &&
+      url.pathname === "/repos/skylerblue333/skycoin4444/issues"
+    ) {
+      const page = Number(url.searchParams.get("page") ?? "1");
+      if (openIncidentNumber && page === incidentPage) {
+        json(res, 200, [
+          { number: openIncidentNumber, title: INCIDENT_TITLE },
+        ]);
+        return;
+      }
+
+      if (openIncidentNumber && page < incidentPage) {
+        json(
+          res,
+          200,
+          Array.from({ length: 100 }, (_, index) => ({
+            number: page * 1000 + index,
+            title: `unrelated issue ${page}-${index}`,
+          }))
+        );
+        return;
+      }
+
+      json(res, 200, []);
       return;
     }
 
@@ -167,14 +189,21 @@ describe("hosted beta incident reconciler", () => {
     expect(stdout + stderr).not.toContain(token);
   });
 
-  it("deduplicates repeated failures while the incident is open", async () => {
-    const mock = await createMockGitHub(777);
+  it("deduplicates repeated failures from the direct paginated issue list", async () => {
+    const mock = await createMockGitHub(777, 2);
     const { stdout, stderr } = await runIncidentScript(mock.origin, "failure");
 
     expect(stderr).toBe("");
     expect(stdout).toContain(
       "Hosted beta incident already open as #777; no duplicate created"
     );
+
+    const reads = mock.requests.filter(
+      request =>
+        request.method === "GET" &&
+        request.pathname === "/repos/skylerblue333/skycoin4444/issues"
+    );
+    expect(reads).toHaveLength(2);
     expect(
       mock.requests.filter(request => request.method !== "GET")
     ).toHaveLength(0);
