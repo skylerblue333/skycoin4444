@@ -10,6 +10,10 @@ const advanced = fs.readFileSync(
   "client/src/pages/HopeAIAdvanced.tsx",
   "utf8"
 );
+const hopeAgentRouter = fs.readFileSync(
+  "server/routers/hopeAgent.ts",
+  "utf8"
+);
 
 describe("HopeAI conversation workspace release contract", () => {
   it("makes the provider-backed workspace the flagship HopeAI route", () => {
@@ -31,6 +35,15 @@ describe("HopeAI conversation workspace release contract", () => {
     expect(workspace).not.toMatch(/thinkingTime/);
     expect(workspace).not.toMatch(/confidence:/);
     expect(workspace).not.toMatch(/Better than ChatGPT/);
+  });
+
+  it("fails closed at the provider boundary without reflecting upstream details", () => {
+    expect(hopeAgentRouter).toMatch(/sanitizeOperationalError\(error\)/);
+    expect(hopeAgentRouter).toMatch(/\[HopeAI\] agent provider failure:/);
+    expect(hopeAgentRouter).toMatch(/message: "HopeAI agent request failed"/);
+    expect(hopeAgentRouter).not.toMatch(
+      /message: error instanceof Error \? error\.message/
+    );
   });
 
   it("provides a tool-aware workspace without false external capability claims", () => {
