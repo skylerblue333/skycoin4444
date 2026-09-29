@@ -149,6 +149,7 @@ export default function HopeAIWorkspace() {
   const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const launchContextAppliedRef = useRef(false);
   const storageKey = user?.id ? storageKeyForUser(user.id) : null;
 
   const models = trpc.ai.getModels.useQuery(undefined, {
@@ -183,6 +184,44 @@ export default function HopeAIWorkspace() {
       // Workspace remains usable in memory when local storage is unavailable.
     }
   }, [loadedStorageKey, storageKey, threads]);
+
+  useEffect(() => {
+    if (!storageKey || loadedStorageKey !== storageKey || launchContextAppliedRef.current) {
+      return;
+    }
+
+    const launchPrompt = readLaunchPrompt();
+    const launchMode = readLaunchMode();
+    if (!launchPrompt && launchMode === "general") return;
+
+    launchContextAppliedRef.current = true;
+
+    if (launchPrompt) {
+      setInput(launchPrompt);
+    }
+
+    if (launchMode !== "general") {
+      const option =
+        modeOptions.find(candidate => candidate.id === launchMode) ?? modeOptions[0];
+      setMode(option.id);
+      setSelectedAgentId(option.agentId);
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("prompt");
+        url.searchParams.delete("source");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          url.pathname + url.search + url.hash
+        );
+      } catch {
+        // Keep the prepared handoff even if browser history cannot be normalized.
+      }
+    }
+  }, [loadedStorageKey, storageKey]);
 
   useEffect(() => {
     if (!selectedModel && models.data?.length) {
