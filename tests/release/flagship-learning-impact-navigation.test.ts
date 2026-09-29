@@ -7,8 +7,8 @@ const school = fs.readFileSync("client/src/pages/CourseCatalog.tsx", "utf8");
 
 describe("flagship learning, HopeAI, SkyHope, social, and gaming paths", () => {
   it("promotes SkySchool and SkyHope into the persistent primary navigation", () => {
-    expect(nav).toContain('{ label: "School", route: "/course-catalog", icon: GraduationCap }');
-    expect(nav).toContain('{ label: "SkyHope", route: "/charity", icon: HeartHandshake }');
+    expect(nav).toContain('{ label: "School", route: "/sky-school", icon: GraduationCap }');
+    expect(nav).toContain('{ label: "SkyHope", route: "/charity", icon: Heart }');
     expect(nav).toContain("School, HopeAI, SkyHope");
   });
 
