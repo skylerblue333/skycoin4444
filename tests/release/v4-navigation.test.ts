@@ -12,14 +12,14 @@ describe("V5 global beta navigation", () => {
 
   it("keeps voice navigation aligned with the connected V5 labels", () => {
     expect(navigation).toContain(
-      "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, SkyHope, Journey, Market, Web3, Dating, Global, or Creator."
+      "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, Impact, Journey, Market, Web3, Dating, Global, or Creator."
     );
     expect(navigation).toContain('{ label: "Creator", route: "/creator-dashboard"');
     expect(navigation).toContain(
       '{ label: "Global", route: "/translation-enabled-community"'
     );
     expect(navigation).toContain('{ label: "Dating", route: "/dating-home"');
-    expect(navigation).toContain('{ label: "SkyHope", route: "/charity"');
+    expect(navigation).toContain('{ label: "Impact", route: "/charity"');
     expect(navigation).toContain('{ label: "Journey", route: "/beta-journey"');
   });
 
