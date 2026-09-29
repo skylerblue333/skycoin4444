@@ -30,7 +30,7 @@ function request(
 }
 
 describe("session cookie transport", () => {
-  it("always sets Secure in production", () => {
+  it("always sets Secure and SameSite=None in production", () => {
     process.env.NODE_ENV = "production";
 
     const options = getSessionCookieOptions(request("http"));
@@ -43,17 +43,32 @@ describe("session cookie transport", () => {
     expect(options.domain).toBeUndefined();
   });
 
-  it("allows HTTP localhost-style development while honoring forwarded HTTPS", () => {
+  it("uses a browser-valid Lax cookie for plain HTTP development", () => {
     process.env.NODE_ENV = "development";
 
-    expect(getSessionCookieOptions(request("http")).secure).toBe(false);
+    expect(getSessionCookieOptions(request("http"))).toMatchObject({
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      secure: false,
+    });
+  });
+
+  it("keeps SameSite=None only when development transport is secure", () => {
+    process.env.NODE_ENV = "development";
+
+    expect(getSessionCookieOptions(request("https"))).toMatchObject({
+      sameSite: "none",
+      secure: true,
+    });
     expect(
-      getSessionCookieOptions(request("http", "http, https")).secure
-    ).toBe(true);
-    expect(getSessionCookieOptions(request("https")).secure).toBe(true);
+      getSessionCookieOptions(request("http", "http, https"))
+    ).toMatchObject({
+      sameSite: "none",
+      secure: true,
+    });
   });
 });
-
 
 describe("session cookie naming", () => {
   it("uses a __Host- cookie in production", () => {
