@@ -10,8 +10,8 @@ const fundraiser = fs.readFileSync(
   "utf8"
 );
 
-describe("SkyHope private HopeAI handoff and local draft boundary", () => {
-  it("keeps user-authored SkyHope details out of HopeAI query strings", () => {
+describe("HopeAI Impact private handoff and local draft boundary", () => {
+  it("keeps user-authored HopeAI Impact details out of HopeAI query strings", () => {
     expect(donation).toContain("HOPEAI_PRIVATE_HANDOFF_PROMPT");
     expect(donation).toContain("const privateReviewBrief");
     expect(donation).toContain(
