@@ -195,12 +195,8 @@ export function resolveBetaAccessClientId(
   return trustedHeaderIp ?? socketIp ?? "unknown-client";
 }
 
-function digestKey(clientId: string, normalizedEmail: string): string {
-  return createHash("sha256")
-    .update(clientId, "utf8")
-    .update("\n", "utf8")
-    .update(normalizedEmail, "utf8")
-    .digest("hex");
+function digestClientKey(clientId: string): string {
+  return createHash("sha256").update(clientId, "utf8").digest("hex");
 }
 
 export class BetaAccessRateLimiter {
@@ -213,10 +209,12 @@ export class BetaAccessRateLimiter {
 
   consume(
     clientId: string,
-    normalizedEmail: string
+    _normalizedEmail: string
   ): BetaAccessRateLimitDecision {
     const now = this.now();
-    const key = digestKey(clientId, normalizedEmail);
+    // The invitation access key is one shared secret, so throttling must not
+    // reset when an attacker rotates the submitted email address.
+    const key = digestClientKey(clientId);
     let entry = this.entries.get(key);
 
     if (!entry || now - entry.windowStartedAt >= this.policy.windowMs) {
