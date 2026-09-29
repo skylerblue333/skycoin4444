@@ -121,6 +121,11 @@ export default function Gaming() {
                     Open arcade floor
                   </Button>
                 </Link>
+                <Link href="/charity">
+                  <Button size="lg" variant="outline" className="border-emerald-300/20 bg-emerald-300/[0.04] text-emerald-100 hover:bg-emerald-300/[0.08]">
+                    SkyHope service planning
+                  </Button>
+                </Link>
               </div>
 
               <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
