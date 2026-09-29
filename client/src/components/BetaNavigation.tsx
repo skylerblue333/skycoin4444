@@ -4,7 +4,9 @@ import {
   ChevronRight,
   Compass,
   Gamepad2,
+  GraduationCap,
   Grid2X2,
+  HeartHandshake,
   Home,
   LogIn,
   Menu,
@@ -37,13 +39,14 @@ const primaryLinks = [
   { label: "Chat", route: "/unified-messaging", icon: MessageCircleMore },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
+  { label: "Impact", route: "/impact-hub", icon: HeartHandshake },
+  { label: "School", route: "/sky-school", icon: GraduationCap },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
 const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
-  { label: "School", route: "/sky-school" },
   { label: "Web3", route: "/beta-web3" },
   { label: "Dating", route: "/dating-home" },
   { label: "Global", route: "/translation-enabled-community" },
@@ -72,7 +75,7 @@ const fourFoursTrail = [
     title: "Help somebody",
     message:
       "Technology is most interesting when it makes another person's day, work, or future a little better.",
-    href: "/charity",
+    href: "/impact-hub",
     action: "Follow hope",
   },
   {
@@ -189,7 +192,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, Impact, Charity, Market, School, HopeAI, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
@@ -220,7 +223,7 @@ export default function BetaNavigation() {
         setVoiceMessage(`Opening ${label}.`);
         setLocation(destination);
       } else {
-        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Wallet, Market, School, Live, Dating, or Explore.`);
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Impact, Charity, Wallet, Market, School, Live, Dating, or Explore.`);
       }
     };
     recognition.onerror = () => {
