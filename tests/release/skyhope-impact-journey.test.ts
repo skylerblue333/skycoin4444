@@ -12,10 +12,10 @@ describe("SkyHope impact journey release contract", () => {
     expect(charity).toContain("SkyHope Impact Workspace");
     expect(charity).toContain("No live donation execution");
     expect(charity).toContain("buildSkyHopeImpactPlan");
-    expect(charity).toContain('href="/hope-a-i"');
-    expect(charity).toContain('href="/sky-school"');
-    expect(charity).toContain('href="/gaming-for-charity"');
-    expect(charity).toContain('href="/activity-feed"');
+    expect(charity).toContain('href: "/hope-a-i"');
+    expect(charity).toContain('href: "/sky-school"');
+    expect(charity).toContain('href: "/gaming-for-charity"');
+    expect(charity).toContain('href: "/activity-feed"');
     expect(charity).not.toContain("WaterAid verified");
     expect(charity).not.toContain("100% of donations go directly");
     expect(charity).not.toContain("On-chain verified");
