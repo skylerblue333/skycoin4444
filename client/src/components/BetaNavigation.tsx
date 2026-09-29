@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Compass,
   Gamepad2,
+  HandHeart,
   Grid2X2,
   Home,
   LogIn,
@@ -37,6 +38,7 @@ const primaryLinks = [
   { label: "Chat", route: "/unified-messaging", icon: MessageCircleMore },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
+  { label: "SkyHope", route: "/charity", icon: HandHeart },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
@@ -189,7 +191,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, SkyHope, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
