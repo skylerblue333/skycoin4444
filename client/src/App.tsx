@@ -17,6 +17,7 @@ const BetaWorkspace = lazy(() => import("./pages/BetaWorkspace"));
 const OperationalReadiness = lazy(() => import("./pages/OperationalReadiness"));
 const RouteHealth = lazy(() => import("./pages/RouteHealth"));
 const DiscoveryCenter = lazy(() => import("./pages/DiscoveryCenter"));
+const ImpactHub = lazy(() => import("./pages/ImpactHub"));
 const BetaNavigation = lazy(() => import("./components/BetaNavigation"));
 const GlobalExperienceRuntime = lazy(() => import("./components/GlobalExperienceRuntime"));
 
@@ -30,6 +31,7 @@ function Router() {
         <Route path="/operational-readiness" component={OperationalReadiness} />
         <Route path="/route-health" component={RouteHealth} />
         <Route path="/discovery-center" component={DiscoveryCenter} />
+        <Route path="/impact-hub" component={ImpactHub} />
         <Route path="/beta-catalog" component={BetaAreaCatalog} />
         <Route path="/beta-journey" component={BetaJourney} />
         <Route path="/beta-commerce" component={BetaCommerceSandbox} />
