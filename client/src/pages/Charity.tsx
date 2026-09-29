@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import SkyHopeAccountImpactPanel from "@/components/SkyHopeAccountImpactPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SKYHOPE_CAUSE_TRACKS,
@@ -204,6 +205,10 @@ export default function Charity() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pt-8 md:px-6">
+        <SkyHopeAccountImpactPanel />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
