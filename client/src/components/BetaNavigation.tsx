@@ -189,7 +189,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, Impact, Charity, Market, School, HopeAI, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
@@ -220,7 +220,7 @@ export default function BetaNavigation() {
         setVoiceMessage(`Opening ${label}.`);
         setLocation(destination);
       } else {
-        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Wallet, Market, School, Live, Dating, or Explore.`);
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, HopeAI, Impact, Charity, Wallet, Market, School, Live, Dating, or Explore.`);
       }
     };
     recognition.onerror = () => {
