@@ -13,7 +13,7 @@ const navigation = fs.readFileSync(
   "client/src/components/BetaNavigation.tsx",
   "utf8"
 );
-const app = fs.readFileSync("client/src/App.tsx", "utf8");
+const routes = fs.readFileSync("client/src/routes/legacy/LegacyRoutesGL.tsx", "utf8");
 
 describe("HopeAI + SkySchool + focused Gaming loop", () => {
   it("keeps HopeAI useful without fake external-model behavior", () => {
@@ -91,10 +91,10 @@ describe("HopeAI + SkySchool + focused Gaming loop", () => {
     expect(navigation).toMatch(
       /label: "HopeAI", route: "\/hope-a-i"/
     );
-    expect(app).toMatch(
-      /const GameSkyRush = lazy\(\(\) => import\('\.\/pages\/GameSkyRush'\)\)/
+    expect(routes).toMatch(
+      /const GameSkyRush = lazy\(\(\) => import\('@\/pages\/GameSkyRush'\)\)/
     );
-    expect(app).toMatch(
+    expect(routes).toMatch(
       /<Route path="\/game-sky-rush" component=\{GameSkyRush\} \/>/
     );
   });

@@ -2,15 +2,20 @@ import fs from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const app = fs.readFileSync("client/src/App.tsx", "utf8");
+const routes = [
+  "client/src/routes/legacy/LegacyRoutesAF.tsx",
+  "client/src/routes/legacy/LegacyRoutesGL.tsx",
+  "client/src/routes/legacy/LegacyRoutesSZ.tsx",
+].map(path => fs.readFileSync(path, "utf8")).join("\n");
 const boundary = fs.readFileSync("client/src/components/ErrorBoundary.tsx", "utf8");
 const notFound = fs.readFileSync("client/src/pages/NotFound.tsx", "utf8");
 
 describe("screen recovery and area restoration", () => {
   it("keeps canonical Gaming and Learn routes registered", () => {
-    expect(app).toMatch(/path="\/arcade" component=\{Arcade\}/);
-    expect(app).toMatch(/path="\/gaming" component=\{Gaming\}/);
-    expect(app).toMatch(/path="\/course-catalog" component=\{CourseCatalog\}/);
-    expect(app).toMatch(/path="\/sky-school" component=\{SkySchool\}/);
+    expect(routes).toMatch(/path="\/arcade" component=\{Arcade\}/);
+    expect(routes).toMatch(/path="\/gaming" component=\{Gaming\}/);
+    expect(routes).toMatch(/path="\/course-catalog" component=\{CourseCatalog\}/);
+    expect(routes).toMatch(/path="\/sky-school" component=\{SkySchool\}/);
   });
 
   it("provides layered lazy-screen and render-error recovery", () => {

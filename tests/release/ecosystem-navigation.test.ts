@@ -10,7 +10,7 @@ const input = fs.readFileSync("client/src/components/ui/input.tsx", "utf8");
 
 describe("ecosystem navigation and visual foundation", () => {
   it("mounts one persistent navigation shell across routed surfaces", () => {
-    expect(app).toContain('import BetaNavigation from "./components/BetaNavigation"');
+    expect(app).toMatch(/const BetaNavigation = lazy\(\(\) => import\("\.\/components\/BetaNavigation"\)\)/);
     expect(app).toMatch(/<BetaNavigation \/>/);
     expect(nav).toMatch(/SKYCOIN4444 beta navigation/);
 

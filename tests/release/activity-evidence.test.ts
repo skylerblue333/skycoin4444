@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 
 const page = fs.readFileSync("client/src/pages/ActivityEvidence.tsx", "utf8");
 const router = fs.readFileSync("server/routers/activityEvidence.ts", "utf8");
-const app = fs.readFileSync("client/src/App.tsx", "utf8");
+const routes = fs.readFileSync("client/src/routes/legacy/LegacyRoutesAF.tsx", "utf8");
 const workspace = fs.readFileSync("client/src/pages/BetaWorkspace.tsx", "utf8");
 
 describe("activity evidence", () => {
   it("is a real account-owned beta route", () => {
-    expect(app).toContain('path="/activity-evidence" component={ActivityEvidence}');
+    expect(routes).toContain('path="/activity-evidence" component={ActivityEvidence}');
     expect(workspace).toContain('route: "/activity-evidence"');
     expect(page).toContain("trpc.activityEvidence.list.useQuery");
     expect(router).toContain("protectedProcedure");

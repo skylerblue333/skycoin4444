@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const app = fs.readFileSync("client/src/App.tsx", "utf8");
+const routes = fs.readFileSync("client/src/routes/legacy/LegacyRoutesGL.tsx", "utf8");
 const workspace = fs.readFileSync(
   "client/src/pages/HopeAIWorkspace.tsx",
   "utf8"
@@ -13,11 +13,11 @@ const advanced = fs.readFileSync(
 
 describe("HopeAI conversation workspace release contract", () => {
   it("makes the provider-backed workspace the flagship HopeAI route", () => {
-    expect(app).toMatch(
-      /const HopeAI = lazy\(\(\) => import\('\.\/pages\/HopeAIWorkspace'\)\)/
+    expect(routes).toMatch(
+      /const HopeAI = lazy\(\(\) => import\('@\/pages\/HopeAIWorkspace'\)\)/
     );
-    expect(app).toMatch(/path="\/hope-a-i" component=\{HopeAI\}/);
-    expect(app).toMatch(/path="\/hope-a-i-coach" component=\{HopeAICoach\}/);
+    expect(routes).toMatch(/path="\/hope-a-i" component=\{HopeAI\}/);
+    expect(routes).toMatch(/path="\/hope-a-i-coach" component=\{HopeAICoach\}/);
     expect(advanced.trim()).toBe('export { default } from "./HopeAIWorkspace";');
   });
 

@@ -9,16 +9,16 @@ import {
   parseStaticRoutes,
   summarizeCapabilityAudit,
 } from "./lib/route-catalog.mjs";
+import { readRouteRegistrySource } from "./lib/route-registry-source.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const appPath = path.join(root, "client/src/App.tsx");
-const appSource = await readFile(appPath, "utf8");
-const imports = parseComponentImports(appSource);
-const staticRoutes = parseStaticRoutes(appSource);
+const registrySource = await readRouteRegistrySource(root);
+const imports = parseComponentImports(registrySource);
+const staticRoutes = parseStaticRoutes(registrySource);
 
 async function resolveSource(moduleReference) {
   if (!moduleReference) return null;
-  const relativeModule = moduleReference.replace(/^\.\//, "");
+  const relativeModule = moduleReference.replace(/^@\//, "").replace(/^\.\//, "");
   const base = path.join(root, "client/src", relativeModule);
   const candidates = [
     base,
