@@ -32,10 +32,12 @@ async function createMockHost(options?: {
   email?: string;
   accessKey?: string;
   sessionValue?: string;
+  releaseSha?: string;
 }) {
   const email = options?.email ?? "tester@example.test";
   const accessKey = options?.accessKey ?? "K".repeat(64);
   const sessionValue = options?.sessionValue ?? "mock-session-jwt-value";
+  const releaseSha = options?.releaseSha ?? "a".repeat(40);
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
@@ -64,6 +66,8 @@ async function createMockHost(options?: {
         authConfigured: true,
         identityVerification: false,
         liveFinancialOrChainExecution: false,
+        releaseSource: "railway",
+        releaseSha,
       });
       return;
     }
@@ -152,6 +156,7 @@ async function createMockHost(options?: {
     email,
     accessKey,
     sessionValue,
+    releaseSha,
   };
 }
 
@@ -165,7 +170,7 @@ afterEach(async () => {
 });
 
 describe("hosted beta smoke verifier", () => {
-  it("verifies public readiness without requiring credentials", async () => {
+  it("verifies public readiness and the expected deployed release", async () => {
     const host = await createMockHost();
     const script = path.resolve("scripts/hosted-beta-smoke.mjs");
 
@@ -175,6 +180,7 @@ describe("hosted beta smoke verifier", () => {
         ...process.env,
         HOSTED_BETA_ORIGIN: host.origin,
         HOSTED_BETA_SMOKE_ALLOW_HTTP: "true",
+        HOSTED_BETA_EXPECTED_SHA: host.releaseSha,
         BETA_SMOKE_EMAIL: "",
         BETA_ACCESS_KEY: "",
       },
@@ -182,8 +188,43 @@ describe("hosted beta smoke verifier", () => {
 
     expect(stderr).toBe("");
     expect(stdout).toMatch(/PASS public beta contract/);
+    expect(stdout).toMatch(/PASS hosted release identity/);
     expect(stdout).toMatch(/SKIP credentialed session/);
     expect(stdout).toMatch(/Hosted beta smoke verification passed/);
+  });
+
+  it("fails closed when a healthy host is serving a stale release", async () => {
+    const host = await createMockHost({ releaseSha: "a".repeat(40) });
+    const script = path.resolve("scripts/hosted-beta-smoke.mjs");
+    let failure: unknown;
+
+    try {
+      await execFileAsync(process.execPath, [script], {
+        cwd: process.cwd(),
+        env: {
+          ...process.env,
+          HOSTED_BETA_ORIGIN: host.origin,
+          HOSTED_BETA_SMOKE_ALLOW_HTTP: "true",
+          HOSTED_BETA_EXPECTED_SHA: "b".repeat(40),
+          BETA_SMOKE_EMAIL: "",
+          BETA_ACCESS_KEY: "",
+        },
+      });
+    } catch (error) {
+      failure = error;
+    }
+
+    expect(failure).toBeTruthy();
+    const stderr =
+      typeof failure === "object" &&
+      failure !== null &&
+      "stderr" in failure &&
+      typeof (failure as { stderr?: unknown }).stderr === "string"
+        ? (failure as { stderr: string }).stderr
+        : "";
+    expect(stderr).toContain("Hosted beta release identity mismatch");
+    expect(stderr).toContain("a".repeat(40));
+    expect(stderr).toContain("b".repeat(40));
   });
 
   it("verifies a credentialed session without leaking credentials or tokens", async () => {
@@ -200,6 +241,7 @@ describe("hosted beta smoke verifier", () => {
         ...process.env,
         HOSTED_BETA_ORIGIN: host.origin,
         HOSTED_BETA_SMOKE_ALLOW_HTTP: "true",
+        HOSTED_BETA_EXPECTED_SHA: host.releaseSha,
         BETA_SMOKE_EMAIL: host.email,
         BETA_ACCESS_KEY: host.accessKey,
       },

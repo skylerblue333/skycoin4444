@@ -1,6 +1,7 @@
 import process from "node:process";
 
 const REQUEST_TIMEOUT_MS = 10_000;
+const FULL_GIT_SHA_PATTERN = /^[0-9a-f]{40}$/i;
 
 function resolveOrigin() {
   const raw = (
@@ -33,6 +34,21 @@ function resolveOrigin() {
   return url.origin;
 }
 
+function resolveExpectedReleaseSha() {
+  const raw = (process.env.HOSTED_BETA_EXPECTED_SHA ?? "").trim();
+  if (!raw) {
+    return null;
+  }
+
+  if (!FULL_GIT_SHA_PATTERN.test(raw)) {
+    throw new Error(
+      "HOSTED_BETA_EXPECTED_SHA must be a full 40-character Git commit SHA"
+    );
+  }
+
+  return raw.toLowerCase();
+}
+
 function timeoutSignal() {
   return AbortSignal.timeout(REQUEST_TIMEOUT_MS);
 }
@@ -41,6 +57,10 @@ async function request(origin, path, init = {}) {
   return fetch(origin + path, {
     redirect: "manual",
     ...init,
+    headers: {
+      "cache-control": "no-cache",
+      ...(init.headers ?? {}),
+    },
     signal: timeoutSignal(),
   });
 }
@@ -68,16 +88,34 @@ async function requireJson(origin, path, label) {
   return { response, json: await response.json() };
 }
 
-function requirePublicContracts(readiness, auth, runtimeReady, health) {
+function requirePublicContracts(
+  readiness,
+  auth,
+  runtimeReady,
+  health,
+  expectedReleaseSha
+) {
   if (
     readiness.status !== "ready" ||
     readiness.database !== "ok" ||
     readiness.configuration !== "ok" ||
     readiness.authConfigured !== true ||
     readiness.identityVerification !== false ||
-    readiness.liveFinancialOrChainExecution !== false
+    readiness.liveFinancialOrChainExecution !== false ||
+    readiness.releaseSource !== "railway" ||
+    typeof readiness.releaseSha !== "string" ||
+    !FULL_GIT_SHA_PATTERN.test(readiness.releaseSha)
   ) {
     throw new Error("Beta readiness contract is not satisfied");
+  }
+
+  if (expectedReleaseSha) {
+    const actualReleaseSha = readiness.releaseSha.toLowerCase();
+    if (actualReleaseSha !== expectedReleaseSha) {
+      throw new Error(
+        `Hosted beta release identity mismatch: expected ${expectedReleaseSha}, received ${actualReleaseSha}`
+      );
+    }
   }
 
   if (
@@ -245,6 +283,7 @@ async function verifyCredentialedAccess(origin, auth) {
 
 async function main() {
   const origin = resolveOrigin();
+  const expectedReleaseSha = resolveExpectedReleaseSha();
 
   await requireOk(origin, "/", "home");
   await requireOk(origin, "/signin", "sign in");
@@ -281,11 +320,17 @@ async function main() {
     readiness.json,
     auth.json,
     runtimeReady.json,
-    health.json
+    health.json,
+    expectedReleaseSha
   );
   console.log(
     "PASS public beta contract: readiness, auth, database, and safety boundaries verified"
   );
+  if (expectedReleaseSha) {
+    console.log(
+      `PASS hosted release identity: deployed release matches ${expectedReleaseSha}`
+    );
+  }
 
   await verifyCredentialedAccess(origin, auth.json);
 
