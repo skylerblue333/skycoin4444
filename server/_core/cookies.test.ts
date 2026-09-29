@@ -43,14 +43,23 @@ describe("session cookie transport", () => {
     expect(options.domain).toBeUndefined();
   });
 
-  it("allows HTTP localhost-style development while honoring forwarded HTTPS", () => {
+  it("uses Lax for local HTTP and None only when the cookie is Secure", () => {
     process.env.NODE_ENV = "development";
 
-    expect(getSessionCookieOptions(request("http")).secure).toBe(false);
+    expect(getSessionCookieOptions(request("http"))).toMatchObject({
+      secure: false,
+      sameSite: "lax",
+    });
     expect(
-      getSessionCookieOptions(request("http", "http, https")).secure
-    ).toBe(true);
-    expect(getSessionCookieOptions(request("https")).secure).toBe(true);
+      getSessionCookieOptions(request("http", "http, https"))
+    ).toMatchObject({
+      secure: true,
+      sameSite: "none",
+    });
+    expect(getSessionCookieOptions(request("https"))).toMatchObject({
+      secure: true,
+      sameSite: "none",
+    });
   });
 });
 
