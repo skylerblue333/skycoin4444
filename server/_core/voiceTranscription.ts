@@ -26,6 +26,7 @@
  * ```
  */
 import { ENV } from "./env";
+import { downloadAllowedAudio, RemoteAudioFetchError } from "./remoteAudio";
 
 export type TranscribeOptions = {
   audioUrl: string; // URL to the audio file (e.g., S3 URL)
@@ -90,36 +91,29 @@ export async function transcribeAudio(
       };
     }
 
-    // Step 2: Download audio from URL
+    // Step 2: Download audio through the fail-closed remote-source boundary.
+    // The boundary requires an explicit HTTPS host allowlist, refuses redirects,
+    // validates audio content types, and enforces the size limit while streaming.
     let audioBuffer: Buffer;
     let mimeType: string;
     try {
-      const response = await fetch(options.audioUrl);
-      if (!response.ok) {
-        return {
-          error: "Failed to download audio file",
-          code: "INVALID_FORMAT",
-          details: `HTTP ${response.status}: ${response.statusText}`
-        };
-      }
-      
-      audioBuffer = Buffer.from(await response.arrayBuffer());
-      mimeType = response.headers.get('content-type') || 'audio/mpeg';
-      
-      // Check file size (16MB limit)
-      const sizeMB = audioBuffer.length / (1024 * 1024);
-      if (sizeMB > 16) {
-        return {
-          error: "Audio file exceeds maximum size limit",
-          code: "FILE_TOO_LARGE",
-          details: `File size is ${sizeMB.toFixed(2)}MB, maximum allowed is 16MB`
-        };
-      }
+      const downloaded = await downloadAllowedAudio(options.audioUrl);
+      audioBuffer = downloaded.buffer;
+      mimeType = downloaded.mimeType;
     } catch (error) {
+      if (error instanceof RemoteAudioFetchError) {
+        return {
+          error: error.publicMessage,
+          code: error.code,
+          details:
+            error.message === error.publicMessage ? undefined : error.message,
+        };
+      }
+
       return {
         error: "Failed to fetch audio file",
         code: "SERVICE_ERROR",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: "Remote audio download failed",
       };
     }
 
