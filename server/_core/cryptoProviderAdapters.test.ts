@@ -4,6 +4,7 @@ import {
   evaluateMainnetWalletPolicy,
   fetchZeroExQuote,
   probeStratumPool,
+  providerUnavailableBoundary,
   reconcileMiningPayouts,
   reconcileTransaction,
   signDigestWithMpcGateway,
@@ -15,6 +16,24 @@ afterEach(() => {
 });
 
 describe("crypto real provider adapters", () => {
+  it("keeps raw provider failures out of client-facing 503 payloads", () => {
+    const failure = providerUnavailableBoundary(
+      new Error(
+        "upstream https://user:super-secret@provider.example.test failed ?api_key=very-secret Bearer abc.def.ghi",
+      ),
+    );
+
+    expect(failure.body).toEqual({
+      error: "provider unavailable",
+      code: "provider_unavailable",
+    });
+    expect(JSON.stringify(failure.body)).not.toContain("super-secret");
+    expect(JSON.stringify(failure.body)).not.toContain("very-secret");
+    expect(failure.logMessage).toContain("[redacted]");
+    expect(failure.logMessage).not.toContain("super-secret");
+    expect(failure.logMessage).not.toContain("very-secret");
+  });
+
   it("reports providers fail-closed when credentials are absent", () => {
     const status = cryptoProviderConfigSnapshot({});
     expect(status.stratum.configured).toBe(false);
