@@ -23,7 +23,7 @@ export interface ImpactMissionInput {
   title: string;
   cause: string;
   objective: string;
-  beneficiaryId?: string;
+  beneficiaryId?: string | null;
   areas: readonly ImpactMissionArea[];
 }
 
@@ -207,8 +207,8 @@ function boundedText(value: unknown, field: string, max = MAX_TEXT): string {
   return normalized;
 }
 
-function optionalId(value: string | undefined, field: string): string | null {
-  if (value === undefined || value.trim() === "") return null;
+function optionalId(value: string | null | undefined, field: string): string | null {
+  if (value === undefined || value === null || value.trim() === "") return null;
   const normalized = value.trim();
   if (!ID.test(normalized)) throw new TypeError(`${field} is invalid`);
   return normalized;
