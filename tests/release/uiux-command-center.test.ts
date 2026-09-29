@@ -41,7 +41,9 @@ describe("unified command-center UI/UX", () => {
     expect(source).toContain('label: "Gaming"');
     expect(source).toContain('label: "HopeAI"');
     expect(source).toContain('label: "Live"');
-    expect(source).toContain('aria-label="Mobile home"');
+    expect(source).toContain("mobilePriorityLinks.map");
+    expect(source).toContain('aria-current={active ? "page" : undefined}');
+    expect(source).toContain("primaryLinks.map");
     expect(source).toContain("Search all SKYCOIN4444 routes");
     expect(source).toContain("Send beta feedback");
   });
