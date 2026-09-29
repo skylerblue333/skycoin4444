@@ -2,6 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { performance } from "node:perf_hooks";
+import {
+  resolveExpectedReleaseSha,
+  validateHostedLoadReleaseIdentity,
+  validateHostedLoadReleaseSamples,
+} from "./lib/hosted-load-release.mjs";
 
 const DEFAULT_ORIGIN =
   "https://skycoin4444-beta-v5-production.up.railway.app";
@@ -108,7 +113,7 @@ async function requestJson(origin, route) {
   }
 }
 
-function validatePreflight(results) {
+function validatePreflight(results, expectedReleaseSha) {
   const byRoute = new Map(results.map(result => [result.route, result]));
   for (const route of ROUTES) {
     const result = byRoute.get(route);
@@ -127,9 +132,7 @@ function validatePreflight(results) {
     readiness?.status !== "ready" ||
     readiness?.database !== "ok" ||
     readiness?.configuration !== "ok" ||
-    readiness?.releaseSource !== "railway" ||
-    typeof readiness?.releaseSha !== "string" ||
-    readiness.releaseSha.length < 7
+    readiness?.releaseSource !== "railway"
   ) {
     throw new Error("Hosted readiness release/database/configuration contract failed");
   }
@@ -140,8 +143,13 @@ function validatePreflight(results) {
     throw new Error("Hosted auth contract failed");
   }
 
+  const releaseIdentity = validateHostedLoadReleaseIdentity(
+    readiness.releaseSha,
+    expectedReleaseSha,
+  );
+
   return {
-    releaseSha: readiness.releaseSha,
+    ...releaseIdentity,
     releaseSource: readiness.releaseSource,
     authMode: auth.mode,
   };
@@ -149,6 +157,9 @@ function validatePreflight(results) {
 
 async function main() {
   const origin = resolveOrigin();
+  const expectedReleaseSha = resolveExpectedReleaseSha(
+    process.env.HOSTED_LOAD_EXPECTED_SHA,
+  );
   const totalRequests = boundedInteger(
     "LOAD_TOTAL_REQUESTS",
     180,
@@ -164,7 +175,9 @@ async function main() {
   const preflight = await Promise.all(
     ROUTES.map(route => requestJson(origin, route)),
   );
-  const release = validatePreflight(preflight);
+  const release = validatePreflight(preflight, expectedReleaseSha);
+  const pinnedReleaseSha = release.releaseSha;
+  const readinessReleaseSamples = [pinnedReleaseSha];
 
   for (let index = 0; index < warmupRequests; index += 1) {
     const result = await requestJson(origin, ROUTES[index % ROUTES.length]);
@@ -173,7 +186,15 @@ async function main() {
         `Warmup failed for ${result.route}: status=${String(result.status)} error=${result.error ?? "invalid JSON"}`,
       );
     }
+    if (result.route === "/api/beta/readiness") {
+      readinessReleaseSamples.push(result.json?.releaseSha);
+    }
   }
+
+  validateHostedLoadReleaseSamples(
+    readinessReleaseSamples,
+    pinnedReleaseSha,
+  );
 
   const results = new Array(totalRequests);
   let cursor = 0;
@@ -195,6 +216,30 @@ async function main() {
   );
 
   const durationMs = performance.now() - started;
+
+  for (const result of results) {
+    if (result.route === "/api/beta/readiness") {
+      readinessReleaseSamples.push(result.json?.releaseSha);
+    }
+  }
+  validateHostedLoadReleaseSamples(
+    readinessReleaseSamples,
+    pinnedReleaseSha,
+  );
+
+  const postflight = await Promise.all(
+    ROUTES.map(route => requestJson(origin, route)),
+  );
+  const postflightRelease = validatePreflight(
+    postflight,
+    pinnedReleaseSha,
+  );
+  readinessReleaseSamples.push(postflightRelease.releaseSha);
+  const runReleaseIdentity = validateHostedLoadReleaseSamples(
+    readinessReleaseSamples,
+    pinnedReleaseSha,
+  );
+
   const latencies = results
     .map(result => result.latencyMs)
     .sort((left, right) => left - right);
@@ -240,7 +285,12 @@ async function main() {
     contract: "skycoin4444.hosted-load-baseline.v1",
     measuredAt: new Date().toISOString(),
     origin,
-    release,
+    release: {
+      ...release,
+      runReleaseConsistencyVerified: true,
+      releaseIdentitySamples: runReleaseIdentity.sampleCount,
+      postflightReleaseSha: postflightRelease.releaseSha,
+    },
     requestPlan: {
       routes: ROUTES,
       totalRequests,
@@ -269,6 +319,7 @@ async function main() {
     },
     limitations: [
       "read-only public health/readiness/auth endpoints only",
+      "manual workflow runs are exact-release-bound; pull-request checks are deployment-agnostic because PR heads are not deployed",
       "single short bounded run, not sustained capacity certification",
       "does not exercise authenticated writes, payment, custody, blockchain, or external provider execution",
       "does not prove autoscaling, multi-region failover, or dependency outage recovery",

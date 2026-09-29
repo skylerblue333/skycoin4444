@@ -15,10 +15,12 @@ The preflight requires:
 - HTTP 200 JSON from all three routes;
 - readiness status `ready`;
 - database and configuration status `ok`;
-- Railway-sourced release identity with a non-empty release SHA;
+- Railway-sourced release identity with a full 40-character release SHA;
 - invitation auth configured.
 
-The measured run records total duration, requests/second, error rate, p50/p95/p99 latency, HTTP status counts, per-route latency, and the deployed release SHA.
+The measured run records total duration, requests/second, error rate, p50/p95/p99 latency, HTTP status counts, per-route latency, the deployed release SHA, and whether exact-release identity was enforced.
+
+Manual `workflow_dispatch` runs bind `HOSTED_LOAD_EXPECTED_SHA` to the workflow revision. A healthy but stale deployment therefore fails before load evidence is accepted. Pull-request runs remain deployment-agnostic because PR heads are not expected to be deployed.
 
 ## Canonical PR baseline
 
@@ -46,8 +48,8 @@ The baseline is intentionally read-only. It does not:
 - invoke external AI/payment/streaming providers;
 - prove autoscaling, multi-region failover, sustained throughput, database recovery, or dependency-outage recovery.
 
-The pull-request job is restricted to branches from this repository so a fork cannot use the workflow to generate traffic against the hosted beta.
+The pull-request job is restricted to branches from this repository so a fork cannot use the workflow to generate traffic against the hosted beta. Pull-request results validate the harness and current hosted service but are not exact-release performance evidence; use a manual run from the intended protected-main release for that claim.
 
 ## Evidence
 
-The workflow writes `artifacts/hosted-load-baseline.json` and retains it for 30 days. Pair that artifact with Railway application/database resource metrics from the same time window when evaluating the launch-resilience gate.
+The workflow writes `artifacts/hosted-load-baseline.json` and retains it for 30 days. For release evidence, require `release.exactReleaseMatchVerified: true` and confirm `release.releaseSha` equals the intended protected-main SHA. Pair that artifact with Railway application/database resource metrics from the same time window when evaluating the launch-resilience gate.
