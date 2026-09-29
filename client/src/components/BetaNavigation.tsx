@@ -40,7 +40,7 @@ const primaryLinks = [
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "School", route: "/course-catalog", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
-  { label: "SkyHope", route: "/charity", icon: HeartHandshake },
+  { label: "HopeAI Impact", route: "/charity", icon: HeartHandshake },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
@@ -194,7 +194,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, SkyHope, Journey, Market, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, Impact, Journey, Market, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
@@ -225,7 +225,7 @@ export default function BetaNavigation() {
         setVoiceMessage(`Opening ${label}.`);
         setLocation(destination);
       } else {
-        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, School, HopeAI, SkyHope, Journey, Wallet, Market, Live, Dating, or Explore.`);
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, School, HopeAI, Impact, Journey, Wallet, Market, Live, Dating, or Explore.`);
       }
     };
     recognition.onerror = () => {
@@ -532,9 +532,9 @@ export default function BetaNavigation() {
           <Gamepad2 className="h-4 w-4" />
           <span className="text-[9px] font-bold">Games</span>
         </Link>
-        <Link href="/unified-messaging" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/unified-messaging") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <MessageCircleMore className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Chat</span>
+        <Link aria-label="Mobile HopeAI" href="/hope-a-i" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/hope-a-i") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
+          <Bot className="h-4 w-4" />
+          <span className="text-[9px] font-bold">HopeAI</span>
         </Link>
         <button type="button" onClick={() => { setMobileOpen(open => !open); setAreaOpen(false); }} className="grid min-h-12 place-items-center rounded-xl text-white/45 transition hover:bg-amber-200/[0.05] hover:text-amber-100">
           <Grid2X2 className="h-4 w-4" />
