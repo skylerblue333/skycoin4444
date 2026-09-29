@@ -1,8 +1,9 @@
-import { createHash, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, scrypt, timingSafeEqual } from "node:crypto";
 
 export type BetaAuthMode = "oauth" | "access_key";
 
 const ACCESS_KEY_MIN_BYTES = 48;
+const ACCESS_KEY_MAX_BYTES = 4_096;
 const SCRYPT_KEY_BYTES = 32;
 const HEX_PATTERN = /^[a-f0-9]+$/i;
 
@@ -57,8 +58,12 @@ export function betaAccessKeyIssue(
       : "BETA_ACCESS_PASSWORD_SCRYPT must contain a valid salt:digest scrypt credential";
   }
   const configured = env.BETA_ACCESS_KEY ?? "";
-  if (Buffer.byteLength(configured, "utf8") < ACCESS_KEY_MIN_BYTES) {
+  const configuredBytes = Buffer.byteLength(configured, "utf8");
+  if (configuredBytes < ACCESS_KEY_MIN_BYTES) {
     return `BETA_ACCESS_KEY must be at least ${ACCESS_KEY_MIN_BYTES} bytes in access_key mode`;
+  }
+  if (configuredBytes > ACCESS_KEY_MAX_BYTES) {
+    return `BETA_ACCESS_KEY must be at most ${ACCESS_KEY_MAX_BYTES} bytes in access_key mode`;
   }
   return null;
 }
@@ -67,21 +72,38 @@ function digest(value: string) {
   return createHash("sha256").update(value, "utf8").digest();
 }
 
-export function verifyBetaAccessKey(
+function deriveScryptKey(
+  value: string,
+  salt: Buffer
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scrypt(value, salt, SCRYPT_KEY_BYTES, (error, derivedKey) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(derivedKey);
+    });
+  });
+}
+
+export async function verifyBetaAccessKey(
   candidate: string,
   env: NodeJS.ProcessEnv = process.env
-): boolean {
+): Promise<boolean> {
   if (betaAuthMode(env) !== "access_key") return false;
   if (betaAccessKeyIssue(env)) return false;
+
+  const candidateBytes = Buffer.byteLength(candidate, "utf8");
+  if (candidateBytes === 0 || candidateBytes > ACCESS_KEY_MAX_BYTES) return false;
 
   const scryptCredential = parseScryptCredential(
     env.BETA_ACCESS_PASSWORD_SCRYPT
   );
   if (scryptCredential) {
-    const candidateDigest = scryptSync(
+    const candidateDigest = await deriveScryptKey(
       candidate,
-      scryptCredential.salt,
-      SCRYPT_KEY_BYTES
+      scryptCredential.salt
     );
     return timingSafeEqual(candidateDigest, scryptCredential.digest);
   }
