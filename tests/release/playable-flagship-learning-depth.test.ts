@@ -23,6 +23,7 @@ describe("playable flagship tables and learning depth", () => {
 
     expect(plinko).toContain("simulatePlinko");
     expect(plinko).toContain("PLINKO_MULTIPLIERS_10");
+    expect(plinko).toMatch(/function reset\(\)[\s\S]*setSeed\(4444\)[\s\S]*setLastSeed\(4444\)/);
     expect(highLow).toContain("nextCardRank");
     expect(highLow).toContain("resolveHighLow");
     expect(roulette).toContain("spinRoulette");
