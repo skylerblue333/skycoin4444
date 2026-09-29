@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import SkyHopeImpactRail from "@/components/SkyHopeImpactRail";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DemoBoundary, GamingBackdrop, StatusBadge } from "@/features/gaming/components/ArcadeSurface";
 
@@ -259,6 +260,8 @@ export default function Gaming() {
             ))}
           </div>
         </section>
+
+        <SkyHopeImpactRail context="gaming" />
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] px-5 py-4 text-xs leading-5 text-white/35">
           <strong className="text-white/60">Engineering beta:</strong> No deposits, withdrawals, wallet wagering, custody, or blockchain settlement are live today. Any future deposit, withdrawal, real-money wager, custody, token settlement, or redeemable crypto reward is restricted to the charity-only finance path and requires verified beneficiaries plus approved external providers. Credits, chips, multipliers, and payouts on the flagship floor remain browser-local demo game state with no cash or token value.
