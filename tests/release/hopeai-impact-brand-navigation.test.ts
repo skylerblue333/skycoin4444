@@ -29,6 +29,15 @@ describe("HopeAI Impact public-brand and flagship navigation contract", () => {
     expect(navigation).toContain('href: "/course-catalog"');
   });
 
+  it("keeps HopeAI, Impact, and School one tap away on the persistent mobile bar", () => {
+    expect(navigation).toContain("const mobilePriorityLinks = [");
+    expect(navigation).toContain('{ label: "HopeAI", route: "/hope-a-i", icon: Bot }');
+    expect(navigation).toContain('{ label: "Impact", route: "/charity", icon: HeartHandshake }');
+    expect(navigation).toContain('{ label: "School", route: "/course-catalog", icon: GraduationCap }');
+    expect(navigation).toContain('aria-current={active ? "page" : undefined}');
+    expect(navigation).toContain('aria-expanded={mobileOpen}');
+  });
+
   it("keeps voice navigation aligned with the public Impact label", () => {
     expect(navigation).toContain("HopeAI, Impact, Journey");
     expect(navigation).not.toContain("HopeAI, SkyHope, Journey");
