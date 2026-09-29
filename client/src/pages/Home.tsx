@@ -74,6 +74,13 @@ const flagshipAreas = [
     status: "Controlled lab",
   },
   {
+    title: "SkyHope",
+    subtitle: "Pledges, volunteering, impact",
+    href: "/charity",
+    icon: Heart,
+    status: "Persisted impact beta",
+  },
+  {
     title: "Market",
     subtitle: "Commerce rehearsal",
     href: "/beta-commerce",
@@ -125,7 +132,7 @@ const missions = [
   { id: "social", label: "Post or reply once", href: "/activity-feed", icon: Users },
   { id: "learn", label: "Complete one lesson", href: "/course-catalog", icon: GraduationCap },
   { id: "play", label: "Play one flagship game", href: "/gaming", icon: Gamepad2 },
-  { id: "explore", label: "Open one new product area", href: "/platform-map", icon: Compass },
+  { id: "impact", label: "Record one SkyHope action", href: "/charity", icon: Heart },
 ] as const;
 
 function localDateKey(date: Date) {
@@ -225,9 +232,9 @@ export default function Home() {
                     Play flagship games
                   </Button>
                 </Link>
-                <Link href="/platform-map">
+                <Link href="/beta-journey">
                   <Button size="lg" variant="ghost" className="text-white/68">
-                    Explore {routeCatalog.routes.length.toLocaleString()} routes
+                    Continue connected journey
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
@@ -236,7 +243,7 @@ export default function Home() {
               <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   [routeCatalog.routes.length.toLocaleString(), "indexed routes"],
-                  ["10", "headline areas"],
+                  ["11", "headline areas"],
                   ["6", "flagship games"],
                   ["1", "unified shell"],
                 ].map(([value, label]) => (
@@ -382,7 +389,7 @@ export default function Home() {
             </div>
             <h2 className="mt-3 text-3xl font-black tracking-tight">A four-step loop, not a wall of features.</h2>
             <p className="mt-4 max-w-xl text-sm leading-7 text-white/43">
-              Use this as a simple tester routine. Completion is stored on this device only; it is not a user-activity or engagement metric.
+              Use this as a simple device-local routine. For persisted account evidence across Social, SkySchool, Gaming, and SkyHope, open the connected journey.
             </p>
 
             <div className="mt-6 flex items-end gap-4">
@@ -397,6 +404,11 @@ export default function Home() {
               <Link href={nextMission.href}>
                 <Button>
                   Continue run <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/beta-journey">
+                <Button variant="outline" className="text-white">
+                  Persisted journey <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
               <Button variant="outline" className="text-white" onClick={() => setShowReset(value => !value)}>
