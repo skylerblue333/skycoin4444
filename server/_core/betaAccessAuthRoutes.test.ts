@@ -55,6 +55,50 @@ afterEach(() => {
 });
 
 describe("beta access login route rate limit", () => {
+
+  it("does not reset the shared-key throttle when a client rotates email addresses", async () => {
+    vi.stubEnv("VITE_BETA_AUTH_MODE", "access_key");
+    vi.stubEnv("BETA_ACCESS_KEY", "A".repeat(48));
+    vi.stubEnv("BETA_ACCESS_MODE", "invite_only");
+    vi.stubEnv("BETA_ALLOWED_EMAILS", "invited@example.com");
+    vi.stubEnv("BETA_ACCESS_RATE_LIMIT_WINDOW_MS", "10000");
+    vi.stubEnv("BETA_ACCESS_RATE_LIMIT_MAX_ATTEMPTS", "3");
+    vi.stubEnv("BETA_ACCESS_RATE_LIMIT_MAX_KEYS", "128");
+    vi.stubEnv("BETA_TRUSTED_CLIENT_IP_HEADER", "");
+
+    const app = createFakeApp();
+    registerBetaAccessAuthRoutes(app as never);
+    const handler = app.routes["POST /api/beta/access-login"];
+
+    const requestFor = (email: string, accessKey = "B".repeat(48)) => ({
+      body: { email, accessKey },
+      get() {
+        return undefined;
+      },
+      socket: { remoteAddress: "192.0.2.56" },
+      protocol: "https",
+      headers: {},
+    });
+
+    for (const email of [
+      "one@example.com",
+      "two@example.com",
+      "three@example.com",
+    ]) {
+      const { body, response } = createResponse();
+      await handler(requestFor(email), response);
+      expect(body.statusCode).toBe(403);
+    }
+
+    const { body, response } = createResponse();
+    await handler(requestFor("invited@example.com", "A".repeat(48)), response);
+
+    expect(body.statusCode).toBe(429);
+    expect(body.payload).toMatchObject({
+      error: "too many beta sign-in attempts",
+    });
+  });
+
   it("returns a generic 429 after the configured attempt threshold", async () => {
     vi.stubEnv("VITE_BETA_AUTH_MODE", "access_key");
     vi.stubEnv("BETA_ACCESS_KEY", "A".repeat(48));
