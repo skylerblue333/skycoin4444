@@ -44,6 +44,22 @@ export default function UnifiedMessaging() {
     toast.success("Draft cleared");
   }
 
+  function openHopeAI() {
+    if (!canCopy) {
+      navigate("/hope-a-i");
+      return;
+    }
+
+    if (!prepareMessagingHopeAILaunch(trimmedDraft)) {
+      toast.error(
+        "This browser could not prepare the private HopeAI handoff. Copy the draft instead."
+      );
+      return;
+    }
+
+    navigate("/hope-a-i?source=messaging");
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950/60 to-slate-950 px-4 py-10 text-white">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -72,13 +88,14 @@ export default function UnifiedMessaging() {
               <Users className="h-4 w-4" />
               Open Social
             </Link>
-            <Link
-              href="/hope-a-i"
+            <button
+              type="button"
+              onClick={openHopeAI}
               className="inline-flex items-center gap-2 rounded-xl border border-violet-300/20 bg-violet-300/[0.08] px-4 py-2 text-sm font-bold text-violet-100 transition hover:bg-violet-300/[0.14]"
             >
               <Bot className="h-4 w-4" />
-              Draft with HopeAI
-            </Link>
+              {canCopy ? "Polish with HopeAI" : "Draft with HopeAI"}
+            </button>
           </div>
         </header>
 
