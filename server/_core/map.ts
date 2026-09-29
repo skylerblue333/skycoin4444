@@ -1,97 +1,206 @@
 /**
- * Google Maps API Integration for Manus WebDev Templates
- * 
- * Main function: makeRequest<T>(endpoint, params) - Makes authenticated requests to Google Maps APIs
- * All credentials are automatically injected. Array parameters use | as separator.
- * 
- * See API examples below the type definitions for usage patterns.
+ * Google Maps API integration through the configured Forge proxy.
+ *
+ * Provider requests are treated as an external trust boundary: endpoints and
+ * parameters are validated, requests are time-bounded, and upstream response
+ * bodies are never reflected through application errors.
  */
 
 import { ENV } from "./env";
 
-// ============================================================================
-// Configuration
-// ============================================================================
+const MAPS_REQUEST_TIMEOUT_MS = 15_000;
 
 type MapsConfig = {
   baseUrl: string;
   apiKey: string;
 };
 
-function getMapsConfig(): MapsConfig {
-  const baseUrl = ENV.forgeApiUrl;
-  const apiKey = ENV.forgeApiKey;
+function isLoopbackHost(hostname: string) {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1"
+  );
+}
 
-  if (!baseUrl || !apiKey) {
+function getMapsConfig(): MapsConfig {
+  const rawBaseUrl = ENV.forgeApiUrl.trim();
+  const apiKey = ENV.forgeApiKey.trim();
+
+  if (!rawBaseUrl || !apiKey) {
     throw new Error(
-      "Google Maps proxy credentials missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY"
+      "Google Maps proxy credentials missing: set BUILT_IN_FORGE_API_URL and BUILT_IN_FORGE_API_KEY",
     );
   }
 
+  let baseUrl: URL;
+  try {
+    baseUrl = new URL(rawBaseUrl);
+  } catch {
+    throw new Error("BUILT_IN_FORGE_API_URL is invalid");
+  }
+
+  const allowLoopbackHttp =
+    process.env.NODE_ENV !== "production" &&
+    baseUrl.protocol === "http:" &&
+    isLoopbackHost(baseUrl.hostname);
+
+  if (baseUrl.protocol !== "https:" && !allowLoopbackHttp) {
+    throw new Error("BUILT_IN_FORGE_API_URL must use HTTPS");
+  }
+
+  if (baseUrl.username || baseUrl.password) {
+    throw new Error("BUILT_IN_FORGE_API_URL must not contain credentials");
+  }
+
+  baseUrl.pathname = baseUrl.pathname.replace(/\/+$/, "") + "/";
+  baseUrl.search = "";
+  baseUrl.hash = "";
+
   return {
-    baseUrl: baseUrl.replace(/\/+$/, ""),
+    baseUrl: baseUrl.toString(),
     apiKey,
   };
 }
-
-// ============================================================================
-// Core Request Handler
-// ============================================================================
 
 interface RequestOptions {
   method?: "GET" | "POST";
   body?: Record<string, unknown>;
 }
 
+function normalizeEndpoint(endpoint: string) {
+  if (
+    typeof endpoint !== "string" ||
+    endpoint.length === 0 ||
+    endpoint !== endpoint.trim() ||
+    !endpoint.startsWith("/") ||
+    endpoint.startsWith("//") ||
+    endpoint.includes("\\") ||
+    endpoint.includes("?") ||
+    endpoint.includes("#") ||
+    /[\u0000-\u001f\u007f]/.test(endpoint) ||
+    endpoint.split("/").includes("..")
+  ) {
+    throw new Error(
+      "Google Maps endpoint must be a normalized absolute proxy path without query or fragment",
+    );
+  }
+
+  return endpoint;
+}
+
+function serializeScalarParam(value: unknown, key: string): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "boolean" || typeof value === "bigint") {
+    return String(value);
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new Error(`Google Maps parameter "${key}" must be finite`);
+    }
+    return String(value);
+  }
+
+  throw new Error(
+    `Google Maps parameter "${key}" must be a string, number, boolean, bigint, or array of those values`,
+  );
+}
+
+function serializeParam(value: unknown, key: string) {
+  if (Array.isArray(value)) {
+    return value.map(item => serializeScalarParam(item, key)).join("|");
+  }
+  return serializeScalarParam(value, key);
+}
+
+async function readJsonWithTimeout<T>(
+  url: string,
+  init: RequestInit,
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    MAPS_REQUEST_TIMEOUT_MS,
+  );
+
+  try {
+    const response = await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      try {
+        await response.body?.cancel();
+      } catch {
+        // Best-effort cleanup only.
+      }
+      throw new Error(
+        `Google Maps API request failed (HTTP ${response.status})`,
+      );
+    }
+
+    try {
+      return (await response.json()) as T;
+    } catch {
+      if (controller.signal.aborted) {
+        throw new Error(
+          `Google Maps API request timed out after ${MAPS_REQUEST_TIMEOUT_MS}ms`,
+        );
+      }
+      throw new Error("Google Maps API returned invalid JSON");
+    }
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(
+        `Google Maps API request timed out after ${MAPS_REQUEST_TIMEOUT_MS}ms`,
+      );
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
- * Make authenticated requests to Google Maps APIs
- * 
- * @param endpoint - The API endpoint (e.g., "/maps/api/geocode/json")
- * @param params - Query parameters for the request
- * @param options - Additional request options
- * @returns The API response
+ * Make an authenticated request to the configured Maps proxy.
+ *
+ * Array query parameters are serialized with `|`, matching Google Maps
+ * multi-value query contracts such as origins, destinations, and waypoints.
  */
 export async function makeRequest<T = unknown>(
   endpoint: string,
   params: Record<string, unknown> = {},
-  options: RequestOptions = {}
+  options: RequestOptions = {},
 ): Promise<T> {
   const { baseUrl, apiKey } = getMapsConfig();
+  const safeEndpoint = normalizeEndpoint(endpoint);
+  const method = options.method ?? "GET";
 
-  // Construct full URL: baseUrl + /v1/maps/proxy + endpoint
-  const url = new URL(`${baseUrl}/v1/maps/proxy${endpoint}`);
+  if (method === "GET" && options.body !== undefined) {
+    throw new Error("Google Maps GET requests cannot include a request body");
+  }
 
-  // Add API key as query parameter (standard Google Maps API authentication)
-  url.searchParams.append("key", apiKey);
+  const url = new URL(
+    `v1/maps/proxy${safeEndpoint}`,
+    baseUrl,
+  );
+  url.searchParams.set("key", apiKey);
 
-  // Add other query parameters
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url.searchParams.append(key, String(value));
-    }
-  });
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === null) continue;
+    url.searchParams.append(key, serializeParam(value, key));
+  }
 
-  const response = await fetch(url.toString(), {
-    method: options.method || "GET",
+  return readJsonWithTimeout<T>(url.toString(), {
+    method,
     headers: {
-      "Content-Type": "application/json",
+      accept: "application/json",
+      ...(options.body ? { "content-type": "application/json" } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(
-      `Google Maps API request failed (${response.status} ${response.statusText}): ${errorText}`
-    );
-  }
-
-  return (await response.json()) as T;
 }
-
-// ============================================================================
-// Type Definitions
-// ============================================================================
 
 export type TravelMode = "driving" | "walking" | "bicycling" | "transit";
 export type MapType = "roadmap" | "satellite" | "terrain" | "hybrid";
@@ -231,89 +340,18 @@ export type RoadsResult = {
   }>;
 };
 
-// ============================================================================
-// Google Maps API Reference
-// ============================================================================
-
 /**
- * GEOCODING - Convert between addresses and coordinates
- * Endpoint: /maps/api/geocode/json
- * Input: { address: string } OR { latlng: string }  // latlng: "37.42,-122.08"
- * Output: GeocodingResult  // results[0].geometry.location, results[0].formatted_address
+ * Common endpoint reference:
+ * - /maps/api/geocode/json
+ * - /maps/api/directions/json
+ * - /maps/api/distancematrix/json
+ * - /maps/api/place/textsearch/json
+ * - /maps/api/place/nearbysearch/json
+ * - /maps/api/place/details/json
+ * - /maps/api/elevation/json
+ * - /maps/api/timezone/json
+ * - /v1/snapToRoads
+ * - /v1/nearestRoads
+ * - /v1/speedLimits
+ * - /maps/api/place/autocomplete/json
  */
-
-/**
- * DIRECTIONS - Get navigation routes between locations
- * Endpoint: /maps/api/directions/json
- * Input: { origin: string, destination: string, mode?: TravelMode, waypoints?: string, alternatives?: boolean }
- * Output: DirectionsResult  // routes[0].legs[0].distance, duration, steps
- */
-
-/**
- * DISTANCE MATRIX - Calculate travel times/distances for multiple origin-destination pairs
- * Endpoint: /maps/api/distancematrix/json
- * Input: { origins: string, destinations: string, mode?: TravelMode, units?: "metric"|"imperial" }  // origins: "NYC|Boston"
- * Output: DistanceMatrixResult  // rows[0].elements[1] = first origin to second destination
- */
-
-/**
- * PLACE SEARCH - Find businesses/POIs by text query
- * Endpoint: /maps/api/place/textsearch/json
- * Input: { query: string, location?: string, radius?: number, type?: string }  // location: "40.7,-74.0"
- * Output: PlacesSearchResult  // results[].name, rating, geometry.location, place_id
- */
-
-/**
- * NEARBY SEARCH - Find places near a specific location
- * Endpoint: /maps/api/place/nearbysearch/json
- * Input: { location: string, radius: number, type?: string, keyword?: string }  // location: "40.7,-74.0"
- * Output: PlacesSearchResult
- */
-
-/**
- * PLACE DETAILS - Get comprehensive information about a specific place
- * Endpoint: /maps/api/place/details/json
- * Input: { place_id: string, fields?: string }  // fields: "name,rating,opening_hours,website"
- * Output: PlaceDetailsResult  // result.name, rating, opening_hours, etc.
- */
-
-/**
- * ELEVATION - Get altitude data for geographic points
- * Endpoint: /maps/api/elevation/json
- * Input: { locations?: string, path?: string, samples?: number }  // locations: "39.73,-104.98|36.45,-116.86"
- * Output: ElevationResult  // results[].elevation (meters)
- */
-
-/**
- * TIME ZONE - Get timezone information for a location
- * Endpoint: /maps/api/timezone/json
- * Input: { location: string, timestamp: number }  // timestamp: Math.floor(Date.now()/1000)
- * Output: TimeZoneResult  // timeZoneId, timeZoneName
- */
-
-/**
- * ROADS - Snap GPS traces to roads, find nearest roads, get speed limits
- * - /v1/snapToRoads: Input: { path: string, interpolate?: boolean }  // path: "lat,lng|lat,lng"
- * - /v1/nearestRoads: Input: { points: string }  // points: "lat,lng|lat,lng"
- * - /v1/speedLimits: Input: { path: string, units?: SpeedUnit }
- * Output: RoadsResult
- */
-
-/**
- * PLACE AUTOCOMPLETE - Real-time place suggestions as user types
- * Endpoint: /maps/api/place/autocomplete/json
- * Input: { input: string, location?: string, radius?: number }
- * Output: { predictions: Array<{ description: string, place_id: string }> }
- */
-
-/**
- * STATIC MAPS - Generate map images as URLs (for emails, reports, <img> tags)
- * Endpoint: /maps/api/staticmap
- * Input: URL params - center: string, zoom: number, size: string, markers?: string, maptype?: MapType
- * Output: Image URL (not JSON) - use directly in <img src={url} />
- * Note: Construct URL manually with getMapsConfig() for auth
- */
-
-
-
-
