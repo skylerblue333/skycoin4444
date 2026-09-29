@@ -4,6 +4,10 @@
 
 HopeAI includes Impact organizer-planning and contribution-intent surfaces. These surfaces are engineering-beta planning tools. They do not execute donations, move money, verify beneficiaries, verify nonprofit status, issue tax receipts, provide custody, or settle transactions.
 
+## Branding compatibility
+
+HopeAI is the only public Hope-branded product. The legacy `SkyHope` file name, storage key, type names, and `source=skyhope` handoff marker remain temporarily as internal compatibility identifiers so existing drafts and links are not broken. They must not be presented as a separate product in user-facing navigation or copy.
+
 ## Private HopeAI handoff
 
 User-authored HopeAI Impact planning details must not be embedded directly in HopeAI route query parameters.
