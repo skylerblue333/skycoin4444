@@ -100,11 +100,19 @@ Those external logging systems require separate configuration and evidence.
 The canonical V5 beta is additionally observed through two provider/external layers:
 
 - Railway exposes deployment logs, HTTP request signals, and CPU/memory/network resource metrics for the hosted service; the managed MySQL service exposes CPU/memory/disk/network resource metrics.
-- `.github/workflows/hosted-beta-health-monitor.yml` performs an independent public smoke every 15 minutes from GitHub Actions. It checks the home/sign-in surfaces plus beta health, beta readiness, runtime readiness, authentication configuration, database/configuration state, and the explicit no-live-financial-or-chain-execution safety boundary.
+- `.github/workflows/hosted-beta-health-monitor.yml` performs an independent public smoke every 15 minutes from GitHub Actions. It checks the home/sign-in surfaces plus beta health, beta readiness, runtime readiness, authentication configuration, database/configuration state, the explicit no-live-financial-or-chain-execution safety boundary, and the deployed release SHA.
 
-A failing scheduled health workflow is an engineering alert signal through GitHub Actions. It is intentionally credential-free and therefore does not exercise authenticated user persistence.
+Scheduled and manually dispatched monitor runs reconcile one repository-native incident signal:
 
-This monitor complements, but does not replace, the bounded hosted load baseline in `scripts/hosted-load-baseline.mjs`.
+- the first non-success result opens one issue titled `[ops] Hosted beta health monitor incident`;
+- later failed runs reuse that open incident instead of creating duplicates;
+- the first later successful run comments with the recovery SHA/run and closes the incident;
+- pull-request checks never receive `issues: write` and never mutate incident state;
+- the incident body contains source/run metadata only, not invitation credentials, session tokens, provider secrets, or request bodies.
+
+The workflow keeps default `contents: read` permission. Only the scheduled/manual incident job receives scoped `issues: write` permission.
+
+This monitor is intentionally credential-free and therefore does not exercise authenticated user persistence. It complements, but does not replace, the bounded hosted load baseline in `scripts/hosted-load-baseline.mjs`.
 
 ## Verification
 
@@ -116,7 +124,11 @@ Focused tests cover:
 - request-signal metadata shape;
 - URI/password/token/Bearer/JWT redaction;
 - whitespace flattening and output bounds;
-- existing fatal/startup redaction compatibility.
+- existing fatal/startup redaction compatibility;
+- hosted incident creation on first failure;
+- duplicate suppression while an incident is open;
+- recovery comment and automatic incident closure;
+- monitor token non-disclosure in incident test output/body.
 
 Hosted verification additionally requires the scheduled smoke workflow to execute successfully against the canonical V5 origin.
 
@@ -131,9 +143,9 @@ This work does not establish:
 - tamper-proof logging;
 - distributed trace propagation;
 - OpenTelemetry export;
-- paging/on-call escalation or a formal SLO alert policy;
+- pager/phone/SMS/on-call escalation or a formal SLO alert policy;
 - complete secret detection;
 - external proxy/header trust configuration;
 - production security certification.
 
-The scheduled GitHub Actions monitor is a basic external availability/configuration signal, not an uptime SLA, incident-management platform, or production observability certification.
+The scheduled GitHub Actions monitor plus deduplicated GitHub incident issue is a basic repository-native external availability/configuration signal. It is not an uptime SLA, an independent incident-management provider, or production observability certification.
