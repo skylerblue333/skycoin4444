@@ -46,6 +46,22 @@ jobs:
           format: table
           exit-code: '1'
 
+      - name: Smoke exact-revision production image
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="skycoin4444:${{ github.sha }}"
+          docker run --rm --entrypoint node "$image" --check dist/index.js
+          docker run --rm --entrypoint node "$image" --input-type=module -e '
+            import { accessSync, constants } from "node:fs";
+            if (typeof process.getuid === "function" && process.getuid() === 0) {
+              throw new Error("production runtime must not execute as root");
+            }
+            accessSync("dist/public/index.html", constants.R_OK);
+            await import("express");
+            await import("@trpc/server/adapters/express");
+          '
+
       - name: Generate CycloneDX SBOM from production image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -70,7 +86,8 @@ jobs:
             image: `skycoin4444:${process.env.GITHUB_SHA}`,
             environment: 'ci-release-validation',
             buildTimestampUtc: new Date().toISOString(),
-            sbomFormat: 'CycloneDX JSON'
+            sbomFormat: 'CycloneDX JSON',
+            runtimeImageSmoke: true
           };
           fs.writeFileSync('release-evidence.json', `${JSON.stringify(evidence, null, 2)}\n`);
           NODE
