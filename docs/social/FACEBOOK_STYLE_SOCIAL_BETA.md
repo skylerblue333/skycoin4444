@@ -48,3 +48,12 @@ This is an engineering-beta UI and interaction upgrade. It does not claim:
 ## Regression gate
 
 tests/release/facebook-style-social-home.test.ts locks the canonical data-backed contracts, familiar information architecture, routed social discovery, and no-fake-engagement boundary.
+
+## Review hardening
+
+The final branch also closes the product-review edge cases found during review:
+
+- Saved is a device-local filter on the currently loaded persisted feed and no longer routes users to an unrelated unimplemented server bookmark destination.
+- Recent highlights are derived from the active filtered post list, so selecting a highlight always targets a rendered post.
+- Anonymous create actions route to sign-in instead of opening an invisible authenticated-only composer.
+- The ambiguous three-dot "Post options" control no longer toggles saved state; Save remains an explicit action.
