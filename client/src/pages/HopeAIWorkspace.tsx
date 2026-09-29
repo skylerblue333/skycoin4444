@@ -43,6 +43,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  MAX_HOPEAI_LAUNCH_DRAFT_CHARS,
+  consumeMessagingHopeAILaunch,
+} from "@/lib/hopeAILaunchContext";
 
 const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 
