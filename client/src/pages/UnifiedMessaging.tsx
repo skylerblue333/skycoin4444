@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Bot, CheckCircle2, Copy, MessageCircle, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -7,11 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { prepareMessagingHopeAILaunch } from "@/lib/hopeAILaunchContext";
 
 const MAX_DRAFT_LENGTH = 4_000;
 
 export default function UnifiedMessaging() {
   const { isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
   const [draft, setDraft] = useState("");
 
   const trimmedDraft = draft.trim();
@@ -44,6 +46,22 @@ export default function UnifiedMessaging() {
     toast.success("Draft cleared");
   }
 
+  function openHopeAI() {
+    if (!canCopy) {
+      navigate("/hope-a-i");
+      return;
+    }
+
+    if (!prepareMessagingHopeAILaunch(trimmedDraft)) {
+      toast.error(
+        "This browser could not prepare the private HopeAI handoff. Copy the draft instead."
+      );
+      return;
+    }
+
+    navigate("/hope-a-i?source=messaging");
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950/60 to-slate-950 px-4 py-10 text-white">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -72,13 +90,14 @@ export default function UnifiedMessaging() {
               <Users className="h-4 w-4" />
               Open Social
             </Link>
-            <Link
-              href="/hope-a-i"
+            <button
+              type="button"
+              onClick={openHopeAI}
               className="inline-flex items-center gap-2 rounded-xl border border-violet-300/20 bg-violet-300/[0.08] px-4 py-2 text-sm font-bold text-violet-100 transition hover:bg-violet-300/[0.14]"
             >
               <Bot className="h-4 w-4" />
-              Draft with HopeAI
-            </Link>
+              {canCopy ? "Polish with HopeAI" : "Draft with HopeAI"}
+            </button>
           </div>
         </header>
 

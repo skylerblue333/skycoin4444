@@ -43,6 +43,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  MAX_HOPEAI_LAUNCH_DRAFT_CHARS,
+  consumeMessagingHopeAILaunch,
+} from "@/lib/hopeAILaunchContext";
 
 const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 
@@ -106,9 +110,13 @@ const starterPrompts = [
 const readLaunchPrompt = (): string => {
   if (typeof window === "undefined") return "";
   try {
-    return (new URLSearchParams(window.location.search).get("prompt") ?? "")
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("source") === "messaging") {
+      return consumeMessagingHopeAILaunch();
+    }
+    return (params.get("prompt") ?? "")
       .trim()
-      .slice(0, 4_000);
+      .slice(0, MAX_HOPEAI_LAUNCH_DRAFT_CHARS);
   } catch {
     return "";
   }
