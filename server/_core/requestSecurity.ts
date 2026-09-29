@@ -3,6 +3,7 @@ import { parseCookieHeader } from "./cookieParser";
 import { getSessionCookieName } from "./cookies";
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+const ORIGIN_REQUIRED_MUTATION_PATHS = new Set(["/api/beta/access-login"]);
 
 export type RequestSecurityDecision = Readonly<
   | { allowed: true; reason: "not_ambient_cookie_mutation" | "same_origin" | "development_no_origin" }
@@ -23,6 +24,7 @@ export type RequestSecurityInput = Readonly<{
   originHeader?: string;
   secFetchSite?: string;
   requestOrigin?: string;
+  requiresOriginValidation?: boolean;
 }>;
 
 function hasSessionCookie(
@@ -53,9 +55,12 @@ export function evaluateCookieMutationOrigin(
   env: NodeJS.ProcessEnv = process.env
 ): RequestSecurityDecision {
   const method = input.method.toUpperCase();
+  const ambientCookieMutation = hasSessionCookie(input.cookieHeader, env);
+  const explicitOriginBoundary = input.requiresOriginValidation === true;
+
   if (
     !UNSAFE_METHODS.has(method) ||
-    !hasSessionCookie(input.cookieHeader, env)
+    (!ambientCookieMutation && !explicitOriginBoundary)
   ) {
     return Object.freeze({
       allowed: true as const,
@@ -137,6 +142,14 @@ function requestOrigin(req: Parameters<RequestHandler>[0]): string | undefined {
   return `${req.protocol}://${host}`;
 }
 
+function requestRequiresOriginValidation(
+  req: Parameters<RequestHandler>[0]
+): boolean {
+  const path =
+    req.path.length > 1 ? req.path.replace(/\/+$/, "") : req.path;
+  return ORIGIN_REQUIRED_MUTATION_PATHS.has(path);
+}
+
 export function createCookieMutationOriginGuard(
   env: NodeJS.ProcessEnv = process.env
 ): RequestHandler {
@@ -148,6 +161,10 @@ export function createCookieMutationOriginGuard(
         originHeader: req.get("origin"),
         secFetchSite: req.get("sec-fetch-site"),
         requestOrigin: requestOrigin(req),
+        // Login is credential-issuing: it must be same-origin even before a
+        // session cookie exists, otherwise a cross-site form can create an
+        // ambient authenticated session in the victim browser.
+        requiresOriginValidation: requestRequiresOriginValidation(req),
       },
       env
     );
