@@ -17,7 +17,7 @@ describe("ecosystem navigation and visual foundation", () => {
     for (const route of [
       "/beta-workspace",
       "/activity-feed",
-      "/sky-school",
+      "/course-catalog",
       "/gaming",
       "/live",
       "/beta-commerce",
