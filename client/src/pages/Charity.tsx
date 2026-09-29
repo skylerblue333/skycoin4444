@@ -1,471 +1,452 @@
-import { useState } from "react";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { getLoginUrl } from "@/const";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "wouter";
 import {
-  Heart, HandHeart, Globe, Users, TrendingUp, Sparkles, Vote,
-  Trophy, BarChart3, Target, Coins, Shield, Loader2, ThumbsUp,
-  ThumbsDown, Award, Flame, Clock, CheckCircle2, ArrowUpRight
+  ArrowRight,
+  Bot,
+  CheckCircle2,
+  Clock,
+  Compass,
+  Gamepad2,
+  GraduationCap,
+  HandHeart,
+  Heart,
+  Save,
+  ShieldCheck,
+  Sparkles,
+  Target,
+  Trash2,
+  Users,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  IMPACT_TRACKS,
+  buildImpactPlan,
+  createImpactJournalEntry,
+  parseImpactJournal,
+  type ImpactJournalEntry,
+  type ImpactTrackId,
+} from "@/lib/hopeImpact";
 
-// DAO Proposals for charity fund allocation
-const DAO_PROPOSALS = [
+const JOURNAL_KEY = "sky4444.hope-impact-journal.v1";
+
+const destinations = [
   {
-    id: "prop-1",
-    title: "Allocate 50,000 SKY444 to Clean Water Initiative",
-    description: "Fund the deployment of water purification systems in 3 rural communities in East Africa. Partnership with WaterAid verified.",
-    category: "Environment",
-    requestedAmount: 50000,
-    votesFor: 847,
-    votesAgainst: 123,
-    status: "active" as const,
-    endsIn: "3 days",
-    proposer: "SkylerDev",
+    label: "Plan with HopeAI",
+    detail: "Turn a service idea into questions, checklists, and next actions.",
+    href: "/hope-a-i",
+    icon: Bot,
   },
   {
-    id: "prop-2",
-    title: "Fund 100 STEM Scholarships for Underserved Youth",
-    description: "Provide full scholarships for coding bootcamps and university CS programs. Partnered with Code.org and local universities.",
-    category: "Education",
-    requestedAmount: 120000,
-    votesFor: 1203,
-    votesAgainst: 89,
-    status: "active" as const,
-    endsIn: "5 days",
-    proposer: "CryptoKing",
+    label: "Learn with SkySchool",
+    detail: "Build the knowledge needed before helping in a new domain.",
+    href: "/sky-school",
+    icon: GraduationCap,
   },
   {
-    id: "prop-3",
-    title: "Emergency Relief: Disaster Recovery Fund",
-    description: "Rapid-response fund for natural disaster relief. Funds distributed within 24 hours of verified events via smart contract.",
-    category: "Humanitarian",
-    requestedAmount: 200000,
-    votesFor: 2341,
-    votesAgainst: 156,
-    status: "passed" as const,
-    endsIn: "Ended",
-    proposer: "NFTQueen",
+    label: "Practice in Gaming",
+    detail: "Use no-value skill games as practice, never as a donation substitute.",
+    href: "/gaming",
+    icon: Gamepad2,
   },
-];
-
-// Top donors leaderboard
-const LEADERBOARD = [
-  { rank: 1, name: "SkylerDev", donated: 125000, campaigns: 12, badge: "Diamond Donor" },
-  { rank: 2, name: "CryptoKing", donated: 89000, campaigns: 8, badge: "Platinum Donor" },
-  { rank: 3, name: "AITrader", donated: 67000, campaigns: 15, badge: "Gold Donor" },
-  { rank: 4, name: "NFTQueen", donated: 45000, campaigns: 6, badge: "Gold Donor" },
-  { rank: 5, name: "DeFiPro", donated: 34000, campaigns: 9, badge: "Silver Donor" },
-  { rank: 6, name: "GameDev", donated: 28000, campaigns: 4, badge: "Silver Donor" },
-  { rank: 7, name: "BlockchainBob", donated: 22000, campaigns: 7, badge: "Bronze Donor" },
-  { rank: 8, name: "CyberAlice", donated: 18000, campaigns: 5, badge: "Bronze Donor" },
-];
-
-
-
-function DonateDialog({ campaign, onSuccess }: { campaign: any; onSuccess: () => void }) {
-  const [amount, setAmount] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const donate = trpc.charity.donate.useMutation({
-    onSuccess: () => {
-      toast.success(`Thank you! ${amount} SKY444 donated to "${campaign.title}"`);
-      setAmount("");
-      setOpen(false);
-      onSuccess();
-    },
-    onError: () => toast.error("Failed to process donation. Please try again."),
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-xs font-semibold">
-          <Heart className="w-3 h-3 mr-1" /> Donate
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border/50">
-        <DialogHeader>
-          <DialogTitle className="text-lg">Donate to Campaign</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-3">
-          <div className="p-3 rounded-lg bg-background/50 border border-border/30">
-            <h4 className="font-semibold text-sm">{campaign.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1">{campaign.description}</p>
-          </div>
-          <div>
-            <label className="text-sm text-muted-foreground mb-1.5 block">Donation Amount (SKY444)</label>
-            <Input
-              type="number"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-background/50 border-border/30 font-mono"
-            />
-            <div className="flex gap-2 mt-2">
-              {[10, 50, 100, 500].map(v => (
-                <button
-                  key={v}
-                  onClick={() => setAmount(String(v))}
-                  className="px-3 py-1 rounded-md border border-border/30 bg-background/50 text-xs font-mono hover:border-primary/50 transition-all"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-3 rounded-lg bg-purple-600/5 border border-purple-500/20">
-            <div className="flex items-center gap-2 text-xs text-purple-400">
-              <Shield className="w-3.5 h-3.5" />
-              <span>100% of donations go directly to the cause. On-chain verified.</span>
-            </div>
-          </div>
-          <Button
-            className="w-full bg-primary hover:bg-primary/90 font-semibold"
-            disabled={!amount || parseFloat(amount) <= 0 || donate.isPending}
-            onClick={() => donate.mutate({ campaignId: campaign.id, amount: parseFloat(amount) })}
-          >
-            {donate.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Heart className="w-4 h-4 mr-2" />}
-            Confirm Donation
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function ProposalCard({ proposal }: { proposal: typeof DAO_PROPOSALS[0] }) {
-  const { isAuthenticated } = useAuth();
-  const totalVotes = proposal.votesFor + proposal.votesAgainst;
-  const forPercent = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
-
-  return (
-    <div className={`p-5 rounded-xl border ${proposal.status === "passed" ? "border-purple-500/30 bg-purple-600/5" : "border-border/50 bg-card/80"} backdrop-blur`}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">{proposal.category}</Badge>
-          <Badge className={`text-[10px] ${proposal.status === "passed" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-            {proposal.status === "passed" ? <><CheckCircle2 className="w-2.5 h-2.5 mr-0.5" /> Passed</> : <><Clock className="w-2.5 h-2.5 mr-0.5" /> {proposal.endsIn}</>}
-          </Badge>
-        </div>
-        <span className="text-xs text-muted-foreground">by {proposal.proposer}</span>
-      </div>
-
-      <h3 className="font-semibold mb-2">{proposal.title}</h3>
-      <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{proposal.description}</p>
-
-      <div className="flex items-center justify-between text-xs mb-2">
-        <span className="text-purple-400 font-mono">{proposal.votesFor} For</span>
-        <span className="text-red-400 font-mono">{proposal.votesAgainst} Against</span>
-      </div>
-      <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30 mb-3">
-        <div className="h-full bg-purple-600 rounded-full" style={{ width: `${forPercent}%` }} />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono text-muted-foreground">
-          <Coins className="w-3 h-3 inline mr-1" />{(proposal.requestedAmount ?? 0).toLocaleString()} SKY444
-        </span>
-        {proposal.status === "active" && (
-          isAuthenticated ? (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="text-xs h-7 text-purple-400 border-purple-500/30 hover:bg-purple-600/10">
-                <ThumbsUp className="w-3 h-3 mr-1" /> For
-              </Button>
-              <Button size="sm" variant="outline" className="text-xs h-7 text-red-400 border-red-500/30 hover:bg-red-500/10">
-                <ThumbsDown className="w-3 h-3 mr-1" /> Against
-              </Button>
-            </div>
-          ) : (
-            <a href={getLoginUrl()}>
-              <Button size="sm" variant="outline" className="text-xs h-7">Sign In to Vote</Button>
-            </a>
-          )
-        )}
-      </div>
-    </div>
-  );
-}
+  {
+    label: "Share with Social",
+    detail: "Share a real completion update without inventing impact or reach.",
+    href: "/activity-feed",
+    icon: Users,
+  },
+] as const;
 
 export default function Charity() {
-  const { isAuthenticated } = useAuth();
-  const { data: campaigns, isLoading, refetch } = trpc.charity.campaigns.useQuery({});
-  const { data: charityStats } = trpc.charity.stats.useQuery();
-  const { data: donorLeaderboard } = trpc.charity.leaderboard.useQuery();
-  const impactMetrics = [
-    { label: "Active Campaigns", value: String(charityStats?.activeCampaigns ?? "—"), icon: Target, color: "text-primary" },
-    { label: "Total Campaigns", value: String(charityStats?.totalCampaigns ?? "—"), icon: HandHeart, color: "text-purple-400" },
-    { label: "SKY444 Raised", value: charityStats ? String(Math.round(charityStats.totalRaised)) : "—", icon: Coins, color: "text-[oklch(0.7_0.2_60)]" },
-    { label: "Donors", value: String(charityStats?.totalDonors ?? "—"), icon: Users, color: "text-green-400" },
-  ];
+  const [trackId, setTrackId] = useState<ImpactTrackId>("shelter-care");
+  const [availableMinutes, setAvailableMinutes] = useState(90);
+  const [teamSize, setTeamSize] = useState(1);
+  const [journal, setJournal] = useState<ImpactJournalEntry[]>([]);
+  const [storageReady, setStorageReady] = useState(false);
+
+  const plan = useMemo(
+    () =>
+      buildImpactPlan({
+        trackId,
+        availableMinutes,
+        teamSize,
+      }),
+    [availableMinutes, teamSize, trackId]
+  );
+
+  useEffect(() => {
+    try {
+      setJournal(parseImpactJournal(window.localStorage.getItem(JOURNAL_KEY)));
+    } catch {
+      setJournal([]);
+    } finally {
+      setStorageReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    try {
+      window.localStorage.setItem(JOURNAL_KEY, JSON.stringify(journal.slice(0, 50)));
+    } catch {
+      // Storage is best-effort. The planner still works without persistence.
+    }
+  }, [journal, storageReady]);
+
+  const savePlan = () => {
+    const entry = createImpactJournalEntry(plan);
+    setJournal(current => [entry, ...current].slice(0, 50));
+  };
+
+  const toggleCompleted = (id: string) => {
+    setJournal(current =>
+      current.map(entry =>
+        entry.id === id ? { ...entry, completed: !entry.completed } : entry
+      )
+    );
+  };
+
+  const removeEntry = (id: string) => {
+    setJournal(current => current.filter(entry => entry.id !== id));
+  };
 
   return (
-    <div className="min-h-screen">
-      {/* ═══ CINEMATIC CHARITY HERO ═══ */}
-      <section className="hero-cinematic border-b border-slate-800/60" style={{ minHeight: 320 }}>
-        <div className="glow-orb glow-orb-pink w-96 h-96 -top-20 right-0 animate-hero-float" />
-        <div className="glow-orb w-64 h-64 bottom-0 left-10 animate-hero-float" style={{ background: 'oklch(0.55 0.24 15 / 0.18)', animationDelay: '2s' }} />
-        <div className="container mx-auto px-4 relative z-10 py-16">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-500/30 bg-red-500/10 mb-6">
-              <Heart className="h-3.5 w-3.5 text-red-400 animate-pulse" />
-              <span className="text-xs font-bold text-red-400 tracking-wide">TRANSPARENT GIVING — ON-CHAIN</span>
+    <main className="min-h-screen overflow-hidden bg-[#060807] text-white">
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute left-[-12rem] top-20 h-[32rem] w-[32rem] rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute right-[-10rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-amber-400/10 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
+        <section className="grid gap-8 rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 lg:grid-cols-[1.15fr_.85fr] lg:p-10">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-emerald-500/15 text-emerald-100">SKYHOPE</Badge>
+              <Badge variant="outline" className="border-white/10 text-white/50">
+                Impact planning beta
+              </Badge>
+              <Badge variant="outline" className="border-amber-300/20 text-amber-100/70">
+                No payment execution
+              </Badge>
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-4 leading-tight text-rainbow">
-              <span className="text-white">Charity</span>{' '}
-              <span className="text-gradient">Hub</span>
+
+            <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.045em] sm:text-6xl">
+              Turn good intentions into
+              <span className="block bg-gradient-to-r from-emerald-200 via-white to-amber-100 bg-clip-text text-transparent">
+                a plan you can actually verify.
+              </span>
             </h1>
-            <p className="text-lg leading-relaxed max-w-xl desc-metallic">
-              Support causes, vote on fund allocation via DAO governance, and track real-world impact — all on-chain and fully transparent.
+
+            <p className="mt-5 max-w-3xl text-base leading-7 text-white/55 sm:text-lg">
+              SkyHope is now a working service-planning and device-local evidence
+              lab. It helps you scope volunteer work, prepare safely, and record
+              what you personally completed without pretending SKYCOIN4444 moved
+              money, verified a charity, created official volunteer hours, or
+              measured real-world impact.
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button onClick={savePlan} size="lg" className="bg-emerald-300 text-black hover:bg-emerald-200">
+                <Save className="mr-2 h-4 w-4" />
+                Save this service plan
+              </Button>
+              <Link href="/hope-a-i">
+                <Button size="lg" variant="outline" className="border-white/15 bg-white/[0.03] text-white">
+                  <Bot className="mr-2 h-4 w-4" />
+                  Continue in HopeAI
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <Card className="border-emerald-300/15 bg-black/25 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <ShieldCheck className="h-5 w-5 text-emerald-200" />
+                Truth boundary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-white/55">
+              <p>
+                The planner creates an engineering-beta service plan only. It does
+                not send donations, move tokens, verify nonprofits, execute smart
+                contracts, certify volunteer hours, or prove that a planned task
+                was completed.
+              </p>
+              <p>
+                Financial contribution flows stay disabled here until a real
+                provider, compliance boundary, receipts, failure handling, and
+                reconciliation path are implemented and independently verified.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {destinations.map(({ label, detail, href, icon: Icon }) => (
+            <Link key={label} href={href}>
+              <Card className="h-full border-white/10 bg-white/[0.03] text-white transition hover:-translate-y-1 hover:border-emerald-200/20">
+                <CardContent className="p-5">
+                  <Icon className="h-6 w-6 text-emerald-200" />
+                  <p className="mt-4 font-black">{label}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/45">{detail}</p>
+                  <div className="mt-4 flex items-center gap-2 text-xs font-bold text-emerald-100/80">
+                    Open area <ArrowRight className="h-3.5 w-3.5" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[.82fr_1.18fr]">
+          <Card className="border-white/10 bg-[#0a0d0b]/95 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-amber-200" />
+                Service planner
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                  Impact track
+                </label>
+                <select
+                  value={trackId}
+                  onChange={event => setTrackId(event.target.value as ImpactTrackId)}
+                  className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-black/30 px-3 text-sm text-white outline-none focus:border-emerald-300/40"
+                >
+                  {IMPACT_TRACKS.map(track => (
+                    <option key={track.id} value={track.id}>
+                      {track.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs leading-5 text-white/38">
+                  {plan.track.description}
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                    Minutes available
+                  </label>
+                  <Input
+                    type="number"
+                    min={15}
+                    max={480}
+                    value={availableMinutes}
+                    onChange={event => setAvailableMinutes(Number(event.target.value))}
+                    className="mt-2 border-white/10 bg-black/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-[0.14em] text-white/40">
+                    Team size
+                  </label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={teamSize}
+                    onChange={event => setTeamSize(Number(event.target.value))}
+                    className="mt-2 border-white/10 bg-black/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <Clock className="h-4 w-4 text-emerald-200" />
+                  <p className="mt-3 text-2xl font-black">{plan.availableMinutes}</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-white/30">minutes</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <Users className="h-4 w-4 text-emerald-200" />
+                  <p className="mt-3 text-2xl font-black">{plan.teamSize}</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-white/30">people</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                  <Sparkles className="h-4 w-4 text-amber-200" />
+                  <p className="mt-3 text-2xl font-black">{plan.plannedUnits}</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-white/30">
+                    planned {plan.track.unitLabel}
+                  </p>
+                </div>
+              </div>
+
+              <p className="rounded-xl border border-white/10 bg-black/20 p-3 font-mono text-xs text-white/40">
+                Plan receipt: {plan.receiptId}
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="space-y-4">
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <HandHeart className="h-5 w-5 text-emerald-200" />
+                  Action sequence
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {plan.steps.map((step, index) => (
+                  <div key={step} className="flex gap-3 rounded-2xl border border-white/10 bg-black/15 p-4">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-300/10 text-xs font-black text-emerald-100">
+                      {index + 1}
+                    </span>
+                    <p className="text-sm leading-6 text-white/55">{step}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="border-white/10 bg-white/[0.03] text-white">
+                <CardHeader>
+                  <CardTitle className="text-base">Role plan</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {plan.rolePlan.map(role => (
+                    <p key={role} className="text-sm leading-6 text-white/48">
+                      • {role}
+                    </p>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="border-white/10 bg-white/[0.03] text-white">
+                <CardHeader>
+                  <CardTitle className="text-base">Evidence checklist</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {plan.evidenceChecklist.map(item => (
+                    <p key={item} className="text-sm leading-6 text-white/48">
+                      • {item}
+                    </p>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-100/45">
+                Device-local journal
+              </p>
+              <h2 className="mt-1 text-3xl font-black">Plans you chose to keep</h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-white/40">
+              These entries stay in this browser. Marking one complete records your
+              own statement only; it is not independent verification.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-            {impactMetrics.map((metric, i) => (
-              <div key={metric.label} className="card-epic p-5 text-center animate-slide-up" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-white/5">
-                  <metric.icon className={`w-5 h-5 ${metric.color}`} />
-                </div>
-                <div className={`text-3xl font-black stat-number ${metric.color} mb-1`}>{metric.value}</div>
-                <div className="text-xs text-slate-500">{metric.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Main Content */}
-      <section className="pb-24">
-        <div className="container mx-auto px-4">
-          <Tabs defaultValue="campaigns" className="w-full">
-            <TabsList className="w-full max-w-lg bg-card/80 border border-border/50">
-              <TabsTrigger value="campaigns" className="flex-1">
-                <HandHeart className="w-4 h-4 mr-1.5" /> Campaigns
-              </TabsTrigger>
-              <TabsTrigger value="dao" className="flex-1">
-                <Vote className="w-4 h-4 mr-1.5" /> DAO Voting
-              </TabsTrigger>
-              <TabsTrigger value="leaderboard" className="flex-1">
-                <Trophy className="w-4 h-4 mr-1.5" /> Leaderboard
-              </TabsTrigger>
-              <TabsTrigger value="impact" className="flex-1">
-                <BarChart3 className="w-4 h-4 mr-1.5" /> Impact
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Campaigns Tab */}
-            <TabsContent value="campaigns" className="mt-6">
-              {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="p-5 rounded-xl border border-border/50 animate-pulse">
-                      <div className="h-4 bg-muted/20 rounded w-1/3 mb-3" />
-                      <div className="h-5 bg-muted/20 rounded w-2/3 mb-2" />
-                      <div className="h-3 bg-muted/20 rounded w-full mb-4" />
-                      <div className="h-2 bg-muted/20 rounded w-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : campaigns && campaigns.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {campaigns.map((c: any) => {
-                    const progress = c.goalAmount > 0 ? (Number(c.raisedAmount) / Number(c.goalAmount)) * 100 : 0;
-                    return (
-                      <div key={c.id} className="p-5 rounded-xl border border-border/50 bg-card/80 hover:border-primary/30 transition-all">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-[10px]">{c.category}</Badge>
-                          <Badge className={`text-[10px] ${c.status === "active" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-muted/20 text-muted-foreground"}`}>
-                            {c.status}
+          {journal.length === 0 ? (
+            <Card className="border-dashed border-white/10 bg-white/[0.02] text-white">
+              <CardContent className="flex min-h-40 flex-col items-center justify-center p-6 text-center">
+                <Heart className="h-7 w-7 text-emerald-200/70" />
+                <p className="mt-3 font-semibold">No saved service plans yet.</p>
+                <p className="mt-1 text-sm text-white/40">
+                  Build a plan above and save it when the scope looks realistic.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-3">
+              {journal.map(entry => (
+                <Card key={entry.id} className="border-white/10 bg-white/[0.03] text-white">
+                  <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="border-white/10 text-white/55">
+                          {entry.trackName}
+                        </Badge>
+                        {entry.completed ? (
+                          <Badge className="bg-emerald-500/15 text-emerald-100">
+                            Personal completion mark
                           </Badge>
-                        </div>
-                        <h3 className="font-semibold mb-2">{c.title}</h3>
-                        <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{c.description}</p>
-                        <div className="mb-2">
-                          {/* Progress bar with milestone markers */}
-                          <div className="relative h-3 bg-background/50 rounded-full overflow-visible border border-border/30 mb-1">
-                            <div className="h-full bg-gradient-to-r from-primary to-[oklch(0.72_0.28_160)] rounded-full transition-all" style={{ width: `${Math.min(100, progress)}%` }} />
-                            {/* Milestone markers at 25%, 50%, 75% */}
-                            {[25, 50, 75].map(pct => (
-                              <div key={pct} className="absolute top-0 bottom-0 w-0.5 flex flex-col items-center" style={{ left: `${pct}%` }}>
-                                <div className={`w-2 h-2 rounded-full border-2 mt-0.5 transition-all ${progress >= pct ? "bg-[oklch(0.80_0.18_70)] border-[oklch(0.80_0.18_70)]" : "bg-background border-border/50"}`} />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex justify-between text-[9px] text-muted-foreground/50 px-1">
-                            <span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between text-xs mb-4">
-                          <span className="font-mono text-primary">{Number(c.raisedAmount).toLocaleString()} SKY444 raised</span>
-                          <span className="text-muted-foreground">{Math.round(progress)}% of goal</span>
-                        </div>
-                        {isAuthenticated ? (
-                          <DonateDialog campaign={c} onSuccess={refetch} />
                         ) : (
-                          <a href={getLoginUrl()} className="block">
-                            <Button size="sm" variant="outline" className="w-full text-xs">Sign In to Donate</Button>
-                          </a>
+                          <Badge variant="outline" className="border-amber-300/15 text-amber-100/60">
+                            Planned
+                          </Badge>
                         )}
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <HandHeart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No Active Campaigns</h3>
-                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                    Charity campaigns will be launched soon. Every donation is tracked on-chain for full transparency.
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-
-            {/* DAO Voting Tab */}
-            <TabsContent value="dao" className="mt-6">
-              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 mb-6 flex items-start gap-3">
-                <Vote className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Charity DAO Governance</h4>
-                  <p className="text-xs text-muted-foreground">SKY444 holders vote on how charity funds are allocated. 1 token = 1 vote. Proposals require 66% approval to pass.</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                {DAO_PROPOSALS.map(proposal => (
-                  <ProposalCard key={proposal.id} proposal={proposal} />
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Leaderboard Tab */}
-            <TabsContent value="leaderboard" className="mt-6">
-              <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 mb-6 flex items-start gap-3">
-                <Trophy className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Donor Leaderboard</h4>
-                  <p className="text-xs text-muted-foreground">Top contributors earn badges, exclusive NFTs, and governance weight multipliers. Donate to climb the ranks!</p>
-                </div>
-              </div>
-              <div className="rounded-xl border border-border/50 bg-card/80 overflow-hidden">
-                <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 border-b border-border/30 text-xs text-muted-foreground font-medium">
-                  <span>Rank</span>
-                  <span>Donor</span>
-                  <span className="text-right">Donated</span>
-                  <span className="text-right">Campaigns</span>
-                  <span className="text-right">Badge</span>
-                </div>
-                {((donorLeaderboard as any[]) || LEADERBOARD).map(donor => (
-                  <div key={donor.rank} className={`grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 items-center border-b border-border/10 last:border-0 ${donor.rank <= 3 ? "bg-yellow-500/5" : ""}`}>
-                    <span className={`font-mono font-bold text-sm ${donor.rank === 1 ? "text-yellow-400" : donor.rank === 2 ? "text-gray-300" : donor.rank === 3 ? "text-orange-400" : "text-muted-foreground"}`}>
-                      #{donor.rank}
-                    </span>
-                    <span className="font-medium text-sm">{donor.name}</span>
-                    <span className="font-mono text-sm text-right text-primary">{(donor.donated ?? 0).toLocaleString()}</span>
-                    <span className="font-mono text-sm text-right text-muted-foreground">{donor.campaigns}</span>
-                    <Badge className={`text-[9px] ${
-                      (donor.badge || "").includes("Diamond") ? "bg-primary/10 text-primary border-primary/30" :
-                      (donor.badge || "").includes("Platinum") ? "bg-gray-200/10 text-gray-300 border-gray-300/30" :
-                      (donor.badge || "").includes("Gold") ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30" :
-                      (donor.badge || "").includes("Silver") ? "bg-gray-400/10 text-gray-400 border-gray-400/30" :
-                      "bg-orange-500/10 text-orange-400 border-orange-500/30"
-                    }`}>
-                      <Award className="w-2.5 h-2.5 mr-0.5" /> {donor.badge}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            {/* Impact Analytics Tab */}
-            <TabsContent value="impact" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Impact by Category */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-primary" /> Impact by Category
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { category: "Education", amount: 320000, percent: 38, color: "bg-primary" },
-                      { category: "Environment", amount: 210000, percent: 25, color: "bg-purple-600" },
-                      { category: "Humanitarian", amount: 180000, percent: 21, color: "bg-red-500" },
-                      { category: "Healthcare", amount: 87000, percent: 10, color: "bg-[oklch(0.7_0.2_280)]" },
-                      { category: "Technology", amount: 50000, percent: 6, color: "bg-[oklch(0.7_0.2_60)]" },
-                    ].map(item => (
-                      <div key={item.category}>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted-foreground">{item.category}</span>
-                          <span className="font-mono">${(item.amount / 1000).toFixed(0)}K ({item.percent}%)</span>
-                        </div>
-                        <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30">
-                          <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percent}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Recent Milestones */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-yellow-400" /> Recent Milestones
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { event: "Clean Water Initiative reached 5,000 beneficiaries", date: "Jun 10, 2026", icon: Globe },
-                      { event: "100th scholarship awarded via STEM program", date: "Jun 8, 2026", icon: Award },
-                      { event: "Emergency fund deployed to flood relief", date: "Jun 5, 2026", icon: Heart },
-                      { event: "$500K total donations milestone reached", date: "Jun 1, 2026", icon: TrendingUp },
-                      { event: "New partnership with UNICEF Innovation", date: "May 28, 2026", icon: HandHeart },
-                    ].map((milestone, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
-                        <milestone.icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-sm">{milestone.event}</p>
-                          <span className="text-[10px] text-muted-foreground">{milestone.date}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Transparency Report */}
-                <div className="p-5 rounded-xl border border-purple-500/20 bg-purple-600/5 md:col-span-2">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-purple-400" /> Transparency Report
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-purple-400">100%</div>
-                      <div className="text-xs text-muted-foreground mt-1">On-Chain Verified</div>
+                      <p className="mt-3 font-semibold">
+                        {entry.availableMinutes} minutes · team {entry.teamSize} · {entry.plannedUnits} planned units
+                      </p>
+                      <p className="mt-1 font-mono text-xs text-white/30">{entry.receiptId}</p>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-primary">0%</div>
-                      <div className="text-xs text-muted-foreground mt-1">Admin Fees</div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toggleCompleted(entry.id)}
+                        className="border-white/10 bg-white/[0.02] text-white"
+                      >
+                        <CheckCircle2 className="mr-2 h-4 w-4" />
+                        {entry.completed ? "Mark planned" : "Mark completed"}
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => removeEntry(entry.id)}
+                        aria-label={"Delete " + entry.trackName + " plan"}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_280)]">24h</div>
-                      <div className="text-xs text-muted-foreground mt-1">Avg Disbursement</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_60)]">47</div>
-                      <div className="text-xs text-muted-foreground mt-1">Verified Partners</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-4 text-center">
-                    All charity fund flows are publicly auditable on-chain. Smart contracts ensure funds reach verified recipients without intermediaries.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
+          <Link href="/platform-map">
+            <Card className="h-full border-white/10 bg-white/[0.03] text-white">
+              <CardContent className="p-5">
+                <Compass className="h-5 w-5 text-emerald-200" />
+                <p className="mt-3 font-black">Explore the ecosystem</p>
+                <p className="mt-2 text-sm leading-6 text-white/40">
+                  Move from SkyHope into the rest of the developed beta paths.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/sky-school">
+            <Card className="h-full border-white/10 bg-white/[0.03] text-white">
+              <CardContent className="p-5">
+                <GraduationCap className="h-5 w-5 text-blue-200" />
+                <p className="mt-3 font-black">Prepare before serving</p>
+                <p className="mt-2 text-sm leading-6 text-white/40">
+                  Use SkySchool for learning and practice before taking on unfamiliar work.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link href="/hope-a-i">
+            <Card className="h-full border-white/10 bg-white/[0.03] text-white">
+              <CardContent className="p-5">
+                <Bot className="h-5 w-5 text-violet-200" />
+                <p className="mt-3 font-black">Ask HopeAI to refine the plan</p>
+                <p className="mt-2 text-sm leading-6 text-white/40">
+                  Use the AI workspace for questions and planning; verify external facts independently.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </section>
+      </div>
+    </main>
   );
 }
