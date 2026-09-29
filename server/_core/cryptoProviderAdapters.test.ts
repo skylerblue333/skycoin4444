@@ -197,17 +197,23 @@ describe("crypto real provider adapters", () => {
     expect(result.privateKeyExposed).toBe(false);
   });
 
-  it("uses an idempotent authenticated MPC signer gateway contract", async () => {
+  it("uses a stable idempotency key for retries of the same MPC signing intent", async () => {
+    const idempotencyKeys: string[] = [];
+    const requestIds: string[] = [];
     const fetchMock = vi.fn(async (_input: URL | RequestInfo, init?: RequestInit) => {
       expect(init?.headers).toMatchObject({
         authorization: "Bearer mpc-token",
         "content-type": "application/json",
       });
+      const headers = init?.headers as Record<string, string>;
+      idempotencyKeys.push(headers["idempotency-key"]);
       const body = JSON.parse(String(init?.body)) as {
+        requestId: string;
         keyId: string;
         digestHex: string;
         algorithm: string;
       };
+      requestIds.push(body.requestId);
       expect(body.keyId).toBe("mpc-key-1");
       expect(body.digestHex).toBe("cd".repeat(32));
       return new Response(JSON.stringify({ signature: "0xsigned" }), {
@@ -217,18 +223,26 @@ describe("crypto real provider adapters", () => {
     });
     vi.stubGlobal("fetch", fetchMock);
 
-    const result = await signDigestWithMpcGateway(
+    const env = {
+      MPC_SIGNER_URL: "https://mpc.example.test/sign",
+      MPC_SIGNER_TOKEN: "mpc-token",
+      MPC_KEY_ID: "mpc-key-1",
+      MPC_SIGNING_ENABLED: "true",
+    };
+    const first = await signDigestWithMpcGateway(
       { digestHex: "cd".repeat(32) },
-      {
-        MPC_SIGNER_URL: "https://mpc.example.test/sign",
-        MPC_SIGNER_TOKEN: "mpc-token",
-        MPC_KEY_ID: "mpc-key-1",
-        MPC_SIGNING_ENABLED: "true",
-      },
+      env,
+    );
+    const retry = await signDigestWithMpcGateway(
+      { digestHex: "cd".repeat(32) },
+      env,
     );
 
-    expect(result.signature).toBe("0xsigned");
-    expect(result.privateKeyExposed).toBe(false);
+    expect(first.signature).toBe("0xsigned");
+    expect(first.privateKeyExposed).toBe(false);
+    expect(retry.requestId).toBe(first.requestId);
+    expect(requestIds).toEqual([first.requestId, first.requestId]);
+    expect(idempotencyKeys).toEqual([first.requestId, first.requestId]);
   });
 
   it("does not attempt a Stratum network connection when no pool is configured", async () => {
