@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ImpactMap() {
-  const campaigns = trpc.charity.campaigns.useQuery({ limit: 100, offset: 0 });
+  const campaigns = trpc.charity.campaigns.useQuery();
 
   return (
     <main className="min-h-screen bg-[#050508] text-white">
