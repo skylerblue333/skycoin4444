@@ -7,7 +7,19 @@ import {
   listCharityCampaigns,
 } from "../features/charityCore";
 
-const campaignQueryInput = z.object({}).optional();
+const campaignQueryInput = z
+  .object({
+    limit: z.number().int().min(1).max(100).default(50),
+    offset: z.number().int().min(0).max(10_000).default(0),
+  })
+  .optional();
+
+const leaderboardQueryInput = z
+  .object({
+    limit: z.number().int().min(1).max(100).default(20),
+  })
+  .optional();
+
 const planInput = z.object({
   campaignId: z.string().trim().min(1).max(120),
   amount: z.number().finite().positive().max(100_000),
@@ -27,11 +39,20 @@ function planOrBadRequest(input: z.infer<typeof planInput>, actorId: string) {
 export const charityRouter = router({
   campaigns: publicProcedure
     .input(campaignQueryInput)
-    .query(() => listCharityCampaigns()),
+    .query(({ input }) => {
+      const campaigns = listCharityCampaigns();
+      const offset = input?.offset ?? 0;
+      const limit = input?.limit ?? 50;
+      return campaigns.slice(offset, offset + limit);
+    }),
 
   stats: publicProcedure.query(() => getCharityStats()),
 
-  leaderboard: publicProcedure.query(() => [] as const),
+  // Compatibility boundary for historical leaderboard callers. This beta does
+  // not have verified donor records, so it returns no fabricated ranking.
+  leaderboard: publicProcedure
+    .input(leaderboardQueryInput)
+    .query(() => [] as const),
 
   prepareContribution: protectedProcedure
     .input(planInput)
