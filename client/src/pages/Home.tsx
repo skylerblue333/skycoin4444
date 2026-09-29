@@ -12,6 +12,7 @@ import {
   Gamepad2,
   GraduationCap,
   Heart,
+  HeartHandshake,
   Languages,
   LayoutDashboard,
   MessageCircleMore,
@@ -32,11 +33,39 @@ import { Button } from "@/components/ui/button";
 
 const flagshipAreas = [
   {
+    title: "HopeAI",
+    subtitle: "Specialist agents, tools, and assistant workspace",
+    href: "/hope-a-i",
+    icon: Bot,
+    status: "Controlled beta",
+  },
+  {
+    title: "SkyHope",
+    subtitle: "Impact missions, pledge intent, and volunteer action",
+    href: "/charity",
+    icon: HeartHandshake,
+    status: "Impact beta",
+  },
+  {
     title: "Social",
     subtitle: "Posts, replies, reactions",
     href: "/activity-feed",
     icon: Users,
     status: "Account-aware beta",
+  },
+  {
+    title: "SkySchool",
+    subtitle: "Lessons, assessments, and practice loops",
+    href: "/sky-school",
+    icon: GraduationCap,
+    status: "Working beta",
+  },
+  {
+    title: "Gaming",
+    subtitle: "Flagship demo-credit games and arcade practice",
+    href: "/gaming",
+    icon: Gamepad2,
+    status: "Playable beta",
   },
   {
     title: "Chat",
@@ -46,32 +75,11 @@ const flagshipAreas = [
     status: "Beta surface",
   },
   {
-    title: "Gaming",
-    subtitle: "Six flagship demo-credit games",
-    href: "/gaming",
-    icon: Gamepad2,
-    status: "Playable beta",
-  },
-  {
-    title: "SkySchool",
-    subtitle: "Lessons and assessment flows",
-    href: "/sky-school",
-    icon: GraduationCap,
-    status: "Working beta",
-  },
-  {
     title: "SkyLive",
     subtitle: "Small-room WebRTC creator flow",
     href: "/live",
     icon: Radio,
     status: "Bounded beta",
-  },
-  {
-    title: "HopeAI",
-    subtitle: "Controlled assistant workspace",
-    href: "/hope-a-i",
-    icon: Bot,
-    status: "Controlled lab",
   },
   {
     title: "Market",
@@ -88,18 +96,18 @@ const flagshipAreas = [
     status: "Controlled sandbox",
   },
   {
-    title: "Dating",
-    subtitle: "Adult-only profile workflow",
-    href: "/dating-profile-setup",
-    icon: Heart,
-    status: "Safety-first beta",
-  },
-  {
     title: "Language Exchange",
     subtitle: "Practice profile and discovery planning",
     href: "/language-partner-discovery",
     icon: Languages,
     status: "Local beta",
+  },
+  {
+    title: "Dating",
+    subtitle: "Adult-only profile workflow",
+    href: "/dating-profile-setup",
+    icon: Heart,
+    status: "Safety-first beta",
   },
 ] as const;
 
@@ -125,6 +133,7 @@ const missions = [
   { id: "social", label: "Post or reply once", href: "/activity-feed", icon: Users },
   { id: "learn", label: "Complete one lesson", href: "/course-catalog", icon: GraduationCap },
   { id: "play", label: "Play one flagship game", href: "/gaming", icon: Gamepad2 },
+  { id: "impact", label: "Record one SkyHope action", href: "/charity", icon: HeartHandshake },
   { id: "explore", label: "Open one new product area", href: "/platform-map", icon: Compass },
 ] as const;
 
@@ -207,9 +216,10 @@ export default function Home() {
                 <span className="sky-gold-text block">one serious product.</span>
               </h1>
               <p className="mt-6 max-w-3xl text-base leading-8 text-white/58 sm:text-lg">
-                Social, chat, live, learning, gaming, commerce, Web3, dating, language exchange,
-                and HopeAI now share a denser premium shell inspired by the red-and-gold control-room
-                direction—without copying unsupported claims from the reference artwork.
+                HopeAI, SkyHope, Social, SkySchool, Gaming, chat, live, commerce, Web3,
+                language exchange, and dating now share one connected beta shell. The
+                front door prioritizes the five areas that form the clearest everyday
+                loop while keeping capability claims tied to evidence.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -342,7 +352,7 @@ export default function Home() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="sky-eyebrow">Ecosystem launch grid</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Ten places worth tapping first.</h2>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Eleven places worth tapping first.</h2>
           </div>
           <Link href="/platform-map" className="inline-flex items-center gap-2 text-sm font-bold text-amber-100/75 hover:text-amber-50">
             Full product map <ArrowRight className="h-4 w-4" />
