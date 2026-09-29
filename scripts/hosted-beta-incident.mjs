@@ -2,6 +2,8 @@ import process from "node:process";
 
 const INCIDENT_TITLE = "[ops] Hosted beta health monitor incident";
 const API_VERSION = "2022-11-28";
+const ISSUE_PAGE_SIZE = 100;
+const MAX_ISSUE_PAGES = 20;
 
 function required(name) {
   const value = (process.env[name] ?? "").trim();
@@ -13,6 +15,13 @@ function validateRepository(repository) {
   if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) {
     throw new Error("GITHUB_REPOSITORY must be in owner/name form");
   }
+}
+
+function encodeRepository(repository) {
+  return repository
+    .split("/")
+    .map(segment => encodeURIComponent(segment))
+    .join("/");
 }
 
 function apiOrigin() {
@@ -52,24 +61,9 @@ async function githubRequest(path, token, init = {}) {
   return response.json();
 }
 
-async function findOpenIncident(repository, token) {
-  const params = new URLSearchParams({
-    q: [
-      `repo:${repository}`,
-      "is:issue",
-      "is:open",
-      "in:title",
-      `"${INCIDENT_TITLE}"`,
-    ].join(" "),
-    per_page: "100",
-  });
-  const result = await githubRequest(
-    `/search/issues?${params.toString()}`,
-    token
-  );
-  const items = Array.isArray(result?.items) ? result.items : [];
+function matchingIncident(issues) {
   return (
-    items.find(
+    issues.find(
       issue =>
         issue &&
         typeof issue === "object" &&
@@ -77,6 +71,28 @@ async function findOpenIncident(repository, token) {
         !issue.pull_request &&
         Number.isSafeInteger(issue.number)
     ) ?? null
+  );
+}
+
+async function findOpenIncident(repository, token) {
+  const encodedRepo = encodeRepository(repository);
+
+  for (let page = 1; page <= MAX_ISSUE_PAGES; page += 1) {
+    const result = await githubRequest(
+      `/repos/${encodedRepo}/issues?state=open&per_page=${ISSUE_PAGE_SIZE}&page=${page}`,
+      token
+    );
+    if (!Array.isArray(result)) {
+      throw new Error("GitHub open-issues response was not an array");
+    }
+
+    const incident = matchingIncident(result);
+    if (incident) return incident;
+    if (result.length < ISSUE_PAGE_SIZE) return null;
+  }
+
+  throw new Error(
+    `Open-issue scan exceeded ${MAX_ISSUE_PAGES * ISSUE_PAGE_SIZE} items`
   );
 }
 
@@ -118,10 +134,7 @@ async function main() {
   }
 
   const incident = await findOpenIncident(repository, token);
-  const encodedRepo = repository
-    .split("/")
-    .map(segment => encodeURIComponent(segment))
-    .join("/");
+  const encodedRepo = encodeRepository(repository);
 
   if (monitorResult !== "success") {
     if (incident) {
