@@ -40,11 +40,16 @@ export function getSessionCookieOptions(
   CookieOptions,
   "domain" | "httpOnly" | "path" | "sameSite" | "secure"
 > {
+  const secure =
+    process.env.NODE_ENV === "production" ? true : isSecureRequest(req);
+
   return {
     httpOnly: true,
     path: "/",
-    sameSite: "none",
-    secure:
-      process.env.NODE_ENV === "production" ? true : isSecureRequest(req),
+    // Browsers reject SameSite=None cookies without Secure. Preserve the
+    // cross-site-capable production/HTTPS policy while keeping local HTTP
+    // development sessions usable.
+    sameSite: secure ? "none" : "lax",
+    secure,
   };
 }
