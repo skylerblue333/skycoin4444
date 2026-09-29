@@ -6,7 +6,7 @@ import {
   Gamepad2,
   GraduationCap,
   Grid2X2,
-  Heart,
+  HeartHandshake,
   Home,
   LogIn,
   Menu,
@@ -38,16 +38,16 @@ const primaryLinks = [
   { label: "Social", route: "/activity-feed", icon: Users },
   { label: "Chat", route: "/unified-messaging", icon: MessageCircleMore },
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
-  { label: "School", route: "/sky-school", icon: GraduationCap },
+  { label: "School", route: "/course-catalog", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
-  { label: "SkyHope", route: "/charity", icon: Heart },
+  { label: "SkyHope", route: "/charity", icon: HeartHandshake },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
 const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
-  { label: "School", route: "/sky-school" },
+  { label: "School", route: "/course-catalog" },
   { label: "Journey", route: "/beta-journey" },
   { label: "Web3", route: "/beta-web3" },
   { label: "Dating", route: "/dating-home" },
@@ -69,7 +69,7 @@ const fourFoursTrail = [
     title: "Keep learning",
     message:
       "Curiosity compounds. Ask better questions, learn from people unlike you, and never be embarrassed to begin again.",
-    href: "/sky-school",
+    href: "/course-catalog",
     action: "Follow the lesson",
   },
   {
