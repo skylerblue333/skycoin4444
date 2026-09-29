@@ -2426,6 +2426,11 @@
       "label": "Image Viewer"
     },
     {
+      "path": "/impact-hub",
+      "component": "ImpactHub",
+      "label": "Impact Hub"
+    },
+    {
       "path": "/impact-map",
       "component": "ImpactMap",
       "label": "Impact Map"
