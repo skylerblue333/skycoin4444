@@ -102,7 +102,8 @@ describe("competitive ecosystem beta", () => {
     expect(languageSource).not.toMatch(
       /MOCK_PARTNERS|Maria García|Yuki Tanaka/
     );
-    expect(languageSource).toMatch(/Partner discovery is not connected/);
+    expect(languageSource).toMatch(/trpc\.languageExchange\.partners/);
+    expect(languageSource).toMatch(/No synthetic people, fake presence/);
   });
 
   it("provides a labeled fixture catalog and bounded local cart", () => {

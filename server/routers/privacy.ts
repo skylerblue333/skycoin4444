@@ -11,6 +11,7 @@ import {
   discoveryBookmarks,
   follows,
   likes,
+  languageExchangeProfiles,
   notificationPreferences,
   notifications,
   posts,
@@ -30,6 +31,7 @@ const exportCategory = z.enum([
   "profile",
   "social",
   "learning",
+  "language_exchange",
   "gaming",
   "feedback",
   "discovery",
@@ -114,6 +116,12 @@ export const privacyRouter = router({
           .where(eq(courseProgress.userId, userId));
       }
 
+      if (requested.has("language_exchange")) {
+        output.languageExchange = await db.query.languageExchangeProfiles.findFirst({
+          where: eq(languageExchangeProfiles.userId, userId),
+        });
+      }
+
       if (requested.has("gaming")) {
         output.gaming = await db
           .select()
@@ -179,7 +187,7 @@ export const privacyRouter = router({
         subjectId: userId,
         categories,
         scope:
-          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, gaming-progress, feedback, discovery, creator, notification, and privacy-request tables. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
+          "Authenticated SKYCOIN4444 engineering-beta data held in the currently integrated account/profile, social, learning, language-exchange, gaming-progress, feedback, discovery, creator, notification, and privacy-request tables. Device-local correction notes are browser storage and are not included in this server export. This is not a claim of exhaustive export across unintegrated legacy/provider systems.",
         data: output,
       };
     }),
