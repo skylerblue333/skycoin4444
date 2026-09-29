@@ -1,12 +1,16 @@
-# SkyHope private planning handoff
+# HopeAI Impact private planning handoff
 
 ## Purpose
 
-SkyHope includes local organizer-planning and contribution-intent surfaces. These surfaces are engineering-beta planning tools. They do not execute donations, move money, verify beneficiaries, verify nonprofit status, issue tax receipts, provide custody, or settle transactions.
+HopeAI includes Impact organizer-planning and contribution-intent surfaces. These surfaces are engineering-beta planning tools. They do not execute donations, move money, verify beneficiaries, verify nonprofit status, issue tax receipts, provide custody, or settle transactions.
+
+## Branding compatibility
+
+HopeAI is the only public Hope-branded product. The legacy `SkyHope` file name, storage key, type names, and `source=skyhope` handoff marker remain temporarily as internal compatibility identifiers so existing drafts and links are not broken. They must not be presented as a separate product in user-facing navigation or copy.
 
 ## Private HopeAI handoff
 
-User-authored SkyHope planning details must not be embedded directly in HopeAI route query parameters.
+User-authored HopeAI Impact planning details must not be embedded directly in HopeAI route query parameters.
 
 Why:
 
@@ -15,7 +19,7 @@ Why:
 - copied URLs can unintentionally carry user-authored details;
 - referrer behavior can expose URL content to other destinations.
 
-SkyHope therefore opens HopeAI with a generic bounded review prompt. The detailed organizer or contribution brief is copied only after an explicit clipboard action, and the user decides whether to paste it into HopeAI.
+The HopeAI Impact surfaces therefore open the HopeAI workspace with a generic bounded review prompt. The detailed organizer or contribution brief is copied only after an explicit clipboard action, and the user decides whether to paste it into HopeAI.
 
 ## Browser draft storage
 
