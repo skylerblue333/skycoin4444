@@ -12,6 +12,7 @@ import {
   FileText,
   FolderOpen,
   GraduationCap,
+  HeartHandshake,
   Loader2,
   Scale,
   MessageSquarePlus,
