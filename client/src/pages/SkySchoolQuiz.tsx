@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,8 +7,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { toast } from "sonner";
+import { appendQuizAttempt, buildQuizCompletionSummary } from "@/lib/betaSessionState";
 import {
-  ArrowLeft, CheckCircle, XCircle, Award, Download, Share2, Trophy,
+  ArrowLeft, CheckCircle, XCircle, Award, ClipboardCheck, Trophy,
   Zap, Target, Brain, Sparkles, Lock, Unlock, BarChart3
 } from "lucide-react";
 
@@ -247,6 +249,20 @@ export default function SkySchoolQuiz({ lessonId = "blockchain-101-lesson-0", on
     setShowResults(true);
     setAnswers(finalAnswers);
 
+    appendQuizAttempt(
+      typeof window === "undefined" ? null : window.localStorage,
+      {
+        lessonId,
+        courseId: quiz.courseId,
+        lessonTitle: quiz.lessonTitle,
+        score,
+        passed,
+        correctCount,
+        questionCount: quiz.questions.length,
+        recordedAt: result.timestamp.toISOString(),
+      }
+    );
+
     if (onComplete) {
       onComplete(result);
     }
@@ -264,6 +280,24 @@ export default function SkySchoolQuiz({ lessonId = "blockchain-101-lesson-0", on
     setShowResults(false);
     setQuizResult(null);
     setSelectedAnswer(null);
+  };
+
+  const handleCopyCompletion = async () => {
+    if (!quizResult) return;
+    const summary = buildQuizCompletionSummary({
+      lessonTitle: quiz.lessonTitle,
+      score: quizResult.score,
+      passed: quizResult.passed,
+      recordedAt: quizResult.timestamp.toISOString(),
+    });
+
+    try {
+      if (!navigator.clipboard) throw new Error("clipboard unavailable");
+      await navigator.clipboard.writeText(summary);
+      toast.success("Learning completion summary copied");
+    } catch {
+      toast.error("Clipboard is unavailable. Your local attempt record is still saved.");
+    }
   };
 
   // Results View
@@ -297,33 +331,44 @@ export default function SkySchoolQuiz({ lessonId = "blockchain-101-lesson-0", on
           </CardContent>
         </Card>
 
-        {/* Certificate (if passed) */}
+        {/* Honest beta completion evidence (if passed) */}
         {quizResult.passed && (
           <Card className="bg-gradient-to-br from-yellow-900/30 to-orange-900/30 border border-yellow-500/30">
             <CardHeader>
               <CardTitle className="text-yellow-300 flex items-center gap-2">
                 <Award className="w-5 h-5" />
-                Certificate of Completion
+                Learning completion record
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-slate-900/50 p-6 rounded-lg border border-yellow-500/20 text-center">
-                <p className="text-slate-400 text-sm mb-2">This certifies that</p>
+                <p className="text-slate-400 text-sm mb-2">Engineering-beta learning evidence for</p>
                 <p className="text-xl font-bold text-white mb-2">{user?.name || "Student"}</p>
-                <p className="text-slate-400 text-sm mb-4">has successfully completed</p>
+                <p className="text-slate-400 text-sm mb-4">completed the quiz for</p>
                 <p className="text-lg font-semibold text-yellow-300 mb-4">{quiz.lessonTitle}</p>
-                <p className="text-slate-400 text-sm">with a score of {quizResult.score}%</p>
-                <p className="text-slate-500 text-xs mt-4">{new Date().toLocaleDateString()}</p>
+                <p className="text-slate-400 text-sm">Score: {quizResult.score}%</p>
+                <p className="text-slate-500 text-xs mt-4">{quizResult.timestamp.toLocaleDateString()}</p>
               </div>
-              <div className="flex gap-3">
-                <Button className="flex-1 bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border border-yellow-500/30">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Certificate
+              <p className="text-xs leading-5 text-yellow-100/55">
+                This browser-local record is not an accredited certificate, professional credential, academic credit, or external verification.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  type="button"
+                  onClick={handleCopyCompletion}
+                  className="flex-1 bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-300 border border-yellow-500/30"
+                >
+                  <ClipboardCheck className="w-4 h-4 mr-2" />
+                  Copy completion summary
                 </Button>
-                <Button className="flex-1 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share Achievement
-                </Button>
+                <Link href="/sky-school" className="flex-1">
+                  <Button
+                    type="button"
+                    className="w-full bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30"
+                  >
+                    Continue in SkySchool
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
