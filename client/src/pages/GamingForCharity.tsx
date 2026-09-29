@@ -237,7 +237,7 @@ export default function GamingForCharity() {
         <section>
           <div className="mb-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-200/60">
-              Charity-only financial scope
+              Charity-only finance policy
             </p>
             <h2 className="mt-2 text-3xl font-black">
               Future real-value rails are gated, not implied.
