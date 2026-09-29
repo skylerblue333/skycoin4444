@@ -12,50 +12,50 @@ import { Link } from "wouter";
 export default function CharityLeaderboard() {
   // Live DB queries — no mock data
   const { data: stats, isLoading: statsLoading } = trpc.charity.stats.useQuery();
-  const { data: campaigns, isLoading: campaignsLoading } = trpc.charity.campaigns.useQuery({ limit: 10 });
-  const { data: leaderboard, isLoading: leaderboardLoading } = trpc.charity.leaderboard.useQuery({ limit: 20 });
+  const { data: campaigns, isLoading: campaignsLoading } = trpc.charity.campaigns.useQuery();
+  const { data: leaderboard, isLoading: leaderboardLoading } = trpc.charity.leaderboard.useQuery();
 
   const fmtSky = (n: number) =>
     n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `${(n / 1_000).toFixed(1)}K` : String(n);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
-      <PageHeader backHref="/charity" title="Charity Leaderboard" subtitle="Top donors driving real-world impact with SKY444" icon={Heart} />
+      <PageHeader backHref="/charity" title="Charity Leaderboard" subtitle="Planning-only charity readiness — live donations are disabled" icon={Heart} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Card className="p-4 border-border/50 text-center">
           <DollarSign className="w-6 h-6 text-purple-400 mx-auto mb-2" />
           <p className="text-2xl font-black text-purple-400">
-            {statsLoading ? "…" : fmtSky(stats?.totalRaised ?? 0)} SKY444
+            {statsLoading ? "…" : `${fmtSky(stats?.liveFundsRaised ?? 0)}`}
           </p>
-          <p className="text-xs text-muted-foreground">Total Donated</p>
+          <p className="text-xs text-muted-foreground">Live Funds Moved</p>
         </Card>
         <Card className="p-4 border-border/50 text-center">
           <Users className="w-6 h-6 text-primary mx-auto mb-2" />
           <p className="text-2xl font-black text-primary">
-            {statsLoading ? "…" : (stats?.totalDonors ?? 0).toLocaleString()}
+            {statsLoading ? "…" : (stats?.liveDonors ?? 0).toLocaleString()}
           </p>
-          <p className="text-xs text-muted-foreground">Total Donors</p>
+          <p className="text-xs text-muted-foreground">Verified Live Donors</p>
         </Card>
         <Card className="p-4 border-border/50 text-center">
           <Globe className="w-6 h-6 text-blue-400 mx-auto mb-2" />
           <p className="text-2xl font-black text-blue-400">
             {statsLoading ? "…" : (stats?.activeCampaigns ?? 0).toLocaleString()}
           </p>
-          <p className="text-xs text-muted-foreground">Active Campaigns</p>
+          <p className="text-xs text-muted-foreground">Planning Campaigns</p>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <h3 className="font-bold mb-4 flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> Top Donors</h3>
+          <h3 className="font-bold mb-4 flex items-center gap-2"><Trophy className="w-4 h-4 text-yellow-400" /> Donor Evidence</h3>
           {leaderboardLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
           ) : !Array.isArray(leaderboard) || leaderboard.length === 0 ? (
             <Card className="p-8 text-center border-border/50">
               <Heart className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-muted-foreground">No donations yet. Be the first to give!</p>
-              <Link href="/charity" className="text-primary text-sm hover:underline mt-2 inline-block">Browse campaigns →</Link>
+              <p className="text-muted-foreground">No live donor leaderboard is available because contribution execution is disabled.</p>
+              <Link href="/charity" className="text-primary text-sm hover:underline mt-2 inline-block">Review planning campaigns →</Link>
             </Card>
           ) : (
             <div className="space-y-3">
@@ -92,7 +92,7 @@ export default function CharityLeaderboard() {
             <div className="space-y-4">
               {(campaigns as any[]).map((c: any) => {
                 const raised = Number(c.raisedAmount ?? 0);
-                const goal = Number(c.goal ?? 1);
+                const goal = Number(c.goalAmount ?? 1);
                 const pct = Math.min(100, Math.round((raised / goal) * 100));
                 return (
                   <Card key={c.id} className="p-4 border-border/50">
@@ -107,11 +107,11 @@ export default function CharityLeaderboard() {
                       <div className="bg-purple-600 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{raised.toLocaleString()} SKY444 raised</span>
-                      <span>Goal: {goal.toLocaleString()} SKY444</span>
+                      <span>${raised.toLocaleString()} live funds moved</span>
+                      <span>Planning goal: ${goal.toLocaleString()}</span>
                     </div>
                     <Link href={`/charity/${c.id}`}>
-                      <Button size="sm" className="w-full mt-3 gap-1 h-8 text-xs"><Heart className="w-3 h-3" /> Donate Now</Button>
+                      <Button size="sm" className="w-full mt-3 gap-1 h-8 text-xs"><Heart className="w-3 h-3" /> Plan Contribution</Button>
                     </Link>
                   </Card>
                 );
@@ -121,12 +121,12 @@ export default function CharityLeaderboard() {
         </div>
       </div>
 
-      {/* Impact note — chart will show real data once donations are made */}
+      {/* Execution remains disabled until a verified provider-backed path exists. */}
       <div className="mt-8">
         <Card className="p-6 border-border/50 text-center">
           <TrendingUp className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Impact analytics will appear here as donations are made.</p>
-          <Link href="/charity" className="text-primary text-sm hover:underline mt-2 inline-block">Start donating →</Link>
+          <p className="text-sm text-muted-foreground">Live contribution analytics remain at zero until a verified external execution path is connected and evidenced.</p>
+          <Link href="/charity" className="text-primary text-sm hover:underline mt-2 inline-block">Open contribution planner →</Link>
         </Card>
       </div>
     </div>
