@@ -17,6 +17,9 @@ export default function UnifiedMessaging() {
   const trimmedDraft = draft.trim();
   const charactersRemaining = MAX_DRAFT_LENGTH - draft.length;
   const canCopy = trimmedDraft.length > 0;
+  const hopeAIHref = canCopy
+    ? "/hope-a-i?source=messaging&prompt=" + encodeURIComponent(trimmedDraft)
+    : "/hope-a-i";
 
   const boundaryItems = useMemo(
     () => [
@@ -73,11 +76,11 @@ export default function UnifiedMessaging() {
               Open Social
             </Link>
             <Link
-              href="/hope-a-i"
+              href={hopeAIHref}
               className="inline-flex items-center gap-2 rounded-xl border border-violet-300/20 bg-violet-300/[0.08] px-4 py-2 text-sm font-bold text-violet-100 transition hover:bg-violet-300/[0.14]"
             >
               <Bot className="h-4 w-4" />
-              Draft with HopeAI
+              {canCopy ? "Polish with HopeAI" : "Draft with HopeAI"}
             </Link>
           </div>
         </header>
