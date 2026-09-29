@@ -3,6 +3,7 @@ import {
   crashCurveMultiplier,
   crashPoint,
   createDeck,
+  createDemoRoundReceipt,
   cryptoChallenge,
   EUROPEAN_ROULETTE_ORDER,
   handValue,
@@ -16,6 +17,7 @@ import {
   rouletteRotationFor,
   simulatePlinko,
   spinRoulette,
+  verifyDemoRoundReceipt,
 } from "../../client/src/lib/flagshipGameEngine";
 
 describe("flagship game engine", () => {
@@ -82,4 +84,32 @@ describe("flagship game engine", () => {
     expect(hunt.candidates).toHaveLength(4);
     expect(hunt.candidates[hunt.answerIndex].startsWith(hunt.target)).toBe(true);
   });
+
+  it("creates replayable, tamper-evident demo receipts without claiming real value", () => {
+    const crash = createDemoRoundReceipt("crash", 4444);
+    const roulette = createDemoRoundReceipt("roulette", 4444);
+    const plinko = createDemoRoundReceipt("plinko", 4444);
+
+    expect(crash.realValue).toBe(false);
+    expect(crash.replayable).toBe(true);
+    expect(crash.summary).toContain("crashAt=");
+    expect(roulette.summary).toContain("number=");
+    expect(plinko.summary).toContain("path=");
+    expect(verifyDemoRoundReceipt(crash)).toBe(true);
+    expect(
+      verifyDemoRoundReceipt({ ...crash, summary: "crashAt=999.00x" }),
+    ).toBe(false);
+    expect(
+      verifyDemoRoundReceipt({ ...roulette, proof: "tampered" }),
+    ).toBe(false);
+  });
+
+  it("rejects malformed or unsafe replay receipt inputs", () => {
+    expect(verifyDemoRoundReceipt(null)).toBe(false);
+    expect(verifyDemoRoundReceipt({ version: 1 })).toBe(false);
+    expect(() =>
+      createDemoRoundReceipt("crash", Number.MAX_SAFE_INTEGER),
+    ).toThrow(/32-bit/);
+  });
+
 });
