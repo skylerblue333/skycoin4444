@@ -64,6 +64,11 @@ export default function BetaJourney() {
             contract. HopeAI stays available as the planning assistant without pretending its local chat history is
             server-persisted completion evidence. Persisted evidence over page count.
           </p>
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/42">
+            The durable activation loop remains the same five gates measured by the onboarding. Connected ecosystem paths
+            are optional ways to keep going after those gates: learn, explore, play, help, and ask HopeAI. Learn once, then
+            move somewhere useful.
+          </p>
         </header>
 
         {!isAuthenticated || !user ? (
@@ -208,8 +213,10 @@ export default function BetaJourney() {
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/45">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
           Journey completion does not issue credentials, token rewards, charity verification, payment settlement,
-          custody, or blockchain transactions. It does not prove external-provider or HopeAI execution. It is an
-          account-owned product-usage summary for the engineering beta.
+          custody, or blockchain transactions. HopeAI still depends on configured AI availability, and this page does not
+          itself process a donation or turn game activity into real-value wagering or rewards. It does not prove
+          external-provider or HopeAI execution. There is no guaranteed AI-provider availability, live donation, or
+          real-value gaming implied by this account-owned engineering-beta summary.
         </section>
       </div>
     </main>
