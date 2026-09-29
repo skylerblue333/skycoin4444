@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { cancelDonation, createDonation, markRecorded, toIntegrationEvent } from "./index";
+import {
+  DonationLedger,
+  cancelDonation,
+  createDonation,
+  createDonationAcknowledgement,
+  markRecorded,
+  toIntegrationEvent,
+} from "./index";
 
 const input = {
   id: "don-1",
@@ -27,7 +34,9 @@ describe("SkyDonations", () => {
   it("rejects invalid money and impossible timestamps", () => {
     expect(() => createDonation({ ...input, amountMinor: 1.5 })).toThrow(RangeError);
     expect(() => createDonation({ ...input, currency: "usd" })).toThrow(TypeError);
-    expect(() => createDonation({ ...input, createdAt: "2026-02-30T00:00:00Z" })).toThrow(TypeError);
+    expect(() =>
+      createDonation({ ...input, createdAt: "2026-02-30T00:00:00Z" }),
+    ).toThrow(TypeError);
   });
 
   it("revalidates mutable records before transitions and emission", () => {
@@ -42,5 +51,61 @@ describe("SkyDonations", () => {
 
   it("prevents cancellation after a donation is recorded", () => {
     expect(() => cancelDonation(markRecorded(createDonation(input)))).toThrow();
+  });
+
+  it("provides a truthful acknowledgement rather than a fake payment or tax receipt", () => {
+    expect(createDonationAcknowledgement(createDonation(input))).toEqual({
+      contract: "skyhope.donation.acknowledgement.v1",
+      donationId: "don-1",
+      campaignId: "camp-1",
+      amountMinor: 2500,
+      currency: "USD",
+      status: "pledged",
+      paymentExecutedBySkycoin4444: false,
+      settlementVerified: false,
+      taxReceipt: false,
+    });
+  });
+
+  it("replays identical pledge requests by idempotency key", () => {
+    const ledger = new DonationLedger();
+    expect(ledger.pledge(input, "request:1")).toEqual(
+      ledger.pledge(input, "request:1"),
+    );
+    expect(ledger.snapshot()).toMatchObject({
+      idempotencyEntries: 1,
+      persistencePerformed: false,
+      externalPaymentExecutionPerformed: false,
+    });
+  });
+
+  it("fails closed when an idempotency key is reused with different money", () => {
+    const ledger = new DonationLedger();
+    ledger.pledge(input, "request:2");
+    expect(() =>
+      ledger.pledge({ ...input, amountMinor: 9999 }, "request:2"),
+    ).toThrow("idempotency key reused with different donation input");
+  });
+
+  it("keeps campaign records isolated and lifecycle transitions explicit", () => {
+    const ledger = new DonationLedger();
+    ledger.pledge(input, "request:a");
+    ledger.pledge(
+      {
+        ...input,
+        id: "don-2",
+        campaignId: "camp-2",
+        createdAt: "2026-08-25T00:01:00Z",
+      },
+      "request:b",
+    );
+
+    expect(ledger.listForCampaign("camp-1").map(item => item.id)).toEqual([
+      "don-1",
+    ]);
+    expect(ledger.markRecorded("don-1").status).toBe("recorded");
+    expect(() => ledger.cancel("don-1")).toThrow(
+      "recorded donations cannot be cancelled",
+    );
   });
 });
