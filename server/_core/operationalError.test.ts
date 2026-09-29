@@ -15,13 +15,15 @@ describe("operational error sanitization", () => {
     expect(summary).toContain("[redacted]");
   });
 
-  it("redacts bearer and JWT-shaped values", () => {
+  it("redacts bearer, plain token fields, and JWT-shaped values", () => {
     const summary = sanitizeOperationalError(
       "Authorization: Bearer top.secret-token " +
-        "token=eyJabc.def.ghi"
+        "token=plain-secret " +
+        "access_token=eyJabc.def.ghi"
     );
 
     expect(summary).not.toContain("top.secret-token");
+    expect(summary).not.toContain("plain-secret");
     expect(summary).not.toContain("eyJabc.def.ghi");
     expect(summary).toContain("[redacted]");
   });

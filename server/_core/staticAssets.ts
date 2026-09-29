@@ -57,14 +57,8 @@ export function serveStatic(
 
   app.use(express.static(bundle.distPath));
 
-  // All API handlers are registered before this production fallback. Keep an
-  // unknown API request truthful instead of returning the SPA shell with 200.
-  app.use("/api", (_req, res) => {
-    res.set("Cache-Control", "no-store");
-    res.status(404).json({ error: "api_route_not_found" });
-  });
-
-  // Fall through to the SPA shell only for non-API browser routes.
+  // API fallbacks are registered before this function so only browser routes
+  // reach the SPA shell.
   app.use("/{*splat}", (_req, res) => {
     res.sendFile(bundle.indexPath);
   });

@@ -20,6 +20,7 @@ import { registerObservability } from "./observability";
 import { assertProductionBetaConfig } from "./productionConfig";
 import { registerRequestSecurity } from "./requestSecurity";
 import { registerSecurityHeaders } from "./securityHeaders";
+import { registerApiBoundary } from "./apiBoundary";
 import { createDependencyReadinessCoordinator } from "./readiness";
 import { registerDatabasePoolRoutes } from "./databasePoolRoutes";
 import { registerFatalRuntimeMonitoring } from "./fatalRuntime";
@@ -129,6 +130,8 @@ async function startServer() {
       createContext,
     })
   );
+
+  registerApiBoundary(app);
 
   if (process.env.NODE_ENV === "development") {
     // A variable import specifier is intentional. The production esbuild command

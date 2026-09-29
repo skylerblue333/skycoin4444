@@ -35,7 +35,7 @@ export function sanitizeOperationalError(
       "$1[redacted]"
     )
     .replace(
-      /(\b(?:password|passwd|pwd|access[_-]?token|refresh[_-]?token|client[_-]?secret|api[_-]?key|apikey)\b\s*[:=]\s*)["']?[^,;\s"']+["']?/gi,
+      /(\b(?:password|passwd|pwd|token|access[_-]?token|refresh[_-]?token|client[_-]?secret|api[_-]?key|apikey)\b\s*[:=]\s*)["']?[^,;\s"']+["']?/gi,
       "$1[redacted]"
     )
     .replace(
