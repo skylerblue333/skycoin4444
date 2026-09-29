@@ -53,10 +53,13 @@ describe("HopeAI social gaming education SkyHope integration", () => {
       "client/src/pages/ImpactMetrics.tsx",
       "client/src/pages/DonationProcessing.tsx",
       "client/src/pages/FundraiserTools.tsx",
-      "client/src/pages/GamingForCharity.tsx",
     ]) {
       expect(readFileSync(path, "utf8")).toContain('from "./Charity"');
     }
+    const impactPlay = readFileSync("client/src/pages/GamingForCharity.tsx", "utf8");
+    expect(impactPlay).toContain("Impact Play Lab");
+    expect(impactPlay).toContain("No live donations");
+    expect(impactPlay).not.toContain('from "./Charity"');
   });
 
   it("promotes HopeAI SkySchool SkyHope and the connected journey in navigation", () => {
