@@ -3,14 +3,15 @@ import {
   ArrowRight,
   BadgeDollarSign,
   BookOpen,
+  Brain,
   Gamepad2,
   HandCoins,
   HeartHandshake,
   Landmark,
   ShieldCheck,
-  Sparkles,
   WalletCards,
 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,58 +22,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const missionThemes = [
-  {
-    name: "Education",
-    detail:
-      "Use knowledge games and lesson completion as a themed mission. No donation is triggered.",
-    href: "/game-crypto-quiz",
-    icon: BookOpen,
-  },
-  {
-    name: "Clean water",
-    detail:
-      "Use Spark Tap as a themed awareness challenge. Sparks are game-only values.",
-    href: "/game-token-tap",
-    icon: Sparkles,
-  },
-  {
-    name: "Community build",
-    detail:
-      "Use Block Builder as a themed teamwork/puzzle session. No funds or tokens move.",
-    href: "/game-block-builder",
-    icon: Gamepad2,
-  },
-] as const;
-
-const charityFinanceScope = [
+const financeScope = [
   {
     title: "Deposits + withdrawals",
     icon: Landmark,
     detail:
-      "Reserved for verified charity beneficiaries through an approved payment provider. SKYCOIN4444 does not hold or move funds itself in the current beta.",
+      "Reserved for a verified charity beneficiary and an approved external provider. SKYCOIN4444 does not hold or move the funds.",
   },
   {
     title: "Real-money wagering",
     icon: BadgeDollarSign,
     detail:
-      "Charity-only scope. It additionally requires age and region gates plus an approved regulated gaming provider before it can be enabled.",
+      "Charity-only scope with additional age, region, legal, and regulated-gaming-provider gates.",
   },
   {
     title: "Custody + token settlement",
     icon: WalletCards,
     detail:
-      "Any custody or blockchain settlement must be delegated to an approved external provider with verified beneficiary records and legal review.",
+      "Any future custody or blockchain settlement must execute through an approved external provider after the policy gates pass.",
   },
   {
     title: "Redeemable crypto rewards",
     icon: HandCoins,
     detail:
-      "If introduced, redeemable crypto value must resolve to the verified charity beneficiary path rather than a personal player payout.",
+      "A future redeemable reward must resolve through the verified charity-beneficiary path rather than a personal player payout.",
   },
 ] as const;
 
 export default function GamingForCharity() {
+  const missions = trpc.charity.missions.useQuery(undefined, { retry: false });
+  const boundary = trpc.charity.boundary.useQuery(undefined, { retry: false });
+
   return (
     <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none fixed inset-0">
@@ -81,7 +61,7 @@ export default function GamingForCharity() {
       </div>
 
       <div className="relative mx-auto max-w-6xl space-y-8 px-4 py-10">
-        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1fr_320px] lg:items-end">
+        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1fr_340px] lg:items-end">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Badge className="bg-emerald-500/15 text-emerald-100">
@@ -97,74 +77,174 @@ export default function GamingForCharity() {
                 variant="outline"
                 className="border-violet-300/25 text-violet-100"
               >
-                Charity-only finance policy
+                Server-backed mission catalog
               </Badge>
             </div>
             <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              Real-value gaming rails belong to charity only.
+              Play can support an impact mission without pretending the score is money.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-white/50">
-              The flagship games stay demo-only. If deposits, withdrawals,
-              real-money wagering, custody, token settlement, or redeemable
-              crypto rewards are introduced, this route is the only permitted
-              product scope for them—and only after verified charity,
-              provider, legal, age, and region gates are satisfied.
+              The game layer stays demo-only. SkyHope missions connect games to
+              authored learning and HopeAI planning, while the real-value policy
+              remains fail-closed behind verified-charity and external-provider
+              gates.
             </p>
           </div>
-          <Link href="/gaming">
-            <Button size="lg" className="w-full">
-              <Gamepad2 className="mr-2 h-5 w-5" />
-              Open Games Center
-            </Button>
-          </Link>
+          <div className="grid gap-3">
+            <Link href="/gaming">
+              <Button size="lg" className="w-full">
+                <Gamepad2 className="mr-2 h-5 w-5" />
+                Open Games Center
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-white/15 bg-white/[0.03] text-white"
+              >
+                <HeartHandshake className="mr-2 h-5 w-5" />
+                Open SkyHope Impact
+              </Button>
+            </Link>
+          </div>
         </header>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {missionThemes.map(theme => {
-            const Icon = theme.icon;
-            return (
-              <Card
-                key={theme.name}
-                className="border-white/10 bg-white/[0.035] text-white"
-              >
-                <CardHeader>
-                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-200">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <CardTitle className="mt-3 text-white">
-                    {theme.name}
-                  </CardTitle>
-                  <CardDescription className="leading-6 text-white/45">
-                    {theme.detail}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link href={theme.href}>
-                    <Button
-                      variant="outline"
-                      className="w-full border-white/15 bg-white/[0.03] text-white"
-                    >
-                      Play themed mission
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <section className="grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              label: "Impact missions",
+              value: missions.data?.length ?? "…",
+            },
+            {
+              label: "Finance actions modeled",
+              value: boundary.data?.allowedActions.length ?? "…",
+            },
+            {
+              label: "Live financial execution",
+              value: "Off",
+            },
+          ].map(item => (
+            <Card
+              key={item.label}
+              className="border-white/10 bg-white/[0.035] text-white"
+            >
+              <CardContent className="p-5">
+                <p className="text-3xl font-black">{item.value}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/30">
+                  {item.label}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
+
+        <section>
+          <div className="mb-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200/60">
+              Server-authored mission paths
+            </p>
+            <h2 className="mt-2 text-3xl font-black">
+              Every mission has a learning step, HopeAI step, and practice step.
+            </h2>
+          </div>
+
+          {missions.isLoading ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {[0, 1, 2, 3].map(index => (
+                <div
+                  key={index}
+                  className="h-64 animate-pulse rounded-3xl border border-white/10 bg-white/[0.03]"
+                />
+              ))}
+            </div>
+          ) : missions.error ? (
+            <Card className="border-rose-300/20 bg-rose-300/[0.04] text-white">
+              <CardContent className="p-6">
+                Impact missions are temporarily unavailable.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {(missions.data ?? []).map((mission, index) => {
+                const Icon =
+                  [BookOpen, Brain, Gamepad2, HeartHandshake][index % 4] ??
+                  HeartHandshake;
+                return (
+                  <Card
+                    key={mission.id}
+                    className="border-white/10 bg-white/[0.035] text-white"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-100">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="border-white/10 text-white/35"
+                        >
+                          {mission.theme}
+                        </Badge>
+                      </div>
+                      <CardTitle className="mt-3 text-white">
+                        {mission.title}
+                      </CardTitle>
+                      <CardDescription className="leading-6 text-white/45">
+                        {mission.summary}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <Link href={mission.learningRoute}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full border-white/10 bg-white/[0.02] text-white"
+                          >
+                            <BookOpen className="mr-1.5 h-3.5 w-3.5" />
+                            Learn
+                          </Button>
+                        </Link>
+                        <Link href={mission.coachRoute}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full border-white/10 bg-white/[0.02] text-white"
+                          >
+                            <Brain className="mr-1.5 h-3.5 w-3.5" />
+                            Coach
+                          </Button>
+                        </Link>
+                        <Link href={mission.practiceRoute}>
+                          <Button size="sm" className="w-full">
+                            <Gamepad2 className="mr-1.5 h-3.5 w-3.5" />
+                            Practice
+                          </Button>
+                        </Link>
+                      </div>
+                      <p className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.035] p-3 text-xs leading-5 text-white/45">
+                        {mission.evidence}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         <section>
           <div className="mb-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-200/60">
-              Charity-only financial scope
+              Charity-only finance policy
             </p>
             <h2 className="mt-2 text-3xl font-black">
               Future real-value rails are gated, not implied.
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {charityFinanceScope.map(item => {
+            {financeScope.map(item => {
               const Icon = item.icon;
               return (
                 <Card
@@ -191,20 +271,15 @@ export default function GamingForCharity() {
             <CardHeader>
               <HeartHandshake className="h-6 w-6 text-violet-200" />
               <CardTitle className="mt-2 text-white">
-                What makes a charity transaction eligible?
+                What must exist before a real-value handoff?
               </CardTitle>
-              <CardDescription className="text-white/45">
-                A financial action must pass every applicable gate before the
-                system can create an external-provider handoff plan.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm leading-6 text-white/45">
-              <p>• Verified charity beneficiary identifier</p>
-              <p>• Approved payment/custody/settlement provider</p>
+              <p>• Verified charity beneficiary</p>
+              <p>• Approved external payment/custody/settlement provider</p>
               <p>• Legal review and region eligibility</p>
-              <p>• Age gate + regulated gaming provider for real-money wagering</p>
-              <p>• Idempotency, receipts, failure/refund handling, and audit evidence</p>
-              <p>• Tests proving game scores alone cannot fabricate money movement</p>
+              <p>• Age gate + regulated gaming provider for real-money gaming</p>
+              <p>• Durable receipts, idempotency, failure handling, and audit evidence</p>
             </CardContent>
           </Card>
 
@@ -214,20 +289,21 @@ export default function GamingForCharity() {
               <CardTitle className="mt-2 text-white">
                 Current beta boundary
               </CardTitle>
-              <CardDescription className="text-white/45">
-                The policy is implemented; live financial execution is not.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-white/45">
-              <p>Sparks, XP, scores, ranks, demo credits, and combos remain game-only values.</p>
-              <p>No wallet, token payout, donation, settlement, or blockchain write occurs today.</p>
+              <p>Sparks, XP, scores, ranks, and demo credits have no monetary value.</p>
+              <p>No wallet, token payout, donation, settlement, or blockchain write occurs here.</p>
               <p>SKYCOIN4444 does not currently hold charity funds or execute wagers.</p>
-              <p>Approved integrations must execute externally; the platform policy layer only authorizes or blocks the handoff.</p>
+              <p>
+                The server policy layer only simulates whether self-attested
+                inputs would pass the modeled gates. It never authorizes a
+                provider handoff and does not make the provider or charity real.
+              </p>
               <Link
-                href="/beta-feedback"
+                href="/sky-school"
                 className="inline-flex items-center font-semibold text-sky-200"
               >
-                Suggest a future impact mission
+                Continue in SkySchool
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </CardContent>
