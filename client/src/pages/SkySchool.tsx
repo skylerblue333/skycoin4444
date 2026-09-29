@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Gamepad2,
   GraduationCap,
+  HandHeart,
   Lightbulb,
   PlayCircle,
   ShieldCheck,
@@ -138,7 +139,7 @@ export default function SkySchool() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-3">
             <Link href="/course-catalog">
               <Button size="lg" className="w-full">
                 <BookOpen className="mr-2 h-4 w-4" />
@@ -153,6 +154,16 @@ export default function SkySchool() {
               >
                 <Brain className="mr-2 h-4 w-4" />
                 Ask HopeAI Coach
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-emerald-300/20 bg-emerald-300/[0.04] text-emerald-100"
+              >
+                <HandHeart className="mr-2 h-4 w-4" />
+                Open SkyHope service lab
               </Button>
             </Link>
           </div>
