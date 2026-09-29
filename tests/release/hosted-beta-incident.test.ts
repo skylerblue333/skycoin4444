@@ -209,6 +209,23 @@ describe("hosted beta incident reconciler", () => {
     ).toHaveLength(0);
   });
 
+  it.each(["cancelled", "skipped"])(
+    "does not mutate incident state when the monitor run is %s",
+    async monitorResult => {
+      const mock = await createMockGitHub(779);
+      const { stdout, stderr } = await runIncidentScript(
+        mock.origin,
+        monitorResult
+      );
+
+      expect(stderr).toBe("");
+      expect(stdout).toContain(
+        `Hosted beta monitor result ${monitorResult}; incident state left unchanged`
+      );
+      expect(mock.requests).toHaveLength(0);
+    }
+  );
+
   it("comments on and closes the open incident after recovery", async () => {
     const mock = await createMockGitHub(778);
     const { stdout, stderr } = await runIncidentScript(mock.origin, "success");

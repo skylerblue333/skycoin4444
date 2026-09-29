@@ -133,10 +133,22 @@ async function main() {
     throw new Error("GITHUB_SHA must be a full 40-character Git commit SHA");
   }
 
+  if (monitorResult === "cancelled" || monitorResult === "skipped") {
+    console.log(
+      `Hosted beta monitor result ${monitorResult}; incident state left unchanged`
+    );
+    return;
+  }
+  if (monitorResult !== "success" && monitorResult !== "failure") {
+    throw new Error(
+      "HOSTED_BETA_MONITOR_RESULT must be success, failure, cancelled, or skipped"
+    );
+  }
+
   const incident = await findOpenIncident(repository, token);
   const encodedRepo = encodeRepository(repository);
 
-  if (monitorResult !== "success") {
+  if (monitorResult === "failure") {
     if (incident) {
       console.log(
         `Hosted beta incident already open as #${incident.number}; no duplicate created`

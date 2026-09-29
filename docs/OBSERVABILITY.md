@@ -104,7 +104,8 @@ The canonical V5 beta is additionally observed through two provider/external lay
 
 Scheduled and manually dispatched monitor runs reconcile one repository-native incident signal:
 
-- the first non-success result opens one issue titled `[ops] Hosted beta health monitor incident`;
+- the first actual monitor failure opens one issue titled `[ops] Hosted beta health monitor incident`;
+- cancelled or skipped GitHub runs leave incident state unchanged rather than being misclassified as hosted outages;
 - later failed runs reuse that open incident instead of creating duplicates;
 - the first later successful run comments with the recovery SHA/run and closes the incident;
 - pull-request checks never receive `issues: write` and never mutate incident state;
