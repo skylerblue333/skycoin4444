@@ -81,6 +81,13 @@ const flagshipAreas = [
     status: "Persisted impact beta",
   },
   {
+    title: "Journey",
+    subtitle: "Persisted cross-product evidence",
+    href: "/beta-journey",
+    icon: Sparkles,
+    status: "Connected beta",
+  },
+  {
     title: "Market",
     subtitle: "Commerce rehearsal",
     href: "/beta-commerce",
@@ -243,7 +250,7 @@ export default function Home() {
               <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   [routeCatalog.routes.length.toLocaleString(), "indexed routes"],
-                  ["11", "headline areas"],
+                  ["12", "headline areas"],
                   ["6", "flagship games"],
                   ["1", "unified shell"],
                 ].map(([value, label]) => (
