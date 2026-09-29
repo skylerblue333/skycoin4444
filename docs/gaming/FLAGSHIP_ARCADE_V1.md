@@ -26,6 +26,12 @@ Each promoted experience now has a dedicated replay loop and visible round state
 
 Shared UI primitives live under `client/src/features/gaming/components`; shared deterministic math lives in `client/src/lib/flagshipGameEngine.ts`.
 
+### Replay evidence
+
+Crash, Plinko, and Roulette now surface a deterministic replay receipt. A receipt records the game, signed-32-bit demo seed, a canonical outcome summary, and a deterministic proof string. The verifier regenerates the expected receipt and fails on changed outcome summaries or proof strings. This gives testers a compact way to reproduce a round and detect accidental/tampered local evidence during beta validation.
+
+These receipts are **not cryptographic fairness proofs**. Seeds are visible deterministic engineering inputs, not secret entropy; the receipt does not establish regulated randomness, server commitment/reveal, independent attestation, monetary settlement, or blockchain execution.
+
 ## Open-source foundation
 
 The rebuild uses the permissive open-source packages already declared by the repository instead of copying an unrelated casino backend:
