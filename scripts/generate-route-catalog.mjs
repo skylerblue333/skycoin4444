@@ -1,11 +1,12 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { parseStaticRoutes } from "./lib/route-catalog.mjs";
+import { readRouteRegistrySource } from "./lib/route-registry-source.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const appSource = await readFile(path.join(root, "client/src/App.tsx"), "utf8");
-const routes = parseStaticRoutes(appSource);
+const registrySource = await readRouteRegistrySource(root);
+const routes = parseStaticRoutes(registrySource);
 
 if (routes.length < 1000) {
   throw new Error(`Route catalog unexpectedly contains only ${routes.length} routes`);

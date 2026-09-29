@@ -2,9 +2,9 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseStaticRoutes } from "./lib/route-catalog.mjs";
+import { readRouteRegistrySource } from "./lib/route-registry-source.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const appPath = path.join(root, "client/src/App.tsx");
 const manifestPath = path.join(root, "client/src/lib/v4Beta.ts");
 const pagePath = path.join(root, "client/src/pages/V4Beta.tsx");
 const workspacePath = path.join(root, "client/src/pages/BetaWorkspace.tsx");
@@ -64,14 +64,14 @@ async function requireFile(relativePath, minimumBytes = 1) {
   return readFile(absolute, "utf8");
 }
 
-const [appSource, manifestSource, pageSource, workspaceSource] = await Promise.all([
-  readFile(appPath, "utf8"),
+const [registrySource, manifestSource, pageSource, workspaceSource] = await Promise.all([
+  readRouteRegistrySource(root),
   readFile(manifestPath, "utf8"),
   readFile(pagePath, "utf8"),
   readFile(workspacePath, "utf8"),
 ]);
 
-const staticRoutes = new Set(parseStaticRoutes(appSource).map(route => route.path));
+const staticRoutes = new Set(parseStaticRoutes(registrySource).map(route => route.path));
 const failures = [];
 
 if (!workspaceSource.includes('import V4Beta from "./V4Beta"') || !workspaceSource.includes("<V4Beta />")) {

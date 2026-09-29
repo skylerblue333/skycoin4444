@@ -31,10 +31,10 @@ describe("V3 route catalog primitives", () => {
   it("maps both direct and lazy page imports", () => {
     const imports = parseComponentImports(`
       import Home from "./pages/Home";
-      const Wallet = lazy(() => import('./pages/Wallet'));
+      const Wallet = lazy(() => import('@/pages/Wallet'));
     `);
     expect(imports.get("Home")).toBe("./pages/Home");
-    expect(imports.get("Wallet")).toBe("./pages/Wallet");
+    expect(imports.get("Wallet")).toBe("@/pages/Wallet");
   });
 
   it("classifies representative product domains", () => {

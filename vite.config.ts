@@ -167,6 +167,40 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Keep the shell small and cacheable without weakening Vite's 500 kB
+    // warning threshold. Rolldown's current code-splitting API is preferred
+    // over the deprecated Rollup/manualChunks compatibility path.
+    rolldownOptions: {
+      output: {
+        strictExecutionOrder: true,
+        codeSplitting: {
+          minSize: 20_000,
+          maxSize: 350_000,
+          groups: [
+            {
+              name: "react-vendor",
+              test: /node_modules[\\/](?:react|react-dom|scheduler|wouter)[\\/]/,
+              priority: 40,
+            },
+            {
+              name: "charts-vendor",
+              test: /node_modules[\\/](?:recharts|d3-[^\\/]+)[\\/]/,
+              priority: 30,
+            },
+            {
+              name: "ui-vendor",
+              test: /node_modules[\\/](?:@radix-ui|framer-motion|lucide-react)[\\/]/,
+              priority: 20,
+            },
+            {
+              name: "vendor",
+              test: /node_modules/,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
   },
   server: {
     host: true,

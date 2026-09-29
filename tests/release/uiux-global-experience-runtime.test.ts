@@ -11,7 +11,7 @@ describe("global experience runtime release contract", () => {
     };
 
     expect(catalog.routes.length).toBeGreaterThan(1000);
-    expect(app).toContain('import GlobalExperienceRuntime from "./components/GlobalExperienceRuntime"');
+    expect(app).toMatch(/const GlobalExperienceRuntime = lazy\(\(\) => import\("\.\/components\/GlobalExperienceRuntime"\)\)/);
     expect(app).toContain("<GlobalExperienceRuntime />");
     expect(app).toContain('id="sky4444-route-content"');
     expect(app).toContain("tabIndex={-1}");

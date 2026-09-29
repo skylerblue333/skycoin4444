@@ -47,8 +47,8 @@ export function parseStaticRoutes(appSource) {
 
 export function parseComponentImports(appSource) {
   const imports = new Map();
-  const directPattern = /import\s+([A-Za-z_$][\w$]*)\s+from\s+["'](\.\/pages\/[^"']+)["'];?/g;
-  const lazyPattern = /const\s+([A-Za-z_$][\w$]*)\s*=\s*lazy\(\(\)\s*=>\s*import\(["'](\.\/pages\/[^"']+)["']\)\);?/g;
+  const directPattern = /import\s+([A-Za-z_$][\w$]*)\s+from\s+["']((?:\.\/|@\/)pages\/[^"']+)["'];?/g;
+  const lazyPattern = /const\s+([A-Za-z_$][\w$]*)\s*=\s*lazy\(\(\)\s*=>\s*import\(["']((?:\.\/|@\/)pages\/[^"']+)["']\)\);?/g;
 
   for (const pattern of [directPattern, lazyPattern]) {
     for (const match of appSource.matchAll(pattern)) {
