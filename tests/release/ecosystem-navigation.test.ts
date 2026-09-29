@@ -43,12 +43,15 @@ describe("ecosystem navigation and visual foundation", () => {
       "/dating-profile-setup",
       "/beta-web3",
       "/hope-a-i",
+      "/charity",
     ]) {
       expect(home).toContain(route);
     }
-    expect(home).toMatch(/Ten places worth tapping first/);
+    expect(home).toMatch(/Eleven places worth tapping first/);
     expect(home).toMatch(/No fake account balance/);
     expect(home).toMatch(/Premium presentation, careful claims/);
+    expect(home).toMatch(/Record one SkyHope action/);
+    expect(home).toMatch(/HopeAI, SkyHope, Social, SkySchool, Gaming/);
   });
 
   it("modernizes shared controls instead of only one page", () => {
