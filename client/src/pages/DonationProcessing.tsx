@@ -31,7 +31,7 @@ const DEFAULT_CHECKLIST: DonationPlanningChecklist = {
 };
 
 const HOPEAI_PRIVATE_HANDOFF_PROMPT =
-  "Help me review a SkyHope donation-intent planning brief. I will paste the private details into HopeAI myself. Do not claim a payment, donation, receipt, settlement, tax deduction, or beneficiary verification occurred.";
+  "Help me review a HopeAI Impact donation-intent planning brief. I will paste the private details into HopeAI myself. Do not claim a payment, donation, receipt, settlement, tax deduction, or beneficiary verification occurred.";
 
 export default function DonationProcessing() {
   const [campaignId, setCampaignId] = useState("community-support-sprint");
@@ -69,7 +69,7 @@ export default function DonationProcessing() {
 
   const privateReviewBrief = preview
     ? [
-        "# SkyHope donation-intent review",
+        "# HopeAI Impact donation-intent review",
         "",
         "Planning exercise only. No money moved.",
         "Campaign: " + preview.campaignId,
@@ -283,7 +283,7 @@ export default function DonationProcessing() {
             href="/charity"
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm font-bold transition hover:border-rose-300/25"
           >
-            Back to SkyHope <ArrowRight className="ml-1 inline h-4 w-4" />
+            Back to HopeAI Impact <ArrowRight className="ml-1 inline h-4 w-4" />
           </Link>
           <Link
             href="/fundraiser-tools"
