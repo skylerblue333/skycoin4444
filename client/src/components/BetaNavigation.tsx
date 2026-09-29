@@ -47,7 +47,7 @@ const primaryLinks = [
 const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
-  { label: "School", route: "/course-catalog" },
+  { label: "School", route: "/sky-school" },
   { label: "Journey", route: "/beta-journey" },
   { label: "Web3", route: "/beta-web3" },
   { label: "Dating", route: "/dating-home" },
@@ -69,7 +69,7 @@ const fourFoursTrail = [
     title: "Keep learning",
     message:
       "Curiosity compounds. Ask better questions, learn from people unlike you, and never be embarrassed to begin again.",
-    href: "/course-catalog",
+    href: "/sky-school",
     action: "Follow the lesson",
   },
   {
