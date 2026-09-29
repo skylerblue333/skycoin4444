@@ -12,6 +12,7 @@ import {
   Gamepad2,
   GraduationCap,
   Heart,
+  HeartHandshake,
   Languages,
   LayoutDashboard,
   MessageCircleMore,
@@ -125,6 +126,7 @@ const missions = [
   { id: "social", label: "Post or reply once", href: "/activity-feed", icon: Users },
   { id: "learn", label: "Complete one lesson", href: "/course-catalog", icon: GraduationCap },
   { id: "play", label: "Play one flagship game", href: "/gaming", icon: Gamepad2 },
+  { id: "impact", label: "Open SkyHope impact", href: "/charity", icon: HeartHandshake },
   { id: "explore", label: "Open one new product area", href: "/platform-map", icon: Compass },
 ] as const;
 
@@ -223,6 +225,12 @@ export default function Home() {
                   <Button size="lg" variant="outline" className="text-white">
                     <Gamepad2 className="mr-2 h-4 w-4" />
                     Play flagship games
+                  </Button>
+                </Link>
+                <Link href="/charity">
+                  <Button size="lg" variant="outline" className="text-white">
+                    <HeartHandshake className="mr-2 h-4 w-4" />
+                    Open SkyHope
                   </Button>
                 </Link>
                 <Link href="/platform-map">

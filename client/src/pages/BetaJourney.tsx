@@ -2,10 +2,14 @@ import { Link } from "wouter";
 import {
   Activity,
   BookOpen,
+  Bot,
   Flag,
+  Gamepad2,
+  HeartHandshake,
   MessageSquare,
   ShieldCheck,
   UserRound,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,6 +66,49 @@ const steps = [
     href: "/beta-feedback",
     label: "Open feedback",
     icon: Flag,
+  },
+] as const;
+
+const continueAreas = [
+  {
+    title: "HopeAI",
+    description:
+      "Move from onboarding evidence into the controlled assistant workspace for planning, drafting, and tool-assisted beta workflows.",
+    href: "/hope-a-i",
+    label: "Open HopeAI",
+    icon: Bot,
+  },
+  {
+    title: "Social",
+    description:
+      "Return to the persisted social surface to publish, reply, and continue account-owned community activity.",
+    href: "/activity-feed",
+    label: "Open Social",
+    icon: Users,
+  },
+  {
+    title: "Gaming",
+    description:
+      "Use the playable beta arcade paths with non-financial progress and explicit no-wager boundaries.",
+    href: "/gaming",
+    label: "Open Gaming",
+    icon: Gamepad2,
+  },
+  {
+    title: "SkySchool",
+    description:
+      "Keep learning through lessons, quizzes, and account-owned education progress after the activation gate.",
+    href: "/sky-school",
+    label: "Open SkySchool",
+    icon: BookOpen,
+  },
+  {
+    title: "SkyHope",
+    description:
+      "Explore charity and impact surfaces without implying that donation settlement or external impact verification is live.",
+    href: "/charity",
+    label: "Open SkyHope",
+    icon: HeartHandshake,
   },
 ] as const;
 
@@ -162,6 +209,46 @@ export default function BetaJourney() {
               </Card>
             );
           })}
+        </section>
+
+        <section aria-labelledby="continue-ecosystem-title">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200/65">
+                Continue after activation
+              </p>
+              <h2 id="continue-ecosystem-title" className="mt-2 text-2xl font-black tracking-tight">
+                Use the major product loop without route hunting.
+              </h2>
+            </div>
+            <Link href="/platform-map" className="text-sm font-semibold text-amber-200/75 hover:text-amber-100">
+              Explore every area →
+            </Link>
+          </div>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {continueAreas.map(area => {
+              const Icon = area.icon;
+              return (
+                <Card key={area.title} className="h-full border-white/10 bg-white/[0.025] text-white">
+                  <CardHeader>
+                    <Icon className="h-5 w-5 text-amber-200" />
+                    <CardTitle className="mt-3 text-base">{area.title}</CardTitle>
+                    <CardDescription className="leading-6 text-white/45">
+                      {area.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href={area.href}>
+                      <Button variant="outline" className="w-full">
+                        {area.label}
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/50">
