@@ -4,10 +4,12 @@ import {
   Activity,
   ArrowRight,
   BookOpen,
+  Bot,
   CheckCircle2,
   Circle,
   Flag,
   Gamepad2,
+  HeartHandshake,
   LayoutDashboard,
   LogOut,
   MessageSquare,
@@ -230,12 +232,14 @@ export default function Dashboard() {
               All product areas <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
+              { label: "HopeAI", detail: "Agents, tools, workspace", href: "/hope-a-i", icon: Bot },
               { label: "Social", detail: "Post, reply, react", href: "/activity-feed", icon: Users },
               { label: "Gaming", detail: "Six flagship games", href: "/gaming", icon: Gamepad2 },
+              { label: "SkySchool", detail: "Lessons and progress", href: "/sky-school", icon: BookOpen },
+              { label: "SkyHope", detail: "Impact missions + readiness", href: "/charity", icon: HeartHandshake },
               { label: "SkyLive", detail: "Creator room beta", href: "/live", icon: Radio },
-              { label: "SkySchool", detail: "Lessons and progress", href: "/course-catalog", icon: BookOpen },
             ].map(item => {
               const Icon = item.icon;
               return (
