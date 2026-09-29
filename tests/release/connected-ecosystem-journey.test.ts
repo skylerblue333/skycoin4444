@@ -11,7 +11,7 @@ const navigation = readFileSync("client/src/components/BetaNavigation.tsx", "utf
 const home = readFileSync("client/src/pages/Home.tsx", "utf8");
 const migrationRunner = readFileSync("scripts/migrate-skyhope-impact.mjs", "utf8");
 
-describe("HopeAI social gaming education SkyHope integration", () => {
+describe("HopeAI social gaming education Impact integration", () => {
   it("replaces the dead charity namespace with a real router", () => {
     expect(routers).toContain('import { charityRouter } from "./routers/charity"');
     expect(routers).toContain("charity:charityRouter");
@@ -72,12 +72,12 @@ describe("HopeAI social gaming education SkyHope integration", () => {
     expect(impactPlay).not.toContain('from "./Charity"');
   });
 
-  it("promotes HopeAI SkySchool SkyHope and the connected journey in navigation", () => {
+  it("promotes HopeAI SkySchool Impact and the connected journey in navigation", () => {
     expect(navigation).toContain('{ label: "School", route: "/course-catalog"');
     expect(navigation).toContain('{ label: "HopeAI", route: "/hope-a-i"');
-    expect(navigation).toContain('{ label: "SkyHope", route: "/charity"');
+    expect(navigation).toContain('{ label: "Impact", route: "/charity"');
     expect(navigation).toContain('{ label: "Journey", route: "/beta-journey"');
-    expect(home).toContain('title: "SkyHope"');
+    expect(home).toContain('title: "HopeAI Impact"');
     expect(home).toContain('href: "/beta-journey"');
     expect(betaJourney).toContain("trpc.charity.journey.useQuery");
     expect(betaJourney).toContain("Social → Learn → Play → Help → HopeAI");
