@@ -13,6 +13,7 @@ import {
   FolderOpen,
   GraduationCap,
   Loader2,
+  Scale,
   MessageSquarePlus,
   Paperclip,
   Pin,
@@ -47,41 +48,43 @@ const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 const storageKeyForUser = (userId: string): string =>
   STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
-type WorkspaceMode = "general" | "build" | "learn" | "plan";
+type WorkspaceMode = "general" | "build" | "learn" | "plan" | "legal";
 
 const modeOptions: Array<{
   id: WorkspaceMode;
   label: string;
   icon: typeof Bot;
-  systemPrompt: string;
+  agentId: string;
 }> = [
   {
     id: "general",
     label: "General",
     icon: Bot,
-    systemPrompt:
-      "You are HopeAI inside the SKYCOIN4444 engineering beta. Be useful, concise, and explicit about uncertainty. Never claim to have executed tools, opened files, browsed the web, or changed external systems unless the supplied conversation contains evidence that it happened.",
+    agentId: "general-assistant",
   },
   {
     id: "build",
     label: "Build",
     icon: Wrench,
-    systemPrompt:
-      "You are HopeAI in Build mode. Help design, debug, review, and ship software. Separate code suggestions from verified execution. Prefer concrete implementation steps and call out security or reliability boundaries.",
+    agentId: "software-engineer",
   },
   {
     id: "learn",
     label: "Learn",
     icon: GraduationCap,
-    systemPrompt:
-      "You are HopeAI in Learn mode. Teach clearly, check assumptions, use examples, and end with a short recall question when appropriate. Distinguish established facts from uncertainty.",
+    agentId: "tutor",
   },
   {
     id: "plan",
     label: "Plan",
     icon: Brain,
-    systemPrompt:
-      "You are HopeAI in Plan mode. Convert the user's goal into a practical sequence with dependencies, risks, and a clear next action. Do not imply autonomous execution or background work.",
+    agentId: "project-manager",
+  },
+  {
+    id: "legal",
+    label: "Lawyer",
+    icon: Scale,
+    agentId: "lawyer",
   },
 ];
 
@@ -110,6 +113,7 @@ export default function HopeAIWorkspace() {
   const [activeThreadId, setActiveThreadId] = useState("");
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<WorkspaceMode>("general");
+  const [selectedAgentId, setSelectedAgentId] = useState("general-assistant");
   const [selectedModel, setSelectedModel] = useState("");
   const [attachments, setAttachments] = useState<HopeWorkspaceAttachment[]>([]);
   const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
@@ -121,7 +125,10 @@ export default function HopeAIWorkspace() {
     enabled: isAuthenticated,
     retry: false,
   });
-  const chat = trpc.ai.chat.useMutation();
+  const catalog = trpc.hopeAI.catalog.useQuery(undefined, {
+    retry: false,
+  });
+  const agentRun = trpc.hopeAI.run.useMutation();
 
   useEffect(() => {
     if (!storageKey) {
@@ -167,6 +174,10 @@ export default function HopeAIWorkspace() {
 
   const activeMode =
     modeOptions.find(option => option.id === mode) ?? modeOptions[0];
+
+  const activeAgent = catalog.data?.agents.find(
+    agent => agent.id === selectedAgentId
+  );
 
   const updateThread = (
     threadId: string,
@@ -238,7 +249,7 @@ export default function HopeAIWorkspace() {
 
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
-    if (!text || !activeThread || chat.isPending) return;
+    if (!text || !activeThread || agentRun.isPending) return;
 
     const threadId = activeThread.id;
     const currentMessages = activeThread.messages;
@@ -263,17 +274,19 @@ export default function HopeAIWorkspace() {
     setAttachments([]);
 
     try {
-      const result = await chat.mutateAsync({
+      const result = await agentRun.mutateAsync({
+        agentId: selectedAgentId,
         message: buildHopeProviderContent(userMessage),
         history: buildHopeProviderHistory(currentMessages),
         ...(selectedModel ? { model: selectedModel } : {}),
-        systemPrompt: activeMode.systemPrompt,
       });
 
       const assistantMessage = createHopeWorkspaceMessage({
         role: "assistant",
         content: result.reply,
         model: result.model,
+        agentName: result.agent.name,
+        toolEvents: result.toolEvents,
       });
 
       updateThread(threadId, thread => ({
@@ -404,11 +417,12 @@ export default function HopeAIWorkspace() {
           <div className="mt-4 rounded-2xl border border-border bg-background/50 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-primary" />
-              Provider-backed chat
+              Tool-enabled agent runtime
             </div>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Requests go through the protected SKYCOIN4444 AI router. Local
-              history is sent only as bounded conversation context.
+              HopeAI can call approved deterministic server tools and records
+              which tools actually ran. External integrations stay gated until
+              they are connected.
             </p>
           </div>
         </aside>
@@ -424,7 +438,7 @@ export default function HopeAIWorkspace() {
                   <div>
                     <h1 className="font-black">HopeAI</h1>
                     <p className="text-xs text-muted-foreground">
-                      Chat + workspace + files
+                      Agents + real tools + files
                     </p>
                   </div>
                 </div>
@@ -486,6 +500,23 @@ export default function HopeAIWorkspace() {
                   )}
                 </select>
 
+                <select
+                  value={selectedAgentId}
+                  onChange={event => setSelectedAgentId(event.target.value)}
+                  className="h-9 max-w-52 rounded-lg border border-border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-primary/40"
+                  aria-label="HopeAI specialist"
+                >
+                  {catalog.data?.agents.length ? (
+                    catalog.data.agents.map(agent => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="general-assistant">General Assistant</option>
+                  )}
+                </select>
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -505,7 +536,10 @@ export default function HopeAIWorkspace() {
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => setMode(option.id)}
+                    onClick={() => {
+                      setMode(option.id);
+                      setSelectedAgentId(option.agentId);
+                    }}
                     className={
                       "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition " +
                       (mode === option.id
@@ -533,10 +567,10 @@ export default function HopeAIWorkspace() {
                       What can HopeAI help you do?
                     </h2>
                     <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-                      This workspace uses the configured AI provider instead of
-                      simulated replies. Add bounded text files, keep multiple
-                      local conversations, and pin useful outputs into the
-                      workspace rail.
+                      This workspace uses the configured AI provider plus a
+                      permissioned server-side tool runtime. Choose from
+                      specialized agents, including Lawyer, engineering,
+                      research, business, security, education, and many more.
                     </p>
                     <div className="mt-7 grid gap-3 sm:grid-cols-2">
                       {starterPrompts.map(prompt => (
@@ -570,6 +604,7 @@ export default function HopeAIWorkspace() {
                           <Check className="h-3.5 w-3.5" />
                         )}
                         <span>{message.role === "assistant" ? "HopeAI" : "You"}</span>
+                        {message.agentName ? <span>· {message.agentName}</span> : null}
                         {message.model ? <span>· {message.model}</span> : null}
                       </div>
 
@@ -590,6 +625,30 @@ export default function HopeAIWorkspace() {
                             {message.content}
                           </p>
                         )}
+
+                        {message.toolEvents?.length ? (
+                          <div className="mt-3 rounded-xl border border-border bg-background/60 p-3">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                              Tool execution
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {message.toolEvents.map((event, index) => (
+                                <Badge
+                                  key={event.toolId + "-" + index}
+                                  variant="outline"
+                                  className={
+                                    event.status === "success"
+                                      ? "border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                                      : "border-destructive/30 text-destructive"
+                                  }
+                                >
+                                  {event.status === "success" ? "✓ " : "✕ "}
+                                  {event.toolId}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
 
                         {message.attachmentNames?.length ? (
                           <div className="mt-3 flex flex-wrap gap-2">
@@ -626,12 +685,12 @@ export default function HopeAIWorkspace() {
                     </article>
                   ))}
 
-                  {chat.isPending ? (
+                  {agentRun.isPending ? (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <div className="grid h-8 w-8 place-items-center rounded-full bg-primary/10">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       </div>
-                      HopeAI is responding through the configured provider…
+                      HopeAI agent is reasoning and may call approved tools…
                     </div>
                   ) : null}
                   <div ref={endRef} />
@@ -679,7 +738,11 @@ export default function HopeAIWorkspace() {
                       void sendMessage();
                     }
                   }}
-                  placeholder={"Message HopeAI in " + activeMode.label + " mode…"}
+                  placeholder={
+                    "Message " +
+                    (activeAgent?.name ?? activeMode.label) +
+                    "…"
+                  }
                   className="min-h-20 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
@@ -708,10 +771,10 @@ export default function HopeAIWorkspace() {
                   </div>
                   <Button
                     onClick={() => void sendMessage()}
-                    disabled={!input.trim() || chat.isPending}
+                    disabled={!input.trim() || agentRun.isPending}
                     size="sm"
                   >
-                    {chat.isPending ? (
+                    {agentRun.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>
@@ -735,11 +798,35 @@ export default function HopeAIWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                Workspace
+                Agent workspace
               </p>
-              <h2 className="mt-1 font-black">Pinned outputs</h2>
+              <h2 className="mt-1 font-black">Tools + outputs</h2>
             </div>
             <Archive className="h-4 w-4 text-muted-foreground" />
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
+            <div className="flex items-center gap-2">
+              <Bot className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold">
+                {activeAgent?.name ?? "General Assistant"}
+              </p>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {activeAgent?.description ??
+                "Specialized HopeAI agent with permissioned local tools."}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Badge variant="outline">
+                {catalog.data?.agentCount ?? "100+"} agents
+              </Badge>
+              <Badge variant="outline">
+                {catalog.data?.executableToolCount ?? "many"} executable tools
+              </Badge>
+              <Badge variant="outline">
+                {catalog.data?.toolCount ?? "many"} catalog tools
+              </Badge>
+            </div>
           </div>
 
           <div className="mt-4 space-y-3">
@@ -807,9 +894,10 @@ export default function HopeAIWorkspace() {
               Beta boundary
             </p>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              This is conversational AI plus a browser-local workspace. It does
-              not claim Manus computer-use automation, ChatGPT feature parity,
-              durable cloud memory, or autonomous background execution.
+              Real local tools are enabled and auditable. Web browsing, email,
+              GitHub writes, payments, wallet signing, cloud deployment, durable
+              cloud memory, and computer-use automation remain unavailable until
+              an explicit integration is connected and authorized.
             </p>
           </div>
         </aside>

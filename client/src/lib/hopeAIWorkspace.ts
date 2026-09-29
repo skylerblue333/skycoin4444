@@ -7,12 +7,21 @@ export type HopeWorkspaceAttachment = {
   text: string;
 };
 
+export type HopeWorkspaceToolEvent = {
+  toolId: string;
+  status: "success" | "error";
+  output?: unknown;
+  error?: string;
+};
+
 export type HopeWorkspaceMessage = {
   id: string;
   role: HopeWorkspaceRole;
   content: string;
   createdAt: number;
   model?: string;
+  agentName?: string;
+  toolEvents?: HopeWorkspaceToolEvent[];
   attachmentNames?: string[];
   attachmentContext?: string;
 };
@@ -66,12 +75,16 @@ export const createHopeWorkspaceMessage = ({
   content,
   now = Date.now(),
   model,
+  agentName,
+  toolEvents = [],
   attachments = [],
 }: {
   role: HopeWorkspaceRole;
   content: string;
   now?: number;
   model?: string;
+  agentName?: string;
+  toolEvents?: HopeWorkspaceToolEvent[];
   attachments?: HopeWorkspaceAttachment[];
 }): HopeWorkspaceMessage => ({
   id: id("message", now),
@@ -79,6 +92,8 @@ export const createHopeWorkspaceMessage = ({
   content: content.trim(),
   createdAt: now,
   ...(model ? { model } : {}),
+  ...(agentName ? { agentName } : {}),
+  ...(toolEvents.length ? { toolEvents: toolEvents.slice(0, 20) } : {}),
   ...(attachments.length
     ? {
         attachmentNames: attachments.map(attachment => attachment.name),
@@ -202,7 +217,24 @@ export const normalizeHopeWorkspaceThreads = (
           typeof thread.createdAt === "number" ? thread.createdAt : Date.now(),
         updatedAt:
           typeof thread.updatedAt === "number" ? thread.updatedAt : Date.now(),
-        messages,
+        messages: messages.map(message => ({
+          ...message,
+          ...(typeof message.agentName === "string"
+            ? { agentName: message.agentName.slice(0, 120) }
+            : {}),
+          ...(Array.isArray(message.toolEvents)
+            ? {
+                toolEvents: message.toolEvents
+                  .filter(
+                    event =>
+                      event &&
+                      typeof event.toolId === "string" &&
+                      (event.status === "success" || event.status === "error")
+                  )
+                  .slice(0, 20),
+              }
+            : {}),
+        })),
         artifacts,
       };
     });
@@ -220,6 +252,17 @@ export const exportHopeWorkspaceThread = (
 
   for (const message of thread.messages) {
     lines.push("## " + (message.role === "user" ? "You" : "HopeAI"));
+    if (message.agentName) {
+      lines.push("Agent: " + message.agentName);
+    }
+    if (message.toolEvents?.length) {
+      lines.push(
+        "Tools: " +
+          message.toolEvents
+            .map(event => event.toolId + " (" + event.status + ")")
+            .join(", ")
+      );
+    }
     if (message.attachmentNames?.length) {
       lines.push("Attachments: " + message.attachmentNames.join(", "));
     }
