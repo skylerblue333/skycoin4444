@@ -22,6 +22,8 @@ A deployment is current only when all of the following are true:
 
 Do not call an old successful deployment current simply because the service is healthy.
 
+The scheduled and manually dispatched `Hosted Beta Health Monitor` passes its exact workflow revision to the public smoke verifier through `HOSTED_BETA_EXPECTED_SHA`. The monitor fails closed when the hosted service reports a different `releaseSha`, even if health, database, authentication configuration, and readiness otherwise look healthy. Pull-request monitor runs intentionally omit this equality check because a PR head is not expected to be deployed; the repository tests still exercise both matching and stale-release behavior.
+
 ## V5 product surface
 
 The V5 hub promotes ten coherent flagship platform areas with product-first navigation, search, recents, favorites, and route-validated quick actions. Guided V4/V5 demo continuity and browser-local tester review remain available for structured evaluation.

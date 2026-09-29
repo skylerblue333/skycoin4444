@@ -8,6 +8,8 @@ on:
     paths:
       - ".github/workflows/hosted-beta-health-monitor.yml"
       - "scripts/hosted-beta-smoke.mjs"
+      - "tests/release/hosted-beta-smoke.test.ts"
+      - "docs/V5_BETA_LAUNCH.md"
 
 permissions:
   contents: read
@@ -23,6 +25,7 @@ jobs:
     timeout-minutes: 5
     env:
       HOSTED_BETA_ORIGIN: https://skycoin4444-beta-v5-production.up.railway.app
+      HOSTED_BETA_EXPECTED_SHA: ${{ github.event_name != 'pull_request' && github.sha || '' }}
     steps:
       - name: Checkout exact source revision
         uses: actions/checkout@v4
