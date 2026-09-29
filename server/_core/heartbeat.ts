@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { ENV } from "./env";
+import { sanitizeOperationalError } from "./operationalError";
 
 export type HeartbeatJob = {
   name: string;
@@ -41,6 +42,7 @@ export type HeartbeatJobInfo = {
 };
 
 const SERVICE = "webdevtoken.v1.WebDevService";
+const FORGE_REQUEST_TIMEOUT_MS = 10_000;
 
 const buildEndpoint = (rpc: string): string => {
   if (!ENV.forgeApiUrl) {
@@ -84,24 +86,40 @@ const callForge = async <T>(
       method: "POST",
       headers,
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(FORGE_REQUEST_TIMEOUT_MS),
     });
   } catch (error) {
+    console.warn(
+      `[Heartbeat] ${rpc} request failed: ${sanitizeOperationalError(error)}`
+    );
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
-      message: `Heartbeat ${rpc} network error: ${String(error)}`,
+      message: `Heartbeat ${rpc} service unavailable.`,
     });
   }
 
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw mapForgeError(response, detail, rpc);
+    console.warn(
+      `[Heartbeat] ${rpc} upstream request failed with status ${response.status}`
+    );
+    throw mapForgeError(response, rpc);
   }
-  return (await response.json()) as T;
+
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    console.warn(
+      `[Heartbeat] ${rpc} returned invalid JSON: ${sanitizeOperationalError(error)}`
+    );
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Heartbeat ${rpc} returned an invalid response.`,
+    });
+  }
 };
 
 const mapForgeError = (
   response: Response,
-  detail: string,
   rpc: string
 ): TRPCError => {
   const status = response.status;
@@ -114,7 +132,7 @@ const mapForgeError = (
   else if (status === 429) code = "TOO_MANY_REQUESTS";
   return new TRPCError({
     code,
-    message: `Heartbeat ${rpc} failed (${status})${detail ? `: ${detail}` : ""}`,
+    message: `Heartbeat ${rpc} failed with upstream status ${status}.`,
   });
 };
 
