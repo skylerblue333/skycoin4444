@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - "scripts/hosted-load-baseline.mjs"
+      - "scripts/lib/hosted-load-release.mjs"
+      - "scripts/lib/hosted-load-release.test.mjs"
       - ".github/workflows/hosted-load-baseline.yml"
 
 permissions:
@@ -21,6 +23,7 @@ jobs:
     timeout-minutes: 10
     env:
       HOSTED_BETA_ORIGIN: https://skycoin4444-beta-v5-production.up.railway.app
+      HOSTED_LOAD_EXPECTED_SHA: ${{ github.event_name == 'workflow_dispatch' && github.sha || '' }}
       LOAD_TOTAL_REQUESTS: "180"
       LOAD_CONCURRENCY: "6"
       LOAD_WARMUP_REQUESTS: "12"
