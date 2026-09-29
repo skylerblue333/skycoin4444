@@ -106,9 +106,13 @@ const starterPrompts = [
 const readLaunchPrompt = (): string => {
   if (typeof window === "undefined") return "";
   try {
-    return (new URLSearchParams(window.location.search).get("prompt") ?? "")
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("source") === "messaging") {
+      return consumeMessagingHopeAILaunch();
+    }
+    return (params.get("prompt") ?? "")
       .trim()
-      .slice(0, 4_000);
+      .slice(0, MAX_HOPEAI_LAUNCH_DRAFT_CHARS);
   } catch {
     return "";
   }
