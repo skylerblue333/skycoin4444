@@ -352,7 +352,7 @@ const betaAreaRouteHints: Readonly<Record<string, readonly string[]>> = {
   creator: ["creator", "content", "publish", "media", "video editor", "video upload", "audio", "blog", "reel"],
   enterprise: ["enterprise", "crm", "business", "organization", "project", "task", "approval", "support", "contract", "invoice", "billing", "subscription", "workflow automation"],
   investor: ["investor", "vesting", "fundraising", "treasury", "equity"],
-  impact: ["charity", "donation", "impact", "skyhope"],
+  impact: ["charity", "donation", "impact", "skyhope", "mission", "volunteer", "beneficiary", "gaming for charity"],
   "trust-safety": ["trust", "safety", "security", "privacy", "audit", "moderation", "compliance", "accessibility", "two factor", "2fa", "permission", "consent", "identity", "auth", "secret"],
   analytics: ["analytics", "metric", "report", "tracking", "insight", "monitoring", "status", "health"],
 };
