@@ -291,6 +291,55 @@ export const arcadeGameProgress = mysqlTable("arcade_game_progress", {
 export type ArcadeGameProgress = typeof arcadeGameProgress.$inferSelect;
 export type InsertArcadeGameProgress = typeof arcadeGameProgress.$inferInsert;
 
+// ============ SKYHOPE IMPACT TABLES ============
+export const charityPledges = mysqlTable("charity_pledges", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  campaignId: varchar("campaign_id", { length: 120 }).notNull(),
+  amountMinor: int("amount_minor").notNull(),
+  currency: varchar("currency", { length: 3 }).notNull(),
+  status: varchar("status", { length: 32 }).default("pledged").notNull(),
+  idempotencyKey: varchar("idempotency_key", { length: 128 }).notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userIdempotencyUnique: uniqueIndex("charity_pledges_user_idempotency_unique").on(
+    table.userId,
+    table.idempotencyKey
+  ),
+  userCreatedIndex: index("charity_pledges_user_created_idx").on(
+    table.userId,
+    table.createdAt
+  ),
+  campaignCreatedIndex: index("charity_pledges_campaign_created_idx").on(
+    table.campaignId,
+    table.createdAt
+  ),
+}));
+
+export const charityVolunteerActions = mysqlTable("charity_volunteer_actions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
+  campaignId: varchar("campaign_id", { length: 120 }),
+  actionType: varchar("action_type", { length: 64 }).notNull(),
+  minutes: int("minutes").notNull(),
+  note: varchar("note", { length: 255 }),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => ({
+  userCreatedIndex: index("charity_volunteer_actions_user_created_idx").on(
+    table.userId,
+    table.createdAt
+  ),
+  campaignCreatedIndex: index("charity_volunteer_actions_campaign_created_idx").on(
+    table.campaignId,
+    table.createdAt
+  ),
+}));
+
+export type CharityPledge = typeof charityPledges.$inferSelect;
+export type InsertCharityPledge = typeof charityPledges.$inferInsert;
+export type CharityVolunteerAction = typeof charityVolunteerActions.$inferSelect;
+export type InsertCharityVolunteerAction = typeof charityVolunteerActions.$inferInsert;
+
 // ============ DISCOVERY PERSISTENCE TABLES ============
 export const discoveryBookmarks = mysqlTable("discovery_bookmarks", {
   id: varchar("id", { length: 255 }).primaryKey(),
