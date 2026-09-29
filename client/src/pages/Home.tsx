@@ -68,10 +68,17 @@ const flagshipAreas = [
   },
   {
     title: "HopeAI",
-    subtitle: "Controlled assistant workspace",
+    subtitle: "Specialist assistant and planning workspace",
     href: "/hope-a-i",
     icon: Bot,
     status: "Controlled lab",
+  },
+  {
+    title: "SkyHope",
+    subtitle: "Community impact planning and evidence",
+    href: "/charity",
+    icon: Heart,
+    status: "Impact-planning beta",
   },
   {
     title: "Market",
@@ -125,6 +132,7 @@ const missions = [
   { id: "social", label: "Post or reply once", href: "/activity-feed", icon: Users },
   { id: "learn", label: "Complete one lesson", href: "/course-catalog", icon: GraduationCap },
   { id: "play", label: "Play one flagship game", href: "/gaming", icon: Gamepad2 },
+  { id: "help", label: "Build one SkyHope action plan", href: "/charity", icon: Heart },
   { id: "explore", label: "Open one new product area", href: "/platform-map", icon: Compass },
 ] as const;
 
@@ -208,7 +216,7 @@ export default function Home() {
               </h1>
               <p className="mt-6 max-w-3xl text-base leading-8 text-white/58 sm:text-lg">
                 Social, chat, live, learning, gaming, commerce, Web3, dating, language exchange,
-                and HopeAI now share a denser premium shell inspired by the red-and-gold control-room
+                HopeAI, and SkyHope community impact now share a denser premium shell inspired by the red-and-gold control-room
                 direction—without copying unsupported claims from the reference artwork.
               </p>
 
@@ -236,7 +244,7 @@ export default function Home() {
               <div className="mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
                   [routeCatalog.routes.length.toLocaleString(), "indexed routes"],
-                  ["10", "headline areas"],
+                  [flagshipAreas.length.toString(), "headline areas"],
                   ["6", "flagship games"],
                   ["1", "unified shell"],
                 ].map(([value, label]) => (
@@ -338,11 +346,89 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-b border-white/[0.06] bg-gradient-to-b from-amber-300/[0.035] via-red-500/[0.025] to-transparent">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <div>
+              <p className="sky-eyebrow">Hope + action</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+                Ask HopeAI. Turn the answer into an impact plan.
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/45">
+                HopeAI is the reasoning and coaching workspace. SkyHope is the community-impact planning path.
+                The beta keeps the handoff explicit so a useful idea can become a bounded plan with evidence steps
+                instead of a fake donation receipt or unverifiable success claim.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/hope-a-i">
+                  <Button>
+                    <Bot className="mr-2 h-4 w-4" />
+                    Plan with HopeAI
+                  </Button>
+                </Link>
+                <Link href="/charity">
+                  <Button variant="outline" className="text-white">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Open SkyHope
+                  </Button>
+                </Link>
+              </div>
+              <p className="mt-5 max-w-2xl text-[11px] leading-5 text-white/28">
+                Engineering beta boundary: these routes do not by themselves execute donations, move funds,
+                verify charities or beneficiaries, issue tax receipts, or prove real-world outcomes.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  title: "Learn",
+                  detail: "Use SkySchool to understand the problem before acting.",
+                  href: "/sky-school",
+                  icon: GraduationCap,
+                },
+                {
+                  title: "Play",
+                  detail: "Use bounded games as engagement, not financial value.",
+                  href: "/gaming",
+                  icon: Gamepad2,
+                },
+                {
+                  title: "Connect",
+                  detail: "Use Social to discuss ideas with account-aware beta participation.",
+                  href: "/activity-feed",
+                  icon: Users,
+                },
+                {
+                  title: "Act",
+                  detail: "Use SkyHope to turn intent into a concrete, evidence-oriented plan.",
+                  href: "/charity",
+                  icon: Heart,
+                },
+              ].map(({ title, detail, href, icon: Icon }) => (
+                <Link
+                  key={title}
+                  href={href}
+                  className="sky-panel-soft group rounded-3xl p-5 transition hover:-translate-y-0.5 hover:border-amber-200/18 hover:bg-amber-200/[0.04]"
+                >
+                  <Icon className="h-5 w-5 text-amber-100/80" />
+                  <strong className="mt-4 block text-base">{title}</strong>
+                  <span className="mt-2 block text-xs leading-5 text-white/38">{detail}</span>
+                  <span className="mt-4 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.14em] text-amber-100/55">
+                    Open path <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="sky-eyebrow">Ecosystem launch grid</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Ten places worth tapping first.</h2>
+            <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Eleven places worth tapping first.</h2>
           </div>
           <Link href="/platform-map" className="inline-flex items-center gap-2 text-sm font-bold text-amber-100/75 hover:text-amber-50">
             Full product map <ArrowRight className="h-4 w-4" />
