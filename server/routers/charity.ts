@@ -84,6 +84,38 @@ export function isImpactTableUnavailable(error: unknown): boolean {
   );
 }
 
+export function isImpactIdempotencyConflict(error: unknown): boolean {
+  const root = error as {
+    code?: unknown;
+    errno?: unknown;
+    message?: unknown;
+    cause?: unknown;
+  };
+  const candidates = [root, root?.cause].filter(Boolean) as Array<{
+    code?: unknown;
+    errno?: unknown;
+    message?: unknown;
+  }>;
+
+  return candidates.some(candidate => {
+    const message = String(candidate?.message ?? "").toLowerCase();
+    const isDuplicate =
+      candidate?.code === "ER_DUP_ENTRY" ||
+      candidate?.errno === 1062 ||
+      candidate?.code === "23505" ||
+      candidate?.code === "SQLITE_CONSTRAINT_UNIQUE" ||
+      message.includes("duplicate entry") ||
+      message.includes("unique constraint failed");
+
+    if (!isDuplicate) return false;
+
+    return (
+      message.includes("charity_pledges_user_idempotency_unique") ||
+      (message.includes("charity_pledges") && message.includes("idempotency"))
+    );
+  });
+}
+
 function campaignById(id: CampaignId) {
   const campaign = SKYHOPE_CAMPAIGNS.find(item => item.id === id);
   if (!campaign) throw new Error("unknown SkyHope campaign");
@@ -344,15 +376,47 @@ export const charityRouter = router({
       }
 
       const id = randomUUID();
-      await db.insert(charityPledges).values({
-        id,
-        userId: ctx.user.id,
-        campaignId: campaign.id,
-        amountMinor: input.amountMinor,
-        currency: campaign.currency,
-        status: "pledged",
-        idempotencyKey: input.idempotencyKey,
-      });
+      try {
+        await db.insert(charityPledges).values({
+          id,
+          userId: ctx.user.id,
+          campaignId: campaign.id,
+          amountMinor: input.amountMinor,
+          currency: campaign.currency,
+          status: "pledged",
+          idempotencyKey: input.idempotencyKey,
+        });
+      } catch (error) {
+        if (!isImpactIdempotencyConflict(error)) throw error;
+
+        const replayRows = await db
+          .select({
+            id: charityPledges.id,
+            campaignId: charityPledges.campaignId,
+            amountMinor: charityPledges.amountMinor,
+            currency: charityPledges.currency,
+            status: charityPledges.status,
+            createdAt: charityPledges.createdAt,
+          })
+          .from(charityPledges)
+          .where(
+            and(
+              eq(charityPledges.userId, ctx.user.id),
+              eq(charityPledges.idempotencyKey, input.idempotencyKey),
+            ),
+          )
+          .limit(1);
+
+        const replay = replayRows[0];
+        if (!replay) throw error;
+
+        return {
+          created: false as const,
+          pledge: replay,
+          settlementExecuted: false as const,
+          paymentProviderCalled: false as const,
+        };
+      }
 
       return {
         created: true as const,
