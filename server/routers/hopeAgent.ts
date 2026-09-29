@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { invokeLLM, type Message } from "../_core/llm";
+import { sanitizeOperationalError } from "../_core/operationalError";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import {
   DEFAULT_HOPE_AGENT_ID,
@@ -36,11 +37,16 @@ const responseText = (
   return content.map(part => part.text ?? "").join("\n").trim();
 };
 
-const providerError = (error: unknown): TRPCError =>
-  new TRPCError({
+const providerError = (error: unknown): TRPCError => {
+  console.warn(
+    "[HopeAI] agent provider failure:",
+    sanitizeOperationalError(error),
+  );
+  return new TRPCError({
     code: "INTERNAL_SERVER_ERROR",
-    message: error instanceof Error ? error.message : "HopeAI agent request failed",
+    message: "HopeAI agent request failed",
   });
+};
 
 type ToolEvent = {
   toolId: string;
