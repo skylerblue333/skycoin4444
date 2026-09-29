@@ -41,6 +41,7 @@ A capability may be called **provider-backed** only after its actual production-
 | Durable activation journey                          | Conditional          | Profile, one authored lesson, one bounded social post, and feedback persist for the invited account and survive refresh/re-authentication.         |
 | Documentation, known issues, and capability catalog | Available in beta    | Public/internal links resolve and match the deployed release.                                                                                     |
 | Feedback and support intake                         | Available in beta    | The destination is monitored and an owner is assigned for triage.                                                                                 |
+| SkyHope cause discovery and pledge planning           | Engineering beta     | Demonstration causes and a validated non-settling pledge planner are available; no payment, donation settlement, custody, token transfer, or blockchain execution occurs. |
 
 ## Explicitly excluded from the initial public beta
 
@@ -84,3 +85,12 @@ If the core journey is unavailable, data integrity/privacy is in doubt, an autho
 The canonical Mission Control beta application is this repository. External repositories and internal packages may act as source libraries, reference implementations, experiments, or historical evidence; they are not independently deployable beta services unless separately named in a release record.
 
 See [`catalogs/mission-control-beta.json`](catalogs/mission-control-beta.json) for the machine-readable surface register, [`docs/BETA_AREA_READINESS_MATRIX.md`](docs/BETA_AREA_READINESS_MATRIX.md) for the all-areas workstream gates, and [`BETA_RELEASE_CHECKLIST.md`](BETA_RELEASE_CHECKLIST.md) for the release procedure. Testers can use the `/beta-catalog` route to inspect the current status and evidence gate for every registered area.
+
+
+## SkyHope controlled-beta boundary
+
+SkyHope is exposed as a controlled engineering-beta impact workspace. Its current cause catalog is explicitly demonstration data used to validate browsing, accessibility, navigation, pledge-planning, and impact-methodology UX.
+
+The SkyHope pledge planner validates an authenticated support intent and returns a projected campaign total, but it does not collect money, persist a donation, issue a receipt, move tokens, hold custody, broadcast a blockchain transaction, verify a nonprofit, or prove an external impact outcome. Volunteer opportunities are product examples until a verified organizer/provider integration supplies live opportunities.
+
+A future provider-backed donation path must separately prove beneficiary verification, legal/region policy, provider configuration, success/failure behavior, monitoring, receipt handling, refund/dispute handling, privacy controls, and release evidence before the product language may claim real donation execution.

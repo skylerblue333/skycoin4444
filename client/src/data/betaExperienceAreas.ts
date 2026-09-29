@@ -266,15 +266,15 @@ export const betaExperienceAreas: readonly BetaExperienceArea[] = [
     category: "impact",
     status: "controlled_beta",
     description:
-      "Bring charity and impact tools together while keeping donation execution and external proof claims behind their real verification boundaries.",
+      "Discover demonstration causes, build a non-settling pledge plan, review volunteer examples, and inspect the evidence boundary before any real-world provider is connected.",
     route: "/charity",
-    action: "Open Impact",
+    action: "Open SkyHope",
     highlights: [
-      { label: "Leaderboard", route: "/charity-leaderboard", note: "Community impact ranking surface" },
-      { label: "Impact map", route: "/impact-map", note: "Impact visualization" },
-      { label: "Impact metrics", route: "/impact-metrics", note: "Impact measurement surface" },
+      { label: "Cause directory", route: "/charity", note: "Demo cause discovery and pledge planning" },
+      { label: "Charity gaming", route: "/gaming-for-charity", note: "Demo-only charity gaming policy" },
+      { label: "Impact metrics", route: "/impact-metrics", note: "Impact measurement surface; evidence varies by route" },
     ],
-    searchTerms: ["hope", "charity", "impact", "community", "giving"],
+    searchTerms: ["hope", "skyhope", "charity", "impact", "volunteer", "pledge", "community", "giving"],
   },
   {
     id: "trust-safety",
