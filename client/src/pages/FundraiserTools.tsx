@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
+  AlertTriangle,
   ArrowRight,
   CheckCircle2,
   Clipboard,
@@ -8,6 +9,7 @@ import {
   Save,
   Sparkles,
   Target,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -31,13 +33,42 @@ const DEFAULT_DRAFT: SkyHopeCampaignDraft = {
   durationDays: 30,
 };
 
+const MAX_SAVED_DRAFT_CHARS = 4_096;
+const HOPEAI_PRIVATE_HANDOFF_PROMPT =
+  "Help me review a SkyHope organizer brief. I will paste the private planning details into HopeAI myself. Keep beneficiary privacy, consent, evidence quality, and realistic measurement central. Do not claim the campaign is published, verified, tax-deductible, funded, or connected to a payment provider.";
+
+function draftFromPlan(plan: SkyHopeCampaignPlan): SkyHopeCampaignDraft {
+  return {
+    title: plan.title,
+    mission: plan.mission,
+    beneficiaryScope: plan.beneficiaryScope,
+    targetOutcome: plan.targetOutcome,
+    targetCount: plan.targetCount,
+    durationDays: plan.durationDays,
+  };
+}
+
 function loadDraft(): SkyHopeCampaignDraft {
   if (typeof window === "undefined") return DEFAULT_DRAFT;
   try {
     const raw = window.localStorage.getItem(SKYHOPE_DRAFT_KEY);
     if (!raw) return DEFAULT_DRAFT;
-    return normalizeSkyHopeCampaignDraft(JSON.parse(raw)) ?? DEFAULT_DRAFT;
+    if (raw.length > MAX_SAVED_DRAFT_CHARS) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    const normalized = normalizeSkyHopeCampaignDraft(JSON.parse(raw));
+    if (!normalized) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    return normalized;
   } catch {
+    try {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+    } catch {
+      // Storage may be unavailable; use the in-memory default either way.
+    }
     return DEFAULT_DRAFT;
   }
 }
@@ -87,9 +118,33 @@ export default function FundraiserTools() {
   }
 
   function saveDraft() {
+    setError("");
     try {
-      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, JSON.stringify(draft));
-      toast.success("SkyHope draft saved on this device.");
+      const validatedPlan = createSkyHopeCampaignPlan(draft);
+      const normalizedDraft = draftFromPlan(validatedPlan);
+      const serialized = JSON.stringify(normalizedDraft);
+      if (serialized.length > MAX_SAVED_DRAFT_CHARS) {
+        throw new Error("Validated draft is too large for browser storage.");
+      }
+      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, serialized);
+      setDraft(normalizedDraft);
+      setPlan(validatedPlan);
+      toast.success("Validated SkyHope draft saved on this device.");
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Campaign draft is invalid."
+      );
+      toast.error("Draft was not saved. Fix the validation issue first.");
+    }
+  }
+
+  function clearSavedDraft() {
+    try {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      setDraft(DEFAULT_DRAFT);
+      setPlan(null);
+      setError("");
+      toast.success("Saved SkyHope draft cleared from this browser.");
     } catch {
       toast.error("Browser storage is unavailable.");
     }
@@ -105,15 +160,9 @@ export default function FundraiserTools() {
     }
   }
 
-  const hopePrompt = organizerBrief
-    ? [
-        "Review this SkyHope organizer brief and improve it as a planning document.",
-        "Keep beneficiary privacy, consent, evidence quality, and realistic measurement central.",
-        "Do not claim the campaign is published, verified, tax-deductible, funded, or connected to a payment provider.",
-        "",
-        organizerBrief,
-      ].join("\n")
-    : "Help me turn a SkyHope cause idea into a bounded organizer brief with evidence checkpoints and no unverified payment claims.";
+  const hopeHref =
+    "/hope-a-i?source=skyhope&prompt=" +
+    encodeURIComponent(HOPEAI_PRIVATE_HANDOFF_PROMPT);
 
   return (
     <main className="min-h-screen bg-[#07090f] px-4 py-12 text-white md:px-6">
@@ -133,10 +182,24 @@ export default function FundraiserTools() {
             Turn a cause into an evidence-first organizer brief.
           </h1>
           <p className="mt-4 text-sm leading-7 text-white/55 md:text-base">
-            Build a deterministic campaign timeline, keep the draft on this
-            device, copy the brief, and hand it to HopeAI for review. Nothing
-            here publishes a fundraiser or collects money.
+            Build a deterministic campaign timeline, keep a validated draft on
+            this device, copy the brief, and hand it to HopeAI for review.
+            Nothing here publishes a fundraiser or collects money.
           </p>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] p-4 text-sm leading-6 text-amber-50/80">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+            <p>
+              Browser-saved drafts are local application storage, not encrypted
+              beneficiary records. Do not enter names, precise addresses,
+              contact details, medical information, account identifiers, or
+              other sensitive personal data. SkyHope also keeps organizer-brief
+              details out of the HopeAI URL; copy and paste them explicitly if
+              you decide they should be shared with HopeAI.
+            </p>
+          </div>
         </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
@@ -151,6 +214,7 @@ export default function FundraiserTools() {
                 Title
                 <Input
                   value={draft.title}
+                  maxLength={120}
                   onChange={event =>
                     setDraft(current => ({ ...current, title: event.target.value }))
                   }
@@ -161,6 +225,7 @@ export default function FundraiserTools() {
                 Mission
                 <textarea
                   value={draft.mission}
+                  maxLength={600}
                   onChange={event =>
                     setDraft(current => ({ ...current, mission: event.target.value }))
                   }
@@ -171,6 +236,7 @@ export default function FundraiserTools() {
                 Beneficiary scope
                 <Input
                   value={draft.beneficiaryScope}
+                  maxLength={240}
                   onChange={event =>
                     setDraft(current => ({
                       ...current,
@@ -184,6 +250,7 @@ export default function FundraiserTools() {
                 Measured outcome
                 <Input
                   value={draft.targetOutcome}
+                  maxLength={240}
                   onChange={event =>
                     setDraft(current => ({
                       ...current,
@@ -242,7 +309,11 @@ export default function FundraiserTools() {
               </Button>
               <Button variant="outline" onClick={saveDraft}>
                 <Save className="mr-2 h-4 w-4" />
-                Save draft
+                Validate + save draft
+              </Button>
+              <Button variant="ghost" onClick={clearSavedDraft}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Clear saved draft
               </Button>
             </div>
           </section>
@@ -301,11 +372,11 @@ export default function FundraiserTools() {
             Donation intent preview <ArrowRight className="ml-1 inline h-4 w-4" />
           </Link>
           <Link
-            href={"/hope-a-i?source=skyhope&prompt=" + encodeURIComponent(hopePrompt)}
+            href={hopeHref}
             className="rounded-2xl border border-rose-300/20 bg-rose-300/[0.06] p-4 text-sm font-black text-rose-100 hover:border-rose-300/35"
           >
             <Sparkles className="mr-1 inline h-4 w-4" />
-            Improve with HopeAI
+            Open HopeAI, then paste brief
           </Link>
         </div>
       </div>
