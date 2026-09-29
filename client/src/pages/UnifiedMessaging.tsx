@@ -1,539 +1,207 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useMemo, useState } from "react";
+import { Link, useLocation } from "wouter";
+import { Bot, CheckCircle2, Copy, MessageCircle, ShieldCheck, Trash2, Users } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Send,
-  MessageCircle,
-  Users,
-  Plus,
-  Search,
-  Phone,
-  Video,
-  MoreVertical,
-  Globe,
-  Volume2,
-  Copy,
-  Trash2,
-  Pin,
-  Archive,
-  Settings,
-} from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { prepareMessagingHopeAILaunch } from "@/lib/hopeAILaunchContext";
 
-interface Message {
-  id: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar: string;
-  content: string;
-  translatedContent?: string;
-  sourceLanguage: string;
-  targetLanguage: string;
-  timestamp: Date;
-  isTranslated: boolean;
-  reactions: { emoji: string; count: number }[];
-}
+const MAX_DRAFT_LENGTH = 4_000;
 
-interface Conversation {
-  id: string;
-  type: "direct" | "group";
-  name: string;
-  avatar: string;
-  lastMessage: string;
-  lastMessageTime: Date;
-  unreadCount: number;
-  participants: { id: string; name: string; avatar: string; online: boolean }[];
-  sourceLanguage: string;
-  targetLanguage: string;
-  autoTranslate: boolean;
-}
+export default function UnifiedMessaging() {
+  const { isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
+  const [draft, setDraft] = useState("");
 
-const MOCK_CONVERSATIONS: Conversation[] = [
-  {
-    id: "c1",
-    type: "direct",
-    name: "李明",
-    avatar: "🇨🇳",
-    lastMessage: "How are you doing today?",
-    lastMessageTime: new Date(Date.now() - 5 * 60 * 1000),
-    unreadCount: 2,
-    participants: [
-      { id: "p1", name: "李明", avatar: "🇨🇳", online: true },
+  const trimmedDraft = draft.trim();
+  const charactersRemaining = MAX_DRAFT_LENGTH - draft.length;
+  const canCopy = trimmedDraft.length > 0;
+
+  const boundaryItems = useMemo(
+    () => [
+      "No remote message is sent from this screen.",
+      "No realtime transport, delivery receipt, presence, push notification, or cross-device persistence is claimed.",
+      "Automatic translation and end-to-end encryption are not enabled on this flagship beta route.",
+      "Use Social for persisted community activity and HopeAI for assistant-supported drafting while messaging transport is completed.",
     ],
-    sourceLanguage: "Chinese",
-    targetLanguage: "English",
-    autoTranslate: true,
-  },
-  {
-    id: "c2",
-    type: "direct",
-    name: "Maria García",
-    avatar: "🇪🇸",
-    lastMessage: "Let's practice tomorrow!",
-    lastMessageTime: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    unreadCount: 0,
-    participants: [
-      { id: "p2", name: "Maria García", avatar: "🇪🇸", online: false },
-    ],
-    sourceLanguage: "Spanish",
-    targetLanguage: "English",
-    autoTranslate: false,
-  },
-  {
-    id: "c3",
-    type: "group",
-    name: "Language Learners",
-    avatar: "👥",
-    lastMessage: "Sofia: Great session everyone!",
-    lastMessageTime: new Date(Date.now() - 30 * 60 * 1000),
-    unreadCount: 5,
-    participants: [
-      { id: "p3", name: "Yuki Tanaka", avatar: "🇯🇵", online: true },
-      { id: "p4", name: "Pierre Dubois", avatar: "🇫🇷", online: true },
-      { id: "p5", name: "Sofia Novak", avatar: "🇷🇺", online: false },
-    ],
-    sourceLanguage: "English",
-    targetLanguage: "Multiple",
-    autoTranslate: true,
-  },
-];
-
-const MOCK_MESSAGES: Message[] = [
-  {
-    id: "m1",
-    senderId: "p1",
-    senderName: "李明",
-    senderAvatar: "🇨🇳",
-    content: "你好！今天怎么样？",
-    translatedContent: "Hello! How are you today?",
-    sourceLanguage: "Chinese",
-    targetLanguage: "English",
-    timestamp: new Date(Date.now() - 10 * 60 * 1000),
-    isTranslated: true,
-    reactions: [{ emoji: "👍", count: 1 }],
-  },
-  {
-    id: "m2",
-    senderId: "user",
-    senderName: "You",
-    senderAvatar: "👤",
-    content: "I'm doing great! Ready for practice?",
-    sourceLanguage: "English",
-    targetLanguage: "Chinese",
-    timestamp: new Date(Date.now() - 8 * 60 * 1000),
-    isTranslated: false,
-    reactions: [],
-  },
-  {
-    id: "m3",
-    senderId: "p1",
-    senderName: "李明",
-    senderAvatar: "🇨🇳",
-    content: "当然！我们今天讨论什么话题？",
-    translatedContent: "Of course! What topic should we discuss today?",
-    sourceLanguage: "Chinese",
-    targetLanguage: "English",
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    isTranslated: true,
-    reactions: [{ emoji: "😊", count: 1 }],
-  },
-];
-
-export function UnifiedMessaging() {
-  const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(
-    MOCK_CONVERSATIONS[0]
+    []
   );
-  const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
-  const [messageInput, setMessageInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showNewConversation, setShowNewConversation] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [autoTranslate, setAutoTranslate] = useState(true);
-  const [selectedLanguagePair, setSelectedLanguagePair] = useState("auto");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  async function copyDraft() {
+    if (!canCopy) return;
+    try {
+      if (!navigator.clipboard) throw new Error("clipboard unavailable");
+      await navigator.clipboard.writeText(trimmedDraft);
+      toast.success("Message draft copied");
+    } catch {
+      toast.error("Clipboard access is unavailable in this browser");
+    }
+  }
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  function clearDraft() {
+    setDraft("");
+    toast.success("Draft cleared");
+  }
 
-  const handleSendMessage = () => {
-    if (!messageInput.trim() || !selectedConversation) return;
+  function openHopeAI() {
+    if (!canCopy) {
+      navigate("/hope-a-i");
+      return;
+    }
 
-    const newMessage: Message = {
-      id: `m${messages.length + 1}`,
-      senderId: "user",
-      senderName: "You",
-      senderAvatar: "👤",
-      content: messageInput,
-      sourceLanguage: selectedConversation.targetLanguage,
-      targetLanguage: selectedConversation.sourceLanguage,
-      timestamp: new Date(),
-      isTranslated: false,
-      reactions: [],
-    };
+    if (!prepareMessagingHopeAILaunch(trimmedDraft)) {
+      toast.error(
+        "This browser could not prepare the private HopeAI handoff. Copy the draft instead."
+      );
+      return;
+    }
 
-    setMessages([...messages, newMessage]);
-    setMessageInput("");
-
-    // Simulate response
-    setTimeout(() => {
-      const response: Message = {
-        id: `m${messages.length + 2}`,
-        senderId: selectedConversation.participants[0].id,
-        senderName: selectedConversation.participants[0].name,
-        senderAvatar: selectedConversation.avatar,
-        content: "That's great! 很好！",
-        translatedContent: "That's great!",
-        sourceLanguage: selectedConversation.sourceLanguage,
-        targetLanguage: selectedConversation.targetLanguage,
-        timestamp: new Date(),
-        isTranslated: autoTranslate,
-        reactions: [],
-      };
-      setMessages((prev) => [...prev, response]);
-    }, 1000);
-  };
-
-  const handleTranslateMessage = (messageId: string) => {
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === messageId ? { ...msg, isTranslated: !msg.isTranslated } : msg
-      )
-    );
-  };
-
-  const handleDeleteMessage = (messageId: string) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
-    toast.success("Message deleted");
-  };
-
-  const filteredConversations = conversations.filter((conv) =>
-    conv.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    navigate("/hope-a-i?source=messaging");
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
-      <div className="max-w-7xl mx-auto h-screen flex flex-col">
-        {/* Header */}
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-            <MessageCircle className="w-8 h-8 text-purple-400" />
-            Unified Messaging
-          </h1>
-          <p className="text-gray-400 text-sm">
-            Real-time translation across all conversations
-          </p>
-        </div>
-
-        <div className="flex gap-4 flex-1 overflow-hidden">
-          {/* Conversations Sidebar */}
-          <div className="w-80 flex flex-col bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
-            {/* Search & New */}
-            <div className="p-4 border-b border-slate-700 space-y-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                <Input
-                  placeholder="Search conversations..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-slate-700 border-slate-600"
-                />
-              </div>
-              <Button
-                className="w-full bg-purple-600 hover:bg-purple-700"
-                onClick={() => setShowNewConversation(true)}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Conversation
-              </Button>
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-950/60 to-slate-950 px-4 py-10 text-white">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header className="flex flex-col gap-4 rounded-3xl border border-violet-300/15 bg-white/[0.035] p-6 shadow-2xl shadow-black/20 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-violet-400/15 text-violet-100">MESSAGING BETA</Badge>
+              <Badge variant="outline" className="border-amber-300/25 text-amber-100">
+                Transport not connected
+              </Badge>
             </div>
-
-            {/* Conversations List */}
-            <ScrollArea className="flex-1">
-              <div className="space-y-2 p-3">
-                {filteredConversations.map((conv) => (
-                  <Card
-                    key={conv.id}
-                    className={`p-3 cursor-pointer transition-all ${
-                      selectedConversation?.id === conv.id
-                        ? "bg-purple-900/50 border-purple-500"
-                        : "bg-slate-700/50 border-slate-600 hover:bg-slate-600/50"
-                    }`}
-                    onClick={() => setSelectedConversation(conv)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl">{conv.avatar}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start mb-1">
-                          <h3 className="font-bold text-white truncate">{conv.name}</h3>
-                          {conv.unreadCount > 0 && (
-                            <Badge className="bg-red-500/20 text-red-400">
-                              {conv.unreadCount}
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-gray-400 text-xs truncate">{conv.lastMessage}</p>
-                        <p className="text-gray-500 text-xs mt-1">
-                          {conv.lastMessageTime.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </ScrollArea>
+            <h1 className="mt-4 flex items-center gap-3 text-3xl font-black tracking-tight sm:text-4xl">
+              <MessageCircle className="h-8 w-8 text-violet-300" />
+              Unified Messaging
+            </h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
+              A truthful engineering-beta workspace for preparing messages and moving between Chat,
+              Social, and HopeAI without pretending that an unfinished realtime backend is already live.
+            </p>
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/activity-feed"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-bold text-white/70 transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <Users className="h-4 w-4" />
+              Open Social
+            </Link>
+            <button
+              type="button"
+              onClick={openHopeAI}
+              className="inline-flex items-center gap-2 rounded-xl border border-violet-300/20 bg-violet-300/[0.08] px-4 py-2 text-sm font-bold text-violet-100 transition hover:bg-violet-300/[0.14]"
+            >
+              <Bot className="h-4 w-4" />
+              {canCopy ? "Polish with HopeAI" : "Draft with HopeAI"}
+            </button>
+          </div>
+        </header>
 
-          {/* Chat Area */}
-          {selectedConversation ? (
-            <div className="flex-1 flex flex-col bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
-              {/* Chat Header */}
-              <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{selectedConversation.avatar}</div>
-                  <div>
-                    <h2 className="font-bold text-white">{selectedConversation.name}</h2>
-                    <p className="text-gray-400 text-sm">
-                      {selectedConversation.type === "group"
-                        ? `${selectedConversation.participants.length} members`
-                        : selectedConversation.participants[0]?.online
-                        ? "Online"
-                        : "Offline"}
-                    </p>
-                  </div>
-                </div>
+        <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
+          <Card className="border-white/10 bg-slate-950/55 text-white">
+            <CardHeader>
+              <CardTitle>Message draft</CardTitle>
+              <CardDescription className="text-white/45">
+                This editor is local to the current page session. Copy the draft when you are ready
+                to move it into a connected communication channel.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                aria-label="Message draft"
+                value={draft}
+                maxLength={MAX_DRAFT_LENGTH}
+                onChange={event => setDraft(event.target.value)}
+                placeholder="Write a message, outreach note, language-exchange reply, or community update…"
+                className="min-h-64 border-white/10 bg-white/[0.035] text-white placeholder:text-white/25"
+              />
 
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs text-white/35">
+                  {charactersRemaining.toLocaleString()} characters remaining · nothing is transmitted automatically
+                </p>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="outline">
-                    <Phone className="w-4 h-4" />
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <Video className="w-4 h-4" />
-                  </Button>
                   <Button
-                    size="sm"
+                    type="button"
                     variant="outline"
-                    onClick={() => setShowSettings(true)}
+                    onClick={clearDraft}
+                    disabled={!draft}
+                    className="border-white/10 bg-transparent text-white/65 hover:bg-white/[0.06] hover:text-white"
                   >
-                    <Settings className="w-4 h-4" />
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Clear
                   </Button>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-4">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`flex gap-3 ${msg.senderId === "user" ? "justify-end" : ""}`}
-                    >
-                      {msg.senderId !== "user" && (
-                        <div className="text-2xl flex-shrink-0">{msg.senderAvatar}</div>
-                      )}
-
-                      <div
-                        className={`max-w-xs ${
-                          msg.senderId === "user"
-                            ? "bg-purple-600 text-white rounded-l-lg rounded-tr-lg"
-                            : "bg-slate-700 text-gray-100 rounded-r-lg rounded-tl-lg"
-                        } p-3 group`}
-                      >
-                        {msg.senderId !== "user" && (
-                          <p className="text-xs font-bold text-gray-300 mb-1">
-                            {msg.senderName}
-                          </p>
-                        )}
-
-                        <p className="text-sm mb-2">{msg.content}</p>
-
-                        {msg.isTranslated && msg.translatedContent && (
-                          <div className="bg-black/20 p-2 rounded text-xs mb-2">
-                            <div className="flex items-center gap-1 mb-1">
-                              <Globe className="w-3 h-3" />
-                              <span className="text-gray-300">
-                                {msg.targetLanguage}
-                              </span>
-                            </div>
-                            <p className="text-gray-200">{msg.translatedContent}</p>
-                          </div>
-                        )}
-
-                        <div className="flex items-center justify-between gap-2 mt-2 text-xs text-gray-400">
-                          <span>
-                            {msg.timestamp.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-
-                          <div className="hidden group-hover:flex gap-1">
-                            {msg.translatedContent && (
-                              <button
-                                onClick={() => handleTranslateMessage(msg.id)}
-                                title="Toggle translation"
-                                className="hover:text-purple-300"
-                              >
-                                <Globe className="w-3 h-3" />
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                navigator.clipboard.writeText(msg.content);
-                                toast.success("Copied to clipboard");
-                              }}
-                              title="Copy message"
-                              className="hover:text-purple-300"
-                            >
-                              <Copy className="w-3 h-3" />
-                            </button>
-                            {msg.senderId === "user" && (
-                              <button
-                                onClick={() => handleDeleteMessage(msg.id)}
-                                title="Delete message"
-                                className="hover:text-red-400"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              </ScrollArea>
-
-              {/* Message Input */}
-              <div className="p-4 border-t border-slate-700 space-y-3">
-                <div className="flex gap-2">
-                  <Textarea
-                    placeholder="Type your message..."
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && e.ctrlKey) {
-                        handleSendMessage();
-                      }
-                    }}
-                    className="bg-slate-700 border-slate-600 resize-none"
-                    rows={3}
-                  />
                   <Button
-                    onClick={handleSendMessage}
-                    className="bg-purple-600 hover:bg-purple-700 self-end"
+                    type="button"
+                    onClick={copyDraft}
+                    disabled={!canCopy}
+                    className="bg-violet-500 text-white hover:bg-violet-400"
                   >
-                    <Send className="w-4 h-4" />
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy draft
                   </Button>
                 </div>
+              </div>
 
-                {autoTranslate && (
-                  <div className="flex items-center gap-2 text-xs text-gray-400 bg-slate-700/50 p-2 rounded">
-                    <Globe className="w-3 h-3" />
-                    Auto-translating to {selectedConversation.sourceLanguage}
+              <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.055] p-4">
+                <p className="text-sm font-black text-amber-100">Remote send is intentionally unavailable here.</p>
+                <p className="mt-1 text-xs leading-5 text-amber-50/55">
+                  The previous flagship screen used hard-coded conversations and simulated replies.
+                  This beta now fails closed until authenticated transport, durable storage, participant
+                  authorization, moderation, and delivery evidence are integrated.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="space-y-6">
+            <Card className="border-emerald-300/15 bg-emerald-300/[0.04] text-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <ShieldCheck className="h-5 w-5 text-emerald-300" />
+                  Capability boundary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {boundaryItems.map(item => (
+                  <div key={item} className="flex gap-2 text-sm leading-5 text-white/55">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300/80" />
+                    <span>{item}</span>
                   </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="border-white/10 bg-white/[0.025] text-white">
+              <CardHeader>
+                <CardTitle className="text-base">Account path</CardTitle>
+                <CardDescription className="text-white/40">
+                  Authenticated messaging remains a launch integration task rather than a simulated success.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isAuthenticated ? (
+                  <p className="text-sm leading-6 text-white/55">
+                    Your beta session is active. The remaining work is a real participant-aware messaging
+                    adapter with durable storage and transport evidence.
+                  </p>
+                ) : (
+                  <Link
+                    href="/signin"
+                    className="inline-flex rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950"
+                  >
+                    Sign in to the beta
+                  </Link>
                 )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex-1 flex items-center justify-center bg-slate-800/50 border border-slate-700 rounded-lg">
-              <div className="text-center">
-                <MessageCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">Select a conversation to start messaging</p>
-              </div>
-            </div>
-          )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-
-      {/* New Conversation Dialog */}
-      <Dialog open={showNewConversation} onOpenChange={setShowNewConversation}>
-        <DialogContent className="bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white">Start New Conversation</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-400 block mb-2">Conversation Type</label>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="type" defaultChecked className="w-4 h-4" />
-                  <span className="text-white">Direct Message</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="radio" name="type" className="w-4 h-4" />
-                  <span className="text-white">Group Chat</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 block mb-2">Select Participant</label>
-              <Input placeholder="Search for users..." className="bg-slate-800 border-slate-700" />
-            </div>
-            <Button className="w-full bg-purple-600 hover:bg-purple-700">
-              Start Conversation
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Settings Dialog */}
-      <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="bg-slate-900 border-slate-700">
-          <DialogHeader>
-            <DialogTitle className="text-white">Conversation Settings</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-white">Auto-Translate Messages</label>
-              <input
-                type="checkbox"
-                checked={autoTranslate}
-                onChange={(e) => setAutoTranslate(e.target.checked)}
-                className="w-4 h-4"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-400 block mb-2">Language Pair</label>
-              <select className="w-full bg-slate-800 border border-slate-700 text-white rounded px-3 py-2">
-                <option>Auto-detect</option>
-                <option>English ↔ Chinese</option>
-                <option>English ↔ Spanish</option>
-                <option>English ↔ Japanese</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Button className="w-full bg-slate-700 hover:bg-slate-600" variant="outline">
-                <Pin className="w-4 h-4 mr-2" />
-                Pin Conversation
-              </Button>
-              <Button className="w-full bg-slate-700 hover:bg-slate-600" variant="outline">
-                <Archive className="w-4 h-4 mr-2" />
-                Archive Conversation
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+    </main>
   );
 }
-
-export default UnifiedMessaging;

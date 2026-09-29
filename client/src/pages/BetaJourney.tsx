@@ -1,246 +1,236 @@
 import { Link } from "wouter";
-import {
-  Activity,
-  BookOpen,
-  Bot,
-  Flag,
-  Gamepad2,
-  HeartHandshake,
-  MessageSquare,
-  ShieldCheck,
-  UserRound,
-} from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { startLogin } from "@/const";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  ArrowRight,
+  Bot,
+  Gamepad2,
+  GraduationCap,
+  Heart,
+  MessageCircleMore,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
-const steps = [
-  {
-    number: "01",
-    title: "Enter with an invited account",
-    description:
-      "Use the configured identity provider. Production admission is checked before session issuance.",
-    href: "/signin",
-    label: "Open sign in",
-    icon: ShieldCheck,
-  },
-  {
-    number: "02",
-    title: "Configure your profile",
-    description:
-      "Save a display name, username, bio, and privacy choice against your authenticated account.",
-    href: "/profile",
-    label: "Open profile",
-    icon: UserRound,
-  },
-  {
-    number: "03",
-    title: "Record SkySchool progress",
-    description:
-      "Complete one deterministic lesson and persist that completion to your account.",
-    href: "/course-catalog",
-    label: "Open SkySchool",
-    icon: BookOpen,
-  },
-  {
-    number: "04",
-    title: "Make one social contribution",
-    description:
-      "Publish a bounded post so the beta has a real account-owned social record.",
-    href: "/activity-feed",
-    label: "Open activity feed",
-    icon: MessageSquare,
-  },
-  {
-    number: "05",
-    title: "Submit actionable feedback",
-    description:
-      "Record one product observation so the beta generates evidence for the next release.",
-    href: "/beta-feedback",
-    label: "Open feedback",
-    icon: Flag,
-  },
-] as const;
+const missionIcons = {
+  social: MessageCircleMore,
+  learn: GraduationCap,
+  play: Gamepad2,
+  impact: Heart,
+} as const;
 
-const connectedPaths = [
-  {
-    title: "Study with HopeAI",
-    description:
-      "Carry a hard question into the HopeAI workspace. Provider-backed answers remain subject to configured AI availability and the workspace's evidence boundaries.",
-    href: "/hope-a-i",
-    label: "Open HopeAI",
-    icon: Bot,
-  },
-  {
-    title: "Connect learning to SkyHope",
-    description:
-      "Move from education into the charity and impact surface. Browsing the path does not itself process a donation, payment, or external transfer.",
-    href: "/charity",
-    label: "Open SkyHope",
-    icon: HeartHandshake,
-  },
-  {
-    title: "Practice through play",
-    description:
-      "Use the flagship game floor as a demo-credit practice path. This journey does not turn game activity into real-value wagering or rewards.",
-    href: "/gaming",
-    label: "Open gaming",
-    icon: Gamepad2,
-  },
+const activationEvidenceRoutes = [
+  { label: "Sign in", href: "/signin" },
+  { label: "Profile", href: "/profile" },
+  { label: "Course catalog", href: "/course-catalog" },
+  { label: "Social activity", href: "/activity-feed" },
+  { label: "Beta feedback", href: "/beta-feedback" },
+  { label: "Activity evidence", href: "/activity-evidence" },
 ] as const;
 
 export default function BetaJourney() {
+  const { user, loading, isAuthenticated } = useAuth();
+  const journey = trpc.charity.journey.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
+
+  if (loading) {
+    return <main className="min-h-screen bg-[#050510] p-8 text-white">Loading connected journey…</main>;
+  }
+
   return (
     <main className="min-h-screen bg-[#050510] text-white">
-      <header className="border-b border-white/10 bg-[#050510]/95">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-5">
-          <Link href="/" className="text-sm text-white/45 hover:text-white">
-            ← Home
-          </Link>
-          <div className="h-4 w-px bg-white/15" />
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-black">Durable Beta Journey</h1>
-              <Badge
-                variant="outline"
-                className="border-emerald-400/40 text-emerald-200"
-              >
-                Non-financial
-              </Badge>
-            </div>
-            <p className="mt-1 text-xs text-white/40">
-              A measurable account activation loop for invited testers
-            </p>
-          </div>
-        </div>
-      </header>
-
       <div className="mx-auto max-w-6xl space-y-8 px-4 py-10">
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200/70">
-              Persisted evidence over page count
-            </p>
-            <h2 className="mt-3 text-4xl font-black tracking-tight">
-              Sign in, configure, learn, contribute, report.
-            </h2>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-white/55">
-              These are the same five gates measured by the onboarding
-              activation status. Profile configuration, lesson progress, social
-              posts, and feedback are account-owned records that should survive
-              refresh and later sessions when the beta database is available.
-            </p>
+        <header className="rounded-[2rem] border border-amber-200/12 bg-gradient-to-br from-amber-300/[0.06] via-white/[0.02] to-rose-400/[0.05] p-6 md:p-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <Sparkles className="h-7 w-7 text-amber-200" />
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-100/55">Connected beta journey</p>
+              <h1 className="mt-1 text-3xl font-black md:text-4xl">Social → Learn → Play → Help → HopeAI.</h1>
+            </div>
+            <Badge variant="outline" className="border-emerald-300/30 text-emerald-100">
+              Persisted evidence
+            </Badge>
           </div>
+          <p className="mt-5 max-w-4xl text-sm leading-7 text-white/50">
+            This path is derived from account-owned records instead of a client-side tour counter. Social posts,
+            SkySchool lesson completions, synced arcade plays, and HopeAI Impact actions all feed one next-step
+            contract. HopeAI stays available as the planning assistant without pretending its local chat history is
+            server-persisted completion evidence. Persisted evidence over page count.
+          </p>
+          <p className="mt-3 max-w-4xl text-sm leading-7 text-white/42">
+            The durable activation loop remains the same five gates measured by the onboarding. Connected ecosystem paths are optional ways to keep going after those gates: learn, explore, play, help, and ask HopeAI. Learn once, then move somewhere useful.
+          </p>
+        </header>
 
-          <Card className="border-emerald-400/25 bg-emerald-400/[0.05] text-white">
-            <CardHeader>
-              <Activity className="h-5 w-5 text-emerald-200" />
-              <CardTitle className="mt-3">Measure the actual journey</CardTitle>
-              <CardDescription className="text-white/50">
-                The onboarding route derives completion from persisted records
-                instead of a client-side tour counter.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Link href="/onboarding">
-                <Button className="w-full">Open activation dashboard</Button>
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-black uppercase tracking-[0.18em] text-white/35">
+              Connected ecosystem paths
+            </span>
+            {[
+              { label: "School", href: "/course-catalog" },
+              { label: "Gaming", href: "/gaming" },
+              { label: "HopeAI", href: "/hope-a-i" },
+              { label: "Impact", href: "/charity" },
+              { label: "Social", href: "/activity-feed" },
+            ].map(path => (
+              <Link key={path.href} href={path.href}>
+                <Button size="sm" variant="ghost">{path.label}</Button>
               </Link>
-              <Link href="/activity-evidence">
-                <Button variant="outline" className="w-full">
-                  Inspect activity evidence
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {steps.map(step => {
-            const Icon = step.icon;
-            return (
-              <Card
-                key={step.number}
-                className="h-full border-white/10 bg-white/[0.025] text-white"
-              >
+        {!isAuthenticated || !user ? (
+          <Card className="border-amber-300/20 bg-amber-300/[0.04]">
+            <CardContent className="space-y-4 p-6">
+              <h2 className="text-xl font-black">Sign in to measure the real journey</h2>
+              <p className="text-sm leading-6 text-white/45">
+                Anonymous browsing is still available, but persisted journey status requires an invited beta account.
+              </p>
+              <Button onClick={() => startLogin()}>Sign in</Button>
+            </CardContent>
+          </Card>
+        ) : journey.data ? (
+          <>
+            <section className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr]">
+              <Card className="border-emerald-300/20 bg-emerald-300/[0.035]">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold tracking-[0.18em] text-white/30">
-                      {step.number}
-                    </span>
-                    <Icon className="h-5 w-5 text-emerald-200" />
+                  <CardTitle>Account progress</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <div>
+                    <strong className="text-6xl font-black text-emerald-100">
+                      {journey.data.completionPercent}%
+                    </strong>
+                    <p className="mt-2 text-sm text-white/40">
+                      {journey.data.completedCount} of {journey.data.totalCount} evidence-backed missions complete
+                    </p>
                   </div>
-                  <CardTitle className="mt-2 text-base">
-                    {step.title}
-                  </CardTitle>
-                  <CardDescription className="leading-6 text-white/45">
-                    {step.description}
-                  </CardDescription>
+                  <Progress value={journey.data.completionPercent} />
+                  <Link href={journey.data.nextMission.route}>
+                    <Button className="w-full">
+                      Continue: {journey.data.nextMission.label}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <p className="text-xs leading-5 text-white/30">
+                    Impact persistence: {journey.data.impactPersistenceReady ? "ready" : "migration 0015 required"}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {journey.data.missions.map(mission => {
+                  const Icon = missionIcons[mission.id as keyof typeof missionIcons] ?? Sparkles;
+                  return (
+                    <Link
+                      key={mission.id}
+                      href={mission.route}
+                      className={
+                        "rounded-3xl border p-5 transition hover:-translate-y-0.5 " +
+                        (mission.complete
+                          ? "border-emerald-300/20 bg-emerald-300/[0.04]"
+                          : "border-white/10 bg-white/[0.025] hover:border-amber-200/20")
+                      }
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-black/20">
+                          <Icon className="h-5 w-5 text-amber-100" />
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className={mission.complete ? "border-emerald-300/30 text-emerald-100" : ""}
+                        >
+                          {mission.complete ? "Complete" : "Open"}
+                        </Badge>
+                      </div>
+                      <h2 className="mt-4 font-black">{mission.label}</h2>
+                      <p className="mt-2 text-xs leading-5 text-white/35">{mission.evidence}</p>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="grid gap-4 md:grid-cols-3">
+              <Card className="border-violet-300/15 bg-violet-300/[0.035]">
+                <CardHeader>
+                  <Bot className="h-5 w-5 text-violet-200" />
+                  <CardTitle className="mt-2">HopeAI assist</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Link href={step.href}>
-                    <Button variant="outline" className="w-full">
-                      {step.label}
+                  <p className="text-sm leading-6 text-white/42">
+                    Use the active HopeAI workspace to plan a lesson, debug code, draft outreach, organize a volunteer
+                    project, or think through the next ecosystem task.
+                  </p>
+                  <Link href="/hope-a-i">
+                    <Button className="mt-4 w-full" variant="outline">
+                      Open HopeAI
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
-            );
-          })}
-        </section>
 
-        <section className="space-y-4" aria-labelledby="connected-ecosystem-paths">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-200/70">
-              Connected ecosystem paths
-            </p>
-            <h2 id="connected-ecosystem-paths" className="mt-2 text-2xl font-black tracking-tight">
-              Learn once, then move somewhere useful.
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-white/50">
-              The durable activation loop stays evidence-led, while these next paths connect education to HopeAI, SkyHope, and the flagship game floor without pretending those systems share persistence or financial execution.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {connectedPaths.map(path => {
-              const Icon = path.icon;
-              return (
-                <Card
-                  key={path.href}
-                  className="h-full border-amber-200/10 bg-amber-200/[0.025] text-white"
-                >
-                  <CardHeader>
-                    <Icon className="h-5 w-5 text-amber-200" />
-                    <CardTitle className="mt-3 text-base">{path.title}</CardTitle>
-                    <CardDescription className="leading-6 text-white/45">
-                      {path.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Link href={path.href}>
-                      <Button variant="outline" className="w-full">
-                        {path.label}
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
+              <Card className="border-white/10 bg-white/[0.025]">
+                <CardHeader>
+                  <ShieldCheck className="h-5 w-5 text-emerald-200" />
+                  <CardTitle className="mt-2">Activation evidence</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-white/42">
+                    Inspect the broader onboarding and activity evidence used by the invitation-only beta.
+                  </p>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {activationEvidenceRoutes.map(route => (
+                      <Link key={route.href} href={route.href}>
+                        <Button className="w-full" variant={route.href === "/activity-evidence" ? "outline" : "ghost"}>
+                          {route.label}
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/50">
+              <Card className="border-rose-300/15 bg-rose-300/[0.035]">
+                <CardHeader>
+                  <Heart className="h-5 w-5 text-rose-200" />
+                  <CardTitle className="mt-2">HopeAI Impact</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-6 text-white/42">
+                    Record pledge intent or volunteer effort, then bring what you actually did back to Social.
+                  </p>
+                  <div className="mt-4 grid gap-2">
+                    <Link href="/charity"><Button className="w-full">Open Impact</Button></Link>
+                    <Link href="/activity-feed"><Button className="w-full" variant="ghost">Open Social</Button></Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </>
+        ) : (
+          <Card className="border-white/10 bg-white/[0.025]">
+            <CardContent className="p-6 text-sm text-white/45">
+              {journey.isLoading
+                ? "Loading account evidence…"
+                : journey.error?.message ?? "Journey evidence is unavailable."}
+            </CardContent>
+          </Card>
+        )}
+
+        <section className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 text-sm leading-7 text-white/45">
           <ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-300" />
-          This journey does not issue credentials, token rewards, staking
-          rewards, airdrops, payments, wallet custody, signatures, blockchain
-          transactions, guaranteed AI-provider availability, live donation
-          processing, real-value gaming, livestream delivery, or
-          production-availability guarantees.
+          Journey completion does not issue credentials, token rewards, charity verification, payment settlement,
+          custody, or blockchain transactions. HopeAI still depends on configured AI availability, and this page does not itself process a donation and does not turn game activity into real-value wagering or rewards. It does not prove external-provider or HopeAI execution. There is no guaranteed AI-provider availability, live donation, or real-value gaming implied by this account-owned engineering-beta summary.
         </section>
       </div>
     </main>

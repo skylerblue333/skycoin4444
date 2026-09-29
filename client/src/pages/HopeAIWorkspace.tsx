@@ -12,6 +12,7 @@ import {
   FileText,
   FolderOpen,
   GraduationCap,
+  HeartHandshake,
   Loader2,
   Scale,
   MessageSquarePlus,
@@ -42,13 +43,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  MAX_HOPEAI_LAUNCH_DRAFT_CHARS,
+  consumeMessagingHopeAILaunch,
+} from "@/lib/hopeAILaunchContext";
 
 const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 
 const storageKeyForUser = (userId: string): string =>
   STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
-type WorkspaceMode = "general" | "build" | "learn" | "plan" | "legal";
+type WorkspaceMode = "general" | "build" | "learn" | "plan" | "impact" | "legal";
 
 const modeOptions: Array<{
   id: WorkspaceMode;
@@ -81,6 +86,12 @@ const modeOptions: Array<{
     agentId: "project-manager",
   },
   {
+    id: "impact",
+    label: "Impact",
+    icon: HeartHandshake,
+    agentId: "project-manager",
+  },
+  {
     id: "legal",
     label: "Lawyer",
     icon: Scale,
@@ -93,7 +104,34 @@ const starterPrompts = [
   "Explain a difficult concept and quiz me on it.",
   "Turn this idea into a concrete implementation plan.",
   "Help me debug a TypeScript problem.",
+  "Turn my SkyHope cause idea into a consent-aware impact plan with evidence checkpoints.",
 ];
+
+const readLaunchPrompt = (): string => {
+  if (typeof window === "undefined") return "";
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("source") === "messaging") {
+      return consumeMessagingHopeAILaunch();
+    }
+    return (params.get("prompt") ?? "")
+      .trim()
+      .slice(0, MAX_HOPEAI_LAUNCH_DRAFT_CHARS);
+  } catch {
+    return "";
+  }
+};
+
+const readLaunchMode = (): WorkspaceMode => {
+  if (typeof window === "undefined") return "general";
+  try {
+    return new URLSearchParams(window.location.search).get("source") === "skyhope"
+      ? "impact"
+      : "general";
+  } catch {
+    return "general";
+  }
+};
 
 const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
   try {
@@ -119,6 +157,7 @@ export default function HopeAIWorkspace() {
   const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const launchContextAppliedRef = useRef(false);
   const storageKey = user?.id ? storageKeyForUser(user.id) : null;
 
   const models = trpc.ai.getModels.useQuery(undefined, {
@@ -153,6 +192,44 @@ export default function HopeAIWorkspace() {
       // Workspace remains usable in memory when local storage is unavailable.
     }
   }, [loadedStorageKey, storageKey, threads]);
+
+  useEffect(() => {
+    if (!storageKey || loadedStorageKey !== storageKey || launchContextAppliedRef.current) {
+      return;
+    }
+
+    const launchPrompt = readLaunchPrompt();
+    const launchMode = readLaunchMode();
+    if (!launchPrompt && launchMode === "general") return;
+
+    launchContextAppliedRef.current = true;
+
+    if (launchPrompt) {
+      setInput(launchPrompt);
+    }
+
+    if (launchMode !== "general") {
+      const option =
+        modeOptions.find(candidate => candidate.id === launchMode) ?? modeOptions[0];
+      setMode(option.id);
+      setSelectedAgentId(option.agentId);
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("prompt");
+        url.searchParams.delete("source");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          url.pathname + url.search + url.hash
+        );
+      } catch {
+        // Keep the prepared handoff even if browser history cannot be normalized.
+      }
+    }
+  }, [loadedStorageKey, storageKey]);
 
   useEffect(() => {
     if (!selectedModel && models.data?.length) {
@@ -294,10 +371,16 @@ export default function HopeAIWorkspace() {
         updatedAt: Date.now(),
         messages: [...thread.messages, assistantMessage].slice(-100),
       }));
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "AI provider request failed.";
-      toast.error(message);
+    } catch {
+      updateThread(threadId, thread => ({
+        ...thread,
+        title: currentMessages.length === 0 ? activeThread.title : thread.title,
+        updatedAt: Date.now(),
+        messages: thread.messages.filter(message => message.id !== userMessage.id),
+      }));
+      setInput(current => (current.trim() ? current : text));
+      setAttachments(current => [...sentAttachments, ...current].slice(0, 3));
+      toast.error("HopeAI request failed. Your draft was restored. Try again.");
     }
   };
 

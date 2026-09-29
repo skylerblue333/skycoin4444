@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import SkyHopeAccountImpactPanel from "@/components/SkyHopeAccountImpactPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SKYHOPE_CAUSE_TRACKS,
@@ -54,13 +55,40 @@ const DEFAULT_EVIDENCE: ImpactEvidenceState = {
   privacyReviewed: false,
 };
 
+const MAX_SAVED_DRAFT_CHARS = 4_096;
+
+function draftFromPlan(plan: SkyHopeCampaignPlan): SkyHopeCampaignDraft {
+  return {
+    title: plan.title,
+    mission: plan.mission,
+    beneficiaryScope: plan.beneficiaryScope,
+    targetOutcome: plan.targetOutcome,
+    targetCount: plan.targetCount,
+    durationDays: plan.durationDays,
+  };
+}
+
 function loadDraft(): SkyHopeCampaignDraft {
   if (typeof window === "undefined") return DEFAULT_DRAFT;
   try {
     const raw = window.localStorage.getItem(SKYHOPE_DRAFT_KEY);
     if (!raw) return DEFAULT_DRAFT;
-    return normalizeSkyHopeCampaignDraft(JSON.parse(raw)) ?? DEFAULT_DRAFT;
+    if (raw.length > MAX_SAVED_DRAFT_CHARS) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    const normalized = normalizeSkyHopeCampaignDraft(JSON.parse(raw));
+    if (!normalized) {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+      return DEFAULT_DRAFT;
+    }
+    return normalized;
   } catch {
+    try {
+      window.localStorage.removeItem(SKYHOPE_DRAFT_KEY);
+    } catch {
+      // Storage can be unavailable; the in-memory default is still safe.
+    }
     return DEFAULT_DRAFT;
   }
 }
@@ -138,11 +166,23 @@ export default function Charity() {
   }
 
   function saveDraft() {
+    setPlanError("");
     try {
-      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, JSON.stringify(draft));
-      setSavedMessage("Draft saved on this device.");
-    } catch {
-      setSavedMessage("Browser storage is unavailable; keep a copy manually.");
+      const validatedPlan = createSkyHopeCampaignPlan(draft);
+      const normalizedDraft = draftFromPlan(validatedPlan);
+      const serialized = JSON.stringify(normalizedDraft);
+      if (serialized.length > MAX_SAVED_DRAFT_CHARS) {
+        throw new Error("Validated draft is too large for browser storage.");
+      }
+      window.localStorage.setItem(SKYHOPE_DRAFT_KEY, serialized);
+      setDraft(normalizedDraft);
+      setPlan(validatedPlan);
+      setSavedMessage("Validated draft saved on this device.");
+    } catch (error) {
+      setSavedMessage("Draft was not saved.");
+      setPlanError(
+        error instanceof Error ? error.message : "Campaign draft is invalid."
+      );
     }
   }
 
@@ -153,7 +193,7 @@ export default function Charity() {
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="border-rose-400/30 bg-rose-400/10 text-rose-200">
               <HeartHandshake className="mr-1 h-3.5 w-3.5" />
-              SkyHope
+              HopeAI · Impact
             </Badge>
             <Badge
               variant="outline"
@@ -178,10 +218,10 @@ export default function Charity() {
               <span className="text-rose-300">Do not fake the evidence.</span>
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-7 text-white/60 md:text-lg">
-              SkyHope now focuses on useful planning, volunteer capacity, impact
-              evidence, and cross-ecosystem coordination. It does not pretend a
-              charity is verified, that money moved, or that a blockchain
-              transaction settled.
+              HopeAI includes an Impact workspace for useful planning, volunteer
+              capacity, impact evidence, and cross-ecosystem coordination. It
+              does not pretend a charity is verified, that money moved, or that
+              a blockchain transaction settled.
             </p>
           </div>
 
@@ -204,6 +244,10 @@ export default function Charity() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pt-8 md:px-6">
+        <SkyHopeAccountImpactPanel />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
@@ -282,6 +326,7 @@ export default function Charity() {
                     Title
                     <Input
                       value={draft.title}
+                      maxLength={120}
                       onChange={event =>
                         setDraft(current => ({
                           ...current,
@@ -296,6 +341,7 @@ export default function Charity() {
                     Mission
                     <textarea
                       value={draft.mission}
+                      maxLength={600}
                       onChange={event =>
                         setDraft(current => ({
                           ...current,
@@ -311,6 +357,7 @@ export default function Charity() {
                       Beneficiary scope
                       <Input
                         value={draft.beneficiaryScope}
+                        maxLength={240}
                         onChange={event =>
                           setDraft(current => ({
                             ...current,
@@ -324,6 +371,7 @@ export default function Charity() {
                       Measured outcome
                       <Input
                         value={draft.targetOutcome}
+                        maxLength={240}
                         onChange={event =>
                           setDraft(current => ({
                             ...current,
@@ -380,7 +428,7 @@ export default function Charity() {
                     </Button>
                     <Button variant="outline" onClick={saveDraft}>
                       <Save className="mr-2 h-4 w-4" />
-                      Save on this device
+                      Validate + save on this device
                     </Button>
                   </div>
                   {savedMessage ? (

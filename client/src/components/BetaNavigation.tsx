@@ -4,8 +4,8 @@ import {
   ChevronRight,
   Compass,
   Gamepad2,
-  Grid2X2,
   GraduationCap,
+  Grid2X2,
   HeartHandshake,
   Home,
   LogIn,
@@ -40,7 +40,7 @@ const primaryLinks = [
   { label: "Gaming", route: "/gaming", icon: Gamepad2 },
   { label: "School", route: "/course-catalog", icon: GraduationCap },
   { label: "HopeAI", route: "/hope-a-i", icon: Bot },
-  { label: "SkyHope", route: "/charity", icon: HeartHandshake },
+  { label: "Impact", route: "/charity", icon: HeartHandshake },
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
@@ -48,6 +48,7 @@ const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
   { label: "School", route: "/sky-school" },
+  { label: "Journey", route: "/beta-journey" },
   { label: "Web3", route: "/beta-web3" },
   { label: "Dating", route: "/dating-home" },
   { label: "Global", route: "/translation-enabled-community" },
@@ -68,7 +69,7 @@ const fourFoursTrail = [
     title: "Keep learning",
     message:
       "Curiosity compounds. Ask better questions, learn from people unlike you, and never be embarrassed to begin again.",
-    href: "/sky-school",
+    href: "/course-catalog",
     action: "Follow the lesson",
   },
   {
@@ -193,7 +194,7 @@ export default function BetaNavigation() {
     recognition.onstart = () => {
       setVoiceListening(true);
       setVoiceMessage(
-        "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, SkyHope, Web3, Dating, Global, or Creator."
+        "Listening… say Home, V5, Explore, Social, Live, Gaming, School, HopeAI, Impact, Journey, Market, Web3, Dating, Global, or Creator."
       );
     };
     recognition.onresult = (event: any) => {
@@ -224,7 +225,7 @@ export default function BetaNavigation() {
         setVoiceMessage(`Opening ${label}.`);
         setLocation(destination);
       } else {
-        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, School, HopeAI, SkyHope, Wallet, Market, Live, Dating, or Explore.`);
+        setVoiceMessage(`I heard “${spoken}”. Try Social, Chat, Gaming, School, HopeAI, Impact, Journey, Wallet, Market, Live, Dating, or Explore.`);
       }
     };
     recognition.onerror = () => {
