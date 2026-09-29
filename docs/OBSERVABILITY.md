@@ -106,6 +106,12 @@ A failing scheduled health workflow is an engineering alert signal through GitHu
 
 This monitor complements, but does not replace, the bounded hosted load baseline in `scripts/hosted-load-baseline.mjs`.
 
+## Provider failure response boundary
+
+Provider-backed crypto routes do not return raw upstream exception text in HTTP 503 responses. The public failure contract is a stable `provider_unavailable` code with a generic message, while the server writes only a bounded redacted operational summary for diagnostics and marks the response `Cache-Control: no-store`.
+
+This prevents provider response bodies, credentials embedded in URLs, bearer material, or other exception details from being reflected to authenticated clients. It does not prove external provider availability or successful provider authentication.
+
 ## Verification
 
 Focused tests cover:
