@@ -83,7 +83,7 @@ describe("HopeAI + SkySchool + focused Gaming loop", () => {
 
   it("routes navigation and app entry points into the canonical platform loop", () => {
     expect(navigation).toMatch(
-      /label: "School", route: "\/sky-school"/
+      /label: "School", route: "\/course-catalog"/
     );
     expect(navigation).toMatch(
       /label: "Gaming", route: "\/gaming"/
