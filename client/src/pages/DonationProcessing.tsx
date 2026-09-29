@@ -3,11 +3,13 @@ import { Link } from "wouter";
 import {
   ArrowRight,
   CheckCircle2,
+  Clipboard,
   HeartHandshake,
   ReceiptText,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,9 @@ const DEFAULT_CHECKLIST: DonationPlanningChecklist = {
   legalBoundaryReviewed: false,
   reconciliationPlanDefined: false,
 };
+
+const HOPEAI_PRIVATE_HANDOFF_PROMPT =
+  "Help me review a SkyHope donation-intent planning brief. I will paste the private details into HopeAI myself. Do not claim a payment, donation, receipt, settlement, tax deduction, or beneficiary verification occurred.";
 
 export default function DonationProcessing() {
   const [campaignId, setCampaignId] = useState("community-support-sprint");
@@ -62,10 +67,11 @@ export default function DonationProcessing() {
     }
   }
 
-  const hopePrompt = preview
+  const privateReviewBrief = preview
     ? [
-        "Help me review this SkyHope donation-intent preview as a planning exercise only.",
-        "Do not claim a payment, donation, receipt, settlement, tax deduction, or beneficiary verification occurred.",
+        "# SkyHope donation-intent review",
+        "",
+        "Planning exercise only. No money moved.",
         "Campaign: " + preview.campaignId,
         "Contributor reference: " + preview.contributorReference,
         "Amount preview: " + preview.amountMajor.toFixed(2) + " " + preview.currency,
@@ -73,9 +79,27 @@ export default function DonationProcessing() {
         readiness.missing.length
           ? "Missing planning gates: " + readiness.missing.join("; ")
           : "All local planning checklist items are marked complete, but external verification is still required.",
-        "Give me the next safest review steps.",
+        "",
+        "Review request: Give me the next safest planning and verification steps. Do not claim a payment, receipt, settlement, tax deduction, beneficiary verification, or provider execution occurred.",
       ].join("\n")
-    : "Help me prepare a safe SkyHope donation-intent planning checklist. Do not execute or claim any payment.";
+    : "";
+
+  async function copyPrivateReviewBrief() {
+    if (!privateReviewBrief) {
+      toast.error("Build a local preview before copying the review brief.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(privateReviewBrief);
+      toast.success("Private review brief copied. Paste it into HopeAI when ready.");
+    } catch {
+      toast.error("Clipboard access is unavailable.");
+    }
+  }
+
+  const hopeHref =
+    "/hope-a-i?source=skyhope&prompt=" +
+    encodeURIComponent(HOPEAI_PRIVATE_HANDOFF_PROMPT);
 
   return (
     <main className="min-h-screen bg-[#07090f] px-4 py-12 text-white md:px-6">
@@ -101,6 +125,20 @@ export default function DonationProcessing() {
           </p>
         </div>
 
+        <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.06] p-4 text-sm leading-6 text-amber-50/80">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-amber-200" />
+            <p>
+              Privacy boundary: campaign and contributor details are kept out of
+              the HopeAI URL. Copy the private review brief explicitly, then paste
+              it into HopeAI only if you want those details included in the chat.
+              Avoid names, contact details, account numbers, medical details, or
+              other sensitive beneficiary information unless it is genuinely
+              necessary and appropriate to share.
+            </p>
+          </div>
+        </div>
+
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
           <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 md:p-6">
             <div className="flex items-center gap-2">
@@ -113,6 +151,7 @@ export default function DonationProcessing() {
                 Campaign reference
                 <Input
                   value={campaignId}
+                  maxLength={80}
                   onChange={event => setCampaignId(event.target.value)}
                   className="mt-2"
                 />
@@ -121,6 +160,7 @@ export default function DonationProcessing() {
                 Contributor reference
                 <Input
                   value={contributorReference}
+                  maxLength={80}
                   onChange={event => setContributorReference(event.target.value)}
                   className="mt-2"
                 />
@@ -238,7 +278,7 @@ export default function DonationProcessing() {
           </section>
         </div>
 
-        <div className="mt-6 grid gap-3 md:grid-cols-3">
+        <div className="mt-6 grid gap-3 md:grid-cols-4">
           <Link
             href="/charity"
             className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm font-bold transition hover:border-rose-300/25"
@@ -251,12 +291,20 @@ export default function DonationProcessing() {
           >
             Open fundraiser tools <ArrowRight className="ml-1 inline h-4 w-4" />
           </Link>
+          <button
+            type="button"
+            onClick={copyPrivateReviewBrief}
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-left text-sm font-bold transition hover:border-white/20"
+          >
+            <Clipboard className="mr-1 inline h-4 w-4" />
+            Copy private review brief
+          </button>
           <Link
-            href={"/hope-a-i?source=skyhope&prompt=" + encodeURIComponent(hopePrompt)}
+            href={hopeHref}
             className="rounded-2xl border border-rose-300/20 bg-rose-300/[0.06] p-4 text-sm font-black text-rose-100 transition hover:border-rose-300/35"
           >
             <Sparkles className="mr-1 inline h-4 w-4" />
-            Review with HopeAI
+            Open HopeAI, then paste
           </Link>
         </div>
       </div>
