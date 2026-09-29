@@ -1,5 +1,6 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { publicProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import {
   CHARITY_GAMING_FINANCE_BOUNDARY,
   evaluateCharityGamingFinance,
@@ -120,6 +121,16 @@ export const charityImpactRouter = router({
   })),
 
   missions: publicProcedure.query(() => SKYHOPE_IMPACT_MISSIONS),
+
+  create: protectedProcedure
+    .input(z.record(z.string(), z.unknown()))
+    .mutation(() => {
+      throw new TRPCError({
+        code: "NOT_IMPLEMENTED",
+        message:
+          "Charity create API is not implemented yet; use SkyHope planning without claiming a live financial campaign.",
+      });
+    }),
 
   evaluateFinance: publicProcedure
     .input(charityFinanceInputSchema)
