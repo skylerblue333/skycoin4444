@@ -3,6 +3,7 @@ import { ENV } from "./env";
 import { sanitizeOperationalError } from "./operationalError";
 
 const STORAGE_PROXY_ERROR_SUMMARY_MAX = 1_000;
+export const STORAGE_PROXY_REQUEST_TIMEOUT_MS = 10_000;
 const LOCAL_REDIRECT_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export function normalizeStorageRedirectUrl(
@@ -38,6 +39,13 @@ export function normalizeStorageRedirectUrl(
   }
 }
 
+export function createStorageProxyRequestInit(apiKey: string): RequestInit {
+  return {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    signal: AbortSignal.timeout(STORAGE_PROXY_REQUEST_TIMEOUT_MS),
+  };
+}
+
 export function registerStorageProxy(app: Express) {
   app.get("/manus-storage/*key", async (req, res) => {
     res.set("Cache-Control", "no-store");
@@ -62,9 +70,10 @@ export function registerStorageProxy(app: Express) {
       );
       forgeUrl.searchParams.set("path", key);
 
-      const forgeResp = await fetch(forgeUrl, {
-        headers: { Authorization: `Bearer ${ENV.forgeApiKey}` },
-      });
+      const forgeResp = await fetch(
+        forgeUrl,
+        createStorageProxyRequestInit(ENV.forgeApiKey)
+      );
 
       if (!forgeResp.ok) {
         // Do not log an untrusted provider response body. It may contain
