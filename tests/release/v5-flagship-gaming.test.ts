@@ -26,10 +26,14 @@ describe("V5 flagship gaming rebuild", () => {
     expect(arcade).toContain('value="crypto"');
     expect(arcade).toContain("Hash Hunt");
     expect(arcade).toContain("Wallet Defense");
+    expect(arcade).toContain("Replay receipt");
+    expect(arcade).toContain("verifyDemoRoundReceipt");
   });
 
   it("keeps wagering-like surfaces explicitly demo-only", () => {
     expect(crash).toMatch(/no cash or token value/i);
+    expect(crash).toContain("Demo replay receipt");
+    expect(crash).toContain("not cryptographic fairness");
     expect(blackjack).toMatch(/No real-money wager/i);
     expect(docs).toMatch(/no monetary or token value/i);
     expect(docs).toMatch(/does not.*accept deposits/is);
