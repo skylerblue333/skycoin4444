@@ -10,9 +10,9 @@ describe("V5 global beta navigation", () => {
     expect(navigation).not.toContain("V4 engineering beta");
   });
 
-  it("keeps voice navigation aligned with the ten-platform V5 labels", () => {
+  it("keeps voice navigation aligned with the flagship V5 labels", () => {
     expect(navigation).toContain(
-      "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, Web3, Dating, Global, or Creator."
+      "Listening… say Home, V5, Explore, Social, Live, Gaming, Market, School, HopeAI, SkyHope, Web3, Dating, Global, or Creator."
     );
     expect(navigation).toContain('{ label: "Creator", route: "/creator-dashboard"');
     expect(navigation).toContain(
