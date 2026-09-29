@@ -1,471 +1,555 @@
-import { useState } from "react";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { getLoginUrl } from "@/const";
-import { toast } from "sonner";
+import { useMemo, useState } from "react";
+import { Link } from "wouter";
 import {
-  Heart, HandHeart, Globe, Users, TrendingUp, Sparkles, Vote,
-  Trophy, BarChart3, Target, Coins, Shield, Loader2, ThumbsUp,
-  ThumbsDown, Award, Flame, Clock, CheckCircle2, ArrowUpRight
+  ArrowRight,
+  BookOpen,
+  Brain,
+  CheckCircle2,
+  Gamepad2,
+  HandHeart,
+  HeartHandshake,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  XCircle,
 } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import SkyHopePersonalPlanner from "@/components/SkyHopePersonalPlanner";
 
-// DAO Proposals for charity fund allocation
-const DAO_PROPOSALS = [
+type FinanceAction =
+  | "deposit"
+  | "withdrawal"
+  | "real-money-wager"
+  | "custody"
+  | "token-settlement"
+  | "redeemable-crypto-reward";
+
+const actionLabels: Record<FinanceAction, string> = {
+  deposit: "Donation deposit",
+  withdrawal: "Charity withdrawal",
+  "real-money-wager": "Charity-only real-money gaming",
+  custody: "Charity custody",
+  "token-settlement": "Token settlement",
+  "redeemable-crypto-reward": "Redeemable crypto reward",
+};
+
+const reasonCopy: Record<string, string> = {
+  "allowed-for-charity-provider-handoff":
+    "Every self-attested modeled gate passed. This is only a policy simulation; no external-provider handoff is authorized and no money movement occurs.",
+  "beneficiary-required":
+    "A bounded charity beneficiary identifier is required before any handoff can be considered.",
+  "beneficiary-not-verified":
+    "A real charity beneficiary must be verified outside this beta before financial handoff can be considered.",
+  "charity-only-required":
+    "Real-value gaming and financial rails are restricted to the charity-only scope.",
+  "payment-provider-not-approved":
+    "An approved external payment, custody, or settlement provider is required.",
+  "legal-review-required":
+    "Legal review must approve the proposed flow before external handoff.",
+  "region-not-allowed":
+    "The proposed region is not approved for this financial flow.",
+  "age-gate-required":
+    "Real-money gaming requires an age gate before provider handoff.",
+  "regulated-gaming-provider-required":
+    "Real-money gaming requires an approved regulated gaming provider.",
+};
+
+const gateDefinitions = [
   {
-    id: "prop-1",
-    title: "Allocate 50,000 SKY444 to Clean Water Initiative",
-    description: "Fund the deployment of water purification systems in 3 rural communities in East Africa. Partnership with WaterAid verified.",
-    category: "Environment",
-    requestedAmount: 50000,
-    votesFor: 847,
-    votesAgainst: 123,
-    status: "active" as const,
-    endsIn: "3 days",
-    proposer: "SkylerDev",
+    key: "beneficiaryVerified",
+    label: "Beneficiary verified",
+    detail: "A real charity beneficiary has been verified outside this beta.",
   },
   {
-    id: "prop-2",
-    title: "Fund 100 STEM Scholarships for Underserved Youth",
-    description: "Provide full scholarships for coding bootcamps and university CS programs. Partnered with Code.org and local universities.",
-    category: "Education",
-    requestedAmount: 120000,
-    votesFor: 1203,
-    votesAgainst: 89,
-    status: "active" as const,
-    endsIn: "5 days",
-    proposer: "CryptoKing",
+    key: "paymentProviderApproved",
+    label: "Provider approved",
+    detail: "An external payment/custody/settlement provider is approved.",
   },
   {
-    id: "prop-3",
-    title: "Emergency Relief: Disaster Recovery Fund",
-    description: "Rapid-response fund for natural disaster relief. Funds distributed within 24 hours of verified events via smart contract.",
-    category: "Humanitarian",
-    requestedAmount: 200000,
-    votesFor: 2341,
-    votesAgainst: 156,
-    status: "passed" as const,
-    endsIn: "Ended",
-    proposer: "NFTQueen",
+    key: "legalReviewApproved",
+    label: "Legal review",
+    detail: "The proposed flow has passed the required legal review.",
   },
-];
+  {
+    key: "regionAllowed",
+    label: "Region allowed",
+    detail: "The proposed user/beneficiary region is approved.",
+  },
+  {
+    key: "ageGatePassed",
+    label: "Age gate",
+    detail: "Required only when the action is real-money gaming.",
+  },
+  {
+    key: "regulatedGamingProviderApproved",
+    label: "Gaming provider",
+    detail: "Required only when the action is real-money gaming.",
+  },
+] as const;
 
-// Top donors leaderboard
-const LEADERBOARD = [
-  { rank: 1, name: "SkylerDev", donated: 125000, campaigns: 12, badge: "Diamond Donor" },
-  { rank: 2, name: "CryptoKing", donated: 89000, campaigns: 8, badge: "Platinum Donor" },
-  { rank: 3, name: "AITrader", donated: 67000, campaigns: 15, badge: "Gold Donor" },
-  { rank: 4, name: "NFTQueen", donated: 45000, campaigns: 6, badge: "Gold Donor" },
-  { rank: 5, name: "DeFiPro", donated: 34000, campaigns: 9, badge: "Silver Donor" },
-  { rank: 6, name: "GameDev", donated: 28000, campaigns: 4, badge: "Silver Donor" },
-  { rank: 7, name: "BlockchainBob", donated: 22000, campaigns: 7, badge: "Bronze Donor" },
-  { rank: 8, name: "CyberAlice", donated: 18000, campaigns: 5, badge: "Bronze Donor" },
-];
-
-
-
-function DonateDialog({ campaign, onSuccess }: { campaign: any; onSuccess: () => void }) {
-  const [amount, setAmount] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const donate = trpc.charity.donate.useMutation({
-    onSuccess: () => {
-      toast.success(`Thank you! ${amount} SKY444 donated to "${campaign.title}"`);
-      setAmount("");
-      setOpen(false);
-      onSuccess();
-    },
-    onError: () => toast.error("Failed to process donation. Please try again."),
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-xs font-semibold">
-          <Heart className="w-3 h-3 mr-1" /> Donate
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="bg-card border-border/50">
-        <DialogHeader>
-          <DialogTitle className="text-lg">Donate to Campaign</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 mt-3">
-          <div className="p-3 rounded-lg bg-background/50 border border-border/30">
-            <h4 className="font-semibold text-sm">{campaign.title}</h4>
-            <p className="text-xs text-muted-foreground mt-1">{campaign.description}</p>
-          </div>
-          <div>
-            <label className="text-sm text-muted-foreground mb-1.5 block">Donation Amount (SKY444)</label>
-            <Input
-              type="number"
-              placeholder="Enter amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="bg-background/50 border-border/30 font-mono"
-            />
-            <div className="flex gap-2 mt-2">
-              {[10, 50, 100, 500].map(v => (
-                <button
-                  key={v}
-                  onClick={() => setAmount(String(v))}
-                  className="px-3 py-1 rounded-md border border-border/30 bg-background/50 text-xs font-mono hover:border-primary/50 transition-all"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="p-3 rounded-lg bg-purple-600/5 border border-purple-500/20">
-            <div className="flex items-center gap-2 text-xs text-purple-400">
-              <Shield className="w-3.5 h-3.5" />
-              <span>100% of donations go directly to the cause. On-chain verified.</span>
-            </div>
-          </div>
-          <Button
-            className="w-full bg-primary hover:bg-primary/90 font-semibold"
-            disabled={!amount || parseFloat(amount) <= 0 || donate.isPending}
-            onClick={() => donate.mutate({ campaignId: campaign.id, amount: parseFloat(amount) })}
-          >
-            {donate.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Heart className="w-4 h-4 mr-2" />}
-            Confirm Donation
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function ProposalCard({ proposal }: { proposal: typeof DAO_PROPOSALS[0] }) {
-  const { isAuthenticated } = useAuth();
-  const totalVotes = proposal.votesFor + proposal.votesAgainst;
-  const forPercent = totalVotes > 0 ? (proposal.votesFor / totalVotes) * 100 : 0;
-
-  return (
-    <div className={`p-5 rounded-xl border ${proposal.status === "passed" ? "border-purple-500/30 bg-purple-600/5" : "border-border/50 bg-card/80"} backdrop-blur`}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">{proposal.category}</Badge>
-          <Badge className={`text-[10px] ${proposal.status === "passed" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-            {proposal.status === "passed" ? <><CheckCircle2 className="w-2.5 h-2.5 mr-0.5" /> Passed</> : <><Clock className="w-2.5 h-2.5 mr-0.5" /> {proposal.endsIn}</>}
-          </Badge>
-        </div>
-        <span className="text-xs text-muted-foreground">by {proposal.proposer}</span>
-      </div>
-
-      <h3 className="font-semibold mb-2">{proposal.title}</h3>
-      <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{proposal.description}</p>
-
-      <div className="flex items-center justify-between text-xs mb-2">
-        <span className="text-purple-400 font-mono">{proposal.votesFor} For</span>
-        <span className="text-red-400 font-mono">{proposal.votesAgainst} Against</span>
-      </div>
-      <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30 mb-3">
-        <div className="h-full bg-purple-600 rounded-full" style={{ width: `${forPercent}%` }} />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono text-muted-foreground">
-          <Coins className="w-3 h-3 inline mr-1" />{(proposal.requestedAmount ?? 0).toLocaleString()} SKY444
-        </span>
-        {proposal.status === "active" && (
-          isAuthenticated ? (
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="text-xs h-7 text-purple-400 border-purple-500/30 hover:bg-purple-600/10">
-                <ThumbsUp className="w-3 h-3 mr-1" /> For
-              </Button>
-              <Button size="sm" variant="outline" className="text-xs h-7 text-red-400 border-red-500/30 hover:bg-red-500/10">
-                <ThumbsDown className="w-3 h-3 mr-1" /> Against
-              </Button>
-            </div>
-          ) : (
-            <a href={getLoginUrl()}>
-              <Button size="sm" variant="outline" className="text-xs h-7">Sign In to Vote</Button>
-            </a>
-          )
-        )}
-      </div>
-    </div>
-  );
-}
+type GateKey = (typeof gateDefinitions)[number]["key"];
 
 export default function Charity() {
-  const { isAuthenticated } = useAuth();
-  const { data: campaigns, isLoading, refetch } = trpc.charity.campaigns.useQuery({});
-  const { data: charityStats } = trpc.charity.stats.useQuery();
-  const { data: donorLeaderboard } = trpc.charity.leaderboard.useQuery();
-  const impactMetrics = [
-    { label: "Active Campaigns", value: String(charityStats?.activeCampaigns ?? "—"), icon: Target, color: "text-primary" },
-    { label: "Total Campaigns", value: String(charityStats?.totalCampaigns ?? "—"), icon: HandHeart, color: "text-purple-400" },
-    { label: "SKY444 Raised", value: charityStats ? String(Math.round(charityStats.totalRaised)) : "—", icon: Coins, color: "text-[oklch(0.7_0.2_60)]" },
-    { label: "Donors", value: String(charityStats?.totalDonors ?? "—"), icon: Users, color: "text-green-400" },
-  ];
+  const boundary = trpc.charity.boundary.useQuery();
+  const missions = trpc.charity.missions.useQuery();
+  const [action, setAction] = useState<FinanceAction>("deposit");
+  const [beneficiaryId, setBeneficiaryId] = useState(
+    "charity:readiness-demo"
+  );
+  const [gates, setGates] = useState<Record<GateKey, boolean>>({
+    beneficiaryVerified: false,
+    paymentProviderApproved: false,
+    legalReviewApproved: false,
+    regionAllowed: false,
+    ageGatePassed: false,
+    regulatedGamingProviderApproved: false,
+  });
+
+  const evaluation = trpc.charity.evaluateFinance.useQuery(
+    {
+      action,
+      beneficiaryId,
+      beneficiaryVerified: gates.beneficiaryVerified,
+      charityOnly: true,
+      paymentProviderApproved: gates.paymentProviderApproved,
+      legalReviewApproved: gates.legalReviewApproved,
+      regionAllowed: gates.regionAllowed,
+      ageGatePassed: gates.ageGatePassed,
+      regulatedGamingProviderApproved:
+        gates.regulatedGamingProviderApproved,
+    },
+    {
+      enabled: beneficiaryId.trim().length > 0,
+      retry: false,
+    }
+  );
+
+  const requiredGates = evaluation.data?.requiredGates ?? [];
+  const passedGateCount = useMemo(
+    () => requiredGates.filter(gate => gate.passed).length,
+    [requiredGates]
+  );
+  const readinessPercent = requiredGates.length
+    ? Math.round((passedGateCount / requiredGates.length) * 100)
+    : 0;
+  const financeDecision = evaluation.data?.hypotheticalDecision;
+
+  function toggleGate(key: GateKey) {
+    setGates(current => ({ ...current, [key]: !current[key] }));
+  }
 
   return (
-    <div className="min-h-screen">
-      {/* ═══ CINEMATIC CHARITY HERO ═══ */}
-      <section className="hero-cinematic border-b border-slate-800/60" style={{ minHeight: 320 }}>
-        <div className="glow-orb glow-orb-pink w-96 h-96 -top-20 right-0 animate-hero-float" />
-        <div className="glow-orb w-64 h-64 bottom-0 left-10 animate-hero-float" style={{ background: 'oklch(0.55 0.24 15 / 0.18)', animationDelay: '2s' }} />
-        <div className="container mx-auto px-4 relative z-10 py-16">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-red-500/30 bg-red-500/10 mb-6">
-              <Heart className="h-3.5 w-3.5 text-red-400 animate-pulse" />
-              <span className="text-xs font-bold text-red-400 tracking-wide">TRANSPARENT GIVING — ON-CHAIN</span>
+    <main className="min-h-screen overflow-hidden bg-[#050510] text-white">
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute left-[-12rem] top-[-8rem] h-[32rem] w-[32rem] rounded-full bg-emerald-500/12 blur-3xl" />
+        <div className="absolute right-[-10rem] top-56 h-[30rem] w-[30rem] rounded-full bg-violet-500/12 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl space-y-8 px-4 py-10">
+        <header className="grid gap-6 border-b border-white/10 pb-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-emerald-500/15 text-emerald-100">
+                SkyHope Impact
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-amber-300/25 text-amber-100"
+              >
+                No live donations
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-white/10 text-white/45"
+              >
+                Policy simulation · self-attested
+              </Badge>
             </div>
-            <h1 className="text-5xl md:text-6xl font-black mb-4 leading-tight text-rainbow">
-              <span className="text-white">Charity</span>{' '}
-              <span className="text-gradient">Hub</span>
+            <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">
+              Turn learning, AI, games, and creator work into impact missions.
             </h1>
-            <p className="text-lg leading-relaxed max-w-xl desc-metallic">
-              Support causes, vote on fund allocation via DAO governance, and track real-world impact — all on-chain and fully transparent.
+            <p className="mt-4 max-w-3xl text-base leading-7 text-white/50">
+              SkyHope now has a real beta workflow: choose an authored mission,
+              learn in SkySchool, plan with HopeAI, practice in the game layer,
+              and inspect hypothetical financial gates that would be required
+              before any future external charity provider could move value.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-            {impactMetrics.map((metric, i) => (
-              <div key={metric.label} className="card-epic p-5 text-center animate-slide-up" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-white/5">
-                  <metric.icon className={`w-5 h-5 ${metric.color}`} />
-                </div>
-                <div className={`text-3xl font-black stat-number ${metric.color} mb-1`}>{metric.value}</div>
-                <div className="text-xs text-slate-500">{metric.label}</div>
-              </div>
-            ))}
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/hope-a-i">
+              <Button size="lg" className="w-full">
+                <Brain className="mr-2 h-4 w-4" />
+                Plan with HopeAI
+              </Button>
+            </Link>
+            <Link href="/sky-school">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-white/15 bg-white/[0.03] text-white"
+              >
+                <BookOpen className="mr-2 h-4 w-4" />
+                Open SkySchool
+              </Button>
+            </Link>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Main Content */}
-      <section className="pb-24">
-        <div className="container mx-auto px-4">
-          <Tabs defaultValue="campaigns" className="w-full">
-            <TabsList className="w-full max-w-lg bg-card/80 border border-border/50">
-              <TabsTrigger value="campaigns" className="flex-1">
-                <HandHeart className="w-4 h-4 mr-1.5" /> Campaigns
-              </TabsTrigger>
-              <TabsTrigger value="dao" className="flex-1">
-                <Vote className="w-4 h-4 mr-1.5" /> DAO Voting
-              </TabsTrigger>
-              <TabsTrigger value="leaderboard" className="flex-1">
-                <Trophy className="w-4 h-4 mr-1.5" /> Leaderboard
-              </TabsTrigger>
-              <TabsTrigger value="impact" className="flex-1">
-                <BarChart3 className="w-4 h-4 mr-1.5" /> Impact
-              </TabsTrigger>
-            </TabsList>
+        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              label: "Authored impact missions",
+              value: missions.data?.length ?? "…",
+              icon: HeartHandshake,
+            },
+            {
+              label: "Charity finance actions",
+              value: boundary.data?.allowedActions.length ?? "…",
+              icon: HandHeart,
+            },
+            {
+              label: "Live donation execution",
+              value: "Off",
+              icon: ShieldCheck,
+            },
+            {
+              label: "SKYCOIN4444 custody",
+              value: "Off",
+              icon: ShieldCheck,
+            },
+          ].map(({ label, value, icon: Icon }) => (
+            <Card
+              key={label}
+              className="border-white/10 bg-white/[0.035] text-white"
+            >
+              <CardContent className="p-5">
+                <Icon className="h-5 w-5 text-emerald-200" />
+                <p className="mt-4 text-3xl font-black">{value}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/30">
+                  {label}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </section>
 
-            {/* Campaigns Tab */}
-            <TabsContent value="campaigns" className="mt-6">
-              {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="p-5 rounded-xl border border-border/50 animate-pulse">
-                      <div className="h-4 bg-muted/20 rounded w-1/3 mb-3" />
-                      <div className="h-5 bg-muted/20 rounded w-2/3 mb-2" />
-                      <div className="h-3 bg-muted/20 rounded w-full mb-4" />
-                      <div className="h-2 bg-muted/20 rounded w-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : campaigns && campaigns.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {campaigns.map((c: any) => {
-                    const progress = c.goalAmount > 0 ? (Number(c.raisedAmount) / Number(c.goalAmount)) * 100 : 0;
-                    return (
-                      <div key={c.id} className="p-5 rounded-xl border border-border/50 bg-card/80 hover:border-primary/30 transition-all">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="outline" className="text-[10px]">{c.category}</Badge>
-                          <Badge className={`text-[10px] ${c.status === "active" ? "bg-purple-600/10 text-purple-400 border-purple-500/30" : "bg-muted/20 text-muted-foreground"}`}>
-                            {c.status}
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold mb-2">{c.title}</h3>
-                        <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{c.description}</p>
-                        <div className="mb-2">
-                          {/* Progress bar with milestone markers */}
-                          <div className="relative h-3 bg-background/50 rounded-full overflow-visible border border-border/30 mb-1">
-                            <div className="h-full bg-gradient-to-r from-primary to-[oklch(0.72_0.28_160)] rounded-full transition-all" style={{ width: `${Math.min(100, progress)}%` }} />
-                            {/* Milestone markers at 25%, 50%, 75% */}
-                            {[25, 50, 75].map(pct => (
-                              <div key={pct} className="absolute top-0 bottom-0 w-0.5 flex flex-col items-center" style={{ left: `${pct}%` }}>
-                                <div className={`w-2 h-2 rounded-full border-2 mt-0.5 transition-all ${progress >= pct ? "bg-[oklch(0.80_0.18_70)] border-[oklch(0.80_0.18_70)]" : "bg-background border-border/50"}`} />
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex justify-between text-[9px] text-muted-foreground/50 px-1">
-                            <span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between text-xs mb-4">
-                          <span className="font-mono text-primary">{Number(c.raisedAmount).toLocaleString()} SKY444 raised</span>
-                          <span className="text-muted-foreground">{Math.round(progress)}% of goal</span>
-                        </div>
-                        {isAuthenticated ? (
-                          <DonateDialog campaign={c} onSuccess={refetch} />
+        <section>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-200/60">
+                Mission loop
+              </p>
+              <h2 className="mt-2 text-3xl font-black">
+                Learn → coach → practice → document.
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-white/45">
+                These are authored beta missions, not claims that an outside
+                charity, school, or community program participated.
+              </p>
+            </div>
+            <Link
+              href="/gaming-for-charity"
+              className="inline-flex items-center text-sm font-semibold text-emerald-200"
+            >
+              Open Impact Play Lab
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+
+          {missions.isLoading ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {[0, 1, 2, 3].map(index => (
+                <div
+                  key={index}
+                  className="h-60 animate-pulse rounded-3xl border border-white/10 bg-white/[0.03]"
+                />
+              ))}
+            </div>
+          ) : missions.error ? (
+            <Card className="border-rose-300/20 bg-rose-300/[0.04] text-white">
+              <CardContent className="p-6 text-sm text-rose-100">
+                Impact missions are temporarily unavailable.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {(missions.data ?? []).map((mission, index) => {
+                const Icon =
+                  [BookOpen, ShieldCheck, Users, Sparkles][index % 4] ??
+                  HeartHandshake;
+                return (
+                  <Card
+                    key={mission.id}
+                    className="border-white/10 bg-white/[0.035] text-white"
+                  >
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-100">
+                          <Icon className="h-5 w-5" />
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="border-white/10 text-white/35"
+                        >
+                          {mission.theme}
+                        </Badge>
+                      </div>
+                      <CardTitle className="mt-3 text-white">
+                        {mission.title}
+                      </CardTitle>
+                      <CardDescription className="leading-6 text-white/45">
+                        {mission.summary}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <Link href={mission.learningRoute}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full border-white/10 bg-white/[0.02] text-white"
+                          >
+                            Learn
+                          </Button>
+                        </Link>
+                        <Link href={mission.coachRoute}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-full border-white/10 bg-white/[0.02] text-white"
+                          >
+                            Coach
+                          </Button>
+                        </Link>
+                        <Link href={mission.practiceRoute}>
+                          <Button size="sm" className="w-full">
+                            Practice
+                          </Button>
+                        </Link>
+                      </div>
+                      <p className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.035] p-3 text-xs leading-5 text-white/45">
+                        {mission.evidence}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        <SkyHopePersonalPlanner />
+
+        <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+          <Card className="border-violet-300/20 bg-violet-300/[0.035] text-white">
+            <CardHeader>
+              <CardTitle className="text-white">
+                Charity finance readiness simulator
+              </CardTitle>
+              <CardDescription className="leading-6 text-white/45">
+                This calls deterministic server-side policy logic with
+                self-attested toggles. It cannot verify anything externally,
+                authorize a provider handoff, or execute a transaction.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid gap-3 md:grid-cols-[1fr_1.2fr]">
+                <label className="space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-white/35">
+                    Proposed action
+                  </span>
+                  <select
+                    value={action}
+                    onChange={event =>
+                      setAction(event.target.value as FinanceAction)
+                    }
+                    className="h-11 w-full rounded-xl border border-white/10 bg-[#0b0b16] px-3 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/30"
+                  >
+                    {(
+                      Object.keys(actionLabels) as FinanceAction[]
+                    ).map(value => (
+                      <option key={value} value={value}>
+                        {actionLabels[value]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-[0.12em] text-white/35">
+                    Beneficiary readiness ID
+                  </span>
+                  <input
+                    value={beneficiaryId}
+                    onChange={event => setBeneficiaryId(event.target.value)}
+                    maxLength={128}
+                    className="h-11 w-full rounded-xl border border-white/10 bg-[#0b0b16] px-3 text-sm text-white outline-none focus:ring-2 focus:ring-violet-300/30"
+                    aria-label="Beneficiary readiness ID"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {gateDefinitions.map(gate => {
+                  const active = gates[gate.key];
+                  const onlyForGaming =
+                    (gate.key === "ageGatePassed" ||
+                      gate.key ===
+                        "regulatedGamingProviderApproved") &&
+                    action !== "real-money-wager";
+                  return (
+                    <button
+                      key={gate.key}
+                      type="button"
+                      onClick={() => toggleGate(gate.key)}
+                      disabled={onlyForGaming}
+                      className={
+                        "rounded-2xl border p-4 text-left transition " +
+                        (onlyForGaming
+                          ? "cursor-not-allowed border-white/[0.05] bg-white/[0.015] opacity-40"
+                          : active
+                            ? "border-emerald-300/25 bg-emerald-300/[0.06]"
+                            : "border-white/10 bg-black/20 hover:border-white/20")
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        {active && !onlyForGaming ? (
+                          <CheckCircle2 className="h-4 w-4 text-emerald-200" />
                         ) : (
-                          <a href={getLoginUrl()} className="block">
-                            <Button size="sm" variant="outline" className="w-full text-xs">Sign In to Donate</Button>
-                          </a>
+                          <XCircle className="h-4 w-4 text-white/25" />
                         )}
+                        <span className="font-semibold">{gate.label}</span>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <HandHeart className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold mb-2">No Active Campaigns</h3>
-                  <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                    Charity campaigns will be launched soon. Every donation is tracked on-chain for full transparency.
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-
-            {/* DAO Voting Tab */}
-            <TabsContent value="dao" className="mt-6">
-              <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 mb-6 flex items-start gap-3">
-                <Vote className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Charity DAO Governance</h4>
-                  <p className="text-xs text-muted-foreground">SKY444 holders vote on how charity funds are allocated. 1 token = 1 vote. Proposals require 66% approval to pass.</p>
-                </div>
+                      <p className="mt-2 text-xs leading-5 text-white/35">
+                        {onlyForGaming
+                          ? "Not required for the selected action."
+                          : gate.detail}
+                      </p>
+                    </button>
+                  );
+                })}
               </div>
-              <div className="space-y-4">
-                {DAO_PROPOSALS.map(proposal => (
-                  <ProposalCard key={proposal.id} proposal={proposal} />
-                ))}
-              </div>
-            </TabsContent>
 
-            {/* Leaderboard Tab */}
-            <TabsContent value="leaderboard" className="mt-6">
-              <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 mb-6 flex items-start gap-3">
-                <Trophy className="w-5 h-5 text-yellow-400 mt-0.5 shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold mb-0.5">Donor Leaderboard</h4>
-                  <p className="text-xs text-muted-foreground">Top contributors earn badges, exclusive NFTs, and governance weight multipliers. Donate to climb the ranks!</p>
+              <div>
+                <div className="mb-2 flex items-center justify-between text-xs text-white/40">
+                  <span>Modeled readiness gates</span>
+                  <span>
+                    {passedGateCount}/{requiredGates.length || 0}
+                  </span>
                 </div>
+                <Progress value={readinessPercent} className="h-2" />
               </div>
-              <div className="rounded-xl border border-border/50 bg-card/80 overflow-hidden">
-                <div className="grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 border-b border-border/30 text-xs text-muted-foreground font-medium">
-                  <span>Rank</span>
-                  <span>Donor</span>
-                  <span className="text-right">Donated</span>
-                  <span className="text-right">Campaigns</span>
-                  <span className="text-right">Badge</span>
-                </div>
-                {((donorLeaderboard as any[]) || LEADERBOARD).map(donor => (
-                  <div key={donor.rank} className={`grid grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 items-center border-b border-border/10 last:border-0 ${donor.rank <= 3 ? "bg-yellow-500/5" : ""}`}>
-                    <span className={`font-mono font-bold text-sm ${donor.rank === 1 ? "text-yellow-400" : donor.rank === 2 ? "text-gray-300" : donor.rank === 3 ? "text-orange-400" : "text-muted-foreground"}`}>
-                      #{donor.rank}
-                    </span>
-                    <span className="font-medium text-sm">{donor.name}</span>
-                    <span className="font-mono text-sm text-right text-primary">{(donor.donated ?? 0).toLocaleString()}</span>
-                    <span className="font-mono text-sm text-right text-muted-foreground">{donor.campaigns}</span>
-                    <Badge className={`text-[9px] ${
-                      (donor.badge || "").includes("Diamond") ? "bg-primary/10 text-primary border-primary/30" :
-                      (donor.badge || "").includes("Platinum") ? "bg-gray-200/10 text-gray-300 border-gray-300/30" :
-                      (donor.badge || "").includes("Gold") ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/30" :
-                      (donor.badge || "").includes("Silver") ? "bg-gray-400/10 text-gray-400 border-gray-400/30" :
-                      "bg-orange-500/10 text-orange-400 border-orange-500/30"
-                    }`}>
-                      <Award className="w-2.5 h-2.5 mr-0.5" /> {donor.badge}
-                    </Badge>
-                  </div>
-                ))}
+
+              <div
+                className={
+                  "rounded-2xl border p-4 " +
+                  (financeDecision?.allowed
+                    ? "border-emerald-300/25 bg-emerald-300/[0.05]"
+                    : "border-amber-300/20 bg-amber-300/[0.04]")
+                }
+              >
+                <p className="font-semibold">
+                  {evaluation.isLoading
+                    ? "Evaluating policy…"
+                    : evaluation.error
+                      ? "Policy evaluation unavailable"
+                      : financeDecision?.allowed
+                        ? "Hypothetical gates pass — no handoff authorized"
+                        : "Hypothetical policy blocked"}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-white/45">
+                  {financeDecision
+                    ? reasonCopy[financeDecision.reason] ??
+                      financeDecision.reason
+                    : "Set a beneficiary ID and readiness gates to inspect the policy."}
+                </p>
+                <p className="mt-2 text-xs text-white/30">
+                  Simulation only. No provider handoff is authorized even when every modeled gate passes.
+                </p>
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
 
-            {/* Impact Analytics Tab */}
-            <TabsContent value="impact" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Impact by Category */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-primary" /> Impact by Category
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { category: "Education", amount: 320000, percent: 38, color: "bg-primary" },
-                      { category: "Environment", amount: 210000, percent: 25, color: "bg-purple-600" },
-                      { category: "Humanitarian", amount: 180000, percent: 21, color: "bg-red-500" },
-                      { category: "Healthcare", amount: 87000, percent: 10, color: "bg-[oklch(0.7_0.2_280)]" },
-                      { category: "Technology", amount: 50000, percent: 6, color: "bg-[oklch(0.7_0.2_60)]" },
-                    ].map(item => (
-                      <div key={item.category}>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted-foreground">{item.category}</span>
-                          <span className="font-mono">${(item.amount / 1000).toFixed(0)}K ({item.percent}%)</span>
-                        </div>
-                        <div className="h-2 bg-background/50 rounded-full overflow-hidden border border-border/30">
-                          <div className={`h-full ${item.color} rounded-full`} style={{ width: `${item.percent}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          <div className="space-y-5">
+            <Card className="border-emerald-300/20 bg-emerald-300/[0.035] text-white">
+              <CardHeader>
+                <ShieldCheck className="h-6 w-6 text-emerald-200" />
+                <CardTitle className="mt-2 text-white">
+                  Current verified boundary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm leading-6 text-white/45">
+                <p>• No live donation or payment execution.</p>
+                <p>• No SKYCOIN4444 custody or blockchain broadcast.</p>
+                <p>• No verified charity-partner claims in this screen.</p>
+                <p>• No invented donor totals, votes, impact counts, or leaderboards.</p>
+                <p>• No game score, XP, Spark, or demo credit becomes money.</p>
+              </CardContent>
+            </Card>
 
-                {/* Recent Milestones */}
-                <div className="p-5 rounded-xl border border-border/50 bg-card/80">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-yellow-400" /> Recent Milestones
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { event: "Clean Water Initiative reached 5,000 beneficiaries", date: "Jun 10, 2026", icon: Globe },
-                      { event: "100th scholarship awarded via STEM program", date: "Jun 8, 2026", icon: Award },
-                      { event: "Emergency fund deployed to flood relief", date: "Jun 5, 2026", icon: Heart },
-                      { event: "$500K total donations milestone reached", date: "Jun 1, 2026", icon: TrendingUp },
-                      { event: "New partnership with UNICEF Innovation", date: "May 28, 2026", icon: HandHeart },
-                    ].map((milestone, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
-                        <milestone.icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                        <div>
-                          <p className="text-sm">{milestone.event}</p>
-                          <span className="text-[10px] text-muted-foreground">{milestone.date}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Transparency Report */}
-                <div className="p-5 rounded-xl border border-purple-500/20 bg-purple-600/5 md:col-span-2">
-                  <h3 className="font-semibold mb-4 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-purple-400" /> Transparency Report
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-purple-400">100%</div>
-                      <div className="text-xs text-muted-foreground mt-1">On-Chain Verified</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-primary">0%</div>
-                      <div className="text-xs text-muted-foreground mt-1">Admin Fees</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_280)]">24h</div>
-                      <div className="text-xs text-muted-foreground mt-1">Avg Disbursement</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold font-mono text-[oklch(0.7_0.2_60)]">47</div>
-                      <div className="text-xs text-muted-foreground mt-1">Verified Partners</div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-4 text-center">
-                    All charity fund flows are publicly auditable on-chain. Smart contracts ensure funds reach verified recipients without intermediaries.
-                  </p>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-    </div>
+            <Card className="border-white/10 bg-white/[0.03] text-white">
+              <CardHeader>
+                <CardTitle className="text-white">
+                  Continue the impact loop
+                </CardTitle>
+                <CardDescription className="text-white/45">
+                  Move through the strongest currently implemented product paths.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-2">
+                {[
+                  {
+                    label: "HopeAI workspace",
+                    href: "/hope-a-i",
+                    icon: Brain,
+                  },
+                  {
+                    label: "SkySchool",
+                    href: "/sky-school",
+                    icon: BookOpen,
+                  },
+                  {
+                    label: "Games Center",
+                    href: "/gaming",
+                    icon: Gamepad2,
+                  },
+                  {
+                    label: "Impact Play Lab",
+                    href: "/gaming-for-charity",
+                    icon: HeartHandshake,
+                  },
+                ].map(item => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-semibold transition hover:border-emerald-300/20 hover:bg-emerald-300/[0.03]"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-emerald-200" />
+                        {item.label}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-white/30" />
+                    </Link>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }
