@@ -28,6 +28,7 @@ import {
   parseMysqlRecoveryTarget,
   parsePositiveNumber,
   resolveReleaseSha,
+  sanitizeRecoveryError,
   type MysqlRecoveryTarget,
 } from "./databaseRecovery";
 
@@ -503,7 +504,7 @@ async function main() {
 main().catch(error => {
   console.error(
     "Database recovery operation failed:",
-    error instanceof Error ? error.message : String(error),
+    sanitizeRecoveryError(error),
   );
   process.exitCode = 1;
 });

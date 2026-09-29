@@ -1,9 +1,56 @@
+import { sanitizeOperationalError } from "../_core/operationalError";
+
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 
 export const DEFAULT_RECOVERY_OBJECTIVES = Object.freeze({
   rpoHours: 24,
   rtoMinutes: 60,
 });
+
+function recoveryErrorText(error: unknown): string {
+  return error instanceof Error
+    ? error.name + ": " + error.message
+    : String(error);
+}
+
+export function sanitizeRecoveryError(
+  error: unknown,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  let text = recoveryErrorText(error);
+
+  for (const raw of [env.DATABASE_URL, env.RESTORE_DATABASE_URL]) {
+    const value = raw?.trim();
+    if (!value) continue;
+
+    // Remove the complete configured URL first. This is intentionally done
+    // before the shared sanitizer so userinfo containing an unescaped "@"
+    // cannot be partially redacted and leave a password suffix behind.
+    text = text.split(value).join("[redacted-database-url]");
+
+    try {
+      const parsed = new URL(value);
+      const credentials = new Set<string>();
+      for (const encoded of [parsed.username, parsed.password]) {
+        if (!encoded) continue;
+        credentials.add(encoded);
+        try {
+          credentials.add(decodeURIComponent(encoded));
+        } catch {
+          // The exact URL was already removed above; keep fail-safe behavior.
+        }
+      }
+      for (const secret of credentials) {
+        if (secret) text = text.split(secret).join("[redacted]");
+      }
+    } catch {
+      // Invalid URLs will fail through the normal recovery parser; exact raw
+      // values were still removed before this best-effort credential pass.
+    }
+  }
+
+  return sanitizeOperationalError(text);
+}
 
 export type MysqlRecoveryTarget = {
   hostname: string;
