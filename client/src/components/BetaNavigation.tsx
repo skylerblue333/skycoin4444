@@ -44,6 +44,13 @@ const primaryLinks = [
   { label: "Live", route: "/live", icon: Radio },
 ] as const;
 
+const mobilePriorityLinks = [
+  { label: "Home", route: "/", icon: Home },
+  { label: "HopeAI", route: "/hope-a-i", icon: Bot },
+  { label: "Impact", route: "/charity", icon: HeartHandshake },
+  { label: "School", route: "/course-catalog", icon: GraduationCap },
+] as const;
+
 const legacyNavigationAliases = [
   { label: "V5", route: "/beta-workspace" },
   { label: "Market", route: "/beta-commerce" },
@@ -520,23 +527,36 @@ export default function BetaNavigation() {
       ) : null}
 
       <div className="fixed inset-x-3 bottom-3 z-[70] grid grid-cols-5 gap-1 rounded-[1.35rem] border border-amber-200/14 bg-[#100706]/95 p-1.5 shadow-2xl shadow-black/60 backdrop-blur-2xl md:hidden">
-        <Link aria-label="Mobile home" href="/" className={"grid min-h-12 place-items-center rounded-xl transition " + (location === "/" ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <Home className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Home</span>
-        </Link>
-        <Link href="/activity-feed" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/activity-feed") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <Users className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Social</span>
-        </Link>
-        <Link href="/gaming" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/gaming") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <Gamepad2 className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Games</span>
-        </Link>
-        <Link href="/unified-messaging" className={"grid min-h-12 place-items-center rounded-xl transition " + (routeIsActive(location, "/unified-messaging") ? "bg-amber-300/10 text-amber-100" : "text-white/45")}>
-          <MessageCircleMore className="h-4 w-4" />
-          <span className="text-[9px] font-bold">Chat</span>
-        </Link>
-        <button type="button" onClick={() => { setMobileOpen(open => !open); setAreaOpen(false); }} className="grid min-h-12 place-items-center rounded-xl text-white/45 transition hover:bg-amber-200/[0.05] hover:text-amber-100">
+        {mobilePriorityLinks.map(({ label, route, icon: Icon }) => {
+          const active = routeIsActive(location, route);
+          return (
+            <Link
+              key={route}
+              aria-label={`Mobile ${label}`}
+              aria-current={active ? "page" : undefined}
+              href={route}
+              className={
+                "grid min-h-12 place-items-center rounded-xl transition " +
+                (active
+                  ? "bg-amber-300/10 text-amber-100"
+                  : "text-white/45")
+              }
+            >
+              <Icon className="h-4 w-4" />
+              <span className="text-[9px] font-bold">{label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => {
+            setMobileOpen(open => !open);
+            setAreaOpen(false);
+          }}
+          aria-label={mobileOpen ? "Close mobile area menu" : "Open mobile area menu"}
+          aria-expanded={mobileOpen}
+          className="grid min-h-12 place-items-center rounded-xl text-white/45 transition hover:bg-amber-200/[0.05] hover:text-amber-100"
+        >
           <Grid2X2 className="h-4 w-4" />
           <span className="text-[9px] font-bold">More</span>
         </button>
