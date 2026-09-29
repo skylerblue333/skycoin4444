@@ -155,6 +155,85 @@ describe("dependency readiness coordinator", () => {
     });
   });
 
+  it("reports an enabled dispatcher as degraded until a successful cycle is proven", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: null,
+        lastFailureAt: null,
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        required: false,
+      },
+    });
+  });
+
+  it("treats malformed dispatcher timestamps as degraded evidence", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "not-a-timestamp",
+        lastFailureAt: null,
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: { status: "degraded" },
+    });
+  });
+
+  it("reports dispatcher health only when success is newer than any failure", async () => {
+    const healthy = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "2026-09-29T07:50:01.000Z",
+        lastFailureAt: "2026-09-29T07:50:00.000Z",
+      }),
+      options,
+    });
+    const tied = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "2026-09-29T07:50:00.000Z",
+        lastFailureAt: "2026-09-29T07:50:00.000Z",
+      }),
+      options,
+    });
+
+    await expect(healthy.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: false,
+      eventDispatcher: { status: "ok" },
+    });
+    await expect(tied.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: { status: "degraded" },
+    });
+  });
+
   it("validates bounded readiness environment settings", () => {
     expect(
       readinessOptionsFromEnv({

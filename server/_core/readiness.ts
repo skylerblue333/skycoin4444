@@ -128,16 +128,21 @@ function dispatcherReadiness(
       });
     }
 
-    const latestFailure = snapshot.lastFailureAt
-      ? Date.parse(snapshot.lastFailureAt)
-      : Number.NEGATIVE_INFINITY;
-    const latestSuccess = snapshot.lastCycleAt
-      ? Date.parse(snapshot.lastCycleAt)
-      : Number.NEGATIVE_INFINITY;
+    const parseTimestamp = (value: string | null | undefined) => {
+      if (!value) return null;
+      const parsed = Date.parse(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+
+    const latestSuccess = parseTimestamp(snapshot.lastCycleAt);
+    const hasFailure = snapshot.lastFailureAt !== null;
+    const latestFailure = parseTimestamp(snapshot.lastFailureAt);
 
     const degraded =
       !snapshot.running ||
-      latestFailure > latestSuccess;
+      latestSuccess === null ||
+      (hasFailure &&
+        (latestFailure === null || latestFailure >= latestSuccess));
 
     return Object.freeze({
       status: degraded ? ("degraded" as const) : ("ok" as const),
