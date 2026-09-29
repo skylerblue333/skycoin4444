@@ -59,7 +59,7 @@ Server environment:
 
 The adapter calls the v2 AllowanceHolder quote endpoint and sends the required `0x-api-key` and `0x-version: v2` headers.
 
-The browser receives the quote and transaction request, but the server does not broadcast it. Token allowances and final wallet approval remain the user's responsibility.
+The browser receives the quote and transaction request, but the server does not broadcast it. Token allowances and final wallet approval remain the user's responsibility. Executable quote payloads must include an explicit decimal `transaction.value`; malformed or missing values are rejected rather than silently treated as zero.
 
 ### Mainnet wallet policy
 
@@ -140,6 +140,8 @@ The provider must return a `signature`, with optional `requestId`.
 The adapter sends an idempotency key and bearer credential from the server. It never accepts a private key from the browser.
 
 ## Durable provider event ledger
+
+Sensitive external side effects (Stratum share submission, OpenBao signing, and MPC signing) use an audit-first boundary: a `requested` provider event must be durably written before the external operation is attempted. The same event reference is then updated to the terminal provider result. If the initial ledger write fails, the external side effect is not attempted. If the provider succeeds but the completion update fails, the API fails closed and the durable `requested` event remains for operator reconciliation.
 
 Migration `0014_crypto_provider_events.sql` adds a provider-event table containing:
 
