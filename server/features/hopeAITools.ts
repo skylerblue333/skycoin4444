@@ -663,6 +663,9 @@ function parseObject(value: string): Record<string, unknown> {
 }
 
 function round(value: number): number {
+  if (!Number.isFinite(value)) {
+    throw new Error("numeric result is not finite");
+  }
   return Number(value.toPrecision(12));
 }
 
@@ -750,7 +753,7 @@ function execute(toolId: string, args: Args): unknown {
         from === "C" ? value : from === "F" ? ((value - 32) * 5) / 9 : value - 273.15;
       const result =
         to === "C" ? celsius : to === "F" ? (celsius * 9) / 5 + 32 : celsius + 273.15;
-      if (to === "K" && result < 0) throw new Error("temperature is below absolute zero");
+      if (celsius < -273.15) throw new Error("temperature is below absolute zero");
       return { value: round(result), unit: to };
     }
     case "text_stats": {
@@ -956,7 +959,18 @@ function execute(toolId: string, args: Args): unknown {
       return { value: Buffer.from(requireString(args, "text"), "utf8").toString("base64") };
     case "base64_decode": {
       const value = requireString(args, "value");
-      const buffer = Buffer.from(value, "base64");
+      if (!/^[A-Za-z0-9+/]*={0,2}$/.test(value) || value.length % 4 === 1) {
+        throw new Error("value must be valid base64");
+      }
+      const firstPadding = value.indexOf("=");
+      if (firstPadding !== -1 && firstPadding < value.length - 2) {
+        throw new Error("value must be valid base64");
+      }
+      const padded = value.padEnd(Math.ceil(value.length / 4) * 4, "=");
+      const buffer = Buffer.from(padded, "base64");
+      if (buffer.toString("base64") !== padded) {
+        throw new Error("value must be valid base64");
+      }
       const text = buffer.toString("utf8");
       if (text.length > 20_000) throw new Error("decoded text is too large");
       return { text };

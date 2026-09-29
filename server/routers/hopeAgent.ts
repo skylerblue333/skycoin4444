@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { invokeLLM, type Message } from "../_core/llm";
-import { sanitizeOperationalError } from "../_core/operationalError";
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import {
   DEFAULT_HOPE_AGENT_ID,
@@ -37,22 +36,31 @@ const responseText = (
   return content.map(part => part.text ?? "").join("\n").trim();
 };
 
-const providerError = (error: unknown): TRPCError => {
-  console.warn(
-    "[HopeAI] agent provider failure:",
-    sanitizeOperationalError(error),
-  );
-  return new TRPCError({
+const providerError = (error: unknown): TRPCError =>
+  new TRPCError({
     code: "INTERNAL_SERVER_ERROR",
-    message: "HopeAI agent request failed",
+    message: error instanceof Error ? error.message : "HopeAI agent request failed",
   });
-};
 
 type ToolEvent = {
   toolId: string;
   status: "success" | "error";
   output?: unknown;
   error?: string;
+};
+
+const MAX_CLIENT_TOOL_EVENT_CHARS = 512;
+
+const toClientToolOutput = (output: unknown): unknown => {
+  const serialized = JSON.stringify(output);
+  if (typeof serialized !== "string" || serialized.length <= MAX_CLIENT_TOOL_EVENT_CHARS) {
+    return output;
+  }
+  return {
+    truncated: true,
+    preview: serialized.slice(0, MAX_CLIENT_TOOL_EVENT_CHARS - 128),
+    originalCharacters: serialized.length,
+  };
 };
 
 async function runToolAgent(input: {
@@ -135,7 +143,7 @@ async function runToolAgent(input: {
         const event: ToolEvent = {
           toolId,
           status: "success",
-          output: execution.output,
+          output: toClientToolOutput(execution.output),
         };
         events.push(event);
         messages.push({
@@ -150,7 +158,7 @@ async function runToolAgent(input: {
         events.push({
           toolId,
           status: "error",
-          error: message,
+          error: message.slice(0, MAX_CLIENT_TOOL_EVENT_CHARS),
         });
         messages.push({
           role: "tool",

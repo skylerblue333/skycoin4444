@@ -27,7 +27,7 @@ export type MessageContent = string | TextContent | ImageContent | FileContent;
 
 export type Message = {
   role: Role;
-  content: MessageContent | MessageContent[];
+  content: MessageContent | MessageContent[] | null;
   name?: string;
   tool_call_id?: string;
   tool_calls?: ToolCall[];
@@ -115,8 +115,9 @@ export type ResponseFormat =
   | { type: "json_schema"; json_schema: JsonSchema };
 
 const ensureArray = (
-  value: MessageContent | MessageContent[],
-): MessageContent[] => (Array.isArray(value) ? value : [value]);
+  value: MessageContent | MessageContent[] | null,
+): MessageContent[] =>
+  value === null ? [] : Array.isArray(value) ? value : [value];
 
 const normalizeContentPart = (
   part: MessageContent,
@@ -150,6 +151,18 @@ const normalizeMessage = (message: Message) => {
       tool_call_id,
       content,
     };
+  }
+
+  if (message.content === null) {
+    if (role === "assistant" && tool_calls?.length) {
+      return {
+        role,
+        name,
+        content: "",
+        tool_calls,
+      };
+    }
+    throw new Error("Null message content is only valid for assistant tool calls");
   }
 
   const contentParts = ensureArray(message.content).map(normalizeContentPart);
