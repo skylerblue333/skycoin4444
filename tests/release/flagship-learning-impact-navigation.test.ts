@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 
 const nav = fs.readFileSync("client/src/components/BetaNavigation.tsx", "utf8");
 const journey = fs.readFileSync("client/src/pages/BetaJourney.tsx", "utf8");
+const normalizedJourney = journey.replace(/\s+/g, " ");
 const school = fs.readFileSync("client/src/pages/CourseCatalog.tsx", "utf8");
 
 describe("flagship learning, HopeAI, SkyHope, social, and gaming paths", () => {
   it("promotes SkySchool and SkyHope into the persistent primary navigation", () => {
-    expect(nav).toContain('{ label: "School", route: "/sky-school", icon: GraduationCap }');
-    expect(nav).toContain('{ label: "SkyHope", route: "/charity", icon: Heart }');
+    expect(nav).toContain('{ label: "School", route: "/course-catalog", icon: GraduationCap }');
+    expect(nav).toContain('{ label: "SkyHope", route: "/charity", icon: HeartHandshake }');
     expect(nav).toContain("School, HopeAI, SkyHope");
   });
 
@@ -23,20 +24,20 @@ describe("flagship learning, HopeAI, SkyHope, social, and gaming paths", () => {
   });
 
   it("keeps the durable activation loop separate from optional cross-area exploration", () => {
-    expect(journey).toContain("same five gates measured by the onboarding");
-    expect(journey).toContain("Connected ecosystem paths");
-    expect(journey).toContain("Learn once, then move somewhere useful.");
+    expect(normalizedJourney).toContain("same five gates measured by the onboarding");
+    expect(normalizedJourney).toContain("Connected ecosystem paths");
+    expect(normalizedJourney).toContain("Learn once, then move somewhere useful.");
     for (const route of ["/hope-a-i", "/charity", "/gaming"]) {
-      expect(journey).toContain(route);
+      expect(normalizedJourney).toContain(route);
     }
   });
 
   it("keeps provider, donation, and real-value gaming claims fail-closed", () => {
-    expect(journey).toContain("configured AI availability");
-    expect(journey).toContain("does not itself process a donation");
-    expect(journey).toContain("does not turn game activity into real-value wagering or rewards");
-    expect(journey).toContain("guaranteed AI-provider availability");
-    expect(journey).toContain("live donation");
-    expect(journey).toContain("real-value gaming");
+    expect(normalizedJourney).toContain("configured AI availability");
+    expect(normalizedJourney).toContain("does not itself process a donation");
+    expect(normalizedJourney).toContain("does not turn game activity into real-value wagering or rewards");
+    expect(normalizedJourney).toContain("guaranteed AI-provider availability");
+    expect(normalizedJourney).toContain("live donation");
+    expect(normalizedJourney).toContain("real-value gaming");
   });
 });
