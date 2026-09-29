@@ -109,7 +109,7 @@ const gateLabels: readonly [
   ["regionAllowed", "Region allowed"],
 ];
 
-export const charityImpactRouter = router({
+export const charityImpactProcedures = {
   boundary: publicProcedure.query(() => ({
     contract: "sky.charity-impact.boundary.v1" as const,
     ...CHARITY_GAMING_FINANCE_BOUNDARY,
@@ -180,4 +180,6 @@ export const charityImpactRouter = router({
         liveExecution: false as const,
       };
     }),
-});
+};
+
+export const charityImpactRouter = router(charityImpactProcedures);

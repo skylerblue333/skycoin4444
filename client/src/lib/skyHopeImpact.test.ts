@@ -1,44 +1,78 @@
 import { describe, expect, it } from "vitest";
 import {
-  buildImpactPlan,
-  getImpactProgram,
-  impactPlanToText,
-  normalizeImpactCommitment,
+  createSkyHopeCampaignPlan,
+  createVolunteerCapacityPlan,
+  normalizeSkyHopeCampaignDraft,
+  scoreImpactReadiness,
 } from "./skyHopeImpact";
 
+const draft = {
+  title: "Weekend learning access",
+  mission: "Coordinate volunteer-led digital learning sessions for families who request support.",
+  beneficiaryScope: "Participating families in one local community",
+  targetOutcome: "Completed learning sessions with participant feedback",
+  targetCount: 40,
+  durationDays: 60,
+};
+
 describe("SkyHope impact planning", () => {
-  it("normalizes untrusted browser state into bounded commitments", () => {
+  it("creates deterministic bounded campaign milestones", () => {
+    const plan = createSkyHopeCampaignPlan(draft);
+    expect(plan.provenance).toBe("deterministic-local-plan");
+    expect(plan.milestones.map(item => item.targetDay)).toEqual([6, 15, 30, 60]);
+    expect(plan.milestones.at(-1)?.label).toMatch(/Closeout/);
+  });
+
+  it("rejects empty, invalid, or implausibly large campaign inputs", () => {
+    expect(() => createSkyHopeCampaignPlan({ ...draft, title: " " })).toThrow();
+    expect(() => createSkyHopeCampaignPlan({ ...draft, targetCount: 0 })).toThrow();
+    expect(() => createSkyHopeCampaignPlan({ ...draft, durationDays: 366 })).toThrow();
+  });
+
+  it("normalizes only valid device-local drafts", () => {
+    expect(normalizeSkyHopeCampaignDraft(draft)).toEqual(draft);
+    expect(normalizeSkyHopeCampaignDraft({ ...draft, targetCount: "bad" })).toBeNull();
+    expect(normalizeSkyHopeCampaignDraft(null)).toBeNull();
+  });
+
+  it("scores impact evidence readiness without inventing outcomes", () => {
     expect(
-      normalizeImpactCommitment({
-        programId: "learning-access",
-        volunteerHours: "500",
-        supplyKits: -4,
-        focus: "  tutor one learner group  ",
-      }),
+      scoreImpactReadiness({
+        needDefined: true,
+        baselineCaptured: true,
+        consentPlanned: false,
+        metricDefined: true,
+        updateCadenceDefined: false,
+        privacyReviewed: true,
+      })
     ).toEqual({
-      programId: "learning-access",
-      volunteerHours: 40,
-      supplyKits: 0,
-      focus: "tutor one learner group",
+      score: 67,
+      readyCount: 4,
+      totalCount: 6,
+      missing: [
+        "Consent for sensitive stories/data is planned",
+        "Update/reporting cadence is defined",
+      ],
     });
   });
 
-  it("falls back to a real packaged impact program for unknown ids", () => {
-    expect(getImpactProgram("not-real").id).toBe("shelter-support");
-  });
-
-  it("builds a deterministic non-financial action plan with truth boundaries", () => {
-    const plan = buildImpactPlan({
-      programId: "community-tech",
-      volunteerHours: 3,
-      supplyKits: 2,
-      focus: "help with basic device security",
+  it("calculates bounded volunteer capacity only", () => {
+    expect(
+      createVolunteerCapacityPlan({
+        volunteerCount: 12,
+        hoursPerVolunteerPerWeek: 2.5,
+        weeks: 8,
+      })
+    ).toMatchObject({
+      totalCapacityHours: 240,
+      provenance: "deterministic-local-plan",
     });
-
-    expect(plan.contract).toBe("skyhope.impact-plan.v1");
-    expect(plan.steps.join(" ")).toContain("3 volunteer hours");
-    expect(plan.steps.join(" ")).toContain("2 supply kits");
-    expect(plan.limitations.join(" ")).toContain("No payment");
-    expect(impactPlanToText(plan)).not.toMatch(/donation confirmed|on-chain verified/i);
+    expect(() =>
+      createVolunteerCapacityPlan({
+        volunteerCount: 10,
+        hoursPerVolunteerPerWeek: 0,
+        weeks: 4,
+      })
+    ).toThrow();
   });
 });

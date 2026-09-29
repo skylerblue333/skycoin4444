@@ -1,202 +1,246 @@
-export type ImpactProgramId =
-  | "shelter-support"
-  | "learning-access"
-  | "community-tech"
-  | "disaster-readiness";
+export const SKYHOPE_DRAFT_KEY = "sky4444.skyhope.campaign-draft.v1";
 
-export type ImpactProgram = Readonly<{
-  id: ImpactProgramId;
+export type SkyHopeCampaignDraft = Readonly<{
   title: string;
-  category: string;
-  summary: string;
-  actions: readonly string[];
-  evidenceNeeded: readonly string[];
-  learningRoute: string;
-  gameRoute: string;
+  mission: string;
+  beneficiaryScope: string;
+  targetOutcome: string;
+  targetCount: number;
+  durationDays: number;
 }>;
 
-export type ImpactCommitment = Readonly<{
-  programId: ImpactProgramId;
-  volunteerHours: number;
-  supplyKits: number;
-  focus: string;
+export type SkyHopeMilestone = Readonly<{
+  id: string;
+  label: string;
+  targetDay: number;
+  evidencePrompt: string;
 }>;
 
-export type ImpactPlan = Readonly<{
-  contract: "skyhope.impact-plan.v1";
-  programId: ImpactProgramId;
-  title: string;
-  steps: readonly string[];
-  evidenceChecklist: readonly string[];
-  limitations: readonly string[];
+export type SkyHopeCampaignPlan = SkyHopeCampaignDraft &
+  Readonly<{
+    milestones: readonly SkyHopeMilestone[];
+    provenance: "deterministic-local-plan";
+  }>;
+
+export type ImpactEvidenceState = Readonly<{
+  needDefined: boolean;
+  baselineCaptured: boolean;
+  consentPlanned: boolean;
+  metricDefined: boolean;
+  updateCadenceDefined: boolean;
+  privacyReviewed: boolean;
 }>;
 
-export const SKYHOPE_COMMITMENT_STORAGE_KEY =
-  "skycoin4444.skyhope.commitment.v1";
+export type ImpactReadiness = Readonly<{
+  score: number;
+  readyCount: number;
+  totalCount: number;
+  missing: readonly string[];
+}>;
 
-export const impactPrograms: readonly ImpactProgram[] = Object.freeze([
-  {
-    id: "shelter-support",
-    title: "Shelter support",
-    category: "Community care",
-    summary:
-      "Plan volunteer time, supply sorting, meal support, or skills-based help for a local shelter or outreach organization.",
-    actions: [
-      "Contact a real local organization and ask what help is currently useful.",
-      "Choose one bounded volunteer task before collecting supplies or money.",
-      "Record only hours or items you personally completed or verified.",
-    ],
-    evidenceNeeded: [
-      "organization name and public contact",
-      "date and type of activity",
-      "receipt or confirmation only when one actually exists",
-    ],
-    learningRoute: "/sky-school",
-    gameRoute: "/gaming-for-charity",
-  },
-  {
-    id: "learning-access",
-    title: "Learning access",
-    category: "Education",
-    summary:
-      "Build a tutoring, device-help, book-drive, or skills-sharing plan without inventing student counts, scholarships, or funding.",
-    actions: [
-      "Pick one learner group and one skill or resource you can realistically support.",
-      "Create a short lesson, tutoring block, or resource checklist.",
-      "Ask the recipient organization what evidence or privacy rules apply.",
-    ],
-    evidenceNeeded: [
-      "authored lesson or resource",
-      "volunteer session record when permitted",
-      "no student identity or outcome claim without permission",
-    ],
-    learningRoute: "/sky-school",
-    gameRoute: "/game-crypto-quiz",
-  },
-  {
-    id: "community-tech",
-    title: "Community technology",
-    category: "Digital access",
-    summary:
-      "Plan device setup, basic cybersecurity, software help, or digital-literacy support for a community organization.",
-    actions: [
-      "Identify one concrete technology problem instead of promising a broad transformation.",
-      "Prepare a reversible checklist and backup path before changing a device or account.",
-      "Document what was actually fixed, what remains, and who owns follow-up.",
-    ],
-    evidenceNeeded: [
-      "before/after task checklist",
-      "owner confirmation for account or device changes",
-      "no credential collection in SKYCOIN4444",
-    ],
-    learningRoute: "/sky-school",
-    gameRoute: "/arcade#crypto",
-  },
-  {
-    id: "disaster-readiness",
-    title: "Disaster readiness",
-    category: "Preparedness",
-    summary:
-      "Create a non-financial preparedness checklist for supplies, contacts, charging, documents, transport, and accessibility needs.",
-    actions: [
-      "Use official local emergency guidance as the source of truth.",
-      "Separate household preparation from claims about emergency response capacity.",
-      "Review the plan periodically and remove stale contact or location details.",
-    ],
-    evidenceNeeded: [
-      "dated preparedness checklist",
-      "source links from the responsible public agency",
-      "no claim that SKYCOIN4444 dispatches emergency services",
-    ],
-    learningRoute: "/sky-school",
-    gameRoute: "/gaming",
-  },
-]);
+export type VolunteerCapacityInput = Readonly<{
+  volunteerCount: number;
+  hoursPerVolunteerPerWeek: number;
+  weeks: number;
+}>;
 
-function boundedInteger(
-  value: unknown,
-  minimum: number,
-  maximum: number,
-): number {
-  const parsed =
-    typeof value === "number"
-      ? value
-      : typeof value === "string" && value.trim() !== ""
-        ? Number(value)
-        : Number.NaN;
-  if (!Number.isFinite(parsed)) return minimum;
-  return Math.min(maximum, Math.max(minimum, Math.round(parsed)));
+export type VolunteerCapacityPlan = VolunteerCapacityInput &
+  Readonly<{
+    totalCapacityHours: number;
+    provenance: "deterministic-local-plan";
+  }>;
+
+export const SKYHOPE_CAUSE_TRACKS = Object.freeze([
+  {
+    id: "education",
+    label: "Education & opportunity",
+    description:
+      "Plan tutoring, school-support, digital-skills, scholarship, or learning-access work with measurable outcomes.",
+    nextHref: "/sky-school",
+    nextLabel: "Open SkySchool",
+  },
+  {
+    id: "community",
+    label: "Community support",
+    description:
+      "Organize volunteer work, local mutual-aid planning, resource navigation, and community updates.",
+    nextHref: "/activity-feed",
+    nextLabel: "Open Community",
+  },
+  {
+    id: "wellbeing",
+    label: "Wellbeing & basic needs",
+    description:
+      "Structure non-clinical support projects around food, shelter, transport, supplies, and referral coordination.",
+    nextHref: "/hope-a-i",
+    nextLabel: "Plan with HopeAI",
+  },
+  {
+    id: "impact-play",
+    label: "Impact play & learning",
+    description:
+      "Use game-only activities and educational challenges to build awareness without real-money wagering or token payouts.",
+    nextHref: "/gaming",
+    nextLabel: "Open Gaming",
+  },
+] as const);
+
+const evidenceLabels: ReadonlyArray<readonly [keyof ImpactEvidenceState, string]> = [
+  ["needDefined", "Problem/need is clearly defined"],
+  ["baselineCaptured", "Baseline evidence is captured"],
+  ["consentPlanned", "Consent for sensitive stories/data is planned"],
+  ["metricDefined", "Outcome metric and counting method are defined"],
+  ["updateCadenceDefined", "Update/reporting cadence is defined"],
+  ["privacyReviewed", "Privacy and beneficiary-safety risks are reviewed"],
+] as const;
+
+function normalizeText(value: string, field: string, max: number, min = 3) {
+  if (typeof value !== "string") throw new TypeError(field + " must be text");
+  const normalized = value.trim().replace(/\s+/g, " ");
+  if (normalized.length < min || normalized.length > max) {
+    throw new RangeError(field + " must be between " + min + " and " + max + " characters");
+  }
+  return normalized;
 }
 
-export function getImpactProgram(id: unknown): ImpactProgram {
-  const program = impactPrograms.find(item => item.id === id);
-  return program ?? impactPrograms[0];
+function positiveInteger(value: number, field: string, max: number) {
+  if (!Number.isSafeInteger(value) || value <= 0 || value > max) {
+    throw new RangeError(field + " must be a positive integer up to " + max);
+  }
+  return value;
 }
 
-export function normalizeImpactCommitment(
-  value: unknown,
-): ImpactCommitment {
-  const record =
-    value && typeof value === "object" && !Array.isArray(value)
-      ? (value as Record<string, unknown>)
-      : {};
-  const program = getImpactProgram(record.programId);
-  const focus =
-    typeof record.focus === "string"
-      ? record.focus.trim().slice(0, 240)
-      : "";
+export function createSkyHopeCampaignPlan(
+  input: SkyHopeCampaignDraft
+): SkyHopeCampaignPlan {
+  const durationDays = positiveInteger(input.durationDays, "durationDays", 365);
+  const targetCount = positiveInteger(input.targetCount, "targetCount", 1_000_000);
+  const draft: SkyHopeCampaignDraft = {
+    title: normalizeText(input.title, "title", 120),
+    mission: normalizeText(input.mission, "mission", 600, 10),
+    beneficiaryScope: normalizeText(
+      input.beneficiaryScope,
+      "beneficiaryScope",
+      240,
+      5
+    ),
+    targetOutcome: normalizeText(input.targetOutcome, "targetOutcome", 240, 5),
+    targetCount,
+    durationDays,
+  };
 
-  return Object.freeze({
-    programId: program.id,
-    volunteerHours: boundedInteger(record.volunteerHours, 0, 40),
-    supplyKits: boundedInteger(record.supplyKits, 0, 100),
-    focus,
+  const milestone = (
+    id: string,
+    label: string,
+    fraction: number,
+    evidencePrompt: string
+  ): SkyHopeMilestone => ({
+    id,
+    label,
+    targetDay: Math.max(1, Math.round(durationDays * fraction)),
+    evidencePrompt,
   });
-}
-
-export function buildImpactPlan(
-  input: ImpactCommitment,
-): ImpactPlan {
-  const commitment = normalizeImpactCommitment(input);
-  const program = getImpactProgram(commitment.programId);
-  const steps = [
-    `Start with: ${program.actions[0]}`,
-    commitment.volunteerHours > 0
-      ? `Reserve up to ${commitment.volunteerHours} volunteer hour${commitment.volunteerHours === 1 ? "" : "s"}; record actual time afterward instead of pre-counting it as impact.`
-      : "Choose a realistic volunteer-time limit before starting.",
-    commitment.supplyKits > 0
-      ? `Prepare up to ${commitment.supplyKits} supply kit${commitment.supplyKits === 1 ? "" : "s"} only after the recipient confirms the contents are useful.`
-      : "Do not buy or collect supplies until a recipient confirms what is useful.",
-    commitment.focus
-      ? `Personal focus: ${commitment.focus}`
-      : "Write one sentence describing the person or community need you are trying to support.",
-    "Finish by recording what actually happened, what did not happen, and the next follow-up.",
-  ];
 
   return Object.freeze({
-    contract: "skyhope.impact-plan.v1" as const,
-    programId: program.id,
-    title: program.title,
-    steps: Object.freeze(steps),
-    evidenceChecklist: Object.freeze([...program.evidenceNeeded]),
-    limitations: Object.freeze([
-      "This is a planning aid, not proof that an organization, donation, beneficiary, or outcome has been verified.",
-      "No payment, token transfer, custody, blockchain write, tax receipt, or charity disbursement is executed by this plan.",
-      "External organizations and emergency guidance must be verified independently before action.",
+    ...draft,
+    milestones: Object.freeze([
+      milestone(
+        "baseline",
+        "Baseline + safety review",
+        0.1,
+        "Record the starting condition, consent plan, risks, and measurement method."
+      ),
+      milestone(
+        "first-delivery",
+        "First delivery checkpoint",
+        0.25,
+        "Record what was delivered, to whom, and the evidence source without exposing sensitive beneficiary data."
+      ),
+      milestone(
+        "midpoint",
+        "Midpoint outcome check",
+        0.5,
+        "Compare measured progress with the baseline and document changes to the plan."
+      ),
+      milestone(
+        "closeout",
+        "Closeout + transparent report",
+        1,
+        "Record final measured outcomes, limitations, unresolved needs, and the evidence used."
+      ),
     ]),
+    provenance: "deterministic-local-plan",
   });
 }
 
-export function impactPlanToText(plan: ImpactPlan): string {
-  return [
-    `SkyHope Impact Plan — ${plan.title}`,
-    "",
-    ...plan.steps.map((step, index) => `${index + 1}. ${step}`),
-    "",
-    "Evidence to keep:",
-    ...plan.evidenceChecklist.map(item => `- ${item}`),
-    "",
-    "Boundaries:",
-    ...plan.limitations.map(item => `- ${item}`),
-  ].join("\n");
+export function normalizeSkyHopeCampaignDraft(
+  value: unknown
+): SkyHopeCampaignDraft | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const candidate = value as Record<string, unknown>;
+  try {
+    const plan = createSkyHopeCampaignPlan({
+      title: String(candidate.title ?? ""),
+      mission: String(candidate.mission ?? ""),
+      beneficiaryScope: String(candidate.beneficiaryScope ?? ""),
+      targetOutcome: String(candidate.targetOutcome ?? ""),
+      targetCount: Number(candidate.targetCount),
+      durationDays: Number(candidate.durationDays),
+    });
+    const { milestones: _milestones, provenance: _provenance, ...draft } = plan;
+    return draft;
+  } catch {
+    return null;
+  }
 }
+
+export function scoreImpactReadiness(
+  state: ImpactEvidenceState
+): ImpactReadiness {
+  const ready = evidenceLabels.filter(([key]) => state[key]);
+  const missing = evidenceLabels
+    .filter(([key]) => !state[key])
+    .map(([, label]) => label);
+  return Object.freeze({
+    score: Math.round((ready.length / evidenceLabels.length) * 100),
+    readyCount: ready.length,
+    totalCount: evidenceLabels.length,
+    missing: Object.freeze(missing),
+  });
+}
+
+export function createVolunteerCapacityPlan(
+  input: VolunteerCapacityInput
+): VolunteerCapacityPlan {
+  const volunteerCount = positiveInteger(
+    input.volunteerCount,
+    "volunteerCount",
+    100_000
+  );
+  const weeks = positiveInteger(input.weeks, "weeks", 104);
+  if (
+    !Number.isFinite(input.hoursPerVolunteerPerWeek) ||
+    input.hoursPerVolunteerPerWeek <= 0 ||
+    input.hoursPerVolunteerPerWeek > 80
+  ) {
+    throw new RangeError("hoursPerVolunteerPerWeek must be greater than 0 and at most 80");
+  }
+  const hoursPerVolunteerPerWeek =
+    Math.round(input.hoursPerVolunteerPerWeek * 100) / 100;
+  const totalCapacityHours =
+    Math.round(volunteerCount * hoursPerVolunteerPerWeek * weeks * 100) / 100;
+  if (!Number.isSafeInteger(Math.round(totalCapacityHours * 100))) {
+    throw new RangeError("volunteer capacity is too large");
+  }
+  return Object.freeze({
+    volunteerCount,
+    hoursPerVolunteerPerWeek,
+    weeks,
+    totalCapacityHours,
+    provenance: "deterministic-local-plan",
+  });
+}
+
+export const impactEvidenceLabels = Object.freeze(
+  evidenceLabels.map(([key, label]) => ({ key, label }))
+);

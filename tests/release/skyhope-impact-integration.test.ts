@@ -19,11 +19,11 @@ const navigation = fs.readFileSync(
 const dashboard = fs.readFileSync("client/src/pages/Dashboard.tsx", "utf8");
 
 describe("SkyHope impact integration", () => {
-  it("replaces the unavailable charity namespace with the real impact router", () => {
+  it("extends the fail-closed charity namespace with real impact procedures", () => {
     expect(routers).toMatch(
       /import \{ charityImpactRouter \} from "\.\/routers\/charityImpact"/
     );
-    expect(routers).toMatch(/charity:charityImpactRouter/);
+    expect(routers).toMatch(/charity:router\\(\\{ \\.\\.\\.createUnavailableFeatureRecord\\("Charity"\\), \\.\\.\\.charityImpactProcedures \\}\\)/);
     expect(routers).not.toMatch(
       /charity:createUnavailableFeatureRouter\("Charity"\)/
     );
