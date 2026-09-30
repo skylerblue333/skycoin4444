@@ -22,6 +22,12 @@ A deployment is current only when all of the following are true:
 
 Do not call an old successful deployment current simply because the service is healthy.
 
+## Hosted load evidence
+
+The repository includes a bounded `Hosted Load Baseline` workflow and `scripts/hosted-load-baseline.mjs`. A manual release-evidence run is valid only when it is pinned to the same exact hosted release SHA being evaluated. The harness checks release identity before, during, and after the run and records request rate plus p50/p95/p99 latency and error-rate evidence for the public health/readiness/auth endpoints.
+
+This tooling is **not** evidence that the current hosted release has passed a load gate until a workflow run for that exact deployed SHA succeeds and its retained artifact is reviewed. A pull-request run is deployment-agnostic because PR heads are not expected to be hosted. A single bounded run is also not sustained-capacity, autoscaling, failover, authenticated-write, provider-outage, payment, custody, or blockchain certification.
+
 The scheduled and manually dispatched `Hosted Beta Health Monitor` passes its exact workflow revision to the public smoke verifier through `HOSTED_BETA_EXPECTED_SHA`. The monitor fails closed when the hosted service reports a different `releaseSha`, even if health, database, authentication configuration, and readiness otherwise look healthy. Pull-request monitor runs intentionally omit this equality check because a PR head is not expected to be deployed; the repository tests still exercise both matching and stale-release behavior.
 
 ## V5 product surface
@@ -45,4 +51,4 @@ Capabilities that are simulated, deterministic, browser-local, account-owned, or
 
 ## Launch rule
 
-Merge only with exact-head CI green. After merge, verify protected `main`, post-merge CI, Railway deployment SHA, and readiness before recording the release as current.
+Merge only with exact-head CI green. After merge, verify protected `main`, post-merge CI, Railway deployment SHA, readiness, and any release-gate evidence against the same exact hosted SHA before recording the release as current. Do not treat the presence of load-test tooling as a passing hosted load result.
