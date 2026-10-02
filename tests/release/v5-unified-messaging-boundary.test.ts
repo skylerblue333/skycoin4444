@@ -29,10 +29,12 @@ describe("flagship unified messaging truth boundary", () => {
   it("provides real local actions and connected ecosystem handoffs", () => {
     expect(messaging).toMatch(/navigator\.clipboard\.writeText/);
     expect(messaging).toMatch(/prepareMessagingHopeAILaunch\(trimmedDraft\)/);
+    expect(messaging).toMatch(/consumeHopeAIMessagingReturn\(\)/);
     expect(messaging).toMatch(/navigate\("\/hope-a-i\?source=messaging"\)/);
     expect(messaging).not.toMatch(/source=messaging&prompt=/);
     expect(messaging).toMatch(/href="\/activity-feed"/);
     expect(messaging).toMatch(/No remote message is sent from this screen/);
+    expect(messaging).toMatch(/it has not been sent to anyone/);
     expect(messaging).toMatch(/participant-aware messaging/);
   });
 });

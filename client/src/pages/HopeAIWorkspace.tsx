@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Streamdown } from "streamdown";
 import { toast } from "sonner";
 import {
@@ -14,6 +14,7 @@ import {
   GraduationCap,
   HeartHandshake,
   Loader2,
+  MessageCircle,
   Scale,
   MessageSquarePlus,
   Paperclip,
@@ -46,6 +47,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   MAX_HOPEAI_LAUNCH_DRAFT_CHARS,
   consumeMessagingHopeAILaunch,
+  prepareHopeAIMessagingReturn,
 } from "@/lib/hopeAILaunchContext";
 
 const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
@@ -53,7 +55,8 @@ const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 const storageKeyForUser = (userId: string): string =>
   STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
-type WorkspaceMode = "general" | "build" | "learn" | "plan" | "impact" | "legal";
+type WorkspaceMode =
+  "general" | "build" | "learn" | "plan" | "impact" | "legal";
 
 const modeOptions: Array<{
   id: WorkspaceMode;
@@ -125,7 +128,8 @@ const readLaunchPrompt = (): string => {
 const readLaunchMode = (): WorkspaceMode => {
   if (typeof window === "undefined") return "general";
   try {
-    return new URLSearchParams(window.location.search).get("source") === "skyhope"
+    return new URLSearchParams(window.location.search).get("source") ===
+      "skyhope"
       ? "impact"
       : "general";
   } catch {
@@ -145,6 +149,7 @@ const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
 
 export default function HopeAIWorkspace() {
   const { user, loading, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
   const [threads, setThreads] = useState<HopeWorkspaceThread[]>(() => [
     createHopeWorkspaceThread(),
   ]);
@@ -194,7 +199,11 @@ export default function HopeAIWorkspace() {
   }, [loadedStorageKey, storageKey, threads]);
 
   useEffect(() => {
-    if (!storageKey || loadedStorageKey !== storageKey || launchContextAppliedRef.current) {
+    if (
+      !storageKey ||
+      loadedStorageKey !== storageKey ||
+      launchContextAppliedRef.current
+    ) {
       return;
     }
 
@@ -210,7 +219,8 @@ export default function HopeAIWorkspace() {
 
     if (launchMode !== "general") {
       const option =
-        modeOptions.find(candidate => candidate.id === launchMode) ?? modeOptions[0];
+        modeOptions.find(candidate => candidate.id === launchMode) ??
+        modeOptions[0];
       setMode(option.id);
       setSelectedAgentId(option.agentId);
     }
@@ -405,6 +415,27 @@ export default function HopeAIWorkspace() {
     }
   };
 
+  const useMessageInMessaging = (message: HopeWorkspaceMessage) => {
+    const result = prepareHopeAIMessagingReturn(message.content);
+    if (result === "prepared") {
+      navigate("/unified-messaging?source=hopeai");
+      return;
+    }
+    if (result === "too_large") {
+      toast.error(
+        "This output exceeds Messaging's 4,000-character draft limit. Use Copy instead so nothing is silently truncated."
+      );
+      return;
+    }
+    if (result === "storage_unavailable") {
+      toast.error(
+        "This browser could not prepare the private Messaging handoff. Use Copy instead."
+      );
+      return;
+    }
+    toast.error("This HopeAI output is empty and cannot be sent to Messaging.");
+  };
+
   const pinMessage = (message: HopeWorkspaceMessage) => {
     if (!activeThread) return;
     updateThread(activeThread.id, thread =>
@@ -425,11 +456,14 @@ export default function HopeAIWorkspace() {
       <main className="min-h-screen bg-background px-4 py-16 text-foreground">
         <div className="mx-auto max-w-xl rounded-3xl border border-border bg-card p-8 shadow-2xl">
           <Badge variant="outline">HopeAI Workspace</Badge>
-          <h1 className="mt-4 text-3xl font-black">A real conversation workspace</h1>
+          <h1 className="mt-4 text-3xl font-black">
+            A real conversation workspace
+          </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Sign in to use the configured server-side AI provider. Conversations
-            and pinned outputs are stored locally in this browser; this beta does
-            not claim autonomous computer use, hidden memory, or background work.
+            and pinned outputs are stored locally in this browser; this beta
+            does not claim autonomous computer use, hidden memory, or background
+            work.
           </p>
           <Link href="/signin">
             <Button className="mt-6 w-full">Open invitation sign in</Button>
@@ -578,7 +612,9 @@ export default function HopeAIWorkspace() {
                     ))
                   ) : (
                     <option value="">
-                      {models.isLoading ? "Loading models…" : "Provider default"}
+                      {models.isLoading
+                        ? "Loading models…"
+                        : "Provider default"}
                     </option>
                   )}
                 </select>
@@ -686,8 +722,12 @@ export default function HopeAIWorkspace() {
                         ) : (
                           <Check className="h-3.5 w-3.5" />
                         )}
-                        <span>{message.role === "assistant" ? "HopeAI" : "You"}</span>
-                        {message.agentName ? <span>· {message.agentName}</span> : null}
+                        <span>
+                          {message.role === "assistant" ? "HopeAI" : "You"}
+                        </span>
+                        {message.agentName ? (
+                          <span>· {message.agentName}</span>
+                        ) : null}
                         {message.model ? <span>· {message.model}</span> : null}
                       </div>
 
@@ -758,6 +798,14 @@ export default function HopeAIWorkspace() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            onClick={() => useMessageInMessaging(message)}
+                          >
+                            <MessageCircle className="mr-2 h-3.5 w-3.5" />
+                            Use in Messaging
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             onClick={() => pinMessage(message)}
                           >
                             <Pin className="mr-2 h-3.5 w-3.5" />
@@ -814,7 +862,9 @@ export default function HopeAIWorkspace() {
               <div className="rounded-2xl border border-border bg-card p-2 shadow-xl">
                 <Textarea
                   value={input}
-                  onChange={event => setInput(event.target.value.slice(0, 8_000))}
+                  onChange={event =>
+                    setInput(event.target.value.slice(0, 8_000))
+                  }
                   onKeyDown={event => {
                     if (event.key === "Enter" && !event.shiftKey) {
                       event.preventDefault();
@@ -822,9 +872,7 @@ export default function HopeAIWorkspace() {
                     }
                   }}
                   placeholder={
-                    "Message " +
-                    (activeAgent?.name ?? activeMode.label) +
-                    "…"
+                    "Message " + (activeAgent?.name ?? activeMode.label) + "…"
                   }
                   className="min-h-20 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
                 />
