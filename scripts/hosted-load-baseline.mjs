@@ -3,6 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { performance } from "node:perf_hooks";
 import {
+  evaluateHostedLoadThresholds,
   resolveExpectedReleaseSha,
   validateHostedLoadReleaseIdentity,
   validateHostedLoadReleaseSamples,
@@ -281,6 +282,21 @@ async function main() {
   );
 
   const errorRate = failures.length / totalRequests;
+  const p50Ms = percentile(latencies, 0.5);
+  const p95Ms = percentile(latencies, 0.95);
+  const p99Ms = percentile(latencies, 0.99);
+  const gate = evaluateHostedLoadThresholds(
+    {
+      errorRate,
+      p95Ms,
+      p99Ms,
+    },
+    {
+      maxErrorRate,
+      p95LimitMs,
+      p99LimitMs,
+    },
+  );
   const report = {
     contract: "skycoin4444.hosted-load-baseline.v1",
     measuredAt: new Date().toISOString(),
@@ -306,9 +322,9 @@ async function main() {
       successes: totalRequests - failures.length,
       errors: failures.length,
       errorRate: Number(errorRate.toFixed(6)),
-      p50Ms: percentile(latencies, 0.5),
-      p95Ms: percentile(latencies, 0.95),
-      p99Ms: percentile(latencies, 0.99),
+      p50Ms,
+      p95Ms,
+      p99Ms,
       statusCounts,
       routes: normalizedRouteStats,
     },
@@ -317,6 +333,7 @@ async function main() {
       p95LimitMs,
       p99LimitMs,
     },
+    gate,
     limitations: [
       "read-only public health/readiness/auth endpoints only",
       "manual workflow runs are exact-release-bound; pull-request checks are deployment-agnostic because PR heads are not deployed",
@@ -335,27 +352,9 @@ async function main() {
 
   console.log("HOSTED_LOAD_BASELINE " + JSON.stringify(report));
 
-  const thresholdFailures = [];
-  if (errorRate > maxErrorRate) {
-    thresholdFailures.push(
-      `errorRate ${errorRate.toFixed(6)} > ${maxErrorRate}`,
-    );
-  }
-  if ((report.results.p95Ms ?? Infinity) > p95LimitMs) {
-    thresholdFailures.push(
-      `p95 ${report.results.p95Ms}ms > ${p95LimitMs}ms`,
-    );
-  }
-  if ((report.results.p99Ms ?? Infinity) > p99LimitMs) {
-    thresholdFailures.push(
-      `p99 ${report.results.p99Ms}ms > ${p99LimitMs}ms`,
-    );
-  }
-
-  if (thresholdFailures.length > 0) {
+  if (!gate.passed) {
     throw new Error(
-      "Hosted load baseline threshold failure: " +
-        thresholdFailures.join("; "),
+      "Hosted load baseline threshold failure: " + gate.failures.join("; "),
     );
   }
 }

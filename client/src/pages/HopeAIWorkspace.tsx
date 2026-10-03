@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Streamdown } from "streamdown";
 import { toast } from "sonner";
 import {
@@ -12,7 +12,10 @@ import {
   FileText,
   FolderOpen,
   GraduationCap,
+  HeartHandshake,
   Loader2,
+  MessageCircle,
+  Scale,
   MessageSquarePlus,
   Paperclip,
   Pin,
@@ -41,47 +44,61 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  MAX_HOPEAI_LAUNCH_DRAFT_CHARS,
+  consumeMessagingHopeAILaunch,
+  prepareHopeAIMessagingReturn,
+} from "@/lib/hopeAILaunchContext";
 
 const STORAGE_KEY_PREFIX = "sky4444.hopeai.workspace.v1";
 
 const storageKeyForUser = (userId: string): string =>
   STORAGE_KEY_PREFIX + ":" + encodeURIComponent(userId);
 
-type WorkspaceMode = "general" | "build" | "learn" | "plan";
+type WorkspaceMode =
+  "general" | "build" | "learn" | "plan" | "impact" | "legal";
 
 const modeOptions: Array<{
   id: WorkspaceMode;
   label: string;
   icon: typeof Bot;
-  systemPrompt: string;
+  agentId: string;
 }> = [
   {
     id: "general",
     label: "General",
     icon: Bot,
-    systemPrompt:
-      "You are HopeAI inside the SKYCOIN4444 engineering beta. Be useful, concise, and explicit about uncertainty. Never claim to have executed tools, opened files, browsed the web, or changed external systems unless the supplied conversation contains evidence that it happened.",
+    agentId: "general-assistant",
   },
   {
     id: "build",
     label: "Build",
     icon: Wrench,
-    systemPrompt:
-      "You are HopeAI in Build mode. Help design, debug, review, and ship software. Separate code suggestions from verified execution. Prefer concrete implementation steps and call out security or reliability boundaries.",
+    agentId: "software-engineer",
   },
   {
     id: "learn",
     label: "Learn",
     icon: GraduationCap,
-    systemPrompt:
-      "You are HopeAI in Learn mode. Teach clearly, check assumptions, use examples, and end with a short recall question when appropriate. Distinguish established facts from uncertainty.",
+    agentId: "tutor",
   },
   {
     id: "plan",
     label: "Plan",
     icon: Brain,
-    systemPrompt:
-      "You are HopeAI in Plan mode. Convert the user's goal into a practical sequence with dependencies, risks, and a clear next action. Do not imply autonomous execution or background work.",
+    agentId: "project-manager",
+  },
+  {
+    id: "impact",
+    label: "Impact",
+    icon: HeartHandshake,
+    agentId: "project-manager",
+  },
+  {
+    id: "legal",
+    label: "Lawyer",
+    icon: Scale,
+    agentId: "lawyer",
   },
 ];
 
@@ -90,7 +107,35 @@ const starterPrompts = [
   "Explain a difficult concept and quiz me on it.",
   "Turn this idea into a concrete implementation plan.",
   "Help me debug a TypeScript problem.",
+  "Turn my SkyHope cause idea into a consent-aware impact plan with evidence checkpoints.",
 ];
+
+const readLaunchPrompt = (): string => {
+  if (typeof window === "undefined") return "";
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("source") === "messaging") {
+      return consumeMessagingHopeAILaunch();
+    }
+    return (params.get("prompt") ?? "")
+      .trim()
+      .slice(0, MAX_HOPEAI_LAUNCH_DRAFT_CHARS);
+  } catch {
+    return "";
+  }
+};
+
+const readLaunchMode = (): WorkspaceMode => {
+  if (typeof window === "undefined") return "general";
+  try {
+    return new URLSearchParams(window.location.search).get("source") ===
+      "skyhope"
+      ? "impact"
+      : "general";
+  } catch {
+    return "general";
+  }
+};
 
 const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
   try {
@@ -104,24 +149,30 @@ const readStoredThreads = (storageKey: string): HopeWorkspaceThread[] => {
 
 export default function HopeAIWorkspace() {
   const { user, loading, isAuthenticated } = useAuth();
+  const [, navigate] = useLocation();
   const [threads, setThreads] = useState<HopeWorkspaceThread[]>(() => [
     createHopeWorkspaceThread(),
   ]);
   const [activeThreadId, setActiveThreadId] = useState("");
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<WorkspaceMode>("general");
+  const [selectedAgentId, setSelectedAgentId] = useState("general-assistant");
   const [selectedModel, setSelectedModel] = useState("");
   const [attachments, setAttachments] = useState<HopeWorkspaceAttachment[]>([]);
   const [loadedStorageKey, setLoadedStorageKey] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const launchContextAppliedRef = useRef(false);
   const storageKey = user?.id ? storageKeyForUser(user.id) : null;
 
   const models = trpc.ai.getModels.useQuery(undefined, {
     enabled: isAuthenticated,
     retry: false,
   });
-  const chat = trpc.ai.chat.useMutation();
+  const catalog = trpc.hopeAI.catalog.useQuery(undefined, {
+    retry: false,
+  });
+  const agentRun = trpc.hopeAI.run.useMutation();
 
   useEffect(() => {
     if (!storageKey) {
@@ -148,6 +199,49 @@ export default function HopeAIWorkspace() {
   }, [loadedStorageKey, storageKey, threads]);
 
   useEffect(() => {
+    if (
+      !storageKey ||
+      loadedStorageKey !== storageKey ||
+      launchContextAppliedRef.current
+    ) {
+      return;
+    }
+
+    const launchPrompt = readLaunchPrompt();
+    const launchMode = readLaunchMode();
+    if (!launchPrompt && launchMode === "general") return;
+
+    launchContextAppliedRef.current = true;
+
+    if (launchPrompt) {
+      setInput(launchPrompt);
+    }
+
+    if (launchMode !== "general") {
+      const option =
+        modeOptions.find(candidate => candidate.id === launchMode) ??
+        modeOptions[0];
+      setMode(option.id);
+      setSelectedAgentId(option.agentId);
+    }
+
+    if (typeof window !== "undefined") {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("prompt");
+        url.searchParams.delete("source");
+        window.history.replaceState(
+          window.history.state,
+          "",
+          url.pathname + url.search + url.hash
+        );
+      } catch {
+        // Keep the prepared handoff even if browser history cannot be normalized.
+      }
+    }
+  }, [loadedStorageKey, storageKey]);
+
+  useEffect(() => {
     if (!selectedModel && models.data?.length) {
       setSelectedModel(models.data[0].id);
     }
@@ -167,6 +261,10 @@ export default function HopeAIWorkspace() {
 
   const activeMode =
     modeOptions.find(option => option.id === mode) ?? modeOptions[0];
+
+  const activeAgent = catalog.data?.agents.find(
+    agent => agent.id === selectedAgentId
+  );
 
   const updateThread = (
     threadId: string,
@@ -238,7 +336,7 @@ export default function HopeAIWorkspace() {
 
   const sendMessage = async (override?: string) => {
     const text = (override ?? input).trim();
-    if (!text || !activeThread || chat.isPending) return;
+    if (!text || !activeThread || agentRun.isPending) return;
 
     const threadId = activeThread.id;
     const currentMessages = activeThread.messages;
@@ -263,17 +361,19 @@ export default function HopeAIWorkspace() {
     setAttachments([]);
 
     try {
-      const result = await chat.mutateAsync({
+      const result = await agentRun.mutateAsync({
+        agentId: selectedAgentId,
         message: buildHopeProviderContent(userMessage),
         history: buildHopeProviderHistory(currentMessages),
         ...(selectedModel ? { model: selectedModel } : {}),
-        systemPrompt: activeMode.systemPrompt,
       });
 
       const assistantMessage = createHopeWorkspaceMessage({
         role: "assistant",
         content: result.reply,
         model: result.model,
+        agentName: result.agent.name,
+        toolEvents: result.toolEvents,
       });
 
       updateThread(threadId, thread => ({
@@ -281,10 +381,16 @@ export default function HopeAIWorkspace() {
         updatedAt: Date.now(),
         messages: [...thread.messages, assistantMessage].slice(-100),
       }));
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "AI provider request failed.";
-      toast.error(message);
+    } catch {
+      updateThread(threadId, thread => ({
+        ...thread,
+        title: currentMessages.length === 0 ? activeThread.title : thread.title,
+        updatedAt: Date.now(),
+        messages: thread.messages.filter(message => message.id !== userMessage.id),
+      }));
+      setInput(current => (current.trim() ? current : text));
+      setAttachments(current => [...sentAttachments, ...current].slice(0, 3));
+      toast.error("HopeAI request failed. Your draft was restored. Try again.");
     }
   };
 
@@ -309,6 +415,27 @@ export default function HopeAIWorkspace() {
     }
   };
 
+  const useMessageInMessaging = (message: HopeWorkspaceMessage) => {
+    const result = prepareHopeAIMessagingReturn(message.content);
+    if (result === "prepared") {
+      navigate("/unified-messaging?source=hopeai");
+      return;
+    }
+    if (result === "too_large") {
+      toast.error(
+        "This output exceeds Messaging's 4,000-character draft limit. Use Copy instead so nothing is silently truncated."
+      );
+      return;
+    }
+    if (result === "storage_unavailable") {
+      toast.error(
+        "This browser could not prepare the private Messaging handoff. Use Copy instead."
+      );
+      return;
+    }
+    toast.error("This HopeAI output is empty and cannot be sent to Messaging.");
+  };
+
   const pinMessage = (message: HopeWorkspaceMessage) => {
     if (!activeThread) return;
     updateThread(activeThread.id, thread =>
@@ -329,11 +456,14 @@ export default function HopeAIWorkspace() {
       <main className="min-h-screen bg-background px-4 py-16 text-foreground">
         <div className="mx-auto max-w-xl rounded-3xl border border-border bg-card p-8 shadow-2xl">
           <Badge variant="outline">HopeAI Workspace</Badge>
-          <h1 className="mt-4 text-3xl font-black">A real conversation workspace</h1>
+          <h1 className="mt-4 text-3xl font-black">
+            A real conversation workspace
+          </h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             Sign in to use the configured server-side AI provider. Conversations
-            and pinned outputs are stored locally in this browser; this beta does
-            not claim autonomous computer use, hidden memory, or background work.
+            and pinned outputs are stored locally in this browser; this beta
+            does not claim autonomous computer use, hidden memory, or background
+            work.
           </p>
           <Link href="/signin">
             <Button className="mt-6 w-full">Open invitation sign in</Button>
@@ -404,11 +534,12 @@ export default function HopeAIWorkspace() {
           <div className="mt-4 rounded-2xl border border-border bg-background/50 p-3">
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="h-4 w-4 text-primary" />
-              Provider-backed chat
+              Tool-enabled agent runtime
             </div>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Requests go through the protected SKYCOIN4444 AI router. Local
-              history is sent only as bounded conversation context.
+              HopeAI can call approved deterministic server tools and records
+              which tools actually ran. External integrations stay gated until
+              they are connected.
             </p>
           </div>
         </aside>
@@ -424,7 +555,7 @@ export default function HopeAIWorkspace() {
                   <div>
                     <h1 className="font-black">HopeAI</h1>
                     <p className="text-xs text-muted-foreground">
-                      Chat + workspace + files
+                      Agents + real tools + files
                     </p>
                   </div>
                 </div>
@@ -481,8 +612,27 @@ export default function HopeAIWorkspace() {
                     ))
                   ) : (
                     <option value="">
-                      {models.isLoading ? "Loading models…" : "Provider default"}
+                      {models.isLoading
+                        ? "Loading models…"
+                        : "Provider default"}
                     </option>
+                  )}
+                </select>
+
+                <select
+                  value={selectedAgentId}
+                  onChange={event => setSelectedAgentId(event.target.value)}
+                  className="h-9 max-w-52 rounded-lg border border-border bg-card px-3 text-xs outline-none focus:ring-2 focus:ring-primary/40"
+                  aria-label="HopeAI specialist"
+                >
+                  {catalog.data?.agents.length ? (
+                    catalog.data.agents.map(agent => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="general-assistant">General Assistant</option>
                   )}
                 </select>
 
@@ -505,7 +655,10 @@ export default function HopeAIWorkspace() {
                   <button
                     key={option.id}
                     type="button"
-                    onClick={() => setMode(option.id)}
+                    onClick={() => {
+                      setMode(option.id);
+                      setSelectedAgentId(option.agentId);
+                    }}
                     className={
                       "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition " +
                       (mode === option.id
@@ -533,10 +686,10 @@ export default function HopeAIWorkspace() {
                       What can HopeAI help you do?
                     </h2>
                     <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-                      This workspace uses the configured AI provider instead of
-                      simulated replies. Add bounded text files, keep multiple
-                      local conversations, and pin useful outputs into the
-                      workspace rail.
+                      This workspace uses the configured AI provider plus a
+                      permissioned server-side tool runtime. Choose from
+                      specialized agents, including Lawyer, engineering,
+                      research, business, security, education, and many more.
                     </p>
                     <div className="mt-7 grid gap-3 sm:grid-cols-2">
                       {starterPrompts.map(prompt => (
@@ -569,7 +722,12 @@ export default function HopeAIWorkspace() {
                         ) : (
                           <Check className="h-3.5 w-3.5" />
                         )}
-                        <span>{message.role === "assistant" ? "HopeAI" : "You"}</span>
+                        <span>
+                          {message.role === "assistant" ? "HopeAI" : "You"}
+                        </span>
+                        {message.agentName ? (
+                          <span>· {message.agentName}</span>
+                        ) : null}
                         {message.model ? <span>· {message.model}</span> : null}
                       </div>
 
@@ -590,6 +748,30 @@ export default function HopeAIWorkspace() {
                             {message.content}
                           </p>
                         )}
+
+                        {message.toolEvents?.length ? (
+                          <div className="mt-3 rounded-xl border border-border bg-background/60 p-3">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                              Tool execution
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {message.toolEvents.map((event, index) => (
+                                <Badge
+                                  key={event.toolId + "-" + index}
+                                  variant="outline"
+                                  className={
+                                    event.status === "success"
+                                      ? "border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+                                      : "border-destructive/30 text-destructive"
+                                  }
+                                >
+                                  {event.status === "success" ? "✓ " : "✕ "}
+                                  {event.toolId}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ) : null}
 
                         {message.attachmentNames?.length ? (
                           <div className="mt-3 flex flex-wrap gap-2">
@@ -616,6 +798,14 @@ export default function HopeAIWorkspace() {
                           <Button
                             size="sm"
                             variant="ghost"
+                            onClick={() => useMessageInMessaging(message)}
+                          >
+                            <MessageCircle className="mr-2 h-3.5 w-3.5" />
+                            Use in Messaging
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
                             onClick={() => pinMessage(message)}
                           >
                             <Pin className="mr-2 h-3.5 w-3.5" />
@@ -626,12 +816,12 @@ export default function HopeAIWorkspace() {
                     </article>
                   ))}
 
-                  {chat.isPending ? (
+                  {agentRun.isPending ? (
                     <div className="flex items-center gap-3 text-sm text-muted-foreground">
                       <div className="grid h-8 w-8 place-items-center rounded-full bg-primary/10">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       </div>
-                      HopeAI is responding through the configured provider…
+                      HopeAI agent is reasoning and may call approved tools…
                     </div>
                   ) : null}
                   <div ref={endRef} />
@@ -672,14 +862,18 @@ export default function HopeAIWorkspace() {
               <div className="rounded-2xl border border-border bg-card p-2 shadow-xl">
                 <Textarea
                   value={input}
-                  onChange={event => setInput(event.target.value.slice(0, 8_000))}
+                  onChange={event =>
+                    setInput(event.target.value.slice(0, 8_000))
+                  }
                   onKeyDown={event => {
                     if (event.key === "Enter" && !event.shiftKey) {
                       event.preventDefault();
                       void sendMessage();
                     }
                   }}
-                  placeholder={"Message HopeAI in " + activeMode.label + " mode…"}
+                  placeholder={
+                    "Message " + (activeAgent?.name ?? activeMode.label) + "…"
+                  }
                   className="min-h-20 resize-none border-0 bg-transparent shadow-none focus-visible:ring-0"
                 />
                 <div className="flex items-center justify-between gap-2 px-1 pb-1">
@@ -708,10 +902,10 @@ export default function HopeAIWorkspace() {
                   </div>
                   <Button
                     onClick={() => void sendMessage()}
-                    disabled={!input.trim() || chat.isPending}
+                    disabled={!input.trim() || agentRun.isPending}
                     size="sm"
                   >
-                    {chat.isPending ? (
+                    {agentRun.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>
@@ -735,11 +929,35 @@ export default function HopeAIWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                Workspace
+                Agent workspace
               </p>
-              <h2 className="mt-1 font-black">Pinned outputs</h2>
+              <h2 className="mt-1 font-black">Tools + outputs</h2>
             </div>
             <Archive className="h-4 w-4 text-muted-foreground" />
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
+            <div className="flex items-center gap-2">
+              <Bot className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold">
+                {activeAgent?.name ?? "General Assistant"}
+              </p>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {activeAgent?.description ??
+                "Specialized HopeAI agent with permissioned local tools."}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Badge variant="outline">
+                {catalog.data?.agentCount ?? "100+"} agents
+              </Badge>
+              <Badge variant="outline">
+                {catalog.data?.executableToolCount ?? "many"} executable tools
+              </Badge>
+              <Badge variant="outline">
+                {catalog.data?.toolCount ?? "many"} catalog tools
+              </Badge>
+            </div>
           </div>
 
           <div className="mt-4 space-y-3">
@@ -807,9 +1025,10 @@ export default function HopeAIWorkspace() {
               Beta boundary
             </p>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              This is conversational AI plus a browser-local workspace. It does
-              not claim Manus computer-use automation, ChatGPT feature parity,
-              durable cloud memory, or autonomous background execution.
+              Real local tools are enabled and auditable. Web browsing, email,
+              GitHub writes, payments, wallet signing, cloud deployment, durable
+              cloud memory, and computer-use automation remain unavailable until
+              an explicit integration is connected and authorized.
             </p>
           </div>
         </aside>

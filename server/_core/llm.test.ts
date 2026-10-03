@@ -17,6 +17,83 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("LLM tool-call message normalization", () => {
+  it("normalizes provider-style null assistant content when tool calls are present", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: "chatcmpl-test",
+          created: 1,
+          model: "test-model",
+          choices: [
+            {
+              index: 0,
+              message: { role: "assistant", content: "done" },
+              finish_reason: "stop",
+            },
+          ],
+        }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await invokeLLM({
+      messages: [
+        { role: "user", content: "calculate" },
+        {
+          role: "assistant",
+          content: null,
+          tool_calls: [
+            {
+              id: "call-1",
+              type: "function",
+              function: {
+                name: "math_operation",
+                arguments: "{\"operation\":\"add\",\"a\":2,\"b\":3}",
+              },
+            },
+          ],
+        },
+        {
+          role: "tool",
+          tool_call_id: "call-1",
+          content: "{\"value\":5}",
+        },
+      ],
+    });
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit | undefined;
+    const body = JSON.parse(String(init?.body ?? "{}")) as {
+      messages?: Array<Record<string, unknown>>;
+    };
+    expect(body.messages?.[1]).toMatchObject({
+      role: "assistant",
+      content: "",
+      tool_calls: [
+        {
+          id: "call-1",
+          type: "function",
+          function: {
+            name: "math_operation",
+          },
+        },
+      ],
+    });
+  });
+
+  it("rejects null content when no assistant tool call justifies it", async () => {
+    await expect(
+      invokeLLM({
+        messages: [{ role: "user", content: null }],
+      }),
+    ).rejects.toThrow(/Null message content is only valid/);
+  });
+});
+
 describe("LLM provider failure boundaries", () => {
   it("does not retry deterministic 4xx failures or leak provider bodies", async () => {
     const fetchMock = vi.fn().mockResolvedValue(

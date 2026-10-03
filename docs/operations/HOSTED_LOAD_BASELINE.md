@@ -52,4 +52,12 @@ The pull-request job is restricted to branches from this repository so a fork ca
 
 ## Evidence
 
-The workflow writes `artifacts/hosted-load-baseline.json` and retains it for 30 days. For release evidence, require `release.exactReleaseMatchVerified: true` and confirm `release.releaseSha` equals the intended protected-main SHA. Pair that artifact with Railway application/database resource metrics from the same time window when evaluating the launch-resilience gate.
+The workflow writes `artifacts/hosted-load-baseline.json` and retains it for 30 days. For release evidence, require all of the following:
+
+- the workflow concluded successfully;
+- `release.exactReleaseMatchVerified: true`;
+- `release.runReleaseConsistencyVerified: true`;
+- `release.releaseSha` equals the intended protected-main SHA;
+- `gate.passed: true` and `gate.failures` is empty.
+
+Failed runs retain their metrics and explicit gate failures for diagnosis, but their artifacts are not passing release evidence. Pair a passing artifact with Railway application/database resource metrics from the same time window when evaluating the launch-resilience gate.

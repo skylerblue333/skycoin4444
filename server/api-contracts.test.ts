@@ -50,8 +50,8 @@ describe("unavailable feature API contracts", () => {
   it("does not fabricate mutation success for an unimplemented protected endpoint", async () => {
     const caller = appRouter.createCaller(createContext(true));
     await expectNotImplemented(
-      () => caller.charity.create({ name: "test cause" }),
-      "Charity",
+      () => caller.marketplace.create({ name: "test listing" }),
+      "Marketplace",
     );
   });
 

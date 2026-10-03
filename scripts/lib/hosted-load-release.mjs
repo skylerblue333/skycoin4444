@@ -60,3 +60,54 @@ export function validateHostedLoadReleaseSamples(
     sampleCount: actualReleaseShas.length,
   });
 }
+
+function requireFiniteNonNegative(name, value) {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`${name} must be a finite non-negative number`);
+  }
+  return value;
+}
+
+export function evaluateHostedLoadThresholds(metrics, thresholds) {
+  if (!metrics || typeof metrics !== "object") {
+    throw new Error("Hosted load metrics are required");
+  }
+  if (!thresholds || typeof thresholds !== "object") {
+    throw new Error("Hosted load thresholds are required");
+  }
+
+  const errorRate = requireFiniteNonNegative(
+    "Hosted load errorRate",
+    metrics.errorRate,
+  );
+  const p95Ms = requireFiniteNonNegative("Hosted load p95Ms", metrics.p95Ms);
+  const p99Ms = requireFiniteNonNegative("Hosted load p99Ms", metrics.p99Ms);
+  const maxErrorRate = requireFiniteNonNegative(
+    "Hosted load maxErrorRate",
+    thresholds.maxErrorRate,
+  );
+  const p95LimitMs = requireFiniteNonNegative(
+    "Hosted load p95LimitMs",
+    thresholds.p95LimitMs,
+  );
+  const p99LimitMs = requireFiniteNonNegative(
+    "Hosted load p99LimitMs",
+    thresholds.p99LimitMs,
+  );
+
+  const failures = [];
+  if (errorRate > maxErrorRate) {
+    failures.push(`errorRate ${errorRate.toFixed(6)} > ${maxErrorRate}`);
+  }
+  if (p95Ms > p95LimitMs) {
+    failures.push(`p95 ${p95Ms}ms > ${p95LimitMs}ms`);
+  }
+  if (p99Ms > p99LimitMs) {
+    failures.push(`p99 ${p99Ms}ms > ${p99LimitMs}ms`);
+  }
+
+  return Object.freeze({
+    passed: failures.length === 0,
+    failures: Object.freeze(failures),
+  });
+}

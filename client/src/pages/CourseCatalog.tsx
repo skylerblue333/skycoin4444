@@ -8,10 +8,14 @@ import { Link } from "wouter";
 import {
   ArrowRight,
   BookOpen,
+  Bot,
   CheckCircle2,
+  Gamepad2,
+  HeartHandshake,
   Search,
   ShieldCheck,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import LearningContinuityPanel from "@/components/LearningContinuityPanel";
@@ -28,6 +32,41 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+
+const connectedLearningPaths = [
+  {
+    title: "Study with HopeAI",
+    description:
+      "Take a lesson question into the HopeAI workspace. Provider availability and HopeAI's execution boundaries still apply.",
+    href: "/hope-a-i",
+    action: "Open HopeAI",
+    icon: Bot,
+  },
+  {
+    title: "Connect learning to impact",
+    description:
+      "Explore HopeAI Impact's charity and service-planning path. Opening this route does not process a donation or imply external payment execution.",
+    href: "/charity",
+    action: "Open Impact",
+    icon: HeartHandshake,
+  },
+  {
+    title: "Practice through play",
+    description:
+      "Move into the flagship game floor for demo-credit practice. Education progress does not create wagers, payouts, or token rewards.",
+    href: "/gaming",
+    action: "Open gaming",
+    icon: Gamepad2,
+  },
+  {
+    title: "Share what you learned",
+    description:
+      "Continue into the account-aware social feed and publish a bounded contribution when you are signed in.",
+    href: "/activity-feed",
+    action: "Open social",
+    icon: Users,
+  },
+] as const;
 
 export default function CourseCatalog() {
   const { isAuthenticated, loading } = useAuth();
@@ -211,6 +250,49 @@ export default function CourseCatalog() {
             setSelectedCourseId(courseId);
           }}
         />
+
+        <section className="space-y-4" aria-labelledby="connected-learning-paths">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-200/60">
+                Connected learning paths
+              </p>
+              <h2 id="connected-learning-paths" className="mt-2 text-2xl font-black tracking-tight">
+                Keep the lesson moving across SKYCOIN4444.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-white/45">
+              These links connect SkySchool to HopeAI, Impact, gaming, and social without claiming shared persistence, provider execution, financial settlement, or credential issuance.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {connectedLearningPaths.map(path => {
+              const Icon = path.icon;
+              return (
+                <Card
+                  key={path.href}
+                  className="h-full border-blue-200/10 bg-blue-200/[0.025] text-white"
+                >
+                  <CardHeader className="pb-3">
+                    <Icon className="h-5 w-5 text-blue-200" />
+                    <CardTitle className="mt-3 text-base">{path.title}</CardTitle>
+                    <CardDescription className="leading-6 text-white/45">
+                      {path.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link href={path.href}>
+                      <Button variant="outline" className="w-full">
+                        {path.action}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
           <aside className="space-y-3" aria-label="Course list">

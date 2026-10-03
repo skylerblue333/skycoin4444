@@ -34,6 +34,7 @@
     "beta:db:bootstrap": "node scripts/bootstrap-beta-db.mjs",
     "beta:smoke:hosted": "node scripts/hosted-beta-smoke.mjs",
     "beta:db:migrate:arcade-progress": "node scripts/migrate-arcade-progress.mjs",
+    "beta:db:migrate:skyhope-impact": "node scripts/migrate-skyhope-impact.mjs",
     "beta:smoke:hosted:journey": "node scripts/hosted-beta-journey-smoke.mjs",
     "postbuild": "node scripts/check-frontend-bundle-budget.mjs"
   },
@@ -75,7 +76,7 @@
     "@trpc/client": "^11.18.0",
     "@trpc/react-query": "^11.18.0",
     "@trpc/server": "^11.18.0",
-    "axios": "^1.19.0",
+    "axios": "^1.20.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

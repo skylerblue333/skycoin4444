@@ -27,9 +27,10 @@ export type MessageContent = string | TextContent | ImageContent | FileContent;
 
 export type Message = {
   role: Role;
-  content: MessageContent | MessageContent[];
+  content: MessageContent | MessageContent[] | null;
   name?: string;
   tool_call_id?: string;
+  tool_calls?: ToolCall[];
 };
 
 export type Tool = {
@@ -88,7 +89,7 @@ export type InvokeResult = {
     index: number;
     message: {
       role: Role;
-      content: string | Array<TextContent | ImageContent | FileContent>;
+      content: string | Array<TextContent | ImageContent | FileContent> | null;
       tool_calls?: ToolCall[];
     };
     finish_reason: string | null;
@@ -114,8 +115,9 @@ export type ResponseFormat =
   | { type: "json_schema"; json_schema: JsonSchema };
 
 const ensureArray = (
-  value: MessageContent | MessageContent[],
-): MessageContent[] => (Array.isArray(value) ? value : [value]);
+  value: MessageContent | MessageContent[] | null,
+): MessageContent[] =>
+  value === null ? [] : Array.isArray(value) ? value : [value];
 
 const normalizeContentPart = (
   part: MessageContent,
@@ -136,7 +138,7 @@ const normalizeContentPart = (
 };
 
 const normalizeMessage = (message: Message) => {
-  const { role, name, tool_call_id } = message;
+  const { role, name, tool_call_id, tool_calls } = message;
 
   if (role === "tool" || role === "function") {
     const content = ensureArray(message.content)
@@ -151,6 +153,18 @@ const normalizeMessage = (message: Message) => {
     };
   }
 
+  if (message.content === null) {
+    if (role === "assistant" && tool_calls?.length) {
+      return {
+        role,
+        name,
+        content: "",
+        tool_calls,
+      };
+    }
+    throw new Error("Null message content is only valid for assistant tool calls");
+  }
+
   const contentParts = ensureArray(message.content).map(normalizeContentPart);
 
   if (contentParts.length === 1 && contentParts[0].type === "text") {
@@ -158,6 +172,7 @@ const normalizeMessage = (message: Message) => {
       role,
       name,
       content: contentParts[0].text,
+      ...(tool_calls?.length ? { tool_calls } : {}),
     };
   }
 
@@ -165,6 +180,7 @@ const normalizeMessage = (message: Message) => {
     role,
     name,
     content: contentParts,
+    ...(tool_calls?.length ? { tool_calls } : {}),
   };
 };
 
