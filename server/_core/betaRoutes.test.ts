@@ -139,7 +139,11 @@ describe("beta status routes", () => {
           checkedAt: "2026-09-04T00:00:00.000Z",
           configuration: { status: "ok", issueKeys: [] },
           database: { status: "ok" },
-          eventDispatcher: { status: "degraded", required: false },
+          eventDispatcher: {
+            status: "degraded",
+            reason: "not_running",
+            required: false,
+          },
           productionCertification: false,
         };
       },
@@ -156,6 +160,11 @@ describe("beta status routes", () => {
       dependencyReadiness: {
         status: "ready",
         degraded: true,
+        eventDispatcher: {
+          status: "degraded",
+          reason: "not_running",
+          required: false,
+        },
       },
       liveFinancialOrChainExecution: false,
     });
