@@ -1,13 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Bot, CheckCircle2, Copy, MessageCircle, ShieldCheck, Trash2, Users } from "lucide-react";
+import {
+  Bot,
+  CheckCircle2,
+  Copy,
+  MessageCircle,
+  ShieldCheck,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { prepareMessagingHopeAILaunch } from "@/lib/hopeAILaunchContext";
+import {
+  consumeHopeAIMessagingReturn,
+  prepareMessagingHopeAILaunch,
+} from "@/lib/hopeAILaunchContext";
 
 const MAX_DRAFT_LENGTH = 4_000;
 
@@ -15,6 +32,8 @@ export default function UnifiedMessaging() {
   const { isAuthenticated } = useAuth();
   const [, navigate] = useLocation();
   const [draft, setDraft] = useState("");
+  const [restoredFromHopeAI, setRestoredFromHopeAI] = useState(false);
+  const returnContextAppliedRef = useRef(false);
 
   const trimmedDraft = draft.trim();
   const charactersRemaining = MAX_DRAFT_LENGTH - draft.length;
@@ -30,6 +49,51 @@ export default function UnifiedMessaging() {
     []
   );
 
+  useEffect(() => {
+    if (returnContextAppliedRef.current || typeof window === "undefined") {
+      return;
+    }
+
+    let isHopeAIReturn = false;
+    try {
+      isHopeAIReturn =
+        new URLSearchParams(window.location.search).get("source") === "hopeai";
+    } catch {
+      return;
+    }
+    if (!isHopeAIReturn) return;
+
+    returnContextAppliedRef.current = true;
+    const result = consumeHopeAIMessagingReturn();
+    if (result.status === "restored") {
+      setDraft(result.draft);
+      setRestoredFromHopeAI(true);
+      toast.success("HopeAI output restored as a local draft for review.");
+    } else if (result.status === "invalid") {
+      toast.error(
+        "The HopeAI output was empty or exceeded the Messaging draft limit. Copy it from HopeAI instead."
+      );
+    } else if (result.status === "storage_unavailable") {
+      toast.error(
+        "This browser could not restore the private HopeAI handoff. Copy the output from HopeAI instead."
+      );
+    } else {
+      toast.error("No prepared HopeAI output was available to restore.");
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("source");
+      window.history.replaceState(
+        window.history.state,
+        "",
+        url.pathname + url.search + url.hash
+      );
+    } catch {
+      // The one-time payload is still consumed if browser history cannot be cleaned.
+    }
+  }, []);
+
   async function copyDraft() {
     if (!canCopy) return;
     try {
@@ -43,6 +107,7 @@ export default function UnifiedMessaging() {
 
   function clearDraft() {
     setDraft("");
+    setRestoredFromHopeAI(false);
     toast.success("Draft cleared");
   }
 
@@ -68,8 +133,13 @@ export default function UnifiedMessaging() {
         <header className="flex flex-col gap-4 rounded-3xl border border-violet-300/15 bg-white/[0.035] p-6 shadow-2xl shadow-black/20 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="bg-violet-400/15 text-violet-100">MESSAGING BETA</Badge>
-              <Badge variant="outline" className="border-amber-300/25 text-amber-100">
+              <Badge className="bg-violet-400/15 text-violet-100">
+                MESSAGING BETA
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-amber-300/25 text-amber-100"
+              >
                 Transport not connected
               </Badge>
             </div>
@@ -78,8 +148,9 @@ export default function UnifiedMessaging() {
               Unified Messaging
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
-              A truthful engineering-beta workspace for preparing messages and moving between Chat,
-              Social, and HopeAI without pretending that an unfinished realtime backend is already live.
+              A truthful engineering-beta workspace for preparing messages and
+              moving between Chat, Social, and HopeAI without pretending that an
+              unfinished realtime backend is already live.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -106,8 +177,9 @@ export default function UnifiedMessaging() {
             <CardHeader>
               <CardTitle>Message draft</CardTitle>
               <CardDescription className="text-white/45">
-                This editor is local to the current page session. Copy the draft when you are ready
-                to move it into a connected communication channel.
+                This editor is local to the current page session. Copy the draft
+                when you are ready to move it into a connected communication
+                channel.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -120,9 +192,20 @@ export default function UnifiedMessaging() {
                 className="min-h-64 border-white/10 bg-white/[0.035] text-white placeholder:text-white/25"
               />
 
+              {restoredFromHopeAI ? (
+                <div
+                  role="status"
+                  className="rounded-2xl border border-violet-300/20 bg-violet-300/[0.07] p-4 text-sm leading-6 text-violet-50/75"
+                >
+                  HopeAI output was restored into this browser-local draft.
+                  Review it before copying; it has not been sent to anyone.
+                </div>
+              ) : null}
+
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-white/35">
-                  {charactersRemaining.toLocaleString()} characters remaining · nothing is transmitted automatically
+                  {charactersRemaining.toLocaleString()} characters remaining ·
+                  nothing is transmitted automatically
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -148,11 +231,15 @@ export default function UnifiedMessaging() {
               </div>
 
               <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.055] p-4">
-                <p className="text-sm font-black text-amber-100">Remote send is intentionally unavailable here.</p>
+                <p className="text-sm font-black text-amber-100">
+                  Remote send is intentionally unavailable here.
+                </p>
                 <p className="mt-1 text-xs leading-5 text-amber-50/55">
-                  The previous flagship screen used hard-coded conversations and simulated replies.
-                  This beta now fails closed until authenticated transport, durable storage, participant
-                  authorization, moderation, and delivery evidence are integrated.
+                  The previous flagship screen used hard-coded conversations and
+                  simulated replies. This beta now fails closed until
+                  authenticated transport, durable storage, participant
+                  authorization, moderation, and delivery evidence are
+                  integrated.
                 </p>
               </div>
             </CardContent>
@@ -168,7 +255,10 @@ export default function UnifiedMessaging() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {boundaryItems.map(item => (
-                  <div key={item} className="flex gap-2 text-sm leading-5 text-white/55">
+                  <div
+                    key={item}
+                    className="flex gap-2 text-sm leading-5 text-white/55"
+                  >
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300/80" />
                     <span>{item}</span>
                   </div>
@@ -180,14 +270,16 @@ export default function UnifiedMessaging() {
               <CardHeader>
                 <CardTitle className="text-base">Account path</CardTitle>
                 <CardDescription className="text-white/40">
-                  Authenticated messaging remains a launch integration task rather than a simulated success.
+                  Authenticated messaging remains a launch integration task
+                  rather than a simulated success.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {isAuthenticated ? (
                   <p className="text-sm leading-6 text-white/55">
-                    Your beta session is active. The remaining work is a real participant-aware messaging
-                    adapter with durable storage and transport evidence.
+                    Your beta session is active. The remaining work is a real
+                    participant-aware messaging adapter with durable storage and
+                    transport evidence.
                   </p>
                 ) : (
                   <Link

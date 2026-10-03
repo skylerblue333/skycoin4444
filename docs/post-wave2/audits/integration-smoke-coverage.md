@@ -26,6 +26,14 @@ Scope: maintain low-cost cross-product smoke tests proving that representative W
 
 The planner intentionally accepts step inputs up to 16,000 characters while Messaging caps message bodies at 4,000 characters. The smoke suite now proves this mismatch fails closed, but a production adapter, summarization policy, or explicit size contract is still required before the boundary can be considered fully transport-compatible.
 
+The flagship browser workflow now has an explicit user-controlled return path:
+a selected HopeAI response can be restored into Unified Messaging as a
+one-time local draft only when it is at most 4,000 characters. Oversized output
+is rejected without silent truncation, session storage failure blocks
+navigation, and the destination states that the restored draft has not been
+sent. This resolves the browser-navigation size policy; it does not resolve the
+separate planner-to-transport adapter gap above.
+
 This proves local TypeScript/domain composition only. It does **not** prove live model inference, autonomous tool execution, external chat transport, realtime delivery, push notifications, persistence, identity verification, or ShadowChat deployment.
 
 ### Marketplace -> Checkout -> Wallet planning
