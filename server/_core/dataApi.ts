@@ -5,6 +5,7 @@
  *   })
  */
 import { ENV } from "./env";
+import { createUpstreamHttpError } from "./providerErrorBoundary";
 
 export type DataApiCallOptions = {
   query?: Record<string, unknown>;
@@ -46,10 +47,7 @@ export async function callDataApi(
   });
 
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(
-      `Data API request failed (${response.status} ${response.statusText})${detail ? `: ${detail}` : ""}`
-    );
+    throw await createUpstreamHttpError(response, "Data API request");
   }
 
   const payload = await response.json().catch(() => ({}));

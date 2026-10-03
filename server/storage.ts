@@ -3,6 +3,7 @@
 // Downloads return /manus-storage/{key} paths served via 307 redirect.
 
 import { ENV } from "./_core/env";
+import { createUpstreamHttpError } from "./_core/providerErrorBoundary";
 
 function getForgeConfig() {
   const forgeUrl = ENV.forgeApiUrl;
@@ -45,8 +46,7 @@ export async function storagePut(
   });
 
   if (!presignResp.ok) {
-    const msg = await presignResp.text().catch(() => presignResp.statusText);
-    throw new Error(`Storage presign failed (${presignResp.status}): ${msg}`);
+    throw await createUpstreamHttpError(presignResp, "Storage presign");
   }
 
   const { url: s3Url } = (await presignResp.json()) as { url: string };
@@ -65,7 +65,7 @@ export async function storagePut(
   });
 
   if (!uploadResp.ok) {
-    throw new Error(`Storage upload to S3 failed (${uploadResp.status})`);
+    throw await createUpstreamHttpError(uploadResp, "Storage upload");
   }
 
   return { key, url: `/manus-storage/${key}` };
@@ -88,8 +88,7 @@ export async function storageGetSignedUrl(relKey: string): Promise<string> {
   });
 
   if (!resp.ok) {
-    const msg = await resp.text().catch(() => resp.statusText);
-    throw new Error(`Storage signed URL failed (${resp.status}): ${msg}`);
+    throw await createUpstreamHttpError(resp, "Storage signed URL");
   }
 
   const { url } = (await resp.json()) as { url: string };
