@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  evaluateHostedLoadThresholds,
   resolveExpectedReleaseSha,
   validateHostedLoadReleaseIdentity,
   validateHostedLoadReleaseSamples,
@@ -75,5 +76,73 @@ describe("hosted load release identity", () => {
     ).toThrow(
       `Hosted load release identity mismatch: expected ${SHA_A}, received ${SHA_B}`,
     );
+  });
+});
+
+describe("hosted load threshold verdict", () => {
+  const thresholds = {
+    maxErrorRate: 0,
+    p95LimitMs: 1_500,
+    p99LimitMs: 3_000,
+  };
+
+  it("passes values at or below every configured threshold", () => {
+    expect(
+      evaluateHostedLoadThresholds(
+        {
+          errorRate: 0,
+          p95Ms: 1_500,
+          p99Ms: 3_000,
+        },
+        thresholds,
+      ),
+    ).toEqual({
+      passed: true,
+      failures: [],
+    });
+  });
+
+  it("records every failed threshold in a deterministic verdict", () => {
+    expect(
+      evaluateHostedLoadThresholds(
+        {
+          errorRate: 0.01,
+          p95Ms: 1_501,
+          p99Ms: 3_001,
+        },
+        thresholds,
+      ),
+    ).toEqual({
+      passed: false,
+      failures: [
+        "errorRate 0.010000 > 0",
+        "p95 1501ms > 1500ms",
+        "p99 3001ms > 3000ms",
+      ],
+    });
+  });
+
+  it("fails closed when required metrics are absent or non-finite", () => {
+    expect(() =>
+      evaluateHostedLoadThresholds(
+        {
+          errorRate: 0,
+          p95Ms: null,
+          p99Ms: 3_000,
+        },
+        thresholds,
+      ),
+    ).toThrow("Hosted load p95Ms must be a finite non-negative number");
+
+    expect(() =>
+      evaluateHostedLoadThresholds(
+        {
+          errorRate: Number.NaN,
+          p95Ms: 1_500,
+          p99Ms: 3_000,
+        },
+        thresholds,
+      ),
+    ).toThrow("Hosted load errorRate must be a finite non-negative number");
   });
 });

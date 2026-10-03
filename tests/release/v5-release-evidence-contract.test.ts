@@ -4,6 +4,10 @@ import { describe, expect, it } from "vitest";
 const launch = fs.readFileSync("docs/V5_BETA_LAUNCH.md", "utf8");
 const workflow = fs.readFileSync(".github/workflows/hosted-load-baseline.yml", "utf8");
 const harness = fs.readFileSync("scripts/hosted-load-baseline.mjs", "utf8");
+const runbook = fs.readFileSync(
+  "docs/operations/HOSTED_LOAD_BASELINE.md",
+  "utf8",
+);
 
 describe("V5 exact-release load evidence contract", () => {
   it("documents that load tooling is not itself hosted load evidence", () => {
@@ -28,6 +32,11 @@ describe("V5 exact-release load evidence contract", () => {
     expect(harness).toContain("p99Ms");
     expect(harness).toContain("errorRate");
     expect(harness).toContain("runReleaseConsistencyVerified: true");
+    expect(harness).toContain("evaluateHostedLoadThresholds");
+    expect(harness).toContain("gate,");
     expect(workflow).toContain("artifacts/hosted-load-baseline.json");
+    expect(runbook).toContain("`gate.passed: true`");
+    expect(runbook).toContain("`gate.failures` is empty");
+    expect(runbook).toContain("artifacts are not passing release evidence");
   });
 });

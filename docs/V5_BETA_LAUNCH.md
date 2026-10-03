@@ -24,7 +24,7 @@ Do not call an old successful deployment current simply because the service is h
 
 ## Hosted load evidence
 
-The repository includes a bounded `Hosted Load Baseline` workflow and `scripts/hosted-load-baseline.mjs`. A manual release-evidence run is valid only when it is pinned to the same exact hosted release SHA being evaluated. The harness checks release identity before, during, and after the run and records request rate plus p50/p95/p99 latency and error-rate evidence for the public health/readiness/auth endpoints.
+The repository includes a bounded `Hosted Load Baseline` workflow and `scripts/hosted-load-baseline.mjs`. A manual release-evidence run is valid only when it is pinned to the same exact hosted release SHA being evaluated. The harness checks release identity before, during, and after the run and records request rate plus p50/p95/p99 latency and error-rate evidence for the public health/readiness/auth endpoints. Passing evidence requires a successful workflow, exact and consistent release identity, and an artifact with `gate.passed: true` plus no recorded gate failures.
 
 This tooling is **not** evidence that the current hosted release has passed a load gate until a workflow run for that exact deployed SHA succeeds and its retained artifact is reviewed. A pull-request run is deployment-agnostic because PR heads are not expected to be hosted. A single bounded run is also not sustained-capacity, autoscaling, failover, authenticated-write, provider-outage, payment, custody, or blockchain certification.
 
