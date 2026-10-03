@@ -1,4 +1,4 @@
-export type HopeFocus = "build" | "learn" | "play" | "ship";
+export type HopeFocus = "build" | "learn" | "play" | "impact" | "ship";
 
 export type HopeActivitySummary = Readonly<{
   lessons: number;
@@ -29,6 +29,7 @@ const FOCUS_LABELS: Record<HopeFocus, string> = {
   build: "Build",
   learn: "Learn",
   play: "Play",
+  impact: "Impact",
   ship: "Ship",
 };
 
@@ -38,6 +39,17 @@ function clampGoal(goal: string) {
 
 function keywordRoute(goal: string): HopePlanStep | null {
   const normalized = goal.toLowerCase();
+
+  if (/charity|impact|donat|volunteer|beneficiary|cause|help people/.test(normalized)) {
+    return {
+      id: "goal-impact",
+      title: "Turn the goal into a truthful impact mission",
+      detail:
+        "Open SkyHope, define one bounded action and its evidence, then connect learning, no-value play, and a social progress update without claiming money moved.",
+      href: "/charity",
+      minutes: 12,
+    };
+  }
 
   if (/live|stream|camera|broadcast|viewer/.test(normalized)) {
     return {
@@ -196,6 +208,15 @@ function focusStep(focus: HopeFocus): HopePlanStep {
         href: "/game-sky-rush",
         minutes: 10,
       };
+    case "impact":
+      return {
+        id: "focus-impact",
+        title: "Build one evidence-first impact mission",
+        detail:
+          "Use SkyHope to connect one learning checkpoint, one bounded action, a no-value practice loop, and a truthful social progress update.",
+        href: "/charity",
+        minutes: 15,
+      };
     case "ship":
       return {
         id: "focus-ship",
@@ -261,15 +282,15 @@ export function createHopePlan(input: {
 
   return Object.freeze({
     title: goal
-      ? `${FOCUS_LABELS[input.focus]} sprint: ${goal}`
-      : `${FOCUS_LABELS[input.focus]} sprint for the current beta`,
+      ? FOCUS_LABELS[input.focus] + " sprint: " + goal
+      : FOCUS_LABELS[input.focus] + " sprint for the current beta",
     summary:
       "A deterministic next-step plan generated from your focus, typed goal, and account-owned activity evidence.",
     focus: input.focus,
     sprintMinutes,
     steps: Object.freeze(unique),
     coachNote:
-      "HopeAI Coach in this beta is a deterministic planner. It does not call an external model, infer emotions, or claim model-generated intelligence.",
+      "HopeAI Coach in this beta is a deterministic planner. It does not call an external model, infer emotions, verify beneficiaries, execute donations, or claim autonomous agents.",
     provenance: "deterministic-local-planner",
   });
 }

@@ -41,6 +41,25 @@ describe("HopeAI deterministic coach", () => {
     expect(plan.coachNote).toMatch(/does not call an external model/);
   });
 
+  it("builds an impact sprint without claiming charity execution", () => {
+    const plan = createHopePlan({
+      goal: "Build a charity impact mission for students",
+      focus: "impact",
+      activity: {
+        lessons: 0,
+        posts: 0,
+        feedback: 1,
+        other: 0,
+      },
+    });
+
+    expect(plan.title).toMatch(/^Impact sprint:/);
+    expect(plan.steps.some(step => step.id === "goal-impact")).toBe(true);
+    expect(plan.steps.some(step => step.id === "focus-impact")).toBe(true);
+    expect(plan.steps.some(step => step.href === "/charity")).toBe(true);
+    expect(plan.coachNote).toMatch(/execute donations/);
+  });
+
   it("prioritizes missing durable learning evidence", () => {
     const plan = createHopePlan({
       goal: "",
@@ -63,6 +82,7 @@ describe("HopeAI deterministic coach", () => {
     ["improve the shop cart", "/beta-commerce-sandbox"],
     ["make dating consent safer", "/dating-home"],
     ["review crypto tip transfer safety", "/wallet-overview"],
+    ["help a charity with a learning mission", "/charity"],
   ])("routes %s to the matching verified beta area", (goal, href) => {
     const plan = createHopePlan({
       goal,

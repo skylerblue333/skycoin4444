@@ -104,19 +104,32 @@ export default function GamingForCharity() {
               Real-value gaming rails belong to charity only.
             </h1>
             <p className="mt-4 max-w-3xl text-base leading-7 text-white/50">
-              The flagship games stay demo-only. If deposits, withdrawals,
-              real-money wagering, custody, token settlement, or redeemable
-              crypto rewards are introduced, this route is the only permitted
-              product scope for them—and only after verified charity,
-              provider, legal, age, and region gates are satisfied.
+              The flagship games stay demo-only. This lab now plugs into a
+              SkyHope impact mission as a no-value practice step. Any future
+              deposits, withdrawals, real-money wagering, custody, token
+              settlement, or redeemable crypto rewards remain outside the
+              current beta and require verified charity, provider, legal, age,
+              and region gates before they could be enabled.
             </p>
           </div>
-          <Link href="/gaming">
-            <Button size="lg" className="w-full">
-              <Gamepad2 className="mr-2 h-5 w-5" />
-              Open Games Center
-            </Button>
-          </Link>
+          <div className="grid gap-3">
+            <Link href="/gaming">
+              <Button size="lg" className="w-full">
+                <Gamepad2 className="mr-2 h-5 w-5" />
+                Open Games Center
+              </Button>
+            </Link>
+            <Link href="/charity">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-emerald-300/20 bg-emerald-300/[0.04] text-emerald-50"
+              >
+                <HeartHandshake className="mr-2 h-5 w-5" />
+                Open SkyHope mission
+              </Button>
+            </Link>
+          </div>
         </header>
 
         <section className="grid gap-4 md:grid-cols-3">
