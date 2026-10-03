@@ -16,8 +16,20 @@ export type DatabaseReadiness = Readonly<{
   status: "ok" | "unavailable" | "timeout" | "skipped";
 }>;
 
+export type DispatcherReadinessReason =
+  | "not_configured"
+  | "disabled"
+  | "probe_failed"
+  | "not_running"
+  | "success_not_observed"
+  | "invalid_success_timestamp"
+  | "invalid_failure_timestamp"
+  | "failure_not_recovered"
+  | "healthy";
+
 export type DispatcherReadiness = Readonly<{
   status: "disabled" | "ok" | "degraded";
+  reason: DispatcherReadinessReason;
   required: false;
 }>;
 
@@ -112,42 +124,57 @@ async function withTimeout<T>(
 function dispatcherReadiness(
   probe: DispatcherProbe | undefined
 ): DispatcherReadiness {
+  const result = (
+    status: DispatcherReadiness["status"],
+    reason: DispatcherReadinessReason
+  ): DispatcherReadiness =>
+    Object.freeze({ status, reason, required: false as const });
+
   if (!probe) {
-    return Object.freeze({
-      status: "disabled" as const,
-      required: false as const,
-    });
+    return result("disabled", "not_configured");
   }
 
   try {
     const snapshot = probe();
     if (!snapshot.enabled) {
-      return Object.freeze({
-        status: "disabled" as const,
-        required: false as const,
-      });
+      return result("disabled", "disabled");
     }
 
-    const latestFailure = snapshot.lastFailureAt
-      ? Date.parse(snapshot.lastFailureAt)
-      : Number.NEGATIVE_INFINITY;
-    const latestSuccess = snapshot.lastCycleAt
-      ? Date.parse(snapshot.lastCycleAt)
-      : Number.NEGATIVE_INFINITY;
+    if (!snapshot.running) {
+      return result("degraded", "not_running");
+    }
 
-    const degraded =
-      !snapshot.running ||
-      latestFailure > latestSuccess;
+    const parseTimestamp = (value: string | null | undefined) => {
+      if (value === null || value === undefined) return null;
+      const parsed = Date.parse(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
 
-    return Object.freeze({
-      status: degraded ? ("degraded" as const) : ("ok" as const),
-      required: false as const,
-    });
+    if (snapshot.lastCycleAt === null || snapshot.lastCycleAt === undefined) {
+      return result("degraded", "success_not_observed");
+    }
+
+    const latestSuccess = parseTimestamp(snapshot.lastCycleAt);
+    if (latestSuccess === null) {
+      return result("degraded", "invalid_success_timestamp");
+    }
+
+    if (snapshot.lastFailureAt === null) {
+      return result("ok", "healthy");
+    }
+
+    const latestFailure = parseTimestamp(snapshot.lastFailureAt);
+    if (latestFailure === null) {
+      return result("degraded", "invalid_failure_timestamp");
+    }
+
+    if (latestFailure >= latestSuccess) {
+      return result("degraded", "failure_not_recovered");
+    }
+
+    return result("ok", "healthy");
   } catch {
-    return Object.freeze({
-      status: "degraded" as const,
-      required: false as const,
-    });
+    return result("degraded", "probe_failed");
   }
 }
 

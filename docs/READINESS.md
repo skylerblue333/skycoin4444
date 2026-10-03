@@ -45,13 +45,23 @@ The cache is deliberately short and is not a substitute for monitoring.
 
 The internal event-outbox dispatcher is currently an optional dependency.
 
-Its readiness state is reported as:
+Its readiness state includes a stable, privacy-safe reason code:
 
-- `disabled` when not enabled;
-- `ok` when enabled and running without a newer failure than the last successful cycle;
-- `degraded` when enabled but not running or when its latest failure is newer than its latest successful cycle.
+| Status | Reason | Meaning |
+| --- | --- | --- |
+| `disabled` | `not_configured` | No dispatcher probe is attached to this runtime. |
+| `disabled` | `disabled` | The dispatcher is explicitly disabled. |
+| `ok` | `healthy` | It is running, has a valid successful-cycle timestamp, and any failure is strictly older than that success. |
+| `degraded` | `not_running` | It is enabled but not running. |
+| `degraded` | `success_not_observed` | It is running, but no successful cycle has been proven. |
+| `degraded` | `invalid_success_timestamp` | Its success timestamp is malformed. |
+| `degraded` | `invalid_failure_timestamp` | Its recorded failure timestamp is malformed. |
+| `degraded` | `failure_not_recovered` | Its latest failure is equal to or newer than its latest success. |
+| `degraded` | `probe_failed` | Reading dispatcher state threw an exception. |
 
 A degraded optional dispatcher does not force the required readiness result to 503. The response carries `degraded: true` so operators can distinguish "serving required beta dependencies" from "all optional subsystems healthy."
+
+Reason codes expose no exception text, message body, destination, credential, or event payload. They support operator triage without turning the public readiness route into an internal-error disclosure surface.
 
 This policy can be tightened later if internal event processing becomes a required user-journey dependency.
 

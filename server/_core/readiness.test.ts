@@ -24,7 +24,11 @@ describe("dependency readiness coordinator", () => {
       degraded: false,
       configuration: { status: "ok", issueKeys: [] },
       database: { status: "ok" },
-      eventDispatcher: { status: "disabled", required: false },
+      eventDispatcher: {
+        status: "disabled",
+        reason: "not_configured",
+        required: false,
+      },
       productionCertification: false,
     });
   });
@@ -150,9 +154,167 @@ describe("dependency readiness coordinator", () => {
       degraded: true,
       eventDispatcher: {
         status: "degraded",
+        reason: "not_running",
         required: false,
       },
     });
+  });
+
+  it("distinguishes an explicitly disabled dispatcher from a missing probe", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: false,
+        running: false,
+        lastCycleAt: null,
+        lastFailureAt: null,
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: false,
+      eventDispatcher: {
+        status: "disabled",
+        reason: "disabled",
+        required: false,
+      },
+    });
+  });
+
+  it("reports an enabled dispatcher as degraded until a successful cycle is proven", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: null,
+        lastFailureAt: null,
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        reason: "success_not_observed",
+        required: false,
+      },
+    });
+  });
+
+  it("treats malformed dispatcher timestamps as degraded evidence", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "not-a-timestamp",
+        lastFailureAt: null,
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        reason: "invalid_success_timestamp",
+      },
+    });
+  });
+
+  it("treats malformed failure timestamps as degraded evidence", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "2026-09-29T07:50:01.000Z",
+        lastFailureAt: "not-a-timestamp",
+      }),
+      options,
+    });
+
+    await expect(coordinator.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        reason: "invalid_failure_timestamp",
+      },
+    });
+  });
+
+  it("reports dispatcher health only when success is newer than any failure", async () => {
+    const healthy = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "2026-09-29T07:50:01.000Z",
+        lastFailureAt: "2026-09-29T07:50:00.000Z",
+      }),
+      options,
+    });
+    const tied = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => ({
+        enabled: true,
+        running: true,
+        lastCycleAt: "2026-09-29T07:50:00.000Z",
+        lastFailureAt: "2026-09-29T07:50:00.000Z",
+      }),
+      options,
+    });
+
+    await expect(healthy.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: false,
+      eventDispatcher: { status: "ok", reason: "healthy" },
+    });
+    await expect(tied.assess()).resolves.toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        reason: "failure_not_recovered",
+      },
+    });
+  });
+
+  it("fails closed when the dispatcher probe throws", async () => {
+    const coordinator = new DependencyReadinessCoordinator({
+      databaseProbe: async () => undefined,
+      configProbe: () => [],
+      dispatcherProbe: () => {
+        throw new Error("internal dispatcher details");
+      },
+      options,
+    });
+
+    const snapshot = await coordinator.assess();
+
+    expect(snapshot).toMatchObject({
+      status: "ready",
+      degraded: true,
+      eventDispatcher: {
+        status: "degraded",
+        reason: "probe_failed",
+        required: false,
+      },
+    });
+    expect(JSON.stringify(snapshot)).not.toContain("internal dispatcher details");
   });
 
   it("validates bounded readiness environment settings", () => {

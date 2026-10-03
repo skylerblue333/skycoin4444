@@ -264,6 +264,7 @@ describe("runtime dependency readiness route", () => {
             database: { status: "unavailable" },
             eventDispatcher: {
               status: "disabled",
+              reason: "not_configured",
               required: false,
             },
             productionCertification: false,
