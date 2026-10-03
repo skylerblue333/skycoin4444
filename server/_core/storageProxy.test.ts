@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { normalizeStorageRedirectUrl } from "./storageProxy";
+import { describe, expect, it, vi } from "vitest";
+import {
+  createStorageProxyRequestInit,
+  normalizeStorageRedirectUrl,
+  STORAGE_PROXY_REQUEST_TIMEOUT_MS,
+} from "./storageProxy";
 
 describe("storage proxy redirect boundary", () => {
   it("accepts HTTPS signed URLs without credentials", () => {
@@ -75,5 +79,27 @@ describe("storage proxy redirect boundary", () => {
   it("rejects missing and malformed redirect values", () => {
     expect(normalizeStorageRedirectUrl(undefined)).toBeNull();
     expect(normalizeStorageRedirectUrl("not a url")).toBeNull();
+  });
+});
+
+
+describe("storage proxy upstream request boundary", () => {
+  it("applies the bounded Forge request timeout and bearer credential", () => {
+    const controller = new AbortController();
+    const timeout = vi
+      .spyOn(AbortSignal, "timeout")
+      .mockReturnValue(controller.signal);
+
+    try {
+      const init = createStorageProxyRequestInit("test-forge-key");
+
+      expect(timeout).toHaveBeenCalledWith(STORAGE_PROXY_REQUEST_TIMEOUT_MS);
+      expect(init.signal).toBe(controller.signal);
+      expect(new Headers(init.headers).get("authorization")).toBe(
+        "Bearer test-forge-key"
+      );
+    } finally {
+      timeout.mockRestore();
+    }
   });
 });
