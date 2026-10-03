@@ -42,6 +42,9 @@ describe("real crypto provider integration release boundary", () => {
   });
 
   it("keeps external signing keys outside the app process", () => {
+    expect(provider).toContain("executeWithProviderAudit");
+    expect(provider).toContain("status: \"requested\"");
+    expect(provider).toContain("external operation was not attempted");
     expect(provider).toContain("/sign/");
     expect(provider).toContain('"x-vault-token"');
     expect(provider).toContain("prehashed: true");
