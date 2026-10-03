@@ -3,6 +3,7 @@ import net from "node:net";
 import tls from "node:tls";
 import type { Express, Request, Response } from "express";
 import { and, eq } from "drizzle-orm";
+import { sanitizeOperationalError } from "./operationalError";
 import { sdk } from "./sdk";
 import { getDb } from "../db";
 import * as schema from "../../drizzle/schema";
@@ -1147,9 +1148,22 @@ function badRequest(res: Response, error: unknown) {
   });
 }
 
+export function providerUnavailableBoundary(error: unknown) {
+  const internalSummary = sanitizeOperationalError(error, 512);
+  return Object.freeze({
+    logMessage: "crypto_provider_failure " + internalSummary,
+    body: Object.freeze({
+      error: "provider unavailable",
+      code: "provider_unavailable",
+    }),
+  });
+}
+
 function unavailable(res: Response, error: unknown) {
-  const message = error instanceof Error ? error.message : "provider unavailable";
-  res.status(503).json({ error: message });
+  const failure = providerUnavailableBoundary(error);
+  console.warn(failure.logMessage);
+  res.set("Cache-Control", "no-store");
+  res.status(503).json(failure.body);
 }
 
 export function registerCryptoProviderRoutes(app: Express) {
