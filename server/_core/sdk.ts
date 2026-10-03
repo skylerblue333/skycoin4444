@@ -15,6 +15,7 @@ import { evaluateBetaAdmission } from "./betaAdmission";
 import { oauthProviderRuntimeEnabled } from "./betaAccessAuth";
 import { deriveLoginMethod } from "./loginMethod";
 import { sanitizeOperationalError } from "./operationalError";
+import { assertOAuthProviderIdentity } from "./oauthIdentity";
 import { resolveSessionTtlMs } from "./sessionPolicy";
 import {
   sessionSigningKeysFromSecrets,
@@ -283,6 +284,7 @@ class SDKServer {
 
     if (session.openId.startsWith(CRON_OPEN_ID_PREFIX)) {
       const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
+      assertOAuthProviderIdentity(session.openId, userInfo.openId);
       const taskUid = userInfo.taskUid ?? null;
       if (!taskUid) {
         throw ForbiddenError("Cron session missing task_uid");
@@ -300,12 +302,16 @@ class SDKServer {
 
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionToken ?? "");
+        const synchronizedOpenId = assertOAuthProviderIdentity(
+          session.openId,
+          userInfo.openId
+        );
         await db.upsertUser({
-          openId: userInfo.openId,
+          openId: synchronizedOpenId,
           name: userInfo.name || null,
           email: userInfo.email ?? null,
         });
-        user = await db.getUserByOpenId(userInfo.openId);
+        user = await db.getUserByOpenId(session.openId);
       } catch (error) {
         console.error(
           "[Auth] Failed to sync user from OAuth:",
