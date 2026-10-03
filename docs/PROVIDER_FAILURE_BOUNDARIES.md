@@ -1,6 +1,6 @@
 # Provider Failure Boundaries
 
-SKYCOIN4444 treats configured AI/image providers as external dependencies rather than trusted in-process components.
+SKYCOIN4444 treats configured AI, image, and Maps proxy providers as external dependencies rather than trusted in-process components.
 
 ## Runtime guarantees in this hardening pass
 
@@ -13,6 +13,10 @@ SKYCOIN4444 treats configured AI/image providers as external dependencies rather
 - Generated-image MIME types are restricted to supported image formats.
 - Generated decoded image payloads are capped at 32 MiB before storage.
 - LLM chat/model responses and image-model lists must satisfy minimum runtime shapes before they are returned to callers.
+- Maps proxy requests use a 15-second timeout that remains active while the response body is consumed.
+- Maps endpoints are restricted to normalized proxy paths without query/fragment injection or parent traversal.
+- Maps query parameters reject object/non-finite values and serialize arrays with `|` as documented by the integration contract.
+- Maps provider error bodies are discarded rather than reflected through application exceptions.
 
 ## Security and product boundary
 
@@ -26,5 +30,6 @@ Focused tests:
 
 - `server/_core/imageGeneration.test.ts`
 - `server/_core/llm.test.ts`
+- `server/_core/map.test.ts`
 
 The canonical PR must also pass the repository's exact-head CI and release-security gates before merge.
