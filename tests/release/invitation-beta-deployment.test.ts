@@ -37,8 +37,10 @@ describe("invitation-only deployable beta boundary", () => {
 
     expect(betaAccessAuth).toMatch(/ACCESS_KEY_MIN_BYTES = 48/);
     expect(betaAccessAuth).toMatch(/BETA_ACCESS_PASSWORD_SCRYPT/);
-    expect(betaAccessAuth).toMatch(/scryptSync/);
+    expect(betaAccessAuth).toMatch(/\bscrypt\(/);
+    expect(betaAccessAuth).not.toMatch(/scryptSync/);
     expect(betaAccessAuth).toMatch(/timingSafeEqual/);
+    expect(betaAccessRoutes).toMatch(/await verifyBetaAccessKey\(accessKey\)/);
     expect(betaAccessRoutes).toMatch(/invalid invitation credentials/);
     expect(betaAccessRoutes).not.toMatch(/localStorage/);
   });
